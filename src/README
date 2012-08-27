@@ -1,0 +1,34 @@
+Persistence:
+-----------
+GUID to locator(s) mappings are stored in a storage engine - currently only MySQL is supported.
+
+MySQL details:
+-------------
+User: mf-user
+Passwd: mf-user
+DB name: mf_gnrs
+Tables: 
+------
+1. global_guid_locators_map: stores GUID to global_locator(s) mappings at the global level.
+Create table statement:
+CREATE TABLE global_guid_locators_map (guid CHAR(32) NOT NULL PRIMARY KEY, locators TEXT NOT NULL, TTLs TEXT NOT NULL, weights TEXT NOT NULL, INDEX guid_index USING BTREE (guid));
+
+The above creates a MyISAM table, in which BTREE is the only indexing option
+
+2. local_guid_locators_map: stores GUID to local_locators(s) mappings at the local level.
+
+CREATE TABLE local_guid_locators_map (guid CHAR(32) NOT NULL PRIMARY KEY, locators TEXT NOT NULL, TTLs TEXT NOT NULL, weights TEXT NOT NULL, INDEX guid_index USING BTREE (guid));
+
+
+Dependencies:
+------------
+
+1. libconfig
+	http://www.hyperrealm.com/libconfig/
+2. MySQL server and client libraries - latest community release
+3. MySQL C++ connector 
+	http://forge.mysql.com/wiki/Connector_C%2B%2B
+4. Boost libraries: dev, thread, system, filesystem, regex
+5. Berkely db:see the following website for detail:(should configure -enable-cxx -enable-stl)
+http://docs.oracle.com/cd/E17076_02/html/installation/build_unix.html
+

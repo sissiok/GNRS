@@ -1,0 +1,17 @@
+CC=g++
+CFLAGS= -c -Wall -fPIC -DLINUX
+LDFLAGS=-shared -Wl,-soname,libgnrs.so -lconfig++
+SOURCES=gnrsclient.cpp address.cpp incomingconnection.cpp packet.cpp socketconnection.cpp packetheader.cpp transmissiontimer.cpp gnrsconfig.cpp outgoingconnection.cpp receiver.cpp
+OBJECTS=$(SOURCES:.cpp=.o)
+SHAREDLIB=libgnrs.so
+
+all: $(SOURCES) $(SHAREDLIB)
+	
+$(SHAREDLIB): $(OBJECTS) 
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+
+.cpp.o:
+	$(CC) $(CFLAGS) $<
+
+clean:
+	rm -rf libgnrs.so *.o

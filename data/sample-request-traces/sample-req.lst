@@ -1,0 +1,25 @@
+# Format of requests:
+# <ts> INSERT <sGUID> <sNA-list>
+# <ts> UPDATE <sGUID> <sNA-list>
+# <ts> LOOKUP <sGUID> <sNA-list> <dGUID> <dNA-list>
+# 
+# Field definitions: 
+# relative-timestamp(ts) - integer
+# operation-type - {INSERT, UPDATE, LOOKUP}
+# GUID - upto 40 digits in hex
+# sGUID - GUID of source where request originates
+# dGUID - GUID of destination being looked up
+# NA-list - comma separated strings of network address
+# sNA-list, dNA-list - source and destination network bindings
+# 
+# Fields are TAB separated
+1	INSERT	1	NA1
+2	INSERT	2	NA1,NA2
+3	INSERT	3	NA3
+4	LOOKUP	1	NA1	2	NA1,NA2
+5	LOOKUP	3	NA3	1	NA1
+6	UPDATE	2	NA1,NA3
+7	UPDATE	3	NA1,NA3
+8	LOOKUP	1	NA1	3	NA1,NA3
+9	LOOKUP	3	NA1,NA3	2	NA1,NA3
+10	LOOKUP	2	NA1,NA3	1	NA1

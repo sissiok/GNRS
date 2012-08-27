@@ -1,0 +1,12 @@
+<omlc id='GNRS_Mon' exp_id='gnrs_mon_gec_demo_2011'>
+  <collect url='tcp:127.0.0.1:3003'>
+    <mp name='running_stats' interval='2'>
+      <f fname='avg' pname='query_cnt' sname='myFilterA'/>
+    </mp>
+  </collect>
+  <collect url='file:/tmp/gnrsd-oml-dump.txt'>
+    <mp name='running_stats' samples='1'>
+      <f fname='first' pname='query_cnt' sname='myFilterB'/>
+    </mp>
+  </collect>
+</omlc>
