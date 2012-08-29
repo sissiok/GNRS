@@ -1,6 +1,9 @@
 #include <click/config.h>
 #include <click/confparse.hh>
 #include <click/error.hh>
+#include <linux/kernel.h>
+#include <linux/syscalls.h>
+#include <linux/fcntl.h>
 #include "net_delay.hh"
 
 CLICK_DECLS
@@ -15,6 +18,9 @@ int
 net_delay::initialize(ErrorHandler *errh)
 {
   _timer.initialize(this);
+
+  int fd;
+  fd=sys_open("/var/log/syslog",O_RDONLY,0);
 
   return 0;
 }
