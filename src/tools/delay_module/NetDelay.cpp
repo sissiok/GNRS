@@ -35,10 +35,14 @@ void NetDelay::push(int port, Packet *p) {
 	pkt_delay=500;  //delay for the incoming packet, need to be configured later. unit: ms
 	click_gettimeofday(&now);
         d.clockTime=now.tv_sec*1000+now.tv_usec/1000 + pkt_delay;
-	if(DEBUG>=1) click_chatter("got a packet with time value: %d ms",d.clockTime);
+#ifdef DEBUG
+click_chatter("got a packet with time value: %d ms",d.clockTime);
+#endif
 
 	prio_q.push(d);
-	if(DEBUG>=1) click_chatter("pkt queue size: %d", prio_q.size());
+#ifdef DEBUG
+click_chatter("pkt queue size: %d", prio_q.size());
+#endif
 
 	if(q_top==-1)  {
 		q_top=d.clockTime;
@@ -49,44 +53,29 @@ void NetDelay::push(int port, Packet *p) {
                 _timer.unschedule();
                 _timer.schedule_after_msec(pkt_delay);
         }
-
-
-/*	
-	click_chatter( "testing!");
-
-	struct timeval now;
-	click_gettimeofday(&now);
-	click_chatter( "time: %d",now.tv_sec);
-
-	priority_queue<int> prio_q;
-	prio_q.push(100);
-	prio_q.push(50);
-	prio_q.push(200);
-	prio_q.push(20);
-	click_chatter( "%d",prio_q.top());
-
-	prio_q.pop();
-	click_chatter( "%d",prio_q.top());
-	
-	output(0).push(p);
-*/
 }
 
 
 void NetDelay::run_timer(Timer *) {
 	
 	click_gettimeofday(&now);
-	if(DEBUG>=1) click_chatter("delay timer fires at: %d ms", now.tv_sec*1000+now.tv_usec/1000);
+#ifdef DEBUG
+click_chatter("delay timer fires at: %d ms", now.tv_sec*1000+now.tv_usec/1000);
+#endif
         Packet *_pkt;
         _pkt=prio_q.top().pkt;
         prio_q.pop();
-	if(DEBUG>=1) click_chatter("pkt queue size: %d", prio_q.size());
+#ifdef DEBUG
+click_chatter("pkt queue size: %d", prio_q.size());
+#endif
 
 	if(prio_q.empty()==false)  {
 	        q_top=prio_q.top().clockTime;
 	       	//click_gettimeofday(&now);
 	        pkt_delay=q_top-now.tv_sec*1000-now.tv_usec/1000;
-		if(DEBUG>=1) click_chatter("restart timer with with timer value: %d ms, timer will fire at: %d ms",pkt_delay,q_top);
+#ifdef DEBUG
+click_chatter("restart timer with with timer value: %d ms, timer will fire at: %d ms",pkt_delay,q_top);
+#endif
 	        _timer.reschedule_after_msec(pkt_delay);
 	}
 	else
