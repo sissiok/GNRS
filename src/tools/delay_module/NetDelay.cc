@@ -4,7 +4,7 @@
 #include <linux/kernel.h>
 #include <linux/syscalls.h>
 #include <linux/fcntl.h>
-#include "NetDelay.hpp"
+#include "NetDelay.hh"
 
 CLICK_DECLS
 NetDelay::NetDelay(): _timer(this),q_top(-1)

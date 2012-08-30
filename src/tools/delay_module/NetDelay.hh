@@ -6,8 +6,8 @@
  *  2012/08/30: Migrated from net_delay.hh
  */
 
-#ifndef __NETDELAY_HPP__
-#define __NETDELAY_HPP__
+#ifndef __NETDELAY_HH__
+#define __NETDELAY_HH__
 
 #include <click/element.hh>
 #include <click/timer.hh>
