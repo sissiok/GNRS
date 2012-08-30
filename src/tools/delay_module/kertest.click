@@ -1,28 +1,17 @@
-//FromDevice(eth0)
-//->Print(ok,60)
-        //->Queue(100)
-       // ->DelayShaper(5)
-//        -> NetDelay
-        //->Unqueue(100)
-//->ToHost(eth0)
-
-
-
-
 cla :: Classifier( 12/0800,   //IP packets
 		   -);
 
 ip_cla :: IPClassifier( dst udp port 5000 or dst udp port 5001 or dst udp port 9000,
 			-);
 
+delayMod :: NetDelay(1, 2, 3 4 5, abc def);
+
 FromDevice(eth0)
-//->Print(OK0) 
-->cla
-//-> Print(OK1)
--> CheckIPHeader(14, CHECKSUM false) 
--> ip_cla 
-//-> Print(OK2)
--> NetDelay -> ToHost;
+  ->cla
+  -> CheckIPHeader(14, CHECKSUM false) 
+  -> ip_cla 
+  -> delayMod
+  -> ToHost;
 
 cla[1] -> ToHost;
 

@@ -20,12 +20,20 @@ int NetDelay::initialize(ErrorHandler *errh)
 
 
 int NetDelay::configure(Vector<String> &conf, ErrorHandler *errh) {
-/*
-	if(cp_va_kparse(conf, this, errh,
-                    cpEnd) < 0)
-		return -1;
-*/
-	return 0;
+  for(Vector<String>::iterator it = conf.begin(); it != conf.end(); ++it)
+  {
+    click_chatter((*it).c_str());
+  }
+    return 0;
+}
+
+int NetDelay::live_reconfigure(Vector<String> &conf, ErrorHandler *errh) {
+  click_chatter("Reconfiguring GNRS delay module.");
+  for(Vector<String>::iterator it = conf.begin(); it != conf.end(); ++it)
+  {
+    click_chatter((*it).c_str());
+  }
+    return 0;
 }
 
 void NetDelay::push(int port, Packet *p) {

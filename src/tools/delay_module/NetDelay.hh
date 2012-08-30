@@ -26,6 +26,9 @@ public:
 	int configure(Vector<String>&, ErrorHandler *);
 	void push(int port, Packet *p);
 	void run_timer(Timer *);
+    int live_reconfigure(Vector<String>& conf, ErrorHandler* errh);
+    bool can_live_reconfigure() const { return true; }
+    
 
 private:
         PriorityQueue<DelayUnit,DelayComparator> prio_q;
