@@ -1,23 +1,24 @@
 /*
- * net_delay.hh
+ * NetDelay.hpp
  *
  *  Created on: Aug 8, 2012
  *      Author: Feixiong Zhang
+ *  2012/08/30: Migrated from net_delay.hh
  */
 
-#ifndef NET_DELAY_HH_
-#define NET_DELAY_HH_
+#ifndef __NETDELAY_HPP__
+#define __NETDELAY_HPP__
 
 #include <click/element.hh>
 #include <click/timer.hh>
-#include "delay_struct.hh"
+#include "DelayUnit.hh"
 CLICK_DECLS
 
-class net_delay : public Element {
+class NetDelay : public Element {
 public:
-	net_delay();
-	~net_delay();
-	const char *class_name() const		{ return "net_delay"; }
+	NetDelay();
+	~NetDelay();
+	const char *class_name() const		{ return "NetDelay"; }
 	const char *port_count() const		{ return "1/1"; }
 	const char *processing() const		{ return "h/h"; }
 
@@ -27,8 +28,8 @@ public:
 	void run_timer(Timer *);
 
 private:
-        priority_queue<delay_unit,delay_compare> prio_q;
-        delay_unit d;
+        PriorityQueue<delay_unit,delay_compare> prio_q;
+        DelayUnit d;
         int q_top;  //top key of the queue
         struct timeval now;
         int pkt_delay;
@@ -37,7 +38,5 @@ private:
 };
 
 CLICK_ENDDECLS
-
-
 #endif
 

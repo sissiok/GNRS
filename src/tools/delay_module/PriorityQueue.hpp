@@ -1,5 +1,5 @@
-#ifndef _PRIORITY_QUEUE_HH
-#define _PRIORITY_QUEUE_HH
+#ifndef __PRIORITYQUEUE_HPP__
+#define __PRIORITYQUEUE_HPP__
 
 #include <click/vector.hh>
 #include <click/heap.hh>
@@ -7,11 +7,11 @@
 CLICK_DECLS
 
 template <typename T, typename Compare = less<T> >
-class priority_queue { 
+class PriorityQueue { 
 public:
 
-	priority_queue() : _compare() { }
-	priority_queue(const Compare &c) : _compare(c) { }
+	PriorityQueue() : _compare() { }
+	PriorityQueue(const Compare &c) : _compare(c) { }
 
 	bool empty() const { return _v.empty(); }
 	int size() const { return _v.size(); }

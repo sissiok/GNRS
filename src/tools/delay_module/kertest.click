@@ -2,7 +2,7 @@
 //->Print(ok,60)
         //->Queue(100)
        // ->DelayShaper(5)
-//        -> net_delay
+//        -> NetDelay
         //->Unqueue(100)
 //->ToHost(eth0)
 
@@ -22,7 +22,7 @@ FromDevice(eth0)
 -> CheckIPHeader(14, CHECKSUM false) 
 -> ip_cla 
 //-> Print(OK2)
--> net_delay -> ToHost;
+-> NetDelay -> ToHost;
 
 cla[1] -> ToHost;
 
