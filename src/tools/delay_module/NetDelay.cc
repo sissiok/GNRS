@@ -1,10 +1,6 @@
 #include <click/config.h>
-#include <click/confparse.hh>
-//#include <click/cxxprotect.h>
+//#include <click/confparse.hh>
 #include <click/error.hh>
-#include <linux/kernel.h>
-#include <linux/syscalls.h>
-#include <linux/fcntl.h>
 #include "NetDelay.hh"
 
 CLICK_DECLS
@@ -24,9 +20,11 @@ int NetDelay::initialize(ErrorHandler *errh)
 
 
 int NetDelay::configure(Vector<String> &conf, ErrorHandler *errh) {
+/*
 	if(cp_va_kparse(conf, this, errh,
                     cpEnd) < 0)
 		return -1;
+*/
 	return 0;
 }
 
@@ -87,6 +85,6 @@ click_chatter("restart timer with with timer value: %d ms, timer will fire at: %
 
 
 CLICK_ENDDECLS
-EXPORT_ELEMENT(NetDelay)
 ELEMENT_REQUIRES(linuxmodule)
+EXPORT_ELEMENT(NetDelay)
 

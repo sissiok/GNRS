@@ -28,7 +28,7 @@ public:
 	void run_timer(Timer *);
 
 private:
-        PriorityQueue<delay_unit,delay_compare> prio_q;
+        PriorityQueue<DelayUnit,DelayComparator> prio_q;
         DelayUnit d;
         int q_top;  //top key of the queue
         struct timeval now;
