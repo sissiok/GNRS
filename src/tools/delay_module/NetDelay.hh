@@ -11,7 +11,7 @@
 
 #include <click/element.hh>
 #include <click/timer.hh>
-#include "DelayUnit.hh"
+#include "DelayUnit.hpp"
 CLICK_DECLS
 
 class NetDelay : public Element {

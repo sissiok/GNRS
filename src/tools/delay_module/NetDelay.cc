@@ -1,5 +1,6 @@
 #include <click/config.h>
 #include <click/confparse.hh>
+//#include <click/cxxprotect.h>
 #include <click/error.hh>
 #include <linux/kernel.h>
 #include <linux/syscalls.h>

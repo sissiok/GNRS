@@ -2,7 +2,7 @@
 #define __DELAYUNIT_HPP__
 
 #include <click/element.hh>
-#include "priority_queue.hh"
+#include "PriorityQueue.hpp"
 
 CLICK_DECLS
 
