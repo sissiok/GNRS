@@ -200,7 +200,7 @@ int Topology::cvertTopoLine2AsandWeight(const string &s, char delim, int &as1, i
 */
 void Topology::init2DArray(int nRow, int nCol, u32b ***a){
 	if ((DEBUG ==1 ))
-				cout << "Init 2-D array%"<< endl;
+				cout << "Initializing [" << nRow << ", " << nCol << "]" << endl;
 	u32b **_a; 
 	_a = new u32b*[nRow];
 	
