@@ -6,13 +6,13 @@ nearly 24GB of RAM at its peak, and produced an output file of 4GB.  The size
 of the matrices are effectively the square of the number of AS's, so be sure
 to allocate sufficient resources when running on large data sets.
 
-The shorest-path generator takes as input a topology file for different
+The shortest-path generator takes as input a topology file for different
 Autonomous Systems (AS's) and the associated cost of that inter-AS link. It
-then uses Djikstra's algorithm to compute the shorest-path between every pair
+then uses Djikstra's algorithm to compute the shortest-path between every pair
 of AS's and output it into a matrix file.
 
 ## Building the Program ##
-To build the shorest path generator, run GMake with the makefile in the
+To build the shortest path generator, run GMake with the makefile in the
 current directory.  If you use the default invocation, it should produce a
 binary output file named 'run.now'.
 
