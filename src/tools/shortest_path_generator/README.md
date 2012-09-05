@@ -35,7 +35,7 @@ only appends the '.route' suffix to the name.  For example:
     ./run.now topology.txt
     # Produces the output file 'topology.txt.route'
 
-## Input File Format ##
+## File Formats ##
 The input file (topology file) is expected to have be an ASCII-encoded (text)
 file with inter-AS link weights on individual lines.  For example, the simple
 network illustrated below:
