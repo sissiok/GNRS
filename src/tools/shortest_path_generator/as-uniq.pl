@@ -29,11 +29,18 @@ my $progName = $0;
 my $numArgs = $#ARGV+1;
 
 # Simple subroutine for printing usage info to the terminal
-sub usage
-{
+sub usage {
   print 'Usage: ',  $progName, " <INPUT> [<OUTPUT>]\n";
   print "  If the OUTPUT file name is not provided, then output will be\n";
   print "  directed to stdout.\n";
+}
+
+# Subroutine for extracting unique elements from a parameter array.
+# Author: Greg Hewgill <http://stackoverflow.com/users/893/greg-hewgill>
+# Source: http://stackoverflow.com/questions/7651/how-do-i-remove-duplicate-items-from-an-array-in-perl
+# Date: 2012/09/05
+sub uniq {
+  return keys %{{ map { $_ => 1 } @_ }} ;
 }
 
 # Ensure there is at least the input file, else die
@@ -44,6 +51,7 @@ if($numArgs < 1) {
 my $outFile = FileHandle->new;
 my $inFile = FileHandle->new;
 
+# Open the input and output files according to arguments
 if($numArgs > 1) {
   $outFile->open(">" . $ARGV[1])
     || die "Could not open \"$ARGV[1]\" for writing.";
@@ -55,7 +63,26 @@ if($numArgs > 1) {
 $inFile->open("<" . $ARGV[0]) 
   || die "Could not open \"$ARGV[0]\" for reading.";
 
-print $outFile "test\n";
+# AS array
+my @asList = ();
+
+# Read the input file, line-by-line
+while (my $line = $inFile->getline) {
+  my @columns = split(/\s/,$line);
+  push @asList, $columns[0];
+  push @asList, $columns[1];
+}
+
+# Extract unique elements
+@asList = uniq(@asList);
+
+# Sort the AS elements
+@asList = sort { $a <=> $b } @asList;
+
+# Write to output file
+foreach my $as (@asList) {
+  print $outFile $as . "\n";
+}
 
 $outFile->close;
 $inFile->close;
