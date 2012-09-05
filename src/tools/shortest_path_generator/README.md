@@ -19,7 +19,7 @@ binary output file named 'run.now'.
     make clean all
 
 Alternatively, you can enable some debugging statements by executing either
-the debug1 or debug2 directives in the makefile.A
+the debug1 or debug2 directives in the makefile.
 
     make clean debug1
     # Or for more verbose output
@@ -35,7 +35,7 @@ only appends the '.route' suffix to the name.  For example:
     ./run.now topology.txt
     # Produces the output file 'topology.txt.route'
 
-## Input File Format ## 
+## Input File Format ##
 The input file (topology file) is expected to have be an ASCII-encoded (text)
 file with inter-AS link weights on individual lines.  For example, the simple
 network illustrated below:
