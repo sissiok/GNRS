@@ -3,7 +3,7 @@
 #
 # Unique Autononous System (AS) sorter for the GNRS toolchain.
 # Author: Robert Moore
-# Last Modified: 2012/09/05
+# Last Modified: 2012/09/06
 # Args: <Input File> <Output File>
 #
 # The input file is expected to be formatted as a 3xN matrix of numbers. The
