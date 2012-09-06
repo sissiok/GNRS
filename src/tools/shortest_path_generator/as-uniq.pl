@@ -68,6 +68,10 @@ my @asList = ();
 
 # Read the input file, line-by-line
 while (my $line = $inFile->getline) {
+  # Skip comments at the start of the line
+  if($line =~ m/^#/) {
+    next;
+  }
   my @columns = split(/\s/,$line);
   push @asList, $columns[0];
   push @asList, $columns[1];
