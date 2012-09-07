@@ -65,8 +65,9 @@ if($numArgs < 2) {
   usage && exit 1;
 }
 
-
+# File containing AS list
 my $asFile;
+# File containing delay matrix
 my $delayFile;
 
 open($asFile, "<", $ARGV[0])
