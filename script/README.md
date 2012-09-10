@@ -6,6 +6,7 @@ GNRS-related experiments simpler and easier.
 You can take a look at the following website on the basic usage of orbit:
 	http://orbit-lab.org/wiki/HowToGetStarted
 Steps to load an image:
+
 1. omf-5.3 tell -a offh -t TOPOLOGY
 1. omf-5.3 load -t TOPOLOGY -i IMAGE
 1. omf-5.3 tell -a offh -t TOPOLOGY
