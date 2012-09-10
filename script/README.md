@@ -7,9 +7,9 @@ You can take a look at the following website on the basic usage of orbit:
 	http://orbit-lab.org/wiki/HowToGetStarted
 Steps to load an image:
 1. omf-5.3 tell -a offh -t TOPOLOGY
-2. omf-5.3 load -t TOPOLOGY -i IMAGE
-3. omf-5.3 tell -a offh -t TOPOLOGY
-4. omf-5.3 tell -a on -t TOPOLOGY
+1. omf-5.3 load -t TOPOLOGY -i IMAGE
+1. omf-5.3 tell -a offh -t TOPOLOGY
+1. omf-5.3 tell -a on -t TOPOLOGY
 
 You can ssh into each node after the node is up if the loading image succeeds.
 
