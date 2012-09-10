@@ -1,0 +1,23 @@
+{ 
+  name: "GNRS Test Configuration",
+  data: {
+    data-path: "../data/test/",
+    topology-file: "fake.topology",
+    delay-matrix-file: "fake.delay-matrix",
+    as-list-file: "fake.aslist",
+  }
+  delay-module: {
+  }
+  node-list: {[
+   {
+    hostname: "node1-1",
+    simnet-ipaddr: "192.168.1.1",
+    simnet-ipmask: "255.255.0.0",
+   },
+   {
+    hostname: "node1-2",
+    simnet-ipaddr: "192.168.1.2",
+    simnet-ipmask: "255.255.0.0",
+   },
+  ]},
+}

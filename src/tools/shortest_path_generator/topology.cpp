@@ -31,9 +31,10 @@ void Topology::init(const char* filename){
 	//Build topology graph
 	readEdges(filename); 
 	//compute routing table 
-	if (DEBUG == 1 ) 
+  #ifdef DEBUG
+	if (DEBUG >= 1 ) 
 		cout<< " start compute routes " <<endl;  
-	
+	#endif
 	string routeFile(filename);
 	routeFile += ".route"; 
 	ifstream rFile(routeFile.c_str()); 
@@ -75,14 +76,14 @@ void Topology::readEdges(const char* filename){
 	if (topoFile.is_open())	{
 		while (topoFile.good()){
 			noLine++; 
-			if ((DEBUG ==1 ) && (noLine%1000 == 0))
+			if ((DEBUG >=1 ) && (noLine%1000 == 0))
 				cout << "percentage : " << (float)noLine*100/93600 <<endl;
 
 			getline(topoFile,tempt_line);  //get line in topo file
-			if (DEBUG == 1) cout << tempt_line << endl;
+			if (DEBUG >= 1) cout << tempt_line << endl;
 			//PARSE THE LINE 			
 			if (cvertTopoLine2AsandWeight(tempt_line,' ', _as1,_as2,_weight) != 0){ 
-				if (DEBUG ==1){ cerr <<"Topology input file error !!!\n" << endl; return; }
+				if (DEBUG >=1){ cerr <<"Topology input file error !!!\n" << endl; return; }
 			}
 			else {
 				_tmpEdge.src_AS = _as1; _tmpEdge.dst_AS=_as2; _tmpEdge.weight = _weight; 
@@ -100,21 +101,21 @@ void Topology::readEdges(const char* filename){
 			}
 		}	//end if can openfile 
 
-		if ((DEBUG ==1 ))
+		if ((DEBUG >=1 ))
 				cout << "percentage : 100%"<< endl;
 
 		/////TODO: Edge, Test Vector
 		topoFile.close();
 		nas = _nas+1;	//Number of ASes - Note "plus 1" compensates _nas		
 
-		if ((DEBUG ==1 ))
+		if ((DEBUG >=1 ))
 				cout << "Number of ASes : 100%"<<nas << endl;
 
 		//BUILD CONNECTIVIY MATRIX
 		//a[i,j] is assigned MAX_EDGE_LENGTH if there is no EDGE
 		init2DArray(nas, nas, &conn_matx); //allocate mem for connection matrix
 
-		if ((DEBUG ==1 ))
+		if ((DEBUG >=1 ))
 				cout << "Just init"<< endl;
 
 		idx_as_arr = new u32b[nas];				//allocate mem for idx->as array		
@@ -126,7 +127,7 @@ void Topology::readEdges(const char* filename){
 			//Symetric
 			conn_matx[ _colIdx][_rowIdx] = conn_matx[_rowIdx][ _colIdx]; 
 		}
-		if (DEBUG ==1){ 
+		if (DEBUG >=1){ 
 			cout <<"//construc conn_matrix from edges vector" <<endl; 
 			for (int _r=0; _r<nas; _r++){
 				for(int _c=0; _c<nas;_c++){
@@ -136,11 +137,11 @@ void Topology::readEdges(const char* filename){
 			}
 		}
 		
-		if (DEBUG ==1) cout <<"//construct as->as mapping" <<endl; 
+		if (DEBUG >=1) cout <<"//construct as->as mapping" <<endl; 
 
 		for(_mIt = as_idx_map.begin(); _mIt != as_idx_map.end(); _mIt++){ //construct as->as mapping
 			idx_as_arr[_mIt->second] = _mIt->first;
-			if (DEBUG ==1) cout <<"Index:value " << _mIt->second << ":" << _mIt->first << endl;
+			if (DEBUG >=1) cout <<"Index:value " << _mIt->second << ":" << _mIt->first << endl;
 		}
 		ofstream as_File("AS_arr.data");
 		for (int i=0;i<nas;i++)
@@ -164,27 +165,35 @@ int Topology::cvertTopoLine2AsandWeight(const string &s, char delim, int &as1, i
 	vector<string> storeLine; 
 	
 	while(getline(ss,item,delim)){ //extract from stream until it's empty
-		if (DEBUG ==1) cout <<"item : " << item <<endl; 
+  #ifdef DEBUG
+		if (DEBUG >=2) cout <<"item : " << item <<endl; 
+  #endif
 		item.erase(item.find_last_not_of(" \n\r\t")+1); //eliminate spaces	
 		if (item.size() >0)	storeLine.push_back(item);
 	}	
 	if (storeLine.size() != 3 )	{
-		if (DEBUG == 1) cerr <<"Error on reading lines on Topology input file, size: " << storeLine.size() <<endl;
+		cerr <<"Error on reading lines on Topology input file, size: " << storeLine.size() <<endl;
 		return 1; 
 	}
 	//read as1
 	item = *(storeLine.begin());
 	as1 = atoi(item.c_str()); 
-	if (DEBUG ==1) cout << "AS1: " << item << endl;
+  #ifdef DEBUG
+	if (DEBUG >=2) cout << "AS1: " << item << endl;
+  #endif
 	//read as2
 	item = *(storeLine.begin()+1); 
 	as2 = atoi(item.c_str());
-	if (DEBUG ==1) cout << "AS2: " << item << endl;
+  #ifdef DEBUG
+	if (DEBUG >=2) cout << "AS2: " << item << endl;
+  #endif
 	//read weight
 	item = *(storeLine.begin()+2);
 	const char* temptcc = item.c_str(); 
 	wei = (u32b)atoi(temptcc);	
-	if (DEBUG ==1) cout << "Weight: " << item << endl;
+  #ifdef DEBUG
+	if (DEBUG >=2) cout << "Weight: " << item << endl;
+  #endif
 	//done 
 	return 0; 
 }
@@ -199,12 +208,12 @@ int Topology::cvertTopoLine2AsandWeight(const string &s, char delim, int &as1, i
 	------------Initialize 2 dimensional array of init elements---------------
 */
 void Topology::init2DArray(int nRow, int nCol, u32b ***a){
-	if ((DEBUG ==1 ))
-				cout << "Init 2-D array%"<< endl;
+	if ((DEBUG >=1 ))
+				cout << "Initializing [" << nRow << ", " << nCol << "]" << endl;
 	u32b **_a; 
 	_a = new u32b*[nRow];
 	
-	if ((DEBUG ==1 )){
+	if ((DEBUG >=1 )){
 				cout << "Init 2-D array 2%"<< endl;
 				if (_a == 0) cout<< "Init can't allocate that big trunk of memory%"<< endl;
 	}
@@ -213,7 +222,7 @@ void Topology::init2DArray(int nRow, int nCol, u32b ***a){
 		_a[i] = _a[i-1]+nCol;
 	
 	}
-	if ((DEBUG ==1 ))
+	if ((DEBUG >=1 ))
 				cout << "Init 2-D array 3%"<< endl;
 	for (int i=0; i<nRow;i++)
 		for(int j=0;j<nCol;j++)
@@ -368,13 +377,13 @@ void Topology::computeRoutes(u32b nn, u32b **cmat, u32b **distance_m, int **pred
 			 if ((_dist[i*nn + j] > 0.0) && (_dist[i*nn+j] < MAX_EDGE_WEIGHT))
 				_pred[i*nn+j] = i;
 
-			  if (DEBUG == 1) cout <<"Entry "<< i<<","<<j<<" is " <<_dist[i*nn+j] <<endl; 
+			  if (DEBUG >= 1) cout <<"Entry "<< i<<","<<j<<" is " <<_dist[i*nn+j] <<endl; 
 		}
 	}
 
 	//Main loop 
 	for(k=0; k< nn; k++){
-		if (DEBUG ==1)
+		if (DEBUG >=1)
 			cout << "Trying k = : " << k <<endl; 
 
 		for(i=0;i<nn;i++){
@@ -382,14 +391,14 @@ void Topology::computeRoutes(u32b nn, u32b **cmat, u32b **distance_m, int **pred
 				if (_dist[i*nn+j] > (_dist[i*nn+k]+ _dist[k*nn+j])){
 					 _dist[i*nn+j] = _dist[i*nn+k] + _dist[k*nn+j];
 					 _pred[i*nn+j] = k; 
-					 if (DEBUG == 1) cout <<"updated entry "<< i<<","<<j<<" to distance " <<_dist[i*nn+j] << "with K: "<< k << "which means AS# " << idx_as_arr[k] <<endl; 
+					 if (DEBUG >= 1) cout <<"updated entry "<< i<<","<<j<<" to distance " <<_dist[i*nn+j] << "with K: "<< k << "which means AS# " << idx_as_arr[k] <<endl; 
 				}
 			}
 		}
 	}
 	
 	//Print out the result
-	if (DEBUG ==1) {
+	if (DEBUG >=1) {
 		cout << "The routing table with shortest distance" <<endl; 
 		for (i=0; i < nn; i++) {
 			for (j=0; j < nn; j++)
