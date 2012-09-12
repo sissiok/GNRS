@@ -31,13 +31,12 @@ public:
     
 
 private:
-        PriorityQueue<DelayUnit,DelayComparator> prio_q;
-        DelayUnit d;
-        int q_top;  //top key of the queue
+        PriorityQueue<DelayUnit,DelayComparator> packetQueue;
+        DelayUnit delayUnit;
+        int queueTop;  //top key of the queue
         struct timeval now;
-        int pkt_delay;
 
-        Timer _timer;
+        Timer sendTimer;
 };
 
 CLICK_ENDDECLS
