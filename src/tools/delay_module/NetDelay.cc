@@ -1,5 +1,7 @@
 #include <click/config.h>
 #include <click/error.hh>
+#include <clicknet/udp.h>
+#include <clicknet/ip.h>
 #include "NetDelay.hh"
 
 CLICK_DECLS
@@ -93,8 +95,16 @@ int NetDelay::live_reconfigure(Vector<String> &conf, ErrorHandler *errh) {
 }
 
 void NetDelay::push(int port, Packet *p) {
-
+    uint64_t hash = 0;
 	delayUnit.pkt=p;
+
+    click_ip *iph = p->ip_header();
+    uint32_t sourceIP = iph->ip_src.s_addr;
+    click_udp *udph = p->udp_header();
+
+    hash = ((uint64_t)sourceIP) << 32;
+
+
 	int pkt_delay=500;  //delay for the incoming packet, need to be configured later. unit: ms
 	click_gettimeofday(&now);
     delayUnit.clockTime=now.tv_sec*1000+now.tv_usec/1000 + pkt_delay;
