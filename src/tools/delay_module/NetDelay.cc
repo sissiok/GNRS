@@ -5,7 +5,7 @@
 CLICK_DECLS
 NetDelay::NetDelay(): sendTimer(this),queueTop(-1)
 {    
-    delayTable = new HashTable<IPAddress,int>(0);
+    delayTable = new HashTable<uint64_t,int>(0);
 }
 
 NetDelay::~NetDelay() {
@@ -25,30 +25,27 @@ int NetDelay::configure(Vector<String> &conf, ErrorHandler *errh) {
     return 0;
 }
 
-void NetDelay::freeTable(const HashTable<IPAddress,int>* table) {
-  // Delete allocated IP addresses
-  for(HashTable<IPAddress,int>::const_iterator it = table->begin(); it != table->end(); it++) {
-    IPAddress *ip = it->first;
-    delete ip;
-  }
+void NetDelay::freeTable(const HashTable<uint64_t,int>* table) {
   delete table;
 }
 
 int NetDelay::live_reconfigure(Vector<String> &conf, ErrorHandler *errh) {
   click_chatter("Reconfiguring GNRS delay module.");
-  const HashTable<IPAddress,int> *newDelayTable = new HashTable<IPAddress,int>(0);
+  const HashTable<uint64_t,int> *newDelayTable = new HashTable<uint64_t,int>(0);
 
   // Iterator increment happens within the loop 3-at-a-time
   for(Vector<String>::iterator it = conf.begin(); it != conf.end();)
   {
+    uint64_t hash = 0;
     click_chatter("Parsing IP addr: %s", (*it).c_str());
     // First item is the IP address
-    IPAddress *ipaddr = new IPAddress((*it));
+    IPAddress ipaddr((*it));
+    // Shift the 32-bit IP address into the upper 32 bits
+    hash = ((uint64_t)(ipaddr.addr())) << 32;
     // Increment to the port #
     it++;
     if(it == conf.end()){
         click_chatter("Reached end of configuration file before parsing port!");
-        delete ipaddr;
         freeTable(newDelayTable);
         return 1;
     }
@@ -57,15 +54,15 @@ int NetDelay::live_reconfigure(Vector<String> &conf, ErrorHandler *errh) {
     int success = sscanf((*it).c_str(),"%d",&port);
     if(!success) {
         click_chatter("Unable to parse port from %s", (*it).c_str());
-        delete ipaddr;
         freeTable(newDelayTable);
         return 1;
     }
+    // Put the port into bits [
+    hash |= (port << 16);
     // Increment to the delay #
     it++;
     if(it == conf.end()){
         click_chatter("Reached end of configuration file before parsing delay!");
-        delete ipaddr;
         freeTable(newDelayTable);
         return 1;
     }
@@ -78,12 +75,18 @@ int NetDelay::live_reconfigure(Vector<String> &conf, ErrorHandler *errh) {
         return 1;
     }
 
-    newDelayTable->set(ipaddr,delay);
+    if(newDelayTable->get(hash)){
+        click_chatter("Delay table collision!");
+        freeTable(newDelayTable);
+        return 1;
+    }
+
+    newDelayTable->set(hash,delay);
 
     // Prep for next loop iteration
     it++;
   }
-  const HashTable<IPAddress,int> *tmpTable = delayTable;
+  const HashTable<uint64_t,int> *tmpTable = delayTable;
   delayTable = newDelayTable;
   delete tmpTable;
   return 0;

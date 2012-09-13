@@ -37,7 +37,7 @@ public:
 	void run_timer(Timer *);
     int live_reconfigure(Vector<String>& conf, ErrorHandler* errh);
     bool can_live_reconfigure() const { return true; }
-    void freeTable(const HashTable<IPAddress,int> *table);
+    void freeTable(const HashTable<uint64_t,int> *table);
 
 private:
     PriorityQueue<DelayUnit,DelayComparator> packetQueue;
@@ -46,7 +46,7 @@ private:
     struct timeval now;
 
     Timer sendTimer;
-    const HashTable<IPAddress, int> *delayTable;
+    const HashTable<uint64_t, int> *delayTable;
 };
 
 CLICK_ENDDECLS
