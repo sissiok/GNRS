@@ -37,6 +37,7 @@ public:
 	void run_timer(Timer *);
     int live_reconfigure(Vector<String>& conf, ErrorHandler* errh);
     bool can_live_reconfigure() const { return true; }
+    void freeTable(const HashTable<IPAddress,int> *table);
 
 private:
     PriorityQueue<DelayUnit,DelayComparator> packetQueue;

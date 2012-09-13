@@ -9,7 +9,7 @@ NetDelay::NetDelay(): sendTimer(this),queueTop(-1)
 }
 
 NetDelay::~NetDelay() {
-  delete delayTable;
+  freeTable(delayTable);
 }
 
 int NetDelay::initialize(ErrorHandler *errh)
@@ -25,9 +25,18 @@ int NetDelay::configure(Vector<String> &conf, ErrorHandler *errh) {
     return 0;
 }
 
+void NetDelay::freeTable(const HashTable<IPAddress,int>* table) {
+  // Delete allocated IP addresses
+  for(HashTable<IPAddress,int>::const_iterator it = table->begin(); it != table->end(); it++) {
+    IPAddress *ip = it->first;
+    delete ip;
+  }
+  delete table;
+}
+
 int NetDelay::live_reconfigure(Vector<String> &conf, ErrorHandler *errh) {
   click_chatter("Reconfiguring GNRS delay module.");
-  HashTable<IPAddress,int> newDelayTable(0);
+  const HashTable<IPAddress,int> *newDelayTable = new HashTable<IPAddress,int>(0);
 
   // Iterator increment happens within the loop 3-at-a-time
   for(Vector<String>::iterator it = conf.begin(); it != conf.end();)
@@ -39,6 +48,7 @@ int NetDelay::live_reconfigure(Vector<String> &conf, ErrorHandler *errh) {
     it++;
     if(it == conf.end()){
         click_chatter("Reached end of configuration file before parsing port!");
+        freeTable(newDelayTable);
         return 1;
     }
     click_chatter("Parsing port value: %s", (*it).c_str());
@@ -46,29 +56,32 @@ int NetDelay::live_reconfigure(Vector<String> &conf, ErrorHandler *errh) {
     int success = sscanf((*it).c_str(),"%d",&port);
     if(!success) {
         click_chatter("Unable to parse port from %s", (*it).c_str());
+        freeTable(newDelayTable);
         return 1;
     }
     // Increment to the delay #
     it++;
     if(it == conf.end()){
         click_chatter("Reached end of configuration file before parsing delay!");
+        freeTable(newDelayTable);
         return 1;
     }
     click_chatter("Parsing delay value: %s", (*it).c_str());
     int delay;
     success = sscanf((*it).c_str(),"%d",&delay);
     if(!success){
-        click_chatter("Unable to parse port from %s",(*it).c_str());
+        click_chatter("Unable to parse delay from %s",(*it).c_str());
+        freeTable(newDelayTable);
         return 1;
     }
 
-    newDelayTable.set(ipaddr,delay);
+    newDelayTable->set(ipaddr,delay);
 
     // Prep for next loop iteration
     it++;
   }
   const HashTable<IPAddress,int> *tmpTable = delayTable;
-  delayTable = &newDelayTable;
+  delayTable = newDelayTable;
   delete tmpTable;
   return 0;
 }
