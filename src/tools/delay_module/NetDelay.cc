@@ -1,14 +1,15 @@
 #include <click/config.h>
-//#include <click/confparse.hh>
 #include <click/error.hh>
 #include "NetDelay.hh"
 
 CLICK_DECLS
 NetDelay::NetDelay(): sendTimer(this),queueTop(-1)
 {    
+    delayTable = new HashTable<IPAddress,int>(0);
 }
 
 NetDelay::~NetDelay() {
+  delete delayTable;
 }
 
 int NetDelay::initialize(ErrorHandler *errh)
@@ -26,10 +27,39 @@ int NetDelay::configure(Vector<String> &conf, ErrorHandler *errh) {
 
 int NetDelay::live_reconfigure(Vector<String> &conf, ErrorHandler *errh) {
   click_chatter("Reconfiguring GNRS delay module.");
-  for(Vector<String>::iterator it = conf.begin(); it != conf.end(); ++it)
+  HashTable<IPAddress,int> newDelayTable(0);
+
+  // Iterator increment happens within the loop 3-at-a-time
+  for(Vector<String>::iterator it = conf.begin(); it != conf.end();)
   {
-    click_chatter((*it).c_str());
+    click_chatter("Parsing IP addr: %s", (*it).c_str());
+    // First item is the IP address
+    IPAddress ipaddr = new IPAddress((*it));
+    // Increment to the port #
+    it++;
+    click_chatter("Parsing port value: %s", (*it).c_str());
+    int port;
+    int success = sscanf((*it).c_str(),"%d",&port);
+    if(!success) {
+        click_chatter("Unable to parse port from %s", (*it).c_str());
+        break;
+    }
+    // Increment to the delay #
+    it++;
+    click_chatter("Parsing delay value: %s", (*it).c_str());
+    int delay;
+    success = sscanf((*it).c_str(),"%d",&delay);
+    if(!success){
+        click_chatter("Unable to parse port from %s",(*it).c_str());
+        break;
+    }
+
+    newDelayTable.set(ipaddr,delay);
+
+    // Prep for next loop iteration
+    it++;
   }
+  delayTable = &newDelayTable;
     return 0;
 }
 

@@ -8,11 +8,20 @@
 
 #ifndef __NETDELAY_HH__
 #define __NETDELAY_HH__
-
+// Click includes
 #include <click/element.hh>
 #include <click/timer.hh>
+#include <click/ipaddress.hh>
+#include <click/hashtable.hh>
+// Custom includes
 #include "DelayUnit.hpp"
 CLICK_DECLS
+
+struct ipaddr_cmp {
+   bool operator() (IPAddress const *ip1, IPAddress const *ip2) {
+       return ip1->addr() < ip2->addr();
+   }
+};
 
 class NetDelay : public Element {
 public:
@@ -28,15 +37,15 @@ public:
 	void run_timer(Timer *);
     int live_reconfigure(Vector<String>& conf, ErrorHandler* errh);
     bool can_live_reconfigure() const { return true; }
-    
 
 private:
-        PriorityQueue<DelayUnit,DelayComparator> packetQueue;
-        DelayUnit delayUnit;
-        int queueTop;  //top key of the queue
-        struct timeval now;
+    PriorityQueue<DelayUnit,DelayComparator> packetQueue;
+    DelayUnit delayUnit;
+    int queueTop;  //top key of the queue
+    struct timeval now;
 
-        Timer sendTimer;
+    Timer sendTimer;
+    const HashTable<IPAddress, int> *delayTable;
 };
 
 CLICK_ENDDECLS
