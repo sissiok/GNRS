@@ -8,6 +8,11 @@
 
 #ifndef __NETDELAY_HH__
 #define __NETDELAY_HH__
+
+
+#define DEBUG
+
+
 // Click includes
 #include <click/element.hh>
 #include <click/timer.hh>
