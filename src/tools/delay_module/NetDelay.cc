@@ -37,21 +37,29 @@ int NetDelay::live_reconfigure(Vector<String> &conf, ErrorHandler *errh) {
     IPAddress ipaddr = new IPAddress((*it));
     // Increment to the port #
     it++;
+    if(it == conf.end()){
+        click_chatter("Reached end of configuration file before parsing port!");
+        return 1;
+    }
     click_chatter("Parsing port value: %s", (*it).c_str());
     int port;
     int success = sscanf((*it).c_str(),"%d",&port);
     if(!success) {
         click_chatter("Unable to parse port from %s", (*it).c_str());
-        break;
+        return 1;
     }
     // Increment to the delay #
     it++;
+    if(it == conf.end()){
+        click_chatter("Reached end of configuration file before parsing delay!");
+        return 1;
+    }
     click_chatter("Parsing delay value: %s", (*it).c_str());
     int delay;
     success = sscanf((*it).c_str(),"%d",&delay);
     if(!success){
         click_chatter("Unable to parse port from %s",(*it).c_str());
-        break;
+        return 1;
     }
 
     newDelayTable.set(ipaddr,delay);
@@ -59,8 +67,10 @@ int NetDelay::live_reconfigure(Vector<String> &conf, ErrorHandler *errh) {
     // Prep for next loop iteration
     it++;
   }
+  const HashTable<IPAddress,int> *tmpTable = delayTable;
   delayTable = &newDelayTable;
-    return 0;
+  delete tmpTable;
+  return 0;
 }
 
 void NetDelay::push(int port, Packet *p) {
