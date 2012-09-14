@@ -1,64 +1,130 @@
 #include <click/config.h>
-//#include <click/confparse.hh>
 #include <click/error.hh>
+#include <clicknet/udp.h>
+#include <clicknet/ip.h>
 #include "NetDelay.hh"
 
 CLICK_DECLS
-NetDelay::NetDelay(): _timer(this),q_top(-1)
+NetDelay::NetDelay(): sendTimer(this),queueTop(-1)
 {    
+    delayTable = new HashTable<uint64_t,int>(0);
 }
 
 NetDelay::~NetDelay() {
+  freeTable(delayTable);
 }
 
 int NetDelay::initialize(ErrorHandler *errh)
 {
-  _timer.initialize(this);
+  sendTimer.initialize(this);
 
   return 0;
 }
 
 
-int NetDelay::configure(Vector<String> &conf, ErrorHandler *errh) {
-  for(Vector<String>::iterator it = conf.begin(); it != conf.end(); ++it)
-  {
-    click_chatter((*it).c_str());
-  }
+int NetDelay::configure(Vector<String> &conf, ErrorHandler *errh) { 
+    // Does nothing
     return 0;
+}
+
+void NetDelay::freeTable(const HashTable<uint64_t,int>* table) {
+  delete table;
 }
 
 int NetDelay::live_reconfigure(Vector<String> &conf, ErrorHandler *errh) {
   click_chatter("Reconfiguring GNRS delay module.");
-  for(Vector<String>::iterator it = conf.begin(); it != conf.end(); ++it)
+  const HashTable<uint64_t,int> *newDelayTable = new HashTable<uint64_t,int>(0);
+
+  // Iterator increment happens within the loop 3-at-a-time
+  for(Vector<String>::iterator it = conf.begin(); it != conf.end();)
   {
-    click_chatter((*it).c_str());
+    uint64_t hash = 0;
+    click_chatter("Parsing IP addr: %s", (*it).c_str());
+    // First item is the IP address
+    IPAddress ipaddr((*it));
+    // Shift the 32-bit IP address into the upper 32 bits
+    hash = ((uint64_t)(ipaddr.addr())) << 32;
+    // Increment to the port #
+    it++;
+    if(it == conf.end()){
+        click_chatter("Reached end of configuration file before parsing port!");
+        freeTable(newDelayTable);
+        return 1;
+    }
+    click_chatter("Parsing port value: %s", (*it).c_str());
+    int port;
+    int success = sscanf((*it).c_str(),"%d",&port);
+    if(!success) {
+        click_chatter("Unable to parse port from %s", (*it).c_str());
+        freeTable(newDelayTable);
+        return 1;
+    }
+    // Put the port into bits [
+    hash |= (port << 16);
+    // Increment to the delay #
+    it++;
+    if(it == conf.end()){
+        click_chatter("Reached end of configuration file before parsing delay!");
+        freeTable(newDelayTable);
+        return 1;
+    }
+    click_chatter("Parsing delay value: %s", (*it).c_str());
+    int delay;
+    success = sscanf((*it).c_str(),"%d",&delay);
+    if(!success){
+        click_chatter("Unable to parse delay from %s",(*it).c_str());
+        freeTable(newDelayTable);
+        return 1;
+    }
+
+    if(newDelayTable->get(hash)){
+        click_chatter("Delay table collision!");
+        freeTable(newDelayTable);
+        return 1;
+    }
+
+    newDelayTable->set(hash,delay);
+
+    // Prep for next loop iteration
+    it++;
   }
-    return 0;
+  const HashTable<uint64_t,int> *tmpTable = delayTable;
+  delayTable = newDelayTable;
+  delete tmpTable;
+  return 0;
 }
 
 void NetDelay::push(int port, Packet *p) {
+    uint64_t hash = 0;
+	delayUnit.pkt=p;
 
-	d.pkt=p;
-	pkt_delay=500;  //delay for the incoming packet, need to be configured later. unit: ms
+    click_ip *iph = p->ip_header();
+    uint32_t sourceIP = iph->ip_src.s_addr;
+    click_udp *udph = p->udp_header();
+
+    hash = ((uint64_t)sourceIP) << 32;
+
+
+	int pkt_delay=500;  //delay for the incoming packet, need to be configured later. unit: ms
 	click_gettimeofday(&now);
-        d.clockTime=now.tv_sec*1000+now.tv_usec/1000 + pkt_delay;
+    delayUnit.clockTime=now.tv_sec*1000+now.tv_usec/1000 + pkt_delay;
 #ifdef DEBUG
 click_chatter("got a packet with time value: %d ms",d.clockTime);
 #endif
 
-	prio_q.push(d);
+	packetQueue.push(delayUnit);
 #ifdef DEBUG
-click_chatter("pkt queue size: %d", prio_q.size());
+click_chatter("pkt queue size: %d", packetQueue.size());
 #endif
 
-	if(q_top==-1)  {
-		q_top=d.clockTime;
-                _timer.schedule_after_msec(pkt_delay);
+	if(queueTop==-1)  {
+		queueTop=delayUnit.clockTime;
+                sendTimer.schedule_after_msec(pkt_delay);
         }
-        else if(prio_q.top().clockTime!=q_top)  {
-                q_top=prio_q.top().clockTime;
-                _timer.unschedule();
-                _timer.schedule_after_msec(pkt_delay);
+        else if(packetQueue.top().clockTime!=queueTop)  {
+                queueTop=packetQueue.top().clockTime;
+                sendTimer.unschedule();
+                sendTimer.schedule_after_msec(pkt_delay);
         }
 }
 
@@ -69,26 +135,26 @@ void NetDelay::run_timer(Timer *) {
 #ifdef DEBUG
 click_chatter("delay timer fires at: %d ms", now.tv_sec*1000+now.tv_usec/1000);
 #endif
-        Packet *_pkt;
-        _pkt=prio_q.top().pkt;
-        prio_q.pop();
+        Packet *somePacket;
+        somePacket = packetQueue.top().pkt;
+        packetQueue.pop();
 #ifdef DEBUG
 click_chatter("pkt queue size: %d", prio_q.size());
 #endif
 
-	if(prio_q.empty()==false)  {
-	        q_top=prio_q.top().clockTime;
+	if(packetQueue.empty()==false)  {
+	        queueTop=packetQueue.top().clockTime;
 	       	//click_gettimeofday(&now);
-	        pkt_delay=q_top-now.tv_sec*1000-now.tv_usec/1000;
+	        int pkt_delay=queueTop-now.tv_sec*1000-now.tv_usec/1000;
 #ifdef DEBUG
-click_chatter("restart timer with with timer value: %d ms, timer will fire at: %d ms",pkt_delay,q_top);
+click_chatter("restart timer with with timer value: %d ms, timer will fire at: %d ms",pkt_delay,queueTop);
 #endif
-	        _timer.reschedule_after_msec(pkt_delay);
+	        sendTimer.reschedule_after_msec(pkt_delay);
 	}
 	else
-		q_top=-1;	
+		queueTop=-1;	
 
-	output(0).push(_pkt);
+	output(0).push(somePacket);
 }
 
 
