@@ -50,6 +50,7 @@ public class UDPEchoServer {
     int count = 0;
     while (true) {
       rcvSocket.receive(rcvPacket);
+      System.out.println("Pkt from " + rcvPacket.getAddress() + ":" + rcvPacket.getPort());
       byte[] data = rcvPacket.getData();
       DataInputStream din = new DataInputStream(new ByteArrayInputStream(data));
       int sequenceNumber = din.readInt();
