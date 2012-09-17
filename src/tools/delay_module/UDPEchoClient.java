@@ -43,7 +43,7 @@ public class UDPEchoClient {
    */
   public static final long INTERVAL = 5l;
   public static final int RECEIVE_TIMEOUT = 1000;
-  public static final int NUM_PKTS = 100;
+  public static final int NUM_PKTS = 1000;
 
   public static boolean keepRunning = true;
 
@@ -76,7 +76,7 @@ public class UDPEchoClient {
         while (UDPEchoClient.keepRunning) {
           try {
             rcvSock.receive(rcvPacket);
-            long rcvTime = System.currentTimeMillis();
+            long rcvTime = System.nanoTime();
             DataInputStream din = new DataInputStream(new ByteArrayInputStream(
                 rcvPacket.getData()));
             int sequenceNumber = din.readInt();
@@ -115,7 +115,7 @@ public class UDPEchoClient {
                 payload.length, dstIp, dstPort);
             synchronized (sendTimes) {
               rcvSock.send(sndPacket);
-              sendTimes[i] = System.currentTimeMillis();
+              sendTimes[i] = System.nanoTime();
             }
             Thread.sleep(INTERVAL);
           } catch (Exception e) {
@@ -158,7 +158,7 @@ public class UDPEchoClient {
 
     for (int i = 0; i < rtts.length; ++i) {
       long rtt = rtts[i];
-      if (rtt <= 0) {
+      if (rtt < 0) {
         continue;
       }
       squareDiff[i] = (float) Math.pow(rtt - avgRtt, 2);
@@ -171,6 +171,6 @@ public class UDPEchoClient {
     variance /= count;
     double stdev = Math.sqrt(variance);
 
-    System.out.printf("Sum: %.1fms\nCount: %d\nMean: %.3fms\nS.Dev: %.3fms\n", sumRTT, count, avgRtt, stdev);
+    System.out.printf("Sum: %,.1fns\nCount: %,d\nMean: %,.3fns\nS.Dev: %,.3fns\n", sumRTT, count, avgRtt, stdev);
   }
 }
