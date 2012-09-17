@@ -58,7 +58,7 @@ public class UDPEchoServer {
       ByteArrayOutputStream bout = new ByteArrayOutputStream(8);
       DataOutputStream dout = new DataOutputStream(bout);
       dout.writeInt(sequenceNumber);
-      dout.writeInt(count++);
+      dout.writeInt(++count);
       dout.flush();
       data = bout.toByteArray();
       dout.close();
