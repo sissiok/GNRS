@@ -171,33 +171,62 @@ void NetDelay::push(int port, Packet *p) {
     }
 }
 
-
+/*
+ * Called whenever this object's timer fires.
+ * Checks the head of the priority queue; if it is ready to process it hands
+ * it to the element's output, otherwise reschedules the timer.
+ */
 void NetDelay::run_timer(Timer *) {
-
+    // Track the current time
     click_gettimeofday(&now);
 #ifdef DEBUG
     click_chatter("delay timer fires at: %d ms", now.tv_sec*1000+now.tv_usec/1000);
 #endif
-    Packet *somePacket;
-    somePacket = packetQueue.top().pkt;
-    packetQueue.pop();
-#ifdef DEBUG
-    click_chatter("pkt queue size: %d", packetQueue.size());
-#endif
+    // Grab the head of the queue
+    DelayUnit topUnit = packetQueue.top();
+    Packet *somePacket = topUnit.pkt;
+    int pktTime = topUnit.clockTime;
+    int currTime = now.tv_sec*1000 + now.tv_usec/1000;
+    /*
+     * Difference from scheduled send and now. A negative value indicates
+     * we've waited too long, a positive value means we're early
+     */ 
+    int timeDifference = pktTime-currTime;   
 
-    if(packetQueue.empty()==false)  {
-        queueTop=packetQueue.top().clockTime;
-        //click_gettimeofday(&now);
-        int pkt_delay=queueTop-now.tv_sec*1000-now.tv_usec/1000;
-#ifdef DEBUG
-        click_chatter("restart timer with with timer value: %d ms, timer will fire at: %d ms",pkt_delay,queueTop);
-#endif
-        sendTimer.reschedule_after_msec(pkt_delay);
+    // The timer fired too early, so let's reschedule
+    if(timeDifference > TIMER_TOLERANCE_MSEC) {
+        queueTop = pktTime;
+        sendTimer.reschedule_after_msec(timeDifference);
     }
-    else
-        queueTop=-1;	
+    // We're on time or late, so send the packet on its way
+    else {
+    #ifdef DEBUG
+        if(timeDifference < -TIMER_TOLERANCE_MSEC) {
+            click_chatter("Packet was delayed more than expected.");
+        }
+    #endif
+        // Remove the top of the queue
+        packetQueue.pop();
+    #ifdef DEBUG
+        click_chatter("pkt queue size: %d", packetQueue.size());
+    #endif
+        // If the queue is not empty, then reschedule the timer
+        if(!packetQueue.empty())  {
+            queueTop=packetQueue.top().clockTime;
+            //click_gettimeofday(&now);
+            int pkt_delay=queueTop-now.tv_sec*1000-now.tv_usec/1000;
+    #ifdef DEBUG
+            click_chatter("restart timer with with timer value: %d ms, timer will fire at: %d ms",pkt_delay,queueTop);
+    #endif
+            sendTimer.reschedule_after_msec(pkt_delay);
+        }
+        // Queue is empty, invalidate the top pointer
+        else {
+            queueTop=-1;	
+        }
 
-    output(0).push(somePacket);
+        output(0).push(somePacket);
+    }
 }
 
 

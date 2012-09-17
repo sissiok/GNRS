@@ -8,10 +8,8 @@
 
 #ifndef __NETDELAY_HH__
 #define __NETDELAY_HH__
-
-
-#define DEBUG
-
+// Number of milliseconds needed to schedule the packet delay timer
+#define TIMER_TOLERANCE_MSEC 2
 
 // Click includes
 #include <click/element.hh>
