@@ -25,12 +25,14 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * @author Robert Moore
@@ -47,12 +49,14 @@ public class UDPEchoClient {
 
   public static boolean keepRunning = true;
 
-  public static void main(String[] args) throws Throwable {
+  public static final long[] sendTimes = new long[NUM_PKTS];
+  public static final long[] receiveTimes = new long[NUM_PKTS];
+  static {
+    Arrays.fill(sendTimes, -1);
+    Arrays.fill(receiveTimes, -1);
+  }
 
-    final long[] sendTimes = new long[NUM_PKTS];
-    Arrays.fill(sendTimes,-1);
-    final long[] rtts = new long[NUM_PKTS];
-    Arrays.fill(rtts,-1);
+  public static void main(String[] args) throws Throwable {
 
     if (args.length < 3) {
 
@@ -66,6 +70,7 @@ public class UDPEchoClient {
 
     final DatagramSocket rcvSock = new DatagramSocket(srcPort);
     rcvSock.setSoTimeout(RECEIVE_TIMEOUT);
+    final LinkedBlockingQueue<DatagramPacket> packetQueue = new LinkedBlockingQueue<DatagramPacket>();
 
     final Thread receiver = new Thread() {
 
@@ -85,9 +90,8 @@ public class UDPEchoClient {
               System.err.println("Uh-oh, no ACK flag in response!");
               continue;
             }
-            synchronized (sendTimes) {
-              rtts[sequenceNumber] = rcvTime - sendTimes[sequenceNumber];
-            }
+            receiveTimes[sequenceNumber] = rcvTime;
+
           } catch (SocketTimeoutException ste) {
             // Ignored, check the loop condition
             continue;
@@ -98,6 +102,7 @@ public class UDPEchoClient {
       }
     };
 
+   
     final Thread sender = new Thread() {
       public void run() {
 
@@ -128,6 +133,7 @@ public class UDPEchoClient {
 
     System.out.println("Starting threads.");
 
+    
     receiver.start();
     sender.start();
 
@@ -135,21 +141,26 @@ public class UDPEchoClient {
       Thread.sleep(100);
     }
 
+
+
     System.out.println("Computing statistics...");
 
-    printStats(rtts);
+    printStats();
 
   }
 
-  public static void printStats(long[] rtts) {
+  public static void printStats() {
+    long[] rtts = new long[NUM_PKTS];
+    Arrays.fill(rtts,-1);
     float sumRTT = 0f;
     int count = 0;
-    for (long rtt : rtts) {
-      if (rtt < 0) {
+    for (int i = 0; i < receiveTimes.length; ++i) {
+      long rcvTime = receiveTimes[i];
+      if (rcvTime < 0) {
         continue;
       }
       ++count;
-      sumRTT += rtt;
+      sumRTT += (rtts[i] = rcvTime - sendTimes[i]);
     }
 
     float avgRtt = sumRTT / count;
@@ -171,6 +182,8 @@ public class UDPEchoClient {
     variance /= count;
     double stdev = Math.sqrt(variance);
 
-    System.out.printf("Sum: %,.1fns\nCount: %,d\nMean: %,.3fns\nS.Dev: %,.3fns\n", sumRTT, count, avgRtt, stdev);
+    System.out.printf(
+        "Sum: %,.1fns\nCount: %,d\nMean: %,.3fns\nS.Dev: %,.3fns\n", sumRTT,
+        count, avgRtt, stdev);
   }
 }
