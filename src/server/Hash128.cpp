@@ -13,7 +13,7 @@ using namespace std;
 //extern struct timespec starttime,endtime,starttime_,endtime_;
 //extern ofstream ProcLagFile;
 
-string Hash128::HashG2Server(char *GUID)
+string Hash128::HashG2Server(char *GUID, u8b hashIndex)
 {      
 
 	//clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &starttime_);
@@ -23,7 +23,7 @@ string Hash128::HashG2Server(char *GUID)
 		
        char var2[8];
        for (int i=0;i<8;i++)
-              var2[i]=var1[i];
+              var2[i]=var1[i+8*hashIndex];
 	   
 //clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &starttime_);
         int hashval= globalHash(var2,server_list.size());
@@ -49,7 +49,7 @@ uint32_t Hash128::HashG2IP(char *GUID, u8b hashIndex)
 }
 
 
-uint32_t Hash128::HashIP2IP(uint32_t IP)
+uint32_t Hash128::HashIP2IP(uint32_t IP, u8b hashIndex)
 {
 	char bitstringIP[32];
 	uint32_t tmp = IP; 
@@ -61,7 +61,7 @@ uint32_t Hash128::HashIP2IP(uint32_t IP)
        //cout<<var1<<endl;
        char var2[8];
        for (int i=0;i<8;i++)
-              var2[i]=var1[i];
+              var2[i]=var1[i+8*hashIndex];
 
         return globalHash(var2);
 }
