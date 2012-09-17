@@ -84,8 +84,6 @@ public class UDPEchoServer {
       while (this.keepRunning) {
         try {
           rcvPacket = this.sharedQueue.take();
-          System.out.println("Pkt from " + rcvPacket.getAddress() + ":"
-              + rcvPacket.getPort());
           byte[] data = rcvPacket.getData();
           DataInputStream din = new DataInputStream(new ByteArrayInputStream(
               data));
