@@ -2,6 +2,7 @@
 #include <click/error.hh>
 #include <clicknet/udp.h>
 #include <clicknet/ip.h>
+#include <click/integers.hh>
 #include "NetDelay.hh"
 
 CLICK_DECLS
@@ -89,7 +90,7 @@ int NetDelay::live_reconfigure(Vector<String> &conf, ErrorHandler *errh) {
             return 1;
         }
 #ifdef DEBUG
-    click_chatter("%llu -> %d",hash, delay);
+        click_chatter("%llu -> %d@%d",hash, delay, &delay);
 #endif
         newDelayTable->set(hash,delay);
 
@@ -99,6 +100,12 @@ int NetDelay::live_reconfigure(Vector<String> &conf, ErrorHandler *errh) {
     const HashTable<uint64_t,int> *tmpTable = delayTable;
     delayTable = newDelayTable;
     delete tmpTable;
+#ifdef DEBUG
+    click_chatter("Iterating new delay table.");
+    for(HashTable<uint64_t,int>::const_iterator it = delayTable->begin(); it!=delayTable->end(); ++it){
+       click_chatter("%llu -> %d",it.key(),it.value());
+    }
+#endif
     return 0;
 }
 
@@ -113,15 +120,18 @@ void NetDelay::push(int port, Packet *p) {
     uint32_t sourceIP = iph->ip_src.s_addr;
     hash = ((uint64_t)sourceIP) << 32;
 #ifdef DEBUG
-    click_chatter("DelayMod: Finished IP hash.");
+    IPAddress ip(iph->ip_src);
+    click_chatter("Created IPAddress.");
+    click_chatter("DelayMod: Finished IP hash (%s)", ip.unparse().c_str());
 #endif
 
     // Extract the src UDP port
     click_udp *udph = p->udp_header();
-    uint16_t srcPort = udph->uh_sport;
+    uint16_t srcPort = net_to_host_order(udph->uh_sport);
+    uint16_t dstPort = net_to_host_order(udph->uh_dport);
     hash |= ((uint64_t)srcPort)<<16;
 #ifdef DEBUG
-    click_chatter("DelayMod: Finished port hash.");
+    click_chatter("DelayMod: Finished port hash (%i -> %i)", srcPort, dstPort);
 #endif
 #ifdef DEBUG
     click_chatter("DelayMod: H: %llu", hash);
@@ -129,10 +139,12 @@ void NetDelay::push(int port, Packet *p) {
 
     int pkt_delay=delayTable->get(hash); 
 #ifdef DEBUG
-    IPAddress ipa(iph->ip_src.s_addr);
-    click_chatter("DelayMod %s:%d %dms",ipa.s(), srcPort, pkt_delay);
+    click_chatter("Mapped delay: %d@%d",pkt_delay,&pkt_delay);
 #endif
     if(pkt_delay > 0){
+#ifdef DEBUG
+        click_chatter("Delaying packet by %dms.",pkt_delay);
+#endif
         click_gettimeofday(&now);
         delayUnit.clockTime=now.tv_sec*1000+now.tv_usec/1000 + pkt_delay;
 #ifdef DEBUG
