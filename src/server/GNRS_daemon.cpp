@@ -198,19 +198,25 @@ START_TIMING("GNRS_daemon:global_insert_packet_handler");
 
 	//tell whether the destination AS for the GUID mapping has been computed or not
 	if(ins->dest_flag==0)  {
+	    for(int i=0;i<K_NUM;i++)  {
 		if(GNRSConfig::hash_func==0){
 			  Hash128 h;
-		         hashed_ip=h.HashG2Server(ins->guid, 0);
+		         hashed_ip=h.HashG2Server(ins->guid, i);
 			}
 		else
-	       		hashed_ip=gnrs_para->gnrs_daemon->GUID2Server(ins->guid, 0);
+	       		hashed_ip=gnrs_para->gnrs_daemon->GUID2Server(ins->guid, i);
 		ins->dest_flag=1;
+
+		if (DEBUG >=1)    cout<<"Hashed Server IP for INSERT: " << hashed_ip<<endl;
+	        insert_packet_handler(hashed_ip.c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt);
+	    }
 	}
-	else
+	else	{
 		hashed_ip=GNRSConfig::server_addr;
 
-	if (DEBUG >=1)    cout<<"Hashed Server IP for INSERT: " << hashed_ip<<endl; 
-	gnrs_para->gnrs_daemon->insert_packet_handler(hashed_ip.c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt);
+		if (DEBUG >=1)    cout<<"Hashed Server IP for INSERT: " << hashed_ip<<endl; 
+		insert_packet_handler(hashed_ip.c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt);
+	}
 	
 REGISTER_TIMING("GNRS_daemon:global_insert_packet_handler");
 
@@ -338,19 +344,25 @@ REGISTER_TIMING("GNRS_daemon:mutex");
 
 		//tell whether the destination AS for the GUID mapping has been computed or not
 		if(lkup->dest_flag==0)  {
+		    string hashed_ip[K_NUM];
+		    for(int i=0;i<K_NUM;i++)  {
 			if(GNRSConfig::hash_func==0){				
 		              Hash128 h;
-		              hashed_ip=h.HashG2Server(lkup->guid, 0);  
-				}
+		              hashed_ip[i]=h.HashG2Server(lkup->guid, i);  
+			}
 			else
-				hashed_ip=gnrs_para->gnrs_daemon->GUID2Server(lkup->guid, 0);
+				hashed_ip[i]=gnrs_para->gnrs_daemon->GUID2Server(lkup->guid, i);
+		    }
 			lkup->dest_flag==1;
+			if (DEBUG >=1)    cout<<"Hashed Server IP for LOOKUP: " << hashed_ip<<endl;
+                        lookup_packet_handler(hashed_ip[0].c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt);
 		}
-		else
-			hashed_ip=GNRSConfig::server_addr;
+		else  {
+			string hashed_ip=GNRSConfig::server_addr;
 			  
-              if (DEBUG >=1)    cout<<"Hashed Server IP for LOOKUP: " << hashed_ip<<endl; 
-	      gnrs_para->gnrs_daemon->insert_packet_handler(hashed_ip.c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt);
+             		 if (DEBUG >=1)    cout<<"Hashed Server IP for LOOKUP: " << hashed_ip<<endl; 
+		      lookup_packet_handler(hashed_ip.c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt);
+		}
 
 	//clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &endtime);
 	//ProcLagFile<<timeval_diff(starttime,endtime)<<endl;

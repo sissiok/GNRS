@@ -35,13 +35,13 @@ struct GNRS_Para  {
         GNRS_daemon *gnrs_daemon;
 };
 
-void insert_packet_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt);
+static void insert_packet_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt);
 
 //static void global_INSERT_packet_handler(GNRS_daemon * gnrs_daemon);
 static void global_INSERT_packet_handler(GNRS_Para *gnrs_para);
 
 
-void lookup_packet_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt);
+static void lookup_packet_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt);
 
 //static void global_LOOKUP_packet_handler(GNRS_daemon * gnrs_daemon);
 static void global_LOOKUP_packet_handler(GNRS_Para *gnrs_para);
