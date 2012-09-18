@@ -43,9 +43,9 @@ public class UDPEchoClient {
   /**
    * Inter-packet delay time
    */
-  public static final long INTERVAL = 5l;
-  public static final int RECEIVE_TIMEOUT = 1000;
-  public static final int NUM_PKTS = 1000;
+  public static final long INTERVAL = 1l;
+  public static final int RECEIVE_TIMEOUT = 3000;
+  public static final int NUM_PKTS = 5000;
 
   public static boolean keepRunning = true;
 
@@ -75,12 +75,14 @@ public class UDPEchoClient {
     final Thread receiver = new Thread() {
 
       public void run() {
+        int count = 0;
         byte[] data = new byte[8];
         DatagramPacket rcvPacket = new DatagramPacket(data, data.length);
-
-        while (UDPEchoClient.keepRunning) {
+        boolean keepRunning = true;
+        while (keepRunning) {
           try {
             rcvSock.receive(rcvPacket);
+            ++count;
             long rcvTime = System.nanoTime();
             DataInputStream din = new DataInputStream(new ByteArrayInputStream(
                 rcvPacket.getData()));
@@ -93,12 +95,13 @@ public class UDPEchoClient {
             receiveTimes[sequenceNumber] = rcvTime;
 
           } catch (SocketTimeoutException ste) {
-            // Ignored, check the loop condition
+            keepRunning=false;
             continue;
           } catch (Exception e) {
             e.printStackTrace();
           }
         }
+        System.out.println("Received " + count + " pkts.");
       }
     };
 
