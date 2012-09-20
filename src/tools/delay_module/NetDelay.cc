@@ -40,7 +40,7 @@ int NetDelay::live_reconfigure(Vector<String> &conf, ErrorHandler *errh) {
     for(Vector<String>::iterator it = conf.begin(); it != conf.end();)
     {
         uint64_t hash = 0;
-#ifdef DEBUG
+#ifdef DEBUG_CFG
         click_chatter("Parsing IP addr: %s", (*it).c_str());
 #endif
         // First item is the IP address
@@ -54,7 +54,7 @@ int NetDelay::live_reconfigure(Vector<String> &conf, ErrorHandler *errh) {
             freeTable(newDelayTable);
             return 1;
         }
-#ifdef DEBUG
+#ifdef DEBUG_CFG
         click_chatter("Parsing port value: %s", (*it).c_str());
 #endif
         int port;
@@ -73,7 +73,7 @@ int NetDelay::live_reconfigure(Vector<String> &conf, ErrorHandler *errh) {
             freeTable(newDelayTable);
             return 1;
         }
-#ifdef DEBUG
+#ifdef DEBUG_CFG
         click_chatter("Parsing delay value: %s", (*it).c_str());
 #endif
         int delay;
@@ -89,7 +89,7 @@ int NetDelay::live_reconfigure(Vector<String> &conf, ErrorHandler *errh) {
             freeTable(newDelayTable);
             return 1;
         }
-#ifdef DEBUG
+#ifdef DEBUG_CFG
         click_chatter("%llu -> %d@%d",hash, delay, &delay);
 #endif
         newDelayTable->set(hash,delay);
@@ -100,7 +100,7 @@ int NetDelay::live_reconfigure(Vector<String> &conf, ErrorHandler *errh) {
     const HashTable<uint64_t,int> *tmpTable = delayTable;
     delayTable = newDelayTable;
     delete tmpTable;
-#ifdef DEBUG
+#ifdef DEBUG_CFG
     click_chatter("Iterating new delay table.");
     for(HashTable<uint64_t,int>::const_iterator it = delayTable->begin(); it!=delayTable->end(); ++it){
        click_chatter("%llu -> %d",it.key(),it.value());
@@ -111,8 +111,8 @@ int NetDelay::live_reconfigure(Vector<String> &conf, ErrorHandler *errh) {
 
 void NetDelay::push(int port, Packet *p) {
     click_gettimeofday(&now);
-    int64_t nowMsec = now.tv_sec*1000 + now.tv_usec/1000;
-#ifdef DEBUG
+    int64_t nowMsec = ((int64_t)now.tv_sec)*1000 + now.tv_usec/1000;
+#ifdef DEBUG_PSH
     click_chatter("DMPsh: Received a packet @%lld.",nowMsec);
 #endif
     uint64_t hash = 0;
@@ -121,7 +121,7 @@ void NetDelay::push(int port, Packet *p) {
     click_ip *iph = p->ip_header();
     uint32_t sourceIP = iph->ip_src.s_addr;
     hash = ((uint64_t)sourceIP) << 32;
-#ifdef DEBUG
+#ifdef DEBUG_PSH
     IPAddress ip(iph->ip_src);
     click_chatter("DMPsh: Finished IP hash (%s)", ip.unparse().c_str());
 #endif
@@ -131,23 +131,26 @@ void NetDelay::push(int port, Packet *p) {
     uint16_t srcPort = net_to_host_order(udph->uh_sport);
     uint16_t dstPort = net_to_host_order(udph->uh_dport);
     hash |= ((uint64_t)srcPort)<<16;
-#ifdef DEBUG
+#ifdef DEBUG_PSH
     click_chatter("DMPsh: Finished port hash (%i -> %i)", srcPort, dstPort);
 #endif
-#ifdef DEBUG
+#ifdef DEBUG_PSH
     click_chatter("DMPsh: H: %llu", hash);
 #endif
 
     int pkt_delay=delayTable->get(hash); 
     
     if(pkt_delay > 0){
-        delayUnit.clockTime=nowMsec + pkt_delay;
-#ifdef DEBUG
-        click_chatter("DMPsh: Delaying packet by %dms (%lld).",pkt_delay, delayUnit.clockTime);
+#ifdef DEBUG_PSH
+    click_chatter("DMPsh: clockTime: %lli, pkt_delay: %lli", delayUnit.clockTime, nowMsec+pkt_delay);
+#endif
+        delayUnit.clockTime = nowMsec + pkt_delay;
+#ifdef DEBUG_PSH
+        click_chatter("DMPsh: Delaying packet by %dms (clockTime %lld).",pkt_delay, delayUnit.clockTime);
 #endif
 
         packetQueue.push(delayUnit);
-#ifdef DEBUG
+#ifdef DEBUG_PSH
         click_chatter("DMPsh: pkt queue size: %d", packetQueue.size());
 #endif
 
@@ -175,19 +178,22 @@ void NetDelay::push(int port, Packet *p) {
 void NetDelay::run_timer(Timer *) {
     // Track the current time
     click_gettimeofday(&now);
-#ifdef DEBUG
-    click_chatter("DMRtim: Fired at %d", now.tv_sec*1000+now.tv_usec/1000);
+    int64_t currTime = ((int64_t)now.tv_sec)*1000 + now.tv_usec/1000;
+#ifdef DEBUG_TIM
+    click_chatter("DMRtim: Fired at %lld", currTime);
 #endif
     // Grab the head of the queue
     DelayUnit topUnit = packetQueue.top();
     Packet *somePacket = topUnit.pkt;
     int64_t pktTime = topUnit.clockTime;
-    int64_t currTime = now.tv_sec*1000 + now.tv_usec/1000;
     /*
      * Difference from scheduled send and now. A negative value indicates
      * we've waited too long, a positive value means we're early
      */ 
-    int timeDifference = (int)(pktTime-currTime);   
+    int64_t timeDifference = pktTime-currTime;   
+#ifdef DEBUG_TIM
+    click_chatter("DMRtim: pktTime %lld (clockTime: %lld)", pktTime, topUnit.clockTime);
+#endif
 
     // The timer fired too early, so let's reschedule
     if(timeDifference > TIMER_TOLERANCE_MSEC) {
@@ -196,9 +202,9 @@ void NetDelay::run_timer(Timer *) {
     }
     // We're on time or late, so send the packet on its way
     else {
-    #ifdef DEBUG
+    #ifdef DEBUG_TIM
         if(timeDifference < -TIMER_TOLERANCE_MSEC) {
-            click_chatter("DMRtim: Packet was delayed more than expected: %dms", timeDifference);
+            click_chatter("DMRtim: Packet was delayed more than expected: %lldms", timeDifference);
         }
     #endif
         // Remove the top of the queue
@@ -207,11 +213,18 @@ void NetDelay::run_timer(Timer *) {
         if(!packetQueue.empty())  {
             queueTop=packetQueue.top().clockTime;
             //click_gettimeofday(&now);
-            int pkt_delay=queueTop-now.tv_sec*1000-now.tv_usec/1000;
-    #ifdef DEBUG
-            click_chatter("DMRtim: Timer will fire in %dms (%d)",pkt_delay,queueTop);
+            int64_t pkt_delay=queueTop-now.tv_sec*1000-now.tv_usec/1000;
+            if(pkt_delay > TIMER_TOLERANCE_MSEC){
+    #ifdef DEBUG_TIM
+            click_chatter("DMRtim: Timer will fire in %lldms (%lld)",pkt_delay,queueTop);
     #endif
-            sendTimer.schedule_after_msec(pkt_delay);
+                sendTimer.schedule_after_msec(pkt_delay);
+            } else {
+    #ifdef DEBUG_TIM
+            click_chatter("DMRtim: Timer will fire immediately.");
+    #endif
+                sendTimer.schedule_now();
+            }
         }
         // Queue is empty, invalidate the top pointer
         else {

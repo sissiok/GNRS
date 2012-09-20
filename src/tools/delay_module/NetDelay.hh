@@ -20,6 +20,7 @@
 #include "DelayUnit.hpp"
 CLICK_DECLS
 
+
 struct ipaddr_cmp {
    bool operator() (IPAddress const *ip1, IPAddress const *ip2) {
        return ip1->addr() < ip2->addr();
