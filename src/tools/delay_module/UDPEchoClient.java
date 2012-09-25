@@ -45,28 +45,39 @@ public class UDPEchoClient {
    */
   public static final long INTERVAL = 1l;
   public static final int RECEIVE_TIMEOUT = 3000;
-  public static final int NUM_PKTS = 5000;
+  public static final int DEFAULT_NUM_PKTS = 5000;
 
   public static boolean keepRunning = true;
 
-  public static final long[] sendTimes = new long[NUM_PKTS];
-  public static final long[] receiveTimes = new long[NUM_PKTS];
-  static {
-    Arrays.fill(sendTimes, -1);
-    Arrays.fill(receiveTimes, -1);
-  }
+  public static long[] sendTimes;
+  public static long[] receiveTimes;
 
   public static void main(String[] args) throws Throwable {
 
     if (args.length < 3) {
 
-      System.err.println("Please provide: <SRC PORT> <DST IP> <DST PORT>");
+      System.err.println("Please provide: <SRC PORT> <DST IP> <DST PORT> [<NUM PKTS>]");
       return;
     }
 
     final int srcPort = Integer.parseInt(args[0]);
     final InetAddress dstIp = Inet4Address.getByName(args[1]);
     final int dstPort = Integer.parseInt(args[2]);
+
+    int tmpPkts = DEFAULT_NUM_PKTS;
+
+    if(args.length > 3){
+      tmpPkts = Integer.parseInt(args[3]);
+      if(tmpPkts <= 0){
+        tmpPkts = DEFAULT_NUM_PKTS;
+      }
+    }
+
+    final int numPkts = tmpPkts;
+    sendTimes = new long[numPkts];
+    receiveTimes = new long[numPkts];
+    Arrays.fill(sendTimes, -1);
+    Arrays.fill(receiveTimes, -1);
 
     final DatagramSocket rcvSock = new DatagramSocket(srcPort);
     rcvSock.setSoTimeout(RECEIVE_TIMEOUT);
@@ -79,15 +90,17 @@ public class UDPEchoClient {
         byte[] data = new byte[8];
         DatagramPacket rcvPacket = new DatagramPacket(data, data.length);
         boolean keepRunning = true;
+        long rcvTime = 0l;
         while (keepRunning) {
           try {
             rcvSock.receive(rcvPacket);
+            rcvTime = System.nanoTime();
             ++count;
-            long rcvTime = System.nanoTime();
             DataInputStream din = new DataInputStream(new ByteArrayInputStream(
                 rcvPacket.getData()));
             int sequenceNumber = din.readInt();
             int ackValue = din.readInt();
+            din.close();
             if (ackValue == 0) {
               System.err.println("Uh-oh, no ACK flag in response!");
               continue;
@@ -95,7 +108,7 @@ public class UDPEchoClient {
             receiveTimes[sequenceNumber] = rcvTime;
 
           } catch (SocketTimeoutException ste) {
-            keepRunning=false;
+            keepRunning = false;
             continue;
           } catch (Exception e) {
             e.printStackTrace();
@@ -105,11 +118,10 @@ public class UDPEchoClient {
       }
     };
 
-   
     final Thread sender = new Thread() {
       public void run() {
-
-        for (int i = 0; i < NUM_PKTS; ++i) {
+        long sndTime = 0l;
+        for (int i = 0; i < numPkts; ++i) {
           try {
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
             DataOutputStream dout = new DataOutputStream(bout);
@@ -118,14 +130,18 @@ public class UDPEchoClient {
             dout.writeInt(0);
             dout.flush();
             byte[] payload = bout.toByteArray();
+            dout.close();
 
             DatagramPacket sndPacket = new DatagramPacket(payload,
                 payload.length, dstIp, dstPort);
             synchronized (sendTimes) {
               rcvSock.send(sndPacket);
-              sendTimes[i] = System.nanoTime();
+              sndTime = System.nanoTime();
+              sendTimes[i] = sndTime;
             }
-            Thread.sleep(INTERVAL);
+            if(INTERVAL > 0){
+              Thread.sleep(INTERVAL);
+            }
           } catch (Exception e) {
             e.printStackTrace();
           }
@@ -136,7 +152,6 @@ public class UDPEchoClient {
 
     System.out.println("Starting threads.");
 
-    
     receiver.start();
     sender.start();
 
@@ -144,17 +159,17 @@ public class UDPEchoClient {
       Thread.sleep(100);
     }
 
-
-
     System.out.println("Computing statistics...");
 
-    printStats();
+    printStats(numPkts);
 
   }
 
-  public static void printStats() {
-    long[] rtts = new long[NUM_PKTS];
-    Arrays.fill(rtts,-1);
+  public static void printStats(int numPkts) {
+    long[] rtts = new long[numPkts];
+    long min = Long.MAX_VALUE;
+    long max = Long.MIN_VALUE;
+    Arrays.fill(rtts, -1);
     float sumRTT = 0f;
     int count = 0;
     for (int i = 0; i < receiveTimes.length; ++i) {
@@ -163,9 +178,20 @@ public class UDPEchoClient {
         continue;
       }
       ++count;
+      long diff = rcvTime - sendTimes[i];
+      if (diff < min) {
+        min = diff;
+      }
+      if (diff > max) {
+        max = diff;
+      }
       sumRTT += (rtts[i] = rcvTime - sendTimes[i]);
     }
 
+//    for(int i = 0; i < rtts.length; ++i){
+//      System.out.println(sendTimes[i] + "-" + receiveTimes[i] + ": " + rtts[i]);
+//    }
+    
     float avgRtt = sumRTT / count;
 
     float[] squareDiff = new float[rtts.length];
@@ -184,9 +210,60 @@ public class UDPEchoClient {
     }
     variance /= count;
     double stdev = Math.sqrt(variance);
+    double pktLoss = (rtts.length-count*1f)/rtts.length;
 
-    System.out.printf(
-        "Sum: %,.1fns\nCount: %,d\nMean: %,.3fns\nS.Dev: %,.3fns\n", sumRTT,
-        count, avgRtt, stdev);
+    System.out.printf( "Min: %,.4fms\nMax: %,.4fms\nCount: %,d (%.2f %% loss)\nMean: %,.4fms\nS.Dev: %,.4f\n", min/1000000f, max/1000000f, count, pktLoss, avgRtt / 1000000, stdev / 1000000);
+
+    long range = max - min;
+
+    final long scale = 100000;
+
+    if (range > 0 && count > 10 && max > 0) {
+      // Size in nanoseconds of each bucket
+      long bucketSize = (long)Math.max(scale, Math.ceil(range/39f));
+
+      int[] buckets = new int[((int) Math.ceil((1f * range) / bucketSize))+1];
+      String[] bucketLabels = new String[buckets.length];
+
+      long baseBucket = (min / scale)*scale;
+
+      for (int i = 0; i < bucketLabels.length; ++i) {
+        bucketLabels[i] = String.format("%,.1f", (baseBucket + (bucketSize*i))/(scale*10f));
+      }
+
+      for (int i = 0; i < rtts.length; ++i) {
+        if(rtts[i] > 0){
+          ++buckets[(int) ((rtts[i] - min) / bucketSize)];
+        }
+      }
+
+      int bucketMin = Integer.MAX_VALUE;
+      int bucketMax = Integer.MIN_VALUE;
+
+      for (int i = 0; i < buckets.length; ++i) {
+        if (buckets[i] < bucketMin) {
+          bucketMin = buckets[i];
+        }
+        if (buckets[i] > bucketMax) {
+          bucketMax = buckets[i];
+        }
+      }
+
+      float tickSize = numPkts/ 400f;
+      System.out.printf("Tick: %.2f packets\n",tickSize);
+
+      for (int i = 0; i < buckets.length; ++i) {
+        System.out.print(bucketLabels[i] + " ");
+        int fullTicks = (int)(buckets[i] / tickSize);
+        int partTicks = (int)(buckets[i] % tickSize);
+        for (int j = 0; j < fullTicks; ++j) {
+          System.out.print('#');
+        }
+        if (partTicks > 0) {
+          System.out.print('.');
+        }
+        System.out.printf(" [%d]\n",buckets[i]);
+      }
+    }
   }
 }
