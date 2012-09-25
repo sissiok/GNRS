@@ -7,7 +7,7 @@
 CLICK_DECLS
 
 struct DelayUnit {
-	int clockTime;   //clockTime is real time: ms. double type is not supported under kernel
+	int64_t clockTime;   //clockTime is real time: ms. double type is not supported under kernel
 	Packet* pkt;
 };
 

@@ -80,7 +80,9 @@ void Topology::readEdges(const char* filename){
 				cout << "percentage : " << (float)noLine*100/93600 <<endl;
 
 			getline(topoFile,tempt_line);  //get line in topo file
-			if (DEBUG >= 1) cout << tempt_line << endl;
+            #ifdef DEBUG
+			if (DEBUG > 2) cout << tempt_line << endl;
+            #endif
 			//PARSE THE LINE 			
 			if (cvertTopoLine2AsandWeight(tempt_line,' ', _as1,_as2,_weight) != 0){ 
 				if (DEBUG >=1){ cerr <<"Topology input file error !!!\n" << endl; return; }
@@ -172,7 +174,7 @@ int Topology::cvertTopoLine2AsandWeight(const string &s, char delim, int &as1, i
 		if (item.size() >0)	storeLine.push_back(item);
 	}	
 	if (storeLine.size() != 3 )	{
-		cerr <<"Error on reading lines on Topology input file, size: " << storeLine.size() <<endl;
+		 cerr <<"Error on reading lines on Topology input file, size: " << storeLine.size() <<endl;
 		return 1; 
 	}
 	//read as1
@@ -212,11 +214,12 @@ void Topology::init2DArray(int nRow, int nCol, u32b ***a){
 				cout << "Initializing [" << nRow << ", " << nCol << "]" << endl;
 	u32b **_a; 
 	_a = new u32b*[nRow];
-	
+#ifdef DEBUG	
 	if ((DEBUG >=1 )){
 				cout << "Init 2-D array 2%"<< endl;
 				if (_a == 0) cout<< "Init can't allocate that big trunk of memory%"<< endl;
 	}
+#endif
 	_a[0] = new u32b[nRow*nCol];
 	for(int i=1;i<nRow;i++)	{//may be don't need this since we don't access by indexes
 		_a[i] = _a[i-1]+nCol;
