@@ -166,6 +166,7 @@ public class UDPEchoClient {
   }
 
   public static void printStats(int numPkts) {
+
     long[] rtts = new long[numPkts];
     long min = Long.MAX_VALUE;
     long max = Long.MIN_VALUE;
@@ -210,7 +211,7 @@ public class UDPEchoClient {
     }
     variance /= count;
     double stdev = Math.sqrt(variance);
-    double pktLoss = (rtts.length-count*1f)/rtts.length;
+    double pktLoss = ((rtts.length-count*1f)/rtts.length)*100;
 
     System.out.printf( "Min: %,.4fms\nMax: %,.4fms\nCount: %,d (%.2f %% loss)\nMean: %,.4fms\nS.Dev: %,.4f\n", min/1000000f, max/1000000f, count, pktLoss, avgRtt / 1000000, stdev / 1000000);
 
