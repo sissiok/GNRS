@@ -6,7 +6,7 @@
 #include "NetDelay.hh"
 
 CLICK_DECLS
-NetDelay::NetDelay(): sendTimer(this),queueTop(-1)
+NetDelay::NetDelay(): sendTimer(this)//,queueTop(-1)
 {    
     delayTable = new HashTable<uint64_t,int>(0);
 }
@@ -110,8 +110,8 @@ int NetDelay::live_reconfigure(Vector<String> &conf, ErrorHandler *errh) {
 }
 
 void NetDelay::push(int port, Packet *p) {
-    click_gettimeofday(&now);
-    int64_t nowMsec = ((int64_t)now.tv_sec)*1000 + now.tv_usec/1000;
+    Timestamp arrivalTs = Timestamp::now_steady();
+    int64_t nowMsec = ((int64_t)arrivalTs.sec())*1000 + arrivalTs.msec();
 #ifdef DEBUG_PSH
     click_chatter("DMPsh: Received a packet @%lld.",nowMsec);
 #endif
@@ -141,28 +141,21 @@ void NetDelay::push(int port, Packet *p) {
     int pkt_delay=delayTable->get(hash); 
     
     if(pkt_delay > 0){
-#ifdef DEBUG_PSH
-    click_chatter("DMPsh: clockTime: %lli, pkt_delay: %lli", delayUnit.clockTime, nowMsec+pkt_delay);
-#endif
-        delayUnit.clockTime = nowMsec + pkt_delay;
-#ifdef DEBUG_PSH
-        click_chatter("DMPsh: Delaying packet by %dms (clockTime %lld).",pkt_delay, delayUnit.clockTime);
-#endif
-
+        // Calculate the actual delay for this packet
+        delayUnit.clockTime = arrivalTs + Timestamp::make_msec(pkt_delay);
         packetQueue.push(delayUnit);
 #ifdef DEBUG_PSH
         click_chatter("DMPsh: pkt queue size: %d", packetQueue.size());
 #endif
-
-        if(queueTop==-1)  {
-            queueTop=delayUnit.clockTime;
-            sendTimer.schedule_after_msec(pkt_delay);
+        if(packetQueue.empty()){
+            sendTimer.schedule_at_steady(arrivalTs+Timestamp::make_msec(pkt_delay));
         }
-        else if(packetQueue.top().clockTime!=queueTop)  {
-            queueTop=packetQueue.top().clockTime;
-            pkt_delay = (int)(queueTop - nowMsec);
+        else {
+            Timestamp nextTs = packetQueue.top().clockTime;
+            if(nextTs > Timestamp::now_steady()){
             sendTimer.unschedule();
-            sendTimer.schedule_after_msec(pkt_delay);
+            sendTimer.schedule_at_steady(nextTs);
+            }
         }
     }
     else { // No delay configured
@@ -177,62 +170,20 @@ void NetDelay::push(int port, Packet *p) {
  */
 void NetDelay::run_timer(Timer *) {
     // Track the current time
-    click_gettimeofday(&now);
-    int64_t currTime = ((int64_t)now.tv_sec)*1000 + now.tv_usec/1000;
+    Timestamp nowTs = Timestamp::now_steady();
+    int64_t currTime = ((int64_t)nowTs.sec())*1000 + nowTs.msec();
 #ifdef DEBUG_TIM
     click_chatter("DMRtim: Fired at %lld", currTime);
 #endif
     // Grab the head of the queue
     DelayUnit topUnit = packetQueue.top();
     Packet *somePacket = topUnit.pkt;
-    int64_t pktTime = topUnit.clockTime;
-    /*
-     * Difference from scheduled send and now. A negative value indicates
-     * we've waited too long, a positive value means we're early
-     */ 
-    int64_t timeDifference = pktTime-currTime;   
-#ifdef DEBUG_TIM
-    click_chatter("DMRtim: pktTime %lld (clockTime: %lld)", pktTime, topUnit.clockTime);
-#endif
-
-    // The timer fired too early, so let's reschedule
-    if(timeDifference > TIMER_TOLERANCE_MSEC) {
-        queueTop = pktTime;
-        sendTimer.schedule_after_msec(timeDifference);
+    packetQueue.pop();
+    // If the queue is not empty, then reschedule the timer
+    if(!packetQueue.empty())  {
+        sendTimer.schedule_at_steady(packetQueue.top().clockTime);
     }
-    // We're on time or late, so send the packet on its way
-    else {
-    #ifdef DEBUG_TIM
-        if(timeDifference < -TIMER_TOLERANCE_MSEC) {
-            click_chatter("DMRtim: Packet was delayed more than expected: %lldms", timeDifference);
-        }
-    #endif
-        // Remove the top of the queue
-        packetQueue.pop();
-        // If the queue is not empty, then reschedule the timer
-        if(!packetQueue.empty())  {
-            queueTop=packetQueue.top().clockTime;
-            //click_gettimeofday(&now);
-            int64_t pkt_delay=queueTop-now.tv_sec*1000-now.tv_usec/1000;
-            if(pkt_delay > TIMER_TOLERANCE_MSEC){
-    #ifdef DEBUG_TIM
-            click_chatter("DMRtim: Timer will fire in %lldms (%lld)",pkt_delay,queueTop);
-    #endif
-                sendTimer.schedule_after_msec(pkt_delay);
-            } else {
-    #ifdef DEBUG_TIM
-            click_chatter("DMRtim: Timer will fire immediately.");
-    #endif
-                sendTimer.schedule_now();
-            }
-        }
-        // Queue is empty, invalidate the top pointer
-        else {
-            queueTop=-1;	
-        }
-
-        output(0).push(somePacket);
-    }
+    output(0).push(somePacket);
 }
 
 

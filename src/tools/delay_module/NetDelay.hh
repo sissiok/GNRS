@@ -9,7 +9,7 @@
 #ifndef __NETDELAY_HH__
 #define __NETDELAY_HH__
 // Number of milliseconds needed to schedule the packet delay timer
-#define TIMER_TOLERANCE_MSEC 2
+#define TIMER_TOLERANCE_MSEC 0
 
 // Click includes
 #include <click/element.hh>
@@ -19,6 +19,11 @@
 // Custom includes
 #include "DelayUnit.hpp"
 CLICK_DECLS
+
+//#define DEBUG_CFG
+//#define DEBUG_WRN
+//#define DEBUG_PSH
+//#define DEBUG_TIM
 
 
 struct ipaddr_cmp {
@@ -46,8 +51,6 @@ public:
 private:
     PriorityQueue<DelayUnit,DelayComparator> packetQueue;
     DelayUnit delayUnit;
-    int queueTop;  //top key of the queue
-    struct timeval now;
 
     Timer sendTimer;
     const HashTable<uint64_t, int> *delayTable;
