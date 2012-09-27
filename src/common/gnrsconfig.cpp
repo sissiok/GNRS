@@ -17,6 +17,8 @@ int GNRSConfig::daemon_listen_port;
 string GNRSConfig::server_addr; //self identity/addr
 int GNRSConfig::hash_func;
 int GNRSConfig::stl_func;
+int GNRSConfig::thread_pool_size;
+int GNRSConfig::service_req_num;
 
 /* GNRS client configuration */
 int GNRSConfig::client_listen_port;
@@ -96,6 +98,18 @@ void GNRSConfig::read_from_file(const char*  filename){
 		cout << "STL_FUNC not defined in config,"
 			<< "using default: " 
 			<< stl_func << endl;
+	}
+
+	if(!cfg.lookupValue("THREAD_POOL_SIZE", thread_pool_size)){
+		cout << "THREAD_POOL_SIZE not defined in config,"
+			<< "using default: " 
+			<< thread_pool_size << endl;
+	}
+
+	if(!cfg.lookupValue("SERVICE_REQ_NUM", service_req_num)){
+		cout << "SERVICE_REQ_NUM not defined in config,"
+			<< "using default: " 
+			<< service_req_num << endl;
 	}
 
 	if(!cfg.lookupValue("CLIENT_LISTEN_PORT", client_listen_port)){
