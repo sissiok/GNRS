@@ -152,6 +152,7 @@ void NetDelay::push(int port, Packet *p) {
         }
         else {
             Timestamp nextTs = packetQueue.top().clockTime;
+            // This is probably wrong
             if(nextTs > Timestamp::now_steady()){
             sendTimer.unschedule();
             sendTimer.schedule_at_steady(nextTs);
