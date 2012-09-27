@@ -58,10 +58,10 @@ int GNRS_daemon::timingStat(int index,double time_)
 
 //return with the AS number when given a GUID
 //GUID-->IP-->AS-->server node
-string GNRS_daemon::GUID2Server(char* GUID )
+string GNRS_daemon::GUID2Server(char* GUID, uint8_t hashIndex)
 {
 	Hash128 h;
-	u32b destIP = h.HashG2IP(GUID, 0); 
+	u32b destIP = h.HashG2IP(GUID, hashIndex); 
 
 	unsigned char iplookup[4];
 	IPAddress addr;
@@ -81,7 +81,7 @@ string GNRS_daemon::GUID2Server(char* GUID )
 		 destAS = radixlookup->lookup_route(addr,addr);
 
 		if (DEBUG >=1){
-			cout<<"destIP:"<<(unsigned int)iplookup[0]<<"."<<(unsigned int)iplookup[1]<<"."<<(unsigned int)iplookup[2]<<"."<<(unsigned int)iplookup[3]<<endl;
+			cout<<"destIP:"<<(unsigned int)iplookup[0]<<"."<<(unsigned int)iplookup[1]<<"."<<(unsigned int)iplookup[2]<<"."<<(unsigned int)iplookup[3]<<" for GUID: "<< GUID <<endl;
 			cout<<"AS number:	" << destAS<< endl; 
 		}
 
@@ -100,7 +100,8 @@ string GNRS_daemon::GUID2Server(char* GUID )
 	if (destAS == -1) {   //no AS is found after MAX_TRY
 		//find the closest prefix
 		u32b minDistance = 4294967295U; 
-		asNum asNumber = 0; 
+		asNum asNumber = 0;
+		cout<<"no AS found for GUID: "<<GUID<<endl; 
 		//Walk through all prefixes PREFIX to find the closest prefix 
 		for(u32b i=0; i<curr_prefix.entryList.size();i++){
 			if ( minDistance > Common::ipDistanceIPtoPrefix(curr_prefix.entryList[i],destIP) ){
@@ -772,7 +773,7 @@ int main(int argc,const char * argv[]) {
 
 	if(GNRSConfig::hash_func==1){
 		gnrsd.initMASK();
-		gnrsd.read_prefix_table("prefix2_1_11.data");
+		gnrsd.read_prefix_table("/usr/local/mobilityfirst/code/prototype/gnrsd/src/server/prefix2_1_11.data");
 		}
 	
 	DECLARE_TIMING_THREAD("tester");
