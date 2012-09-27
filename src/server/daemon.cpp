@@ -230,10 +230,10 @@ bool daemon::lookup_handler(HashMap& hm,lookup_message_t *lkup, lookup_response_
 		//locators= hm.get_locator(lkup->guid);
 		//TTLs=hm.get_ttl(lkup->guid);
 		//weights=hm.get_weight(lkup->guid);
-		int _TTL;
+		unsigned int _TTL;
 		while(i<TTLs->size())
 		{
-			cout<<*(TTLs->at(i))<<" "<<ts.tv_sec<<endl;
+			//cout<<*(TTLs->at(i))<<" "<<ts.tv_sec<<endl;
 			_TTL=*(TTLs->at(i))-ts.tv_sec;
 			//cout<<_TTL<<endl;
 			if(_TTL>0)
