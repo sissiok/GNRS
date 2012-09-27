@@ -86,7 +86,7 @@ string GNRS_daemon::GUID2Server(char* GUID, uint8_t hashIndex)
 		}
 
 		if (destAS == -1){	//no prefix is found 
-			destIP = h.HashIP2IP(destIP); 
+			destIP = h.HashIP2IP(destIP, hashIndex); 
 			tryNum++; 	
 			temp=Common::num2ip(destIP);
 			iplookup[0]=temp[0];
@@ -122,6 +122,59 @@ string GNRS_daemon::GUID2Server(char* GUID, uint8_t hashIndex)
 }
 
 
+void GNRS_daemon::insert_packet_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt)
+{
+	common_header_t *hdr=(common_header_t*)recvd_pkt->getPayloadPointer();
+	insert_message_t *ins = (insert_message_t*)recvd_pkt->getPayloadPointer();
+        Address * GNRS_server_sendtoaddr;
+        OutgoingConnection *GNRS_sport=new OutgoingConnection();
+        GNRS_sport->init();
+
+        if(strcmp(hash_ip,GNRSConfig::server_addr.c_str())==0)
+               {
+                        if (DEBUG >=1) cout << "Inserting GNRS locally." << endl;
+                                 //cout<<"Reached in here"<<endl;
+                         //GNRS_server_sendtoaddr= new Address(hdr->sender_addr,GNRSConfig::client_listen_port);
+                         GNRS_server_sendtoaddr= new Address(hdr->sender_addr,ntohl(hdr->sender_listen_port));
+                         GNRS_sport->setRemoteAddress(GNRS_server_sendtoaddr);
+
+                         insert_handler( _hm, ins,0);
+
+                         insert_ack_message_t *ack = (insert_ack_message_t*)malloc(sizeof(insert_ack_message_t));
+                         strcpy(ack->c_hdr.sender_addr, GNRSConfig::server_addr.c_str());
+                         ack->c_hdr.req_id = ins->c_hdr.req_id;
+                         ack->c_hdr.type = INSERT_ACK;
+                         ack->c_hdr.sender_listen_port=htonl(GNRSConfig::daemon_listen_port+1);
+                         ack->resp_code = SUCCESS;
+
+                         Packet *p = new Packet();
+                         p->setPayload((char*)ack, sizeof(insert_ack_message_t));
+
+                         GNRS_sport->sendPack(p);
+                         if (DEBUG >=1) cout<<"ACK FOR INSERT SENT"<<endl;
+                         delete p;
+                          } // end of tyep 0 pkt handler
+           else
+                      {
+                              //send insert packet to Hashed loc
+                             //GNRS_server_sendtoaddr = new Address(hash_ip,7000);
+                             GNRS_server_sendtoaddr = new Address(hash_ip, GNRSConfig::daemon_listen_port+1);
+                             GNRS_sport->setRemoteAddress(GNRS_server_sendtoaddr);
+
+                             GNRS_sport->sendPack(recvd_pkt);
+
+                                if (DEBUG >=1){
+                                        cout<<"forward insert packet to IP:"<<hash_ip<<endl;
+                                        cout<<"packet type:"<<(int)((common_header_t*)recvd_pkt->getPayloadPointer())->type<<endl;
+                                        cout<<"sender address:"<<((common_header_t*)recvd_pkt->getPayloadPointer())->sender_addr<<endl;
+                                        cout<<"sender listen port:"<<ntohl(hdr->sender_listen_port)<<endl;
+                                        }
+
+                      }
+        delete GNRS_server_sendtoaddr;
+        delete GNRS_sport;
+}
+
 
 void GNRS_daemon::global_INSERT_packet_handler(GNRS_Para *gnrs_para)
 {
@@ -135,7 +188,6 @@ START_TIMING("GNRS_daemon:global_insert_packet_handler");
 	*/	
 
 	Packet *recvd_pkt=gnrs_para->recvd_pkt;
-	common_header_t *hdr=(common_header_t*)recvd_pkt->getPayloadPointer();
 	OutgoingConnection *GNRS_sport=new OutgoingConnection();
         GNRS_sport->init();
        if (DEBUG >=1) cout<<"insert packet received at GNRS"<<endl;
@@ -146,65 +198,26 @@ START_TIMING("GNRS_daemon:global_insert_packet_handler");
 
 	//tell whether the destination AS for the GUID mapping has been computed or not
 	if(ins->dest_flag==0)  {
+	    for(int i=0;i<K_NUM;i++)  {
 		if(GNRSConfig::hash_func==0){
 			  Hash128 h;
-		         hashed_ip=h.HashG2Server(ins->guid);
+		         hashed_ip=h.HashG2Server(ins->guid, i);
 			}
 		else
-	       		hashed_ip=gnrs_para->gnrs_daemon->GUID2Server(ins->guid);
+	       		hashed_ip=gnrs_para->gnrs_daemon->GUID2Server(ins->guid, i);
 		ins->dest_flag=1;
+
+		if (DEBUG >=1)    cout<<"Hashed Server IP for INSERT: " << hashed_ip<<endl;
+	        insert_packet_handler(hashed_ip.c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt);
+	    }
 	}
-	else
+	else	{
 		hashed_ip=GNRSConfig::server_addr;
+
+		if (DEBUG >=1)    cout<<"Hashed Server IP for INSERT: " << hashed_ip<<endl; 
+		insert_packet_handler(hashed_ip.c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt);
+	}
 	
-	if (DEBUG >=1)    cout<<"Hashed Server IP for INSERT: " << hashed_ip<<endl; 
-        const char * hash_ip = hashed_ip.c_str(); 
-        Address * GNRS_server_sendtoaddr;
-
-	if(strcmp(hash_ip,GNRSConfig::server_addr.c_str())==0)
-               {  							
-			if (DEBUG >=1) cout << "Inserting GNRS locally." << endl;
-                              	 //cout<<"Reached in here"<<endl;   
-            	  	 //GNRS_server_sendtoaddr= new Address(hdr->sender_addr,GNRSConfig::client_listen_port);
-			 GNRS_server_sendtoaddr= new Address(hdr->sender_addr,ntohl(hdr->sender_listen_port));
-            	  	 GNRS_sport->setRemoteAddress(GNRS_server_sendtoaddr);
-							 
-			insert_handler( gnrs_para->gnrs_daemon->g_hm, ins,0);
-			 
-			 insert_ack_message_t *ack = (insert_ack_message_t*)malloc(sizeof(insert_ack_message_t));
-			 strcpy(ack->c_hdr.sender_addr, GNRSConfig::server_addr.c_str());
-			 ack->c_hdr.req_id = ins->c_hdr.req_id;
-			 ack->c_hdr.type = INSERT_ACK;
-			 ack->c_hdr.sender_listen_port=htonl(GNRSConfig::daemon_listen_port+1);
-			 ack->resp_code = SUCCESS;
-
-			 Packet *p = new Packet();
-			 p->setPayload((char*)ack, sizeof(insert_ack_message_t)); 
-
-             		 GNRS_sport->sendPack(p);
-                    	 if (DEBUG >=1) cout<<"ACK FOR INSERT SENT"<<endl;
-			 delete p;
-                 	  } // end of tyep 0 pkt handler
-           else
-                      {
-                              //send insert packet to Hashed loc
-                             //GNRS_server_sendtoaddr = new Address(hash_ip,7000);
-                             GNRS_server_sendtoaddr = new Address(hash_ip, GNRSConfig::daemon_listen_port+1); 
-                             GNRS_sport->setRemoteAddress(GNRS_server_sendtoaddr);
-
-                             GNRS_sport->sendPack(recvd_pkt);
-
-				if (DEBUG >=1){
-					cout<<"forward insert packet to IP:"<<hash_ip<<endl;
-					cout<<"packet type:"<<(int)((common_header_t*)recvd_pkt->getPayloadPointer())->type<<endl;
-					cout<<"sender address:"<<((common_header_t*)recvd_pkt->getPayloadPointer())->sender_addr<<endl; 
-					cout<<"sender listen port:"<<ntohl(hdr->sender_listen_port)<<endl;       
-					}
-
-                      }
-	delete GNRS_server_sendtoaddr;	
-	delete GNRS_sport;
-	delete(recvd_pkt);
 REGISTER_TIMING("GNRS_daemon:global_insert_packet_handler");
 
 
@@ -215,8 +228,88 @@ REGISTER_TIMING("GNRS_daemon:global_insert_packet_handler");
                 pthread_mutex_unlock(&ins_pkt_sampling_mutex);
         }
 
+        delete(recvd_pkt);
 	delete gnrs_para;
     return (void)0;
+}
+
+
+void GNRS_daemon::lookup_packet_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt)
+{
+	common_header_t *hdr=(common_header_t*)recvd_pkt->getPayloadPointer();
+	lookup_message_t *lkup = (lookup_message_t*)recvd_pkt->getPayloadPointer();
+	OutgoingConnection *GNRS_sport=new OutgoingConnection();
+	GNRS_sport->init();
+        Address * GNRS_server_sendtoaddr;
+
+        Packet *p;
+        //REGISTER_TIMING("GNRS_daemon:preprocess");
+
+        //START_TIMING("GNRS_daemon:usleep");
+        //usleep(20);
+        //REGISTER_TIMING("GNRS_daemon:usleep");
+
+                 if(strcmp(hash_ip,GNRSConfig::server_addr.c_str())==0)
+                  {
+                         if (DEBUG >=1) cout << "LOOKing up GNRS locally" << endl;
+                          lookup_response_message_t *resp;
+
+                          //clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &starttime_);
+                          //START_TIMING("GNRS_daemon:lookup_handler");
+                          lookup_handler(_hm,lkup,resp,0);
+                          //REGISTER_TIMING("GNRS_daemon:lookup_handler");
+                          //clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &endtime_);
+                          //ProcLagFile<<timeval_diff(starttime_,endtime_)<<' ';
+
+                          //clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &starttime_);
+                           //START_TIMING("GNRS_daemon:send_out_lookup_response");
+                          //GNRS_server_sendtoaddr= new Address(hdr->sender_addr, GNRSConfig::client_listen_port);
+                          GNRS_server_sendtoaddr= new Address(hdr->sender_addr, ntohl(hdr->sender_listen_port));
+                       GNRS_sport->setRemoteAddress(GNRS_server_sendtoaddr);
+
+                          p = new Packet();
+                          p->setPayload((char*)resp, sizeof(lookup_response_message_t)+ntohs(resp->na_num)*sizeof(NA));
+                       GNRS_sport->sendPack(p);
+                          //REGISTER_TIMING("GNRS_daemon:send_out_lookup_response");
+                          //clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &endtime_);
+                          //ProcLagFile<<timeval_diff(starttime_,endtime_)<<' ';
+
+                        if (DEBUG >=1) cout<<"lookup response packet sent from GNRS"<<endl;
+                           if (DEBUG >=1){
+                                cout<<"packet req_id:"<<ntohl(((common_header_t*)p->getPayloadPointer())->req_id)<<endl;
+                                cout<<"packet type:"<<(int)((common_header_t*)p->getPayloadPointer())->type<<endl;
+                                cout<<"number of locators in the packet:"<<ntohs(((lookup_response_message*)p->getPayloadPointer())->na_num)<<endl;
+                                for(int i=0;i<ntohs(((lookup_response_message*)p->getPayloadPointer())->na_num);i++)
+                                        cout<<"locator "<<i+1<<":"<<((lookup_response_message*)p->getPayloadPointer())->NAs[i].net_addr<<endl;
+                                }
+                        delete p;
+                    }
+                    else
+                     {
+                                        //send lookup packet to Hashed location
+                                        //GNRS_server_sendtoaddr = new Address(hash_ip,7000);
+                                        GNRS_server_sendtoaddr = new Address(hash_ip,GNRSConfig::daemon_listen_port+1);
+                                        GNRS_sport->setRemoteAddress(GNRS_server_sendtoaddr);
+                                        //GNRS_sport->sendPack(recvd_pkt);
+                         if (DEBUG >=1)    {
+                                cout << "Forwarding lookup: pkt type: " << (int)hdr->type << endl;
+                                cout<<"sender listen port:"<<ntohl(hdr->sender_listen_port)<<endl;
+                         }
+                         /*lookup_message_t *lkup_f = (lookup_message_t*)malloc(sizeof(lookup_message_t));
+                         strcpy(lkup_f->c_hdr.sender_addr, lkup->c_hdr.sender_addr);
+                         lkup_f->c_hdr.req_id = lkup->c_hdr.req_id;
+                         lkup_f->c_hdr.type = LOOKUP;
+                         strcpy(lkup_f->guid, lkup->guid);
+                         p = new Packet();
+                         p->setPayload((char*)lkup_f, sizeof(lookup_message_t));
+                         GNRS_sport->sendPack(p);  */
+
+                         GNRS_sport->sendPack(recvd_pkt);
+                      }
+
+        delete GNRS_server_sendtoaddr;
+        delete GNRS_sport;
+
 }
 
 
@@ -243,8 +336,6 @@ REGISTER_TIMING("GNRS_daemon:mutex");
 	//START_TIMING("GNRS_daemon:preprocess");
 	Packet *recvd_pkt=gnrs_para->recvd_pkt;
 	common_header_t *hdr=(common_header_t*)recvd_pkt->getPayloadPointer();
-	OutgoingConnection *GNRS_sport=new OutgoingConnection();
-        GNRS_sport->init();
 		if (DEBUG >=1) cout<<"Packet Recieved for Lookup at GNRS"<<endl;
                         	//* Handle Lookup Packet */
 		lookup_message_t *lkup = (lookup_message_t*)recvd_pkt->getPayloadPointer();
@@ -253,96 +344,32 @@ REGISTER_TIMING("GNRS_daemon:mutex");
 
 		//tell whether the destination AS for the GUID mapping has been computed or not
 		if(lkup->dest_flag==0)  {
+		    string hashed_ip[K_NUM];
+		    for(int i=0;i<K_NUM;i++)  {
 			if(GNRSConfig::hash_func==0){				
 		              Hash128 h;
-		              hashed_ip=h.HashG2Server(lkup->guid);  
-				}
+		              hashed_ip[i]=h.HashG2Server(lkup->guid, i);  
+			}
 			else
-				hashed_ip=gnrs_para->gnrs_daemon->GUID2Server(lkup->guid);
+				hashed_ip[i]=gnrs_para->gnrs_daemon->GUID2Server(lkup->guid, i);
+		    }
 			lkup->dest_flag==1;
+			if (DEBUG >=1)    cout<<"Hashed Server IP for LOOKUP: " << hashed_ip<<endl;
+                        lookup_packet_handler(hashed_ip[0].c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt);
 		}
-		else
-			hashed_ip=GNRSConfig::server_addr;
+		else  {
+			string hashed_ip=GNRSConfig::server_addr;
 			  
-              const char * hash_ip = hashed_ip.c_str();
-            	if (DEBUG >=1)    cout<<"Hashed Server IP for LOOKUP: " << hashed_ip<<endl; 
-              Address * GNRS_server_sendtoaddr;
-		
-		Packet *p;
-	//REGISTER_TIMING("GNRS_daemon:preprocess");
+             		 if (DEBUG >=1)    cout<<"Hashed Server IP for LOOKUP: " << hashed_ip<<endl; 
+		      lookup_packet_handler(hashed_ip.c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt);
+		}
 
-	//START_TIMING("GNRS_daemon:usleep");
-	//usleep(20);
-	//REGISTER_TIMING("GNRS_daemon:usleep");
-
-                 if(strcmp(hash_ip,GNRSConfig::server_addr.c_str())==0)
-                  { 
-			 if (DEBUG >=1) cout << "LOOKing up GNRS locally" << endl;
-			  lookup_response_message_t *resp;
-			  
-			  //clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &starttime_);
-			  //START_TIMING("GNRS_daemon:lookup_handler");
-	      		  lookup_handler(gnrs_para->gnrs_daemon->g_hm,lkup,resp,0);
-			  //REGISTER_TIMING("GNRS_daemon:lookup_handler");
-			  //clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &endtime_);
-			  //ProcLagFile<<timeval_diff(starttime_,endtime_)<<' ';
-
-			  //clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &starttime_);
-			   //START_TIMING("GNRS_daemon:send_out_lookup_response");
-			  //GNRS_server_sendtoaddr= new Address(hdr->sender_addr, GNRSConfig::client_listen_port);
-			  GNRS_server_sendtoaddr= new Address(hdr->sender_addr, ntohl(hdr->sender_listen_port));
-                       GNRS_sport->setRemoteAddress(GNRS_server_sendtoaddr);
-			 
-			  p = new Packet();
-			  p->setPayload((char*)resp, sizeof(lookup_response_message_t)+ntohs(resp->na_num)*sizeof(NA)); 
-                       GNRS_sport->sendPack(p);
-			  //REGISTER_TIMING("GNRS_daemon:send_out_lookup_response");
-			  //clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &endtime_);
-			  //ProcLagFile<<timeval_diff(starttime_,endtime_)<<' ';
-						
-                        if (DEBUG >=1) cout<<"lookup response packet sent from GNRS"<<endl;
-			   if (DEBUG >=1){
-				cout<<"packet req_id:"<<ntohl(((common_header_t*)p->getPayloadPointer())->req_id)<<endl;
-				cout<<"packet type:"<<(int)((common_header_t*)p->getPayloadPointer())->type<<endl;
-				cout<<"number of locators in the packet:"<<ntohs(((lookup_response_message*)p->getPayloadPointer())->na_num)<<endl;
-				for(int i=0;i<ntohs(((lookup_response_message*)p->getPayloadPointer())->na_num);i++)
-					cout<<"locator "<<i+1<<":"<<((lookup_response_message*)p->getPayloadPointer())->NAs[i].net_addr<<endl;
-			   	}
-			delete p;
-                    }
-                    else
-                     {
-                                        //send lookup packet to Hashed location
-                                        //GNRS_server_sendtoaddr = new Address(hash_ip,7000);
-                                        GNRS_server_sendtoaddr = new Address(hash_ip,GNRSConfig::daemon_listen_port+1); 
-                                        GNRS_sport->setRemoteAddress(GNRS_server_sendtoaddr);
-                                        //GNRS_sport->sendPack(recvd_pkt);
-			 if (DEBUG >=1)    {
-				cout << "Forwarding lookup: pkt type: " << (int)hdr->type << endl;
-				cout<<"sender listen port:"<<ntohl(hdr->sender_listen_port)<<endl;       
-			 }
-			 /*lookup_message_t *lkup_f = (lookup_message_t*)malloc(sizeof(lookup_message_t));
-			 strcpy(lkup_f->c_hdr.sender_addr, lkup->c_hdr.sender_addr);
-			 lkup_f->c_hdr.req_id = lkup->c_hdr.req_id;
-			 lkup_f->c_hdr.type = LOOKUP;
-			 strcpy(lkup_f->guid, lkup->guid);
-			 p = new Packet();
-			 p->setPayload((char*)lkup_f, sizeof(lookup_message_t)); 
-			 GNRS_sport->sendPack(p);  */
-	
-			 GNRS_sport->sendPack(recvd_pkt);
-                                }
-
-	uint32_t _req_id;
-        if(SAMPLING==1) _req_id=ntohl(hdr->req_id);
-
-	//delete p;
-	delete(recvd_pkt);
-	delete GNRS_server_sendtoaddr;
-	delete GNRS_sport;
 	//clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &endtime);
 	//ProcLagFile<<timeval_diff(starttime,endtime)<<endl;
 double sample_time=REGISTER_TIMING("GNRS_daemon:global_lookup_packet_handler");
+
+	uint32_t _req_id;
+        if(SAMPLING==1) _req_id=ntohl(hdr->req_id);
 
 	if(SAMPLING==1)  {
 		//uint32_t _req_id=ntohl(hdr->req_id);
@@ -356,6 +383,8 @@ double sample_time=REGISTER_TIMING("GNRS_daemon:global_lookup_packet_handler");
 		}  
 		pthread_mutex_unlock(&lkup_pkt_sampling_mutex);
 	}
+
+	delete(recvd_pkt);
 	delete gnrs_para;
 	return (void)0;
 }

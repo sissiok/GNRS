@@ -20,7 +20,7 @@ using namespace std;
 #define MAX_EDGE_WEIGHT 4294967295U 
 #endif 
 #ifndef K_NUM
-#define K_NUM 0	//Number of replicated (number of hashing function)
+#define K_NUM 1	//Number of replicated (number of hashing function)
 #endif 
 #ifndef MAX_TRY_NUM
 #define MAX_TRY_NUM 10   //maximum number of rehashing 
