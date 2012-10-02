@@ -23,6 +23,10 @@ using namespace std;
 
 #define DEFAULT_STL_FUNC 0
 
+#define DEFAULT_THREAD_POOL 1
+
+#define DEFAULT_SERV_NUM -1
+
 /**
  * Define defaults for global config variables and assign
  * values readin from configuration files
@@ -44,6 +48,8 @@ public:
   static string server_addr; //self identity/addr
   static int hash_func;
   static int stl_func;
+  static int thread_pool_size;
+  static int service_req_num;
 
   /* gnrs client configuration */
   static int client_listen_port;

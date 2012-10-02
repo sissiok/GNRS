@@ -80,10 +80,12 @@ string GNRS_daemon::GUID2Server(char* GUID, uint8_t hashIndex)
 	while ((tryNum <MAX_TRY_NUM) && (destAS == -1 )) {
 		 destAS = radixlookup->lookup_route(addr,addr);
 
+		#ifdef DEBUG
 		if (DEBUG >=1){
 			cout<<"destIP:"<<(unsigned int)iplookup[0]<<"."<<(unsigned int)iplookup[1]<<"."<<(unsigned int)iplookup[2]<<"."<<(unsigned int)iplookup[3]<<" for GUID: "<< GUID <<endl;
 			cout<<"AS number:	" << destAS<< endl; 
 		}
+		#endif
 
 		if (destAS == -1){	//no prefix is found 
 			destIP = h.HashIP2IP(destIP, hashIndex); 
@@ -111,13 +113,17 @@ string GNRS_daemon::GUID2Server(char* GUID, uint8_t hashIndex)
 				longestCidrPref.mask_bit =  curr_prefix.entryList[i].mask_bit; 
 			}
 		}
+		#ifdef DEBUG
 		if (DEBUG >=1) cout << "used ipDistance !!! Distance is : "<< (unsigned int) minDistance << ", AS Number:  " << (unsigned int)asNumber << endl; 
+		#endif
 		destAS = asNumber; 
 	}
+	#ifdef DEBUG
 	if (DEBUG >=1){
 		cout<<"destIP:	" << (int)(Common::num2ip(destIP))[0]<<"."<<(int)(Common::num2ip(destIP))[1]<<"."<<(int)(Common::num2ip(destIP))[2]<<"."<<(int)(Common::num2ip(destIP))[3] << endl; 
 		cout<<"AS Number:  " << (unsigned int)destAS << endl; 
 		}
+	#endif
 	return(h.MapAS2Server(destAS));
 }
 
@@ -132,7 +138,9 @@ void GNRS_daemon::insert_packet_handler(const char* hash_ip, HashMap _hm, Packet
 
         if(strcmp(hash_ip,GNRSConfig::server_addr.c_str())==0)
                {
+			#ifdef DEBUG
                         if (DEBUG >=1) cout << "Inserting GNRS locally." << endl;
+			#endif
                                  //cout<<"Reached in here"<<endl;
                          //GNRS_server_sendtoaddr= new Address(hdr->sender_addr,GNRSConfig::client_listen_port);
                          GNRS_server_sendtoaddr= new Address(hdr->sender_addr,ntohl(hdr->sender_listen_port));
@@ -151,7 +159,9 @@ void GNRS_daemon::insert_packet_handler(const char* hash_ip, HashMap _hm, Packet
                          p->setPayload((char*)ack, sizeof(insert_ack_message_t));
 
                          GNRS_sport->sendPack(p);
+			 #ifdef DEBUG
                          if (DEBUG >=1) cout<<"ACK FOR INSERT SENT"<<endl;
+			 #endif
                          delete p;
                           } // end of tyep 0 pkt handler
            else
@@ -163,12 +173,14 @@ void GNRS_daemon::insert_packet_handler(const char* hash_ip, HashMap _hm, Packet
 
                              GNRS_sport->sendPack(recvd_pkt);
 
+				#ifdef DEBUG
                                 if (DEBUG >=1){
                                         cout<<"forward insert packet to IP:"<<hash_ip<<endl;
                                         cout<<"packet type:"<<(int)((common_header_t*)recvd_pkt->getPayloadPointer())->type<<endl;
                                         cout<<"sender address:"<<((common_header_t*)recvd_pkt->getPayloadPointer())->sender_addr<<endl;
                                         cout<<"sender listen port:"<<ntohl(hdr->sender_listen_port)<<endl;
                                         }
+				#endif
 
                       }
         delete GNRS_server_sendtoaddr;
@@ -178,7 +190,7 @@ void GNRS_daemon::insert_packet_handler(const char* hash_ip, HashMap _hm, Packet
 
 void GNRS_daemon::global_INSERT_packet_handler(GNRS_Para *gnrs_para)
 {
-START_TIMING("GNRS_daemon:global_insert_packet_handler");	
+START_TIMING((char *)"GNRS_daemon:global_insert_packet_handler");	
 	/*
 	pthread_mutex_lock( &(gnrs_condition.mutex) );
 	Packet *recvd_pkt=gnrs_para->recvd_pkt;
@@ -218,7 +230,7 @@ START_TIMING("GNRS_daemon:global_insert_packet_handler");
 		insert_packet_handler(hashed_ip.c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt);
 	}
 	
-REGISTER_TIMING("GNRS_daemon:global_insert_packet_handler");
+REGISTER_TIMING((char *)"GNRS_daemon:global_insert_packet_handler");
 
 
         if(SAMPLING==1)  {
@@ -274,6 +286,7 @@ void GNRS_daemon::lookup_packet_handler(const char* hash_ip, HashMap _hm, Packet
                           //clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &endtime_);
                           //ProcLagFile<<timeval_diff(starttime_,endtime_)<<' ';
 
+			#ifdef DEBUG
                         if (DEBUG >=1) cout<<"lookup response packet sent from GNRS"<<endl;
                            if (DEBUG >=1){
                                 cout<<"packet req_id:"<<ntohl(((common_header_t*)p->getPayloadPointer())->req_id)<<endl;
@@ -282,6 +295,7 @@ void GNRS_daemon::lookup_packet_handler(const char* hash_ip, HashMap _hm, Packet
                                 for(int i=0;i<ntohs(((lookup_response_message*)p->getPayloadPointer())->na_num);i++)
                                         cout<<"locator "<<i+1<<":"<<((lookup_response_message*)p->getPayloadPointer())->NAs[i].net_addr<<endl;
                                 }
+			#endif
                         delete p;
                     }
                     else
@@ -291,10 +305,12 @@ void GNRS_daemon::lookup_packet_handler(const char* hash_ip, HashMap _hm, Packet
                                         GNRS_server_sendtoaddr = new Address(hash_ip,GNRSConfig::daemon_listen_port+1);
                                         GNRS_sport->setRemoteAddress(GNRS_server_sendtoaddr);
                                         //GNRS_sport->sendPack(recvd_pkt);
+			 #ifdef DEBUG
                          if (DEBUG >=1)    {
                                 cout << "Forwarding lookup: pkt type: " << (int)hdr->type << endl;
                                 cout<<"sender listen port:"<<ntohl(hdr->sender_listen_port)<<endl;
                          }
+			 #endif
                          /*lookup_message_t *lkup_f = (lookup_message_t*)malloc(sizeof(lookup_message_t));
                          strcpy(lkup_f->c_hdr.sender_addr, lkup->c_hdr.sender_addr);
                          lkup_f->c_hdr.req_id = lkup->c_hdr.req_id;
@@ -316,7 +332,7 @@ void GNRS_daemon::lookup_packet_handler(const char* hash_ip, HashMap _hm, Packet
 void GNRS_daemon::global_LOOKUP_packet_handler(GNRS_Para *gnrs_para)
 {
 	//int local_lookup_num=lookup_num;
-START_TIMING("GNRS_daemon:global_lookup_packet_handler");
+START_TIMING((char *)"GNRS_daemon:global_lookup_packet_handler");
 	//clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &starttime);
 /*
 START_TIMING("GNRS_daemon:mutex");
@@ -366,7 +382,7 @@ REGISTER_TIMING("GNRS_daemon:mutex");
 
 	//clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &endtime);
 	//ProcLagFile<<timeval_diff(starttime,endtime)<<endl;
-double sample_time=REGISTER_TIMING("GNRS_daemon:global_lookup_packet_handler");
+double sample_time=REGISTER_TIMING((char *)"GNRS_daemon:global_lookup_packet_handler");
 
 	uint32_t _req_id;
         if(SAMPLING==1) _req_id=ntohl(hdr->req_id);
@@ -480,12 +496,14 @@ void* GNRS_daemon::g_receiver()
 				    }
 
                                    //int flag1=1;
+				#ifdef DEBUG
                                 if (DEBUG >=1) {
 					cout<<"packet request ID:"<<ntohl(hdr->req_id)<<endl;
 					cout<<"packet type:"<<(int)hdr->type<<endl;
 					cout<<"sender address:"<<hdr->sender_addr<<endl;       
 					cout<<"sender listen port:"<<ntohl(hdr->sender_listen_port)<<endl;       
                            		}
+				#endif
 				    //ProcLagFile<<ntohl(hdr->req_id)<<' ';
 
 				     // gnrs_condition.condition_set = true;
@@ -721,7 +739,7 @@ void GNRS_daemon::initMASK(){
 
 void GNRS_daemon::print_usage()
 {
-	cout << "Usage: ./gnrsd <config file> <thread_pool_size> <service_req_num> [<server_self_addr>] [servers_list_file]" << endl;
+	cout << "Usage: ./gnrsd <config file> [ <thread_pool_size> <service_req_num> <server_self_addr>] [servers_list_file ]" << endl;
 }
 
 
@@ -731,6 +749,11 @@ void GNRS_daemon::print_usage()
 // pkt_sampling_output.data: print out the total service time of sampled pkt
 int main(int argc,const char * argv[]) {
 
+	GNRS_daemon gnrsd;
+	if(argc < 2){
+		gnrsd.print_usage();
+		exit(0);
+	}
 	if(SAMPLING==1) {
 		ProcFile.open("/var/log/gnrs_proc_statistics.data"); 
 		if (!ProcFile.is_open()){
@@ -747,33 +770,35 @@ int main(int argc,const char * argv[]) {
 
 	rec_insert_num=rec_lookup_num=0;
 	proc_insert_num=proc_lookup_num=0;
-	GNRS_daemon gnrsd;
 
-	if(argc < 4){
-		gnrsd.print_usage();
-		exit(0);
-	}
 	const char* conf_filename = argv[1];
+        /**
+         * Read configuration settings from file and update any
+         * default settings.
+         *
+         * Exits program with error code either on i/o or parse errors while
+         * reading the file, or when a required setting hasn't been specified
+         */
+        GNRSConfig::init_defaults();
+        GNRSConfig::read_from_file(conf_filename);
 
-        char _pool_size[5];
-        strcpy(_pool_size,argv[2]);
-        pool_size=Common::port_str2num(_pool_size);
-	if(DEBUG>=1) cout<<"pool_size: "<<pool_size<<endl;
+	if(argc > 2) {
+	        char _pool_size[5];
+        	strcpy(_pool_size,argv[2]);
+	        pool_size=Common::port_str2num(_pool_size);
+		if(DEBUG>=1) cout<<"pool_size: "<<pool_size<<endl;
+	}
+	else
+		pool_size = GNRSConfig::thread_pool_size;
 
-        char _serv_req_num[10];
-        strcpy(_serv_req_num,argv[3]);
-        serv_req_num=Common::port_str2num(_serv_req_num);
-	if(DEBUG>=1) cout<<"server terminate after receiving: "<<serv_req_num<<endl;
-
-	/**
-	 * Read configuration settings from file and update any
-	 * default settings.
-	 * 
-	 * Exits program with error code either on i/o or parse errors while 
-	 * reading the file, or when a required setting hasn't been specified
-	 */ 
-	GNRSConfig::init_defaults();
-	GNRSConfig::read_from_file(conf_filename);
+	if(argc > 3) {
+        	char _serv_req_num[10];
+	        strcpy(_serv_req_num,argv[3]);
+	        serv_req_num=Common::port_str2num(_serv_req_num);
+		if(DEBUG>=1) cout<<"server terminate after receiving: "<<serv_req_num<<endl;
+	}
+	else
+		serv_req_num = GNRSConfig::service_req_num;
 
 	/**
 	 * Override server self address from config with command line param
@@ -805,7 +830,7 @@ int main(int argc,const char * argv[]) {
 		gnrsd.read_prefix_table("/usr/local/mobilityfirst/code/prototype/gnrsd/src/server/prefix2_1_11.data");
 		}
 	
-	DECLARE_TIMING_THREAD("tester");
+	DECLARE_TIMING_THREAD((char *)"tester");
 	
 	gnrsd.g_receiver();
 
