@@ -35,16 +35,16 @@ struct GNRS_Para  {
         GNRS_daemon *gnrs_daemon;
 };
 
-static void insert_packet_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt);
+static void insert_msg_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt, bool redirect_flag);
 
 //static void global_INSERT_packet_handler(GNRS_daemon * gnrs_daemon);
-static void global_INSERT_packet_handler(GNRS_Para *gnrs_para);
+static void global_INSERT_msg_handler(GNRS_Para *gnrs_para);
 
 
-static void lookup_packet_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt);
+static void lookup_msg_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt);
 
 //static void global_LOOKUP_packet_handler(GNRS_daemon * gnrs_daemon);
-static void global_LOOKUP_packet_handler(GNRS_Para *gnrs_para);
+static void global_LOOKUP_msg_handler(GNRS_Para *gnrs_para);
 
 void* g_receiver();
 
@@ -73,12 +73,6 @@ private:
 	Packet *recvd_pkt;
 };
 
-/*
-struct GNRS_Para  {
-	Packet *recvd_pkt;
-	GNRS_daemon *gnrs_daemon;
-};
-*/
 
 #define SEC2NANO 1000000000
 

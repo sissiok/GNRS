@@ -7,8 +7,6 @@
 //#include "../common/time_measure.h"
 #include "../common/profiler/Timing.h"
 #include "statistics.h"
-//struct timeval starttime,endtime,starttime_,endtime_;
-//struct timespec starttime,endtime,starttime_,endtime_;
 ofstream ProcFile;
 ofstream ProcFile_;
 int rec_insert_num,rec_lookup_num,proc_insert_num,proc_lookup_num;
@@ -127,8 +125,9 @@ string GNRS_daemon::GUID2Server(char* GUID, uint8_t hashIndex)
 	return(h.MapAS2Server(destAS));
 }
 
-
-void GNRS_daemon::insert_packet_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt)
+//hash_ip: Hashed Server IP for INSERT
+//redirect_flag: true: the msg is redirected from another gnrs server; false: the msg comes from a client
+void GNRS_daemon::insert_msg_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt, bool redirect_flag)
 {
 	common_header_t *hdr=(common_header_t*)recvd_pkt->getPayloadPointer();
 	insert_message_t *ins = (insert_message_t*)recvd_pkt->getPayloadPointer();
@@ -141,35 +140,38 @@ void GNRS_daemon::insert_packet_handler(const char* hash_ip, HashMap _hm, Packet
 			#ifdef DEBUG
                         if (DEBUG >=1) cout << "Inserting GNRS locally." << endl;
 			#endif
-                                 //cout<<"Reached in here"<<endl;
-                         //GNRS_server_sendtoaddr= new Address(hdr->sender_addr,GNRSConfig::client_listen_port);
-                         GNRS_server_sendtoaddr= new Address(hdr->sender_addr,ntohl(hdr->sender_listen_port));
-                         GNRS_sport->setRemoteAddress(GNRS_server_sendtoaddr);
 
-                         insert_handler( _hm, ins,0);
+			insert_handler( _hm, ins,0);
+			if(redirect_flag == true)  {
+                       		 GNRS_server_sendtoaddr= new Address(hdr->sender_addr,ntohl(hdr->sender_listen_port));
+                        	 GNRS_sport->setRemoteAddress(GNRS_server_sendtoaddr);
 
-                         insert_ack_message_t *ack = (insert_ack_message_t*)malloc(sizeof(insert_ack_message_t));
-                         strcpy(ack->c_hdr.sender_addr, GNRSConfig::server_addr.c_str());
-                         ack->c_hdr.req_id = ins->c_hdr.req_id;
-                         ack->c_hdr.type = INSERT_ACK;
-                         ack->c_hdr.sender_listen_port=htonl(GNRSConfig::daemon_listen_port+1);
-                         ack->resp_code = SUCCESS;
+        	                 insert_ack_message_t *ack = (insert_ack_message_t*)malloc(sizeof(insert_ack_message_t));
+                	         strcpy(ack->c_hdr.sender_addr, GNRSConfig::server_addr.c_str());
+                        	 ack->c_hdr.req_id = ins->c_hdr.req_id;
+	                         ack->c_hdr.type = INSERT_ACK;
+        	                 ack->c_hdr.sender_listen_port=htonl(GNRSConfig::daemon_listen_port+1);
+                	         ack->resp_code = SUCCESS;
 
-                         Packet *p = new Packet();
-                         p->setPayload((char*)ack, sizeof(insert_ack_message_t));
+                        	 Packet *p = new Packet();
+	                         p->setPayload((char*)ack, sizeof(insert_ack_message_t));
 
-                         GNRS_sport->sendPack(p);
-			 #ifdef DEBUG
-                         if (DEBUG >=1) cout<<"ACK FOR INSERT SENT"<<endl;
-			 #endif
-                         delete p;
-                          } // end of tyep 0 pkt handler
+        	                 GNRS_sport->sendPack(p);
+				 #ifdef DEBUG
+                        	 if (DEBUG >=1) cout<<"ACK FOR INSERT SENT sent to redirecting server!"<<endl;
+				 #endif
+        	                 delete p;
+				 delete GNRS_server_sendtoaddr;
+			 }
+               }
            else
                       {
                               //send insert packet to Hashed loc
-                             //GNRS_server_sendtoaddr = new Address(hash_ip,7000);
                              GNRS_server_sendtoaddr = new Address(hash_ip, GNRSConfig::daemon_listen_port+1);
                              GNRS_sport->setRemoteAddress(GNRS_server_sendtoaddr);
+
+			     //update the sender address to the gnrs server's address, will be used for insert-ack
+			     strcpy(hdr->sender_addr, GNRSConfig::server_addr.c_str());
 
                              GNRS_sport->sendPack(recvd_pkt);
 
@@ -181,23 +183,16 @@ void GNRS_daemon::insert_packet_handler(const char* hash_ip, HashMap _hm, Packet
                                         cout<<"sender listen port:"<<ntohl(hdr->sender_listen_port)<<endl;
                                         }
 				#endif
+			    delete GNRS_server_sendtoaddr;
 
                       }
-        delete GNRS_server_sendtoaddr;
         delete GNRS_sport;
 }
 
-
-void GNRS_daemon::global_INSERT_packet_handler(GNRS_Para *gnrs_para)
+//this is the working thread for insert pool: called by the listening thread
+void GNRS_daemon::global_INSERT_msg_handler(GNRS_Para *gnrs_para)
 {
-START_TIMING((char *)"GNRS_daemon:global_insert_packet_handler");	
-	/*
-	pthread_mutex_lock( &(gnrs_condition.mutex) );
-	Packet *recvd_pkt=gnrs_para->recvd_pkt;
-	gnrs_condition.condition_set = false;
-	pthread_cond_signal(&(gnrs_condition.condition));
-	pthread_mutex_unlock( &(gnrs_condition.mutex) );
-	*/	
+START_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");	
 
 	Packet *recvd_pkt=gnrs_para->recvd_pkt;
 	OutgoingConnection *GNRS_sport=new OutgoingConnection();
@@ -210,31 +205,58 @@ START_TIMING((char *)"GNRS_daemon:global_insert_packet_handler");
 
 	//tell whether the destination AS for the GUID mapping has been computed or not
 	if(ins->dest_flag==0)  {
+	    common_header_t *hdr=(common_header_t*)recvd_pkt->getPayloadPointer();
+	    //keep a local copy of the client sender address intended for reply ack to the client
+	    char client_sender_addr[SIZE_OF_NET_ADDR];
+	    strcpy(client_sender_addr, hdr->sender_addr);
+		//K-replica and calculate destination AS for each replica
 	    for(int i=0;i<K_NUM;i++)  {
 		if(GNRSConfig::hash_func==0){
 			  Hash128 h;
-		         hashed_ip=h.HashG2Server(ins->guid, i);
+		          hashed_ip=h.HashG2Server(ins->guid, i);
 			}
 		else
 	       		hashed_ip=gnrs_para->gnrs_daemon->GUID2Server(ins->guid, i);
 		ins->dest_flag=1;
 
 		if (DEBUG >=1)    cout<<"Hashed Server IP for INSERT: " << hashed_ip<<endl;
-	        insert_packet_handler(hashed_ip.c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt);
+	        insert_msg_handler(hashed_ip.c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt, false);
 	    }
+	    //reply a insert-ack to the client who sends out the insert request
+	    OutgoingConnection *GNRS_sport=new OutgoingConnection();
+	    GNRS_sport->init();
+	    Address * GNRS_server_sendtoaddr;
+	    GNRS_server_sendtoaddr= new Address(client_sender_addr,ntohl(hdr->sender_listen_port));
+            GNRS_sport->setRemoteAddress(GNRS_server_sendtoaddr);
+	    insert_ack_message_t *ack = (insert_ack_message_t*)malloc(sizeof(insert_ack_message_t));
+	    strcpy(ack->c_hdr.sender_addr, GNRSConfig::server_addr.c_str());
+	    ack->c_hdr.req_id = ins->c_hdr.req_id;
+	    ack->c_hdr.type = INSERT_ACK;
+	    ack->c_hdr.sender_listen_port=htonl(GNRSConfig::daemon_listen_port+1);
+	    ack->resp_code = SUCCESS;
+
+	    Packet *p = new Packet();
+	    p->setPayload((char*)ack, sizeof(insert_ack_message_t)); 
+
+            GNRS_sport->sendPack(p);
+	    #ifdef DEBUG
+		if (DEBUG >=1) cout<<"ACK FOR INSERT SENT to CLIENT!"<<endl;
+	    #endif
+	    delete p;
+	    delete GNRS_server_sendtoaddr;
+	    delete GNRS_sport;
 	}
 	else	{
 		hashed_ip=GNRSConfig::server_addr;
 
 		if (DEBUG >=1)    cout<<"Hashed Server IP for INSERT: " << hashed_ip<<endl; 
-		insert_packet_handler(hashed_ip.c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt);
+		insert_msg_handler(hashed_ip.c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt, true);
 	}
 	
-REGISTER_TIMING((char *)"GNRS_daemon:global_insert_packet_handler");
+REGISTER_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");
 
 
         if(SAMPLING==1)  {
-                //uint32_t _req_id=ntohl(hdr->req_id);
                 pthread_mutex_lock(&ins_pkt_sampling_mutex);
                 proc_insert_num++;
                 pthread_mutex_unlock(&ins_pkt_sampling_mutex);
@@ -246,7 +268,7 @@ REGISTER_TIMING((char *)"GNRS_daemon:global_insert_packet_handler");
 }
 
 
-void GNRS_daemon::lookup_packet_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt)
+void GNRS_daemon::lookup_msg_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt)
 {
 	common_header_t *hdr=(common_header_t*)recvd_pkt->getPayloadPointer();
 	lookup_message_t *lkup = (lookup_message_t*)recvd_pkt->getPayloadPointer();
@@ -255,36 +277,20 @@ void GNRS_daemon::lookup_packet_handler(const char* hash_ip, HashMap _hm, Packet
         Address * GNRS_server_sendtoaddr;
 
         Packet *p;
-        //REGISTER_TIMING("GNRS_daemon:preprocess");
-
-        //START_TIMING("GNRS_daemon:usleep");
-        //usleep(20);
-        //REGISTER_TIMING("GNRS_daemon:usleep");
 
                  if(strcmp(hash_ip,GNRSConfig::server_addr.c_str())==0)
                   {
                          if (DEBUG >=1) cout << "LOOKing up GNRS locally" << endl;
                           lookup_response_message_t *resp;
 
-                          //clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &starttime_);
-                          //START_TIMING("GNRS_daemon:lookup_handler");
                           lookup_handler(_hm,lkup,resp,0);
-                          //REGISTER_TIMING("GNRS_daemon:lookup_handler");
-                          //clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &endtime_);
-                          //ProcLagFile<<timeval_diff(starttime_,endtime_)<<' ';
 
-                          //clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &starttime_);
-                           //START_TIMING("GNRS_daemon:send_out_lookup_response");
-                          //GNRS_server_sendtoaddr= new Address(hdr->sender_addr, GNRSConfig::client_listen_port);
                           GNRS_server_sendtoaddr= new Address(hdr->sender_addr, ntohl(hdr->sender_listen_port));
                        GNRS_sport->setRemoteAddress(GNRS_server_sendtoaddr);
 
                           p = new Packet();
                           p->setPayload((char*)resp, sizeof(lookup_response_message_t)+ntohs(resp->na_num)*sizeof(NA));
                        GNRS_sport->sendPack(p);
-                          //REGISTER_TIMING("GNRS_daemon:send_out_lookup_response");
-                          //clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &endtime_);
-                          //ProcLagFile<<timeval_diff(starttime_,endtime_)<<' ';
 
 			#ifdef DEBUG
                         if (DEBUG >=1) cout<<"lookup response packet sent from GNRS"<<endl;
@@ -300,25 +306,15 @@ void GNRS_daemon::lookup_packet_handler(const char* hash_ip, HashMap _hm, Packet
                     }
                     else
                      {
-                                        //send lookup packet to Hashed location
-                                        //GNRS_server_sendtoaddr = new Address(hash_ip,7000);
-                                        GNRS_server_sendtoaddr = new Address(hash_ip,GNRSConfig::daemon_listen_port+1);
-                                        GNRS_sport->setRemoteAddress(GNRS_server_sendtoaddr);
-                                        //GNRS_sport->sendPack(recvd_pkt);
+                         //send lookup packet to Hashed location
+                         GNRS_server_sendtoaddr = new Address(hash_ip,GNRSConfig::daemon_listen_port+1);
+                         GNRS_sport->setRemoteAddress(GNRS_server_sendtoaddr);
 			 #ifdef DEBUG
                          if (DEBUG >=1)    {
                                 cout << "Forwarding lookup: pkt type: " << (int)hdr->type << endl;
                                 cout<<"sender listen port:"<<ntohl(hdr->sender_listen_port)<<endl;
                          }
 			 #endif
-                         /*lookup_message_t *lkup_f = (lookup_message_t*)malloc(sizeof(lookup_message_t));
-                         strcpy(lkup_f->c_hdr.sender_addr, lkup->c_hdr.sender_addr);
-                         lkup_f->c_hdr.req_id = lkup->c_hdr.req_id;
-                         lkup_f->c_hdr.type = LOOKUP;
-                         strcpy(lkup_f->guid, lkup->guid);
-                         p = new Packet();
-                         p->setPayload((char*)lkup_f, sizeof(lookup_message_t));
-                         GNRS_sport->sendPack(p);  */
 
                          GNRS_sport->sendPack(recvd_pkt);
                       }
@@ -329,25 +325,10 @@ void GNRS_daemon::lookup_packet_handler(const char* hash_ip, HashMap _hm, Packet
 }
 
 
-void GNRS_daemon::global_LOOKUP_packet_handler(GNRS_Para *gnrs_para)
+//this is the working thread for lookup pool: called by the listening thread
+void GNRS_daemon::global_LOOKUP_msg_handler(GNRS_Para *gnrs_para)
 {
-	//int local_lookup_num=lookup_num;
-START_TIMING((char *)"GNRS_daemon:global_lookup_packet_handler");
-	//clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &starttime);
-/*
-START_TIMING("GNRS_daemon:mutex");
-	pthread_mutex_lock( &(gnrs_condition.mutex) );
-	Packet *recvd_pkt=gnrs_para->recvd_pkt;
-	gnrs_condition.condition_set = false;
-	pthread_cond_signal(&(gnrs_condition.condition));
-	pthread_mutex_unlock( &(gnrs_condition.mutex) );
-REGISTER_TIMING("GNRS_daemon:mutex");
-*/	
-/*
-        for(int j=0;j<1000000;j++)  {
-                asm volatile (".byte 0x0f, 0x31" : "=A" (_timestamp));
-        }
-*/
+START_TIMING((char *)"GNRS_daemon:global_lookup_msg_handler");
 
 	//START_TIMING("GNRS_daemon:preprocess");
 	Packet *recvd_pkt=gnrs_para->recvd_pkt;
@@ -371,31 +352,27 @@ REGISTER_TIMING("GNRS_daemon:mutex");
 		    }
 			lkup->dest_flag==1;
 			if (DEBUG >=1)    cout<<"Hashed Server IP for LOOKUP: " << hashed_ip<<endl;
-                        lookup_packet_handler(hashed_ip[0].c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt);
+                        lookup_msg_handler(hashed_ip[0].c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt);
 		}
 		else  {
 			string hashed_ip=GNRSConfig::server_addr;
 			  
              		 if (DEBUG >=1)    cout<<"Hashed Server IP for LOOKUP: " << hashed_ip<<endl; 
-		      lookup_packet_handler(hashed_ip.c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt);
+		      lookup_msg_handler(hashed_ip.c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt);
 		}
 
-	//clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &endtime);
-	//ProcLagFile<<timeval_diff(starttime,endtime)<<endl;
-double sample_time=REGISTER_TIMING((char *)"GNRS_daemon:global_lookup_packet_handler");
+double sample_time=REGISTER_TIMING((char *)"GNRS_daemon:global_lookup_msg_handler");
 
 	uint32_t _req_id;
         if(SAMPLING==1) _req_id=ntohl(hdr->req_id);
 
 	if(SAMPLING==1)  {
-		//uint32_t _req_id=ntohl(hdr->req_id);
 		pthread_mutex_lock(&lkup_pkt_sampling_mutex);
 		proc_lookup_num++;
 		if(proc_lookup_num%STAT_STEP<STAT_RANGE) gnrs_para->gnrs_daemon->timingStat(proc_lookup_num-proc_lookup_num%STAT_STEP,sample_time);
 		PKT_SAMPLE_MAP::iterator _it=_pkt_sample.find(_req_id);
 		if(_it!=_pkt_sample.end())  {
 			clock_gettime(CLOCK_REALTIME, &_it->second.endtime);
-			//printf("index: %d, endtime: %llu\n ",_req_id,(unsigned long long)_it->second.endtime.tv_sec*1000000000 + _it->second.endtime.tv_nsec );
 		}  
 		pthread_mutex_unlock(&lkup_pkt_sampling_mutex);
 	}
@@ -421,35 +398,18 @@ void* GNRS_daemon::g_receiver()
 		
         cout<<"GNRS : Receiver started"<<endl;
 
-	/*ProcLagFile.open("/var/log/processing_lag.data"); 
-	if (!ProcLagFile.is_open()){
-		cerr << "Can't open OUTPUT Latency File !!! Returning..." <<endl;
-		return (void *)0;
-	}  */
-
-	ThreadPool<GNRS_Para*> insert_pool (global_INSERT_packet_handler, 
+	ThreadPool<GNRS_Para*> insert_pool (global_INSERT_msg_handler, 
 		pool_size, //minimum threads
 		pool_size, //maximum threads
 		ThreadPool<GNRS_Para*>::UnlimitedLifetime  //thread lifetime
 		);
 
-	ThreadPool<GNRS_Para*> lookup_pool (global_LOOKUP_packet_handler, 
+	ThreadPool<GNRS_Para*> lookup_pool (global_LOOKUP_msg_handler, 
 		pool_size, 
 		pool_size, 
 		ThreadPool<GNRS_Para*>::UnlimitedLifetime
 		);
 
-	/*ThreadPool<GNRS_daemon*> insert_pool (global_INSERT_packet_handler, 
-		1, //minimum threads
-		1, //maximum threads
-		ThreadPool<GNRS_daemon*>::UnlimitedLifetime  //thread lifetime
-		);
-
-	ThreadPool<GNRS_daemon*> lookup_pool (global_LOOKUP_packet_handler, 
-		1, 
-		1, 
-		ThreadPool<GNRS_daemon*>::UnlimitedLifetime
-		);  */
 	
 	//Packet *recvd_pkt;
 	common_header_t *hdr;
@@ -462,12 +422,6 @@ void* GNRS_daemon::g_receiver()
 		thres=-serv_req_num; 
         while(i<thres){
                  try{
-			   /* 	pthread_mutex_lock( &(gnrs_condition.mutex) );
-				if (gnrs_condition.condition_set) {   //side effect: limit the number of para in the para queue of thread pool to at most 1.
-	 				 pthread_cond_wait(&(gnrs_condition.condition), &(gnrs_condition.mutex));
-				}
-				pthread_mutex_unlock( (&gnrs_condition.mutex) );  */
-
                          recvd_pkt = my_global_rport->receivePacketDirectly();					
 		
 			 gnrs_para=new GNRS_Para;
@@ -478,20 +432,16 @@ void* GNRS_daemon::g_receiver()
 				startStatistics(0.1);		
 				j++;
 			  }
-			    //gettimeofday(&starttime,0x0);
-			    //clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &starttime);
                          if(recvd_pkt != NULL)
                          {    
 				    hdr = (common_header_t*)recvd_pkt->getPayloadPointer();
 
 				    if(SAMPLING==1&&rec_lookup_num%1000==1)  {  //potential bug lies: here we assume if a lookup pkt comes, the following pkts are all lookup. but the packet might be insert packet, don't need to be counted.
 						uint32_t _req_id=ntohl(hdr->req_id);
-						//cout<<"lookup_num:"<<lookup_num<<"  req_id:"<<_req_id<<endl;
 						pthread_mutex_lock(&lkup_pkt_sampling_mutex);
 						clock_gettime(CLOCK_REALTIME, &_pkt_sample[_req_id].starttime);
         				        _pkt_sample[_req_id].endtime.tv_sec=0;
 				                _pkt_sample[_req_id].endtime.tv_nsec=0;
-						//printf("index: %d, starttime: %llu\n ",_req_id,(unsigned long long)_pkt_sample[_req_id].starttime.tv_sec*1000000000 + _pkt_sample[_req_id].starttime.tv_nsec );
 						pthread_mutex_unlock(&lkup_pkt_sampling_mutex);
 				    }
 
@@ -511,19 +461,10 @@ void* GNRS_daemon::g_receiver()
 					    insert_pool.Launch(gnrs_para);
 					    rec_insert_num++;
 	                           	}
-					    //g_thread = boost::thread(&GNRS_daemon::global_INSERT_packet_handler, this, recvd_pkt,hdr,GNRS_sport);  
-					    //global_INSERT_packet_handler(recvd_pkt,hdr,GNRS_sport);
 	                           else if(hdr->type == LOOKUP) {
-					    //lookup_pool.Launch(this);
 					    lookup_pool.Launch(gnrs_para);
 					    rec_lookup_num++;
 	                           	}
-					    //g_thread = boost::thread(&GNRS_daemon::global_LOOKUP_packet_handler, this, recvd_pkt,hdr,GNRS_sport);  
-					    //global_LOOKUP_packet_handler(recvd_pkt,hdr,GNRS_sport);   
-					    
-					   //gettimeofday(&endtime,0x0);
-					   //clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &endtime);
-			 		   //ProcLagFile<<timeval_diff(starttime,endtime)<<endl;
                           } 
 			if(serv_req_num>0) i++;
                    }
@@ -542,37 +483,10 @@ void* GNRS_daemon::g_receiver()
 		pthread_cond_destroy(&gnrs_condition.condition);
 		delete(GNRS_server_raddr);
 		delete(my_global_rport);
-		//ProcLagFile.close(); 
         return (void *)0;
 
 }  // end of GNRS receiver
 
-
-
-/****************************************************
-
-	
-	Do longest prefix matching for an IP 
-	return: Maxlenght (which can be ZERO) 
-			and the coresponding asNumber
-
-void GNRS_daemon::longestPrefixMatching(u32b IP, u8b &maxPrefLen, asNum &asNumber, Cidr &maxPrefCidr){
-	maxPrefLen =0; 
-	asNumber =0; 
-	//Walk through all prefixes PREFIX to find the longest one 
-	for(u32b i=0; i<curr_prefix.entryList.size();i++){
-		u32b bitMask = curr_prefix.entryList[i].mask_bit-1;
-		u32b left = curr_prefix.entryList[i].prefix & MASK[bitMask];
-		u32b right = IP & MASK[bitMask]; 
-		if ((left == right) && (maxPrefLen < bitMask+1)){
-			maxPrefLen = bitMask + 1; 
-			asNumber = curr_prefix.entryList[i].orgin_AS; 
-			maxPrefCidr.mask_bit = curr_prefix.entryList[i].mask_bit;
-			maxPrefCidr.prefix = curr_prefix.entryList[i].prefix; 
-		}
-	}
-}
-*************************************************/
 
 
 
@@ -745,7 +659,7 @@ void GNRS_daemon::print_usage()
 
 // we have three output files here:
 // gnrs_proc_statistics.data: print out the number of insert and lookup pkts processed per 0.1s
-// gnrs_time_statistics.data: print out the processing time of global_lookup_handler along time. results might not be accurate as it outreaches timing library's precision limit
+// gnrs_time_statistics.data: print out the processing time of global_lookup_handler for certain sampled pkt.
 // pkt_sampling_output.data: print out the total service time of sampled pkt
 int main(int argc,const char * argv[]) {
 
