@@ -12,8 +12,9 @@
 
 #ifdef UNITTEST
 #include "unit_test.h"
-#include <string>
+#include <cstring>
 #include <stdlib.h>
+
 
 /// LRUCache type for use in the unit tests
 typedef LRUCache<std::string,std::string> unit_lru_type;

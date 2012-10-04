@@ -123,6 +123,7 @@ unit_test_sub_SOURCES = sub_unit.cpp
 #define _UNIT_TEST_H
 
 #ifdef UNITTEST
+#include <stdio.h>
 #include <iostream>
 #include <vector>
 #include <sys/time.h>
