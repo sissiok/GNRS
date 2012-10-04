@@ -206,9 +206,27 @@ START_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");
 	//tell whether the destination AS for the GUID mapping has been computed or not
 	if(ins->dest_flag==0)  {
 	    common_header_t *hdr=(common_header_t*)recvd_pkt->getPayloadPointer();
-	    //keep a local copy of the client sender address intended for reply ack to the client
-	    char client_sender_addr[SIZE_OF_NET_ADDR];
-	    strcpy(client_sender_addr, hdr->sender_addr);
+
+            //reply a insert-ack to the client who sends out the insert request
+            OutgoingConnection *GNRS_sport=new OutgoingConnection();
+            GNRS_sport->init();
+            Address * GNRS_server_sendtoaddr;
+            GNRS_server_sendtoaddr= new Address(hdr->sender_addr,ntohl(hdr->sender_listen_port));
+            GNRS_sport->setRemoteAddress(GNRS_server_sendtoaddr);
+            insert_ack_message_t *ack = (insert_ack_message_t*)malloc(sizeof(insert_ack_message_t));
+            strcpy(ack->c_hdr.sender_addr, GNRSConfig::server_addr.c_str());
+            ack->c_hdr.req_id = ins->c_hdr.req_id;
+            ack->c_hdr.type = INSERT_ACK;
+            ack->c_hdr.sender_listen_port=htonl(GNRSConfig::daemon_listen_port+1);
+            ack->resp_code = SUCCESS;
+
+            Packet *p = new Packet();
+            p->setPayload((char*)ack, sizeof(insert_ack_message_t));
+
+            GNRS_sport->sendPack(p);
+            #ifdef DEBUG
+                if (DEBUG >=1) cout<<"ACK FOR INSERT SENT to CLIENT!"<<endl;
+            #endif
 
 	    //insert cache for ack checking
 	    msg_element* _temp = new msg_element;
@@ -218,7 +236,7 @@ START_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");
 	    gettimeofday(&_req_time, NULL);
 	    _temp->expire_ts = (unsigned long long)_req_time.tv_sec*1000000 + _req_time.tv_usec + INSERT_TIMEOUT;
 	    _temp->ack_num = 0;
-	    insert_cache.push_back(_temp);
+	    insert_cache.push_back(_temp); //TODO: need mutex here
 
 	    //K-replica and calculate destination AS for each replica
 	    for(int i=0;i<K_NUM;i++)  {
@@ -229,33 +247,19 @@ START_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");
 		else
 	       		hashed_ip=gnrs_para->gnrs_daemon->GUID2Server(ins->guid, i);
 		ins->dest_flag=1;
+		const char * hash_ip = hashed_ip.c_str(); 
+		
+		strcpy(_temp->_dstInfo[i].dst_addr, hash_ip);
+		if(strcmp(hash_ip,GNRSConfig::server_addr.c_str())==0)
+			_temp->_dstInfo[i].ack_flag = true;  //no ack is needed if it will be inserted locally
+		else
+			_temp->_dstInfo[i].ack_flag = false;
 
-		strcpy(_temp->_dstInfo[i].dst_addr, hashed_ip.c_str());
-		_temp->_dstInfo[i].ack_flag = false;
 
 		if (DEBUG >=1)    cout<<"Hashed Server IP for INSERT: " << hashed_ip<<endl;
-	        insert_msg_handler(hashed_ip.c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt, false);
+	        insert_msg_handler(hash_ip, gnrs_para->gnrs_daemon->g_hm, recvd_pkt, false);
 	    }
-	    //reply a insert-ack to the client who sends out the insert request
-	    OutgoingConnection *GNRS_sport=new OutgoingConnection();
-	    GNRS_sport->init();
-	    Address * GNRS_server_sendtoaddr;
-	    GNRS_server_sendtoaddr= new Address(client_sender_addr,ntohl(hdr->sender_listen_port));
-            GNRS_sport->setRemoteAddress(GNRS_server_sendtoaddr);
-	    insert_ack_message_t *ack = (insert_ack_message_t*)malloc(sizeof(insert_ack_message_t));
-	    strcpy(ack->c_hdr.sender_addr, GNRSConfig::server_addr.c_str());
-	    ack->c_hdr.req_id = ins->c_hdr.req_id;
-	    ack->c_hdr.type = INSERT_ACK;
-	    ack->c_hdr.sender_listen_port=htonl(GNRSConfig::daemon_listen_port+1);
-	    ack->resp_code = SUCCESS;
 
-	    Packet *p = new Packet();
-	    p->setPayload((char*)ack, sizeof(insert_ack_message_t)); 
-
-            GNRS_sport->sendPack(p);
-	    #ifdef DEBUG
-		if (DEBUG >=1) cout<<"ACK FOR INSERT SENT to CLIENT!"<<endl;
-	    #endif
 	    delete p;
 	    delete GNRS_server_sendtoaddr;
 	    delete GNRS_sport;
