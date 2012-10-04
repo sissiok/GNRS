@@ -241,16 +241,44 @@ void gnrsd::global_INSERT_msg_handler(MsgParameter *gnrs_para)
 {
 START_TIMING((char *)"gnrsd:global_insert_msg_handler");
 
-  gnrsd* server = gnrs_para->gnrs_daemon;
-  guid_cache_t* cache = server->getCache();
-
+  
+  struct timeval _req_time;
+  gettimeofday(&_req_time, NULL);
 
 	Packet *recvd_pkt=gnrs_para->recvd_pkt;
 	OutgoingConnection *GNRS_sport=new OutgoingConnection();
         GNRS_sport->init();
         if (DEBUG >=1) cout<<"insert packet received at GNRS"<<endl;
 	insert_message_t *ins = (insert_message_t*)recvd_pkt->getPayloadPointer();
-	if (DEBUG >=1)    cout <<"Mapping info in packet is : guid: " << ins->guid << " netaddr: " <<ins->NAs[0].net_addr<<endl;
+  // Insert into the cache
+  gnrsd* server = gnrs_para->gnrs_daemon;
+  guid_cache_t* cache = server->getCache();
+
+  char* guid = ins->guid;
+  uint16_t numNetAddrs = ins->na_num;
+  NA* netAddrs = ins->NAs;
+  value* someValue = new value;
+  // Allocate the vectors needed
+  someValue->locator = new vector<string*>();
+  someValue->expire = new vector<unsigned int*>();
+  someValue->weight = new vector<unsigned short*>();
+  for(NA* someNetAddr = netAddrs; 
+      someNetAddr < netAddrs+numNetAddrs; 
+      ++someNetAddr){
+    someValue->locator->push_back((new string(someNetAddr->net_addr)));
+    unsigned int* expireTime = new unsigned int(_req_time.tv_sec +
+      ntohl(someNetAddr->ttlMsec)/1000);
+    someValue->expire->push_back(expireTime);
+    unsigned short* weight = new unsigned short((ntohs(someNetAddr->weight)));
+    someValue->weight->push_back(weight);
+  }
+
+  cache->insert(guid,someValue);
+
+	if (DEBUG >=1) {
+    cout <<"Mapping info in packet is : guid: " << ins->guid << " netaddr: "
+         << ins->NAs[0].net_addr<<endl; 
+  }
 
 	string hashed_ip;
 
@@ -283,8 +311,6 @@ START_TIMING((char *)"gnrsd:global_insert_msg_handler");
 	    insert_msg_element* _temp = new insert_msg_element;
 	    //_temp->req_id = ntohl(hdr->req_id);
 	    _temp->pkt = recvd_pkt;
-	    struct timeval _req_time;
-	    gettimeofday(&_req_time, NULL);
 	    _temp->expire_ts = (unsigned long long)_req_time.tv_sec*1000000 + _req_time.tv_usec + INSERT_TIMEOUT;
 	    _temp->ack_num = 0;
 

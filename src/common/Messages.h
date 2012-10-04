@@ -13,7 +13,7 @@
 
 struct NA{
 		char net_addr[SIZE_OF_NET_ADDR];
-		uint32_t TTL;
+		uint32_t ttlMsec; // Expiration TTL in milliseconds
 		uint16_t weight;
 };
 
