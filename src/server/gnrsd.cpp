@@ -232,10 +232,18 @@ void gnrsd::insert_msg_handler(const char* hash_ip, HashMap& _hm, Packet* recvd_
         delete GNRS_sport;
 }
 
+guid_cache_t* gnrsd::getCache(){
+  return this->cache;
+}
+
 //this is the working thread for insert pool: called by the listening thread
 void gnrsd::global_INSERT_msg_handler(MsgParameter *gnrs_para)
 {
 START_TIMING((char *)"gnrsd:global_insert_msg_handler");
+
+  gnrsd* server = gnrs_para->gnrs_daemon;
+  guid_cache_t* cache = server->getCache();
+
 
 	Packet *recvd_pkt=gnrs_para->recvd_pkt;
 	OutgoingConnection *GNRS_sport=new OutgoingConnection();

@@ -60,6 +60,7 @@ class gnrsd: public daemon{
   public:
 
     gnrsd();
+    ~gnrsd();
 
     struct MsgParameter  {
       Packet *recvd_pkt;
@@ -103,6 +104,8 @@ class gnrsd: public daemon{
     int timingStat(int index,double time_);
     int prev_time_index,prev_index_num;
     double total_time;
+    
+    guid_cache_t* getCache();
 
   private:
     Address * GNRS_server_raddr;
