@@ -486,6 +486,7 @@ void gnrsd::global_LOOKUP_msg_handler(MsgParameter *gnrs_para)
     vector<string*>::iterator netIter = cachedValue->locator->begin();
     vector<unsigned int*>::iterator expireIter = cachedValue->expire->begin();
     vector<unsigned short*>::iterator weightIter = cachedValue->weight->begin();
+    vector<NA> naVector;
     // Step through each cached value
     for(; netIter != cachedValue->locator->end(); netIter++){
       expire = **expireIter;
@@ -494,6 +495,11 @@ void gnrsd::global_LOOKUP_msg_handler(MsgParameter *gnrs_para)
         cacheMiss = true;
       }else {
         // Prep some output for the response message
+        struct NA newNA;
+        strncpy(newNA.net_addr,(*netIter)->c_str(),SIZE_OF_NET_ADDR);
+        newNA.ttlMsec = (uint32_t)(htonl(**expireIter));
+        newNA.weight = (uint16_t)(htons(**weightIter));
+        naVector.push_back(newNA);
       }
       
 
@@ -501,12 +507,53 @@ void gnrsd::global_LOOKUP_msg_handler(MsgParameter *gnrs_para)
       expireIter++;
       weightIter++;
     }
+    // Send the packet
+    if(!naVector.empty()){
+      // Build a response message
+      int responseLength =
+        sizeof(lookup_response_message_t)+naVector.size()*sizeof(NA);
+      lookup_response_message_t* responseMsg =
+        (lookup_response_message_t*)
+          malloc(responseLength);
+
+      // Build the common header info
+      responseMsg->c_hdr.req_id = hdr->req_id;
+      responseMsg->c_hdr.type = LOOKUP_RESP;
+      responseMsg->c_hdr.sender_listen_port = htonl(GNRSConfig::daemon_listen_port);
+
+      // Indicate a success
+      // TODO: Return CACHED response code
+      responseMsg->resp_code = htons(SUCCESS);
+      // Number of NAs in message
+      responseMsg->na_num = htonl(naVector.size());
+      // Step through each NA and put it in the response
+      int i = 0;
+      while(i < responseMsg->na_num){
+        responseMsg->NAs[i] = naVector[i];
+        ++i;
+      }
+
+      // Allocate a socket to send the response message
+      OutgoingConnection sendSocket;
+      sendSocket.init();
+      // Grab the address from the request
+      Address dstAddress(hdr->sender_addr,ntohl(hdr->sender_listen_port));
+      sendSocket.setRemoteAddress(&dstAddress);
+      
+      // Create a packet to send the message in
+      Packet p;
+      p.setPayload((char*)responseMsg,responseLength);
+
+      // Send the packet
+      sendSocket.sendPack(&p);
+      delete responseMsg;
+    }
   }else{
     cacheMiss = true;
   }
   
   if(!cacheMiss){
-    // TODO: Used cached value
+    // TODO: Use cached value
     delete(recvd_pkt);
     delete gnrs_para;
     return;
