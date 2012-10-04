@@ -6,6 +6,7 @@
 #include "announced_prefix_table.h"
 #include "./LPM/iproutetable.hh"
 #include "./LPM/radixiplookup.hh"
+#include <lru_cache.h>
 
 #define MAX_RETRY_NUM 5
 #define INSERT_TIMEOUT 5000000 //us
