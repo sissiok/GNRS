@@ -3,7 +3,7 @@
 #include <map>
 #include "ThreadPool.h"
 #include "db_cxx.h"
-#include "GNRS_daemon.h"
+#include "gnrsd.h"
 //#include "../common/time_measure.h"
 #include "../common/profiler/Timing.h"
 #include "statistics.h"
@@ -16,10 +16,10 @@ int serv_req_num;
 
 
 unsigned long long _timestamp;
-map<uint32_t, insert_msg_element*> * GNRS_daemon::insert_table = NULL;
-map<uint32_t,lookup_msg_element*> * GNRS_daemon::lookup_table = NULL;
+map<uint32_t, insert_msg_element*> * gnrsd::insert_table = NULL;
+map<uint32_t,lookup_msg_element*> * gnrsd::lookup_table = NULL;
 
-GNRS_daemon::GNRS_daemon():g_hm()
+gnrsd::gnrsd():g_hm()
 {
 	prev_time_index=0;
 	prev_index_num=0;
@@ -27,7 +27,7 @@ GNRS_daemon::GNRS_daemon():g_hm()
 
 }
 
-int GNRS_daemon::timingStat(int index,double time_)
+int gnrsd::timingStat(int index,double time_)
 {
   if(index==prev_time_index)  {
 	prev_index_num++;
@@ -44,7 +44,7 @@ int GNRS_daemon::timingStat(int index,double time_)
 
 //return with the AS number when given a GUID
 //GUID-->IP-->AS-->server node
-string GNRS_daemon::GUID2Server(char* GUID, uint8_t hashIndex)
+string gnrsd::GUID2Server(char* GUID, uint8_t hashIndex)
 {
 	Hash128 h;
 	u32b destIP = h.HashG2IP(GUID, hashIndex); 
@@ -114,7 +114,7 @@ string GNRS_daemon::GUID2Server(char* GUID, uint8_t hashIndex)
 }
 
 //async timer for the insert msg
-void* GNRS_daemon::InsertTimerProc(void *arg)  {
+void* gnrsd::InsertTimerProc(void *arg)  {
 
 	while(1)  {
 		usleep(WAKEUP_INTERVAL);
@@ -162,7 +162,7 @@ void* GNRS_daemon::InsertTimerProc(void *arg)  {
 
 //hash_ip: Hashed Server IP for INSERT
 //FromServer: true: the msg is redirected from another gnrs server; false: the msg comes from a client
-void GNRS_daemon::insert_msg_handler(const char* hash_ip, HashMap& _hm, Packet* recvd_pkt, bool FromServer)
+void gnrsd::insert_msg_handler(const char* hash_ip, HashMap& _hm, Packet* recvd_pkt, bool FromServer)
 {
 	common_header_t *hdr=(common_header_t*)recvd_pkt->getPayloadPointer();
 	insert_message_t *ins = (insert_message_t*)recvd_pkt->getPayloadPointer();
@@ -228,9 +228,9 @@ void GNRS_daemon::insert_msg_handler(const char* hash_ip, HashMap& _hm, Packet* 
 }
 
 //this is the working thread for insert pool: called by the listening thread
-void GNRS_daemon::global_INSERT_msg_handler(MsgParameter *gnrs_para)
+void gnrsd::global_INSERT_msg_handler(MsgParameter *gnrs_para)
 {
-START_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");
+START_TIMING((char *)"gnrsd:global_insert_msg_handler");
 
 	Packet *recvd_pkt=gnrs_para->recvd_pkt;
 	OutgoingConnection *GNRS_sport=new OutgoingConnection();
@@ -330,7 +330,7 @@ START_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");
 		delete recvd_pkt;
 	}
 	
-REGISTER_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");
+REGISTER_TIMING((char *)"gnrsd:global_insert_msg_handler");
 
 
         if(SAMPLING==1)  {
@@ -346,7 +346,7 @@ REGISTER_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");
 }
 
 //hash_ip: the ip address for the server that will serve the lookup request
-void GNRS_daemon::lookup_msg_handler(const char* hash_ip, HashMap& _hm, Packet* recvd_pkt)
+void gnrsd::lookup_msg_handler(const char* hash_ip, HashMap& _hm, Packet* recvd_pkt)
 {
 	common_header_t *hdr=(common_header_t*)recvd_pkt->getPayloadPointer();
 	lookup_message_t *lkup = (lookup_message_t*)recvd_pkt->getPayloadPointer();
@@ -415,11 +415,11 @@ void GNRS_daemon::lookup_msg_handler(const char* hash_ip, HashMap& _hm, Packet* 
 
 
 //this is the working thread for lookup pool: called by the listening thread
-void GNRS_daemon::global_LOOKUP_msg_handler(MsgParameter *gnrs_para)
+void gnrsd::global_LOOKUP_msg_handler(MsgParameter *gnrs_para)
 {
-START_TIMING((char *)"GNRS_daemon:global_lookup_msg_handler");
+START_TIMING((char *)"gnrsd:global_lookup_msg_handler");
 
-	//START_TIMING("GNRS_daemon:preprocess");
+	//START_TIMING("gnrsd:preprocess");
 	Packet *recvd_pkt=gnrs_para->recvd_pkt;
 	common_header_t *hdr=(common_header_t*)recvd_pkt->getPayloadPointer();
 		if (DEBUG >=1) cout<<"Packet Recieved for Lookup at GNRS"<<endl;
@@ -448,7 +448,7 @@ START_TIMING((char *)"GNRS_daemon:global_lookup_msg_handler");
 		         lookup_msg_handler(hashed_ip.c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt);
 		}
 
-double sample_time=REGISTER_TIMING((char *)"GNRS_daemon:global_lookup_msg_handler");
+double sample_time=REGISTER_TIMING((char *)"gnrsd:global_lookup_msg_handler");
 
 	uint32_t _req_id;
         if(SAMPLING==1) _req_id=ntohl(hdr->req_id);
@@ -471,7 +471,7 @@ double sample_time=REGISTER_TIMING((char *)"GNRS_daemon:global_lookup_msg_handle
 
 
 //this is the working thread for insert ack pool: called by the listening thread
-void GNRS_daemon::global_INSERT_ACK_handler(MsgParameter *msg_para)
+void gnrsd::global_INSERT_ACK_handler(MsgParameter *msg_para)
 {
 	Packet *recvd_pkt=msg_para->recvd_pkt;
         common_header_t *hdr=(common_header_t*)recvd_pkt->getPayloadPointer();
@@ -510,7 +510,7 @@ void GNRS_daemon::global_INSERT_ACK_handler(MsgParameter *msg_para)
 
 //this is the working thread for lookup response pool: called by the listening thread
 //it will check the lookup_table to retrieve the client network address and listening port number which it can use for forwarding
-void GNRS_daemon::global_LOOKUP_RESP_handler(MsgParameter *msg_para)
+void gnrsd::global_LOOKUP_RESP_handler(MsgParameter *msg_para)
 {
 	Packet *recvd_pkt=msg_para->recvd_pkt;
 	common_header_t *hdr=(common_header_t*)recvd_pkt->getPayloadPointer();
@@ -549,7 +549,7 @@ void GNRS_daemon::global_LOOKUP_RESP_handler(MsgParameter *msg_para)
 *   Recieve insert ack: type 2
 *   Recieve lookup response: type 3
 */
-int GNRS_daemon::g_receiver()
+int gnrsd::g_receiver()
 {
 
 	insert_table = new map<uint32_t, insert_msg_element*>;
@@ -677,7 +677,7 @@ int GNRS_daemon::g_receiver()
 
 
 
-void GNRS_daemon::read_prefix_table(const char *pref_Filename)
+void gnrsd::read_prefix_table(const char *pref_Filename)
 {
 	//build prefix table data structure
 	u64b act_time=0;
@@ -729,7 +729,7 @@ void GNRS_daemon::read_prefix_table(const char *pref_Filename)
 }  
 
 
-void* GNRS_daemon::read_server_list()
+void* gnrsd::read_server_list()
 {
 	int count=0;
       string line;
@@ -756,7 +756,7 @@ void* GNRS_daemon::read_server_list()
  * Update in-memory structure with mappings from persistent store
  *
  */
-void GNRS_daemon::read_mappings_from_store(){
+void gnrsd::read_mappings_from_store(){
 
 	Driver *driver = get_driver_instance();
 	/* build db url for connection */
@@ -825,7 +825,7 @@ void GNRS_daemon::read_mappings_from_store(){
 initialize the MASK array
 (UTILITY FUNCTION)
 */
-void GNRS_daemon::initMASK(){
+void gnrsd::initMASK(){
 	u32b tmp =0;	 
 	for (u8b i=0; i<32; i++){
 		u32b tmp2 = (1); 
@@ -838,7 +838,7 @@ void GNRS_daemon::initMASK(){
 
 
 
-void GNRS_daemon::print_usage()
+void gnrsd::print_usage()
 {
 	cout << "Usage: ./gnrsd <config file> [ <thread_pool_size> <service_req_num> <server_self_addr>] [servers_list_file ]" << endl;
 }
@@ -850,7 +850,7 @@ void GNRS_daemon::print_usage()
 // pkt_sampling_output.data: print out the total service time of sampled pkt
 int main(int argc,const char * argv[]) {
 
-	GNRS_daemon gnrsd;
+	gnrsd gnrsd;
 	if(argc < 2){
 		gnrsd.print_usage();
 		exit(0);

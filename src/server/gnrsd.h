@@ -1,3 +1,6 @@
+#ifndef _GNRSD_H
+#define _GNRSD_H
+
 #include "daemon.h"
 #include "Hash128.h"
 #include "announced_prefix_table.h"
@@ -50,14 +53,14 @@ struct lookup_msg_element {
 	uint32_t src_listen_port;
 };
 
-class GNRS_daemon: public daemon{
+class gnrsd: public daemon{
 public:
 
-GNRS_daemon();
+gnrsd();
 
 struct MsgParameter  {
         Packet *recvd_pkt;
-        GNRS_daemon *gnrs_daemon;
+        gnrsd *gnrs_daemon;
 };
 
 //resend the insert msg if timeout
@@ -100,9 +103,7 @@ double total_time;
 
 private:
 	Address * GNRS_server_raddr;
-	//Address * GNRS_server_saddr;
 	IncomingConnection *my_global_rport;
-	//OutgoingConnection *GNRS_sport;
 	HashMap g_hm;    //global hashmap 
 
 	RadixIPLookup *radixlookup;
@@ -224,4 +225,5 @@ inline void makemask(char *str, char *mask,char *ip)
 		 
 	}
 }
+#endif
 
