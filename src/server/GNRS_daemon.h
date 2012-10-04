@@ -4,6 +4,9 @@
 #include "./LPM/iproutetable.hh"
 #include "./LPM/radixiplookup.hh"
 
+#define MAX_RETRY_NUM 5
+#define INSERT_TIMEOUT 500000 //us
+
 Driver *driver;
 Connection *con;
 Statement *stmt;
@@ -25,6 +28,20 @@ struct GNRS_Condition {
 		bool condition_set;
 	} gnrs_condition;
 
+
+//these two  structures are used for insert msg for ack reliability
+struct dst_info {
+	char dst_addr[SIZE_OF_NET_ADDR];
+	bool ack_flag;  //true: got acked; false: not acked yet
+};
+struct msg_element {
+        uint32_t req_id;
+	Packet *_pkt;
+	unsigned long long expire_ts; //expire timestamp for this packet
+        int ack_num;  //number of ack received
+	dst_info _dstInfo[K_NUM];
+};
+
 class GNRS_daemon: public daemon{
 public:
 
@@ -34,6 +51,9 @@ struct GNRS_Para  {
         Packet *recvd_pkt;
         GNRS_daemon *gnrs_daemon;
 };
+
+//vector used for insert ack checking
+vector<msg_element*> insert_cache;
 
 static void insert_msg_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt, bool redirect_flag);
 

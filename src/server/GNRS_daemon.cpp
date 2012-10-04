@@ -209,7 +209,18 @@ START_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");
 	    //keep a local copy of the client sender address intended for reply ack to the client
 	    char client_sender_addr[SIZE_OF_NET_ADDR];
 	    strcpy(client_sender_addr, hdr->sender_addr);
-		//K-replica and calculate destination AS for each replica
+
+	    //insert cache for ack checking
+	    msg_element* _temp = new msg_element;
+	    _temp->req_id = ntohl(hdr->req_id);
+	    _temp->pkt = recvd_pkt;
+	    struct timeval _req_time;
+	    gettimeofday(&_req_time, NULL);
+	    _temp->expire_ts = (unsigned long long)_req_time.tv_sec*1000000 + _req_time.tv_usec + INSERT_TIMEOUT;
+	    _temp->ack_num = 0;
+	    insert_cache.push_back(_temp);
+
+	    //K-replica and calculate destination AS for each replica
 	    for(int i=0;i<K_NUM;i++)  {
 		if(GNRSConfig::hash_func==0){
 			  Hash128 h;
@@ -218,6 +229,9 @@ START_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");
 		else
 	       		hashed_ip=gnrs_para->gnrs_daemon->GUID2Server(ins->guid, i);
 		ins->dest_flag=1;
+
+		strcpy(_temp->_dstInfo[i].dst_addr, hashed_ip.c_str());
+		_temp->_dstInfo[i].ack_flag = false;
 
 		if (DEBUG >=1)    cout<<"Hashed Server IP for INSERT: " << hashed_ip<<endl;
 	        insert_msg_handler(hashed_ip.c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt, false);
