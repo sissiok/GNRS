@@ -1,0 +1,12 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$classLRUCache.xhtml#ad59b44b509fcef46b3666695c5e4a1aa" title="Clears all storage and indices." alt="" coords="180,5,303,33"/>
+<area shape="rect" id="node5" href="$lru__cache_8cpp.xhtml#a5cc6945fc2f7ed6a7c8481972f4e172c" title="Dumps the cache for debugging." alt="" coords="214,57,269,85"/>
+<area shape="rect" id="node9" href="$classLRUCache.xhtml#a5896c9481fb649f5570fb8677c33b49c" title="Fetches a copy of cached data." alt="" coords="388,109,511,137"/>
+<area shape="rect" id="node11" href="$classLRUCache.xhtml#aa095f7527b11c4fb1bfad28bc06c91a6" title="Checks for the existance of a key in the cache." alt="" coords="177,161,305,189"/>
+<area shape="rect" id="node14" href="$classLRUCache.xhtml#a47523c87a56e9bd718566b2659366fd1" title="Inserts a key&#45;data pair into the cache and removes entries if neccessary." alt="" coords="178,213,305,241"/>
+<area shape="rect" id="node16" href="$classLRUCache.xhtml#a3b625a8778e0dc1e5e69da3c331b9751" title="Gets the maximum sbstract size of the cache." alt="" coords="166,265,316,293"/>
+<area shape="rect" id="node18" href="$classLRUCache.xhtml#a34e974cf87c08620131a9b006443e93b" title="Removes a key&#45;data pair from the cache." alt="" coords="172,317,311,345"/>
+<area shape="rect" id="node20" href="$classLRUCache.xhtml#a3a521aa7646757957a53850db90ad289" title="Gets the current abstract size of the cache." alt="" coords="182,369,300,397"/>
+<area shape="rect" id="node22" href="$classLRUCache.xhtml#a844206e9e2fde04aaf11c638725f2c29" title="Touches a key in the Cache and makes it the most recently used." alt="" coords="178,421,305,449"/>
+<area shape="rect" id="node7" href="$classLRUCache.xhtml#a3ca261ee9025168c081883b6dacc4131" title="Get a list of keys." alt="" coords="365,57,533,85"/>
+</map>

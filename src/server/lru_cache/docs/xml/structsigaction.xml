@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.1">
+  <compounddef id="structsigaction" kind="struct" prot="public">
+    <compoundname>sigaction</compoundname>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structsigaction_1a684e70081d03d46ce70af097ea5cfd49" prot="public" static="no" mutable="no">
+        <type>sigset_t</type>
+        <definition>sigset_t sigaction::sa_mask</definition>
+        <argsstring></argsstring>
+        <name>sa_mask</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" line="1334" bodyfile="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" bodystart="1334" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structsigaction_1aea0dabe7a03641c8b426521f4406b425" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int sigaction::sa_flags</definition>
+        <argsstring></argsstring>
+        <name>sa_flags</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" line="1335" bodyfile="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" bodystart="1335" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <collaborationgraph>
+      <node id="29">
+        <label>sigaction</label>
+      </node>
+    </collaborationgraph>
+    <location file="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" line="1332" bodyfile="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" bodystart="1332" bodyend="1336"/>
+    <listofallmembers>
+      <member refid="structsigaction_1aea0dabe7a03641c8b426521f4406b425" prot="public" virt="non-virtual"><scope>sigaction</scope><name>sa_flags</name></member>
+      <member refid="structsigaction_1a684e70081d03d46ce70af097ea5cfd49" prot="public" virt="non-virtual"><scope>sigaction</scope><name>sa_mask</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

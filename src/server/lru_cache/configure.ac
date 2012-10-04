@@ -1,0 +1,14 @@
+AC_INIT
+AC_CONFIG_SRCDIR([configure.ac])
+
+AC_CONFIG_HEADERS([config.h])
+AM_INIT_AUTOMAKE(lru_cache, 0.5)
+
+AC_LANG([C++])
+AC_PROG_CXX
+LT_INIT
+
+AX_BOOST_THREAD
+
+AC_CONFIG_FILES([Makefile src/Makefile])
+AC_OUTPUT

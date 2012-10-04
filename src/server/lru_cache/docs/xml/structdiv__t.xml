@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.1">
+  <compounddef id="structdiv__t" kind="struct" prot="public">
+    <compoundname>div_t</compoundname>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structdiv__t_1a0b9dda2884048daa68ca4aaa12b17b9a" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int div_t::quot</definition>
+        <argsstring></argsstring>
+        <name>quot</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" line="1525" bodyfile="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" bodystart="1525" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structdiv__t_1ac64389de252de53eda8b4f8dbb7c623f" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int div_t::rem</definition>
+        <argsstring></argsstring>
+        <name>rem</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" line="1526" bodyfile="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" bodystart="1526" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <collaborationgraph>
+      <node id="9">
+        <label>div_t</label>
+      </node>
+    </collaborationgraph>
+    <location file="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" line="1524" bodyfile="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" bodystart="1524" bodyend="1527"/>
+    <listofallmembers>
+      <member refid="structdiv__t_1a0b9dda2884048daa68ca4aaa12b17b9a" prot="public" virt="non-virtual"><scope>div_t</scope><name>quot</name></member>
+      <member refid="structdiv__t_1ac64389de252de53eda8b4f8dbb7c623f" prot="public" virt="non-virtual"><scope>div_t</scope><name>rem</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

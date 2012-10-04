@@ -1,0 +1,13 @@
+# v1.4 (2012/06/10)
+
+  Updated the auto tools, bumped the copyright.  Fixed a bug and applied a performance
+  patch, both contributed by 月迷津渡 gdcex@qq.com.  Good spotting!
+  Thanks to:
+    月迷津渡 gdcex@qq.com
+
+# v1.3 (2011/05/15)
+
+  Updated the docs, copyrights and build tools.  Applied two patches provided by users.
+  Thanks to:
+     Steven Parkes <smparkes@smparkes.net>
+     Pierre-Luc Brunelle <pierre-luc.brunelle@polymtl.ca>

@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.1">
+  <compounddef id="structclockinfo" kind="struct" prot="public">
+    <compoundname>clockinfo</compoundname>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structclockinfo_1ac4b4f8350528937152d1dfc743b1a540" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int clockinfo::hz</definition>
+        <argsstring></argsstring>
+        <name>hz</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" line="31513" bodyfile="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" bodystart="31513" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structclockinfo_1a37e7cff8383a333ac34d231e9478b78f" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int clockinfo::tick</definition>
+        <argsstring></argsstring>
+        <name>tick</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" line="31514" bodyfile="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" bodystart="31514" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structclockinfo_1af6b7c9f73724da339bb4a45fbf58eeaf" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int clockinfo::tickadj</definition>
+        <argsstring></argsstring>
+        <name>tickadj</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" line="31515" bodyfile="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" bodystart="31515" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structclockinfo_1aa3eb90ad6f1991e1a35712689cb81110" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int clockinfo::stathz</definition>
+        <argsstring></argsstring>
+        <name>stathz</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" line="31516" bodyfile="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" bodystart="31516" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structclockinfo_1ac2fb4dc19859451d4718674784c5f38b" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int clockinfo::profhz</definition>
+        <argsstring></argsstring>
+        <name>profhz</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" line="31517" bodyfile="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" bodystart="31517" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <collaborationgraph>
+      <node id="5">
+        <label>clockinfo</label>
+      </node>
+    </collaborationgraph>
+    <location file="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" line="31512" bodyfile="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" bodystart="31512" bodyend="31518"/>
+    <listofallmembers>
+      <member refid="structclockinfo_1ac4b4f8350528937152d1dfc743b1a540" prot="public" virt="non-virtual"><scope>clockinfo</scope><name>hz</name></member>
+      <member refid="structclockinfo_1ac2fb4dc19859451d4718674784c5f38b" prot="public" virt="non-virtual"><scope>clockinfo</scope><name>profhz</name></member>
+      <member refid="structclockinfo_1aa3eb90ad6f1991e1a35712689cb81110" prot="public" virt="non-virtual"><scope>clockinfo</scope><name>stathz</name></member>
+      <member refid="structclockinfo_1a37e7cff8383a333ac34d231e9478b78f" prot="public" virt="non-virtual"><scope>clockinfo</scope><name>tick</name></member>
+      <member refid="structclockinfo_1af6b7c9f73724da339bb4a45fbf58eeaf" prot="public" virt="non-virtual"><scope>clockinfo</scope><name>tickadj</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

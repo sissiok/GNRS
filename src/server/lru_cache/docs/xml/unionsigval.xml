@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.1">
+  <compounddef id="unionsigval" kind="union" prot="public">
+    <compoundname>sigval</compoundname>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="unionsigval_1a560393252ee7edc37df44bf1c11bdbdd" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int sigval::sival_int</definition>
+        <argsstring></argsstring>
+        <name>sival_int</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" line="1285" bodyfile="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" bodystart="1285" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="unionsigval_1a4668f1bd7463de7b70bd0022207e26ac" prot="public" static="no" mutable="no">
+        <type>void *</type>
+        <definition>void* sigval::sival_ptr</definition>
+        <argsstring></argsstring>
+        <name>sival_ptr</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" line="1286" bodyfile="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" bodystart="1286" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <collaborationgraph>
+      <node id="35">
+        <label>sigval</label>
+      </node>
+    </collaborationgraph>
+    <location file="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" line="1283" bodyfile="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" bodystart="1283" bodyend="1287"/>
+    <listofallmembers>
+      <member refid="unionsigval_1a560393252ee7edc37df44bf1c11bdbdd" prot="public" virt="non-virtual"><scope>sigval</scope><name>sival_int</name></member>
+      <member refid="unionsigval_1a4668f1bd7463de7b70bd0022207e26ac" prot="public" virt="non-virtual"><scope>sigval</scope><name>sival_ptr</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,15 @@
+.TH "test" 3 "Sun Jun 10 2012" "Version 1.4" "C++ LRU Cache Template" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+test \- Test List 
+.IP "\fBMember \fBDEFINE_TEST\fP (lru_cache_1cycle)\fP" 1c
+Basic creation and desctruction test  
+.IP "\fBMember \fBDEFINE_TEST\fP (lru_cache_threads)\fP" 1c
+Check for badness with multithreaded access, this is more of a stress test than an empirical test\&.  
+.IP "\fBMember \fBDEFINE_TEST\fP (lru_cache_scope_check)\fP" 1c
+Check that objects inserted in a different scope are still there\&.  
+.IP "\fBMember \fBDEFINE_TEST\fP (lru_cache_stress)\fP" 1c
+Insert lots of objects and benchmark the rate\&. 
+.PP
+

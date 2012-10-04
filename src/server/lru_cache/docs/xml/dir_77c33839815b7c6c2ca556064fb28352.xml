@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.1">
+  <compounddef id="dir_77c33839815b7c6c2ca556064fb28352" kind="dir">
+    <compoundname>docs/examples/</compoundname>
+    <innerfile refid="lru__example_8cpp">lru_example.cpp</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/Users/paudley/Sites/dist/lru_cache/docs/examples/"/>
+  </compounddef>
+</doxygen>

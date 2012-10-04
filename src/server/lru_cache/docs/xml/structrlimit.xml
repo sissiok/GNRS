@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.1">
+  <compounddef id="structrlimit" kind="struct" prot="public">
+    <compoundname>rlimit</compoundname>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structrlimit_1afb303c82ed3027a353e423a555b944b4" prot="public" static="no" mutable="no">
+        <type>rlim_t</type>
+        <definition>rlim_t rlimit::rlim_cur</definition>
+        <argsstring></argsstring>
+        <name>rlim_cur</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" line="1386" bodyfile="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" bodystart="1386" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structrlimit_1ab24ab4934cab539abf45b259f5db7639" prot="public" static="no" mutable="no">
+        <type>rlim_t</type>
+        <definition>rlim_t rlimit::rlim_max</definition>
+        <argsstring></argsstring>
+        <name>rlim_max</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" line="1387" bodyfile="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" bodystart="1387" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <collaborationgraph>
+      <node id="23">
+        <label>rlimit</label>
+      </node>
+    </collaborationgraph>
+    <location file="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" line="1385" bodyfile="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" bodystart="1385" bodyend="1388"/>
+    <listofallmembers>
+      <member refid="structrlimit_1afb303c82ed3027a353e423a555b944b4" prot="public" virt="non-virtual"><scope>rlimit</scope><name>rlim_cur</name></member>
+      <member refid="structrlimit_1ab24ab4934cab539abf45b259f5db7639" prot="public" virt="non-virtual"><scope>rlimit</scope><name>rlim_max</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

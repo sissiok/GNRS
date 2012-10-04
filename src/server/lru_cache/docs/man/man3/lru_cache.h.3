@@ -1,0 +1,59 @@
+.TH "lru_cache.h" 3 "Sun Jun 10 2012" "Version 1.4" "C++ LRU Cache Template" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+lru_cache.h \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Classes"
+
+.in +1c
+.ti -1c
+.RI "class \fBLRUCache< Key, Data, Sizefn >\fP"
+.br
+.RI "\fITemplate cache with an LRU removal policy\&. \fP"
+.in -1c
+.SS "Macros"
+
+.in +1c
+.ti -1c
+.RI "#define \fBSCOPED_MUTEX\fP   boost::mutex::scoped_lock lock(this->_mutex);"
+.br
+.RI "\fIIf we are reentrant then use a BOOST scoped mutex where neccessary\&. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+Template cache with an LRU removal policy 
+.PP
+\fBAuthor:\fP
+.RS 4
+Patrick Audley 
+.RE
+.PP
+\fBVersion:\fP
+.RS 4
+1\&.4 
+.RE
+.PP
+\fBDate:\fP
+.RS 4
+June 2012 
+.RE
+.PP
+\fB\fP
+.RS 4
+This cache is thread safe if compiled with _REENTRANT defined\&. It uses the BOOST scientific computing library to provide the thread safety mutexes\&.
+.RE
+.PP
+\fB\fP
+.RS 4
+Thanks to graydon@pobox.com for the size counting functor\&. Thanks to 月迷津渡 gdcex@qq.com for fixes and tweaks\&. 
+.RE
+.PP
+
+.PP
+Definition in file \fBlru_cache\&.h\fP\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for C++ LRU Cache Template from the source code\&.

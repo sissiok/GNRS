@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.1">
+  <compounddef id="structaccessx__descriptor" kind="struct" prot="public">
+    <compoundname>accessx_descriptor</compoundname>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structaccessx__descriptor_1a683b495f54c2579a4a9e65d1327efc8b" prot="public" static="no" mutable="no">
+        <type>unsigned int</type>
+        <definition>unsigned int accessx_descriptor::ad_name_offset</definition>
+        <argsstring></argsstring>
+        <name>ad_name_offset</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" line="179" bodyfile="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" bodystart="179" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structaccessx__descriptor_1a4b7f7a45c00caca2fea857e1e3412a00" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int accessx_descriptor::ad_flags</definition>
+        <argsstring></argsstring>
+        <name>ad_flags</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" line="180" bodyfile="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" bodystart="180" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structaccessx__descriptor_1afa1f0871d6d302aa7316e6b83ef5f0ac" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int accessx_descriptor::ad_pad[2]</definition>
+        <argsstring>[2]</argsstring>
+        <name>ad_pad</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" line="181" bodyfile="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" bodystart="181" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <collaborationgraph>
+      <node id="3">
+        <label>accessx_descriptor</label>
+      </node>
+    </collaborationgraph>
+    <location file="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" line="178" bodyfile="/Users/paudley/Sites/dist/lru_cache/src/lru_cache_unit.cpp" bodystart="178" bodyend="182"/>
+    <listofallmembers>
+      <member refid="structaccessx__descriptor_1a4b7f7a45c00caca2fea857e1e3412a00" prot="public" virt="non-virtual"><scope>accessx_descriptor</scope><name>ad_flags</name></member>
+      <member refid="structaccessx__descriptor_1a683b495f54c2579a4a9e65d1327efc8b" prot="public" virt="non-virtual"><scope>accessx_descriptor</scope><name>ad_name_offset</name></member>
+      <member refid="structaccessx__descriptor_1afa1f0871d6d302aa7316e6b83ef5f0ac" prot="public" virt="non-virtual"><scope>accessx_descriptor</scope><name>ad_pad</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>
