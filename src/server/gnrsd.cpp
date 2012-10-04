@@ -24,7 +24,12 @@ gnrsd::gnrsd():g_hm()
 	prev_time_index=0;
 	prev_index_num=0;
 	total_time=0;
+  cache = new guid_cache_t(1024);
 
+}
+
+gnrsd::~gnrsd(){
+  delete cache;
 }
 
 int gnrsd::timingStat(int index,double time_)
