@@ -16,6 +16,7 @@ int serv_req_num;
 
 
 unsigned long long _timestamp;
+map<uint32_t, msg_element*> * GNRS_daemon::insert_cache = NULL;
 
 GNRS_daemon::GNRS_daemon():g_hm()
 {
@@ -126,8 +127,8 @@ string GNRS_daemon::GUID2Server(char* GUID, uint8_t hashIndex)
 }
 
 //hash_ip: Hashed Server IP for INSERT
-//redirect_flag: true: the msg is redirected from another gnrs server; false: the msg comes from a client
-void GNRS_daemon::insert_msg_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt, bool redirect_flag)
+//FromServer: true: the msg is redirected from another gnrs server; false: the msg comes from a client
+void GNRS_daemon::insert_msg_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt, bool FromServer)
 {
 	common_header_t *hdr=(common_header_t*)recvd_pkt->getPayloadPointer();
 	insert_message_t *ins = (insert_message_t*)recvd_pkt->getPayloadPointer();
@@ -142,7 +143,9 @@ void GNRS_daemon::insert_msg_handler(const char* hash_ip, HashMap _hm, Packet* r
 			#endif
 
 			insert_handler( _hm, ins,0);
-			if(redirect_flag == true)  {
+
+			//send ack to the server that forwards the insert msg
+			if(FromServer == true)  {
                        		 GNRS_server_sendtoaddr= new Address(hdr->sender_addr,ntohl(hdr->sender_listen_port));
                         	 GNRS_sport->setRemoteAddress(GNRS_server_sendtoaddr);
 
@@ -172,6 +175,7 @@ void GNRS_daemon::insert_msg_handler(const char* hash_ip, HashMap _hm, Packet* r
 
 			     //update the sender address to the gnrs server's address, will be used for insert-ack
 			     strcpy(hdr->sender_addr, GNRSConfig::server_addr.c_str());
+			     hdr->sender_listen_port = htonl(GNRSConfig::daemon_listen_port+1);
 
                              GNRS_sport->sendPack(recvd_pkt);
 
@@ -190,14 +194,14 @@ void GNRS_daemon::insert_msg_handler(const char* hash_ip, HashMap _hm, Packet* r
 }
 
 //this is the working thread for insert pool: called by the listening thread
-void GNRS_daemon::global_INSERT_msg_handler(GNRS_Para *gnrs_para)
+void GNRS_daemon::global_INSERT_msg_handler(MsgParameter *gnrs_para)
 {
-START_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");	
+START_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");
 
 	Packet *recvd_pkt=gnrs_para->recvd_pkt;
 	OutgoingConnection *GNRS_sport=new OutgoingConnection();
         GNRS_sport->init();
-       if (DEBUG >=1) cout<<"insert packet received at GNRS"<<endl;
+        if (DEBUG >=1) cout<<"insert packet received at GNRS"<<endl;
 	insert_message_t *ins = (insert_message_t*)recvd_pkt->getPayloadPointer();
 	if (DEBUG >=1)    cout <<"Mapping info in packet is : guid: " << ins->guid << " netaddr: " <<ins->NAs[0].net_addr<<endl;
 
@@ -228,15 +232,15 @@ START_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");
                 if (DEBUG >=1) cout<<"ACK FOR INSERT SENT to CLIENT!"<<endl;
             #endif
 
-	    //insert cache for ack checking
+	    //insert cache for acknowledgement checking
 	    msg_element* _temp = new msg_element;
-	    _temp->req_id = ntohl(hdr->req_id);
+	    //_temp->req_id = ntohl(hdr->req_id);
 	    _temp->pkt = recvd_pkt;
 	    struct timeval _req_time;
 	    gettimeofday(&_req_time, NULL);
 	    _temp->expire_ts = (unsigned long long)_req_time.tv_sec*1000000 + _req_time.tv_usec + INSERT_TIMEOUT;
 	    _temp->ack_num = 0;
-	    insert_cache.push_back(_temp); //TODO: need mutex here
+	    insert_cache->insert( pair<uint32_t,msg_element*>(ntohl(hdr->req_id),_temp) ); //TODO: need mutex here
 
 	    //K-replica and calculate destination AS for each replica
 	    for(int i=0;i<K_NUM;i++)  {
@@ -250,8 +254,10 @@ START_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");
 		const char * hash_ip = hashed_ip.c_str(); 
 		
 		strcpy(_temp->_dstInfo[i].dst_addr, hash_ip);
-		if(strcmp(hash_ip,GNRSConfig::server_addr.c_str())==0)
+		if(strcmp(hash_ip,GNRSConfig::server_addr.c_str())==0)  {
 			_temp->_dstInfo[i].ack_flag = true;  //no ack is needed if it will be inserted locally
+			_temp->ack_num++;
+		}
 		else
 			_temp->_dstInfo[i].ack_flag = false;
 
@@ -344,7 +350,7 @@ void GNRS_daemon::lookup_msg_handler(const char* hash_ip, HashMap _hm, Packet* r
 
 
 //this is the working thread for lookup pool: called by the listening thread
-void GNRS_daemon::global_LOOKUP_msg_handler(GNRS_Para *gnrs_para)
+void GNRS_daemon::global_LOOKUP_msg_handler(MsgParameter *gnrs_para)
 {
 START_TIMING((char *)"GNRS_daemon:global_lookup_msg_handler");
 
@@ -401,37 +407,77 @@ double sample_time=REGISTER_TIMING((char *)"GNRS_daemon:global_lookup_msg_handle
 }
 
 
+//this is the working thread for insert ack pool: called by the listening thread
+void GNRS_daemon::global_INSERT_ACK_handler(MsgParameter *gnrs_para)
+{
+	Packet *recvd_pkt=gnrs_para->recvd_pkt;
+        common_header_t *hdr=(common_header_t*)recvd_pkt->getPayloadPointer();
+
+	uint32_t index = ntohl(hdr->req_id);
+	if((*insert_cache)[index]->ack_num == K_num-1)  {
+		#ifdef DEBUG
+			cout<<"all insert ack received for req_id: " << index<<endl;
+		#endif
+	}
+	else  {
+
+	}
+}
+
+
+//this is the working thread for lookup response pool: called by the listening thread
+void GNRS_daemon::global_LOOKUP_RESP_handler(MsgParameter *gnrs_para)
+{
+
+}
+
 
 /*
 *   GNRS RECEIVER SCRIPT :
 *   Receive insert and perform put : type 0
 *   Recieve lookup and perform get : type 1
+*   Recieve insert ack: type 2
+*   Recieve lookup response: type 3
 */
 void* GNRS_daemon::g_receiver()
 {
+
+	insert_cache = new map<uint32_t, msg_element*>;
+	//GNRSConfig::daemon_listen_port is previously reserved for LNRS while GNRSConfig::daemon_listen_port+1 for GNRS
         GNRS_server_raddr = new Address(GNRSConfig::server_addr.c_str(), GNRSConfig::daemon_listen_port+1); 
         my_global_rport = new IncomingConnection();
         my_global_rport->setLocalAddress(GNRS_server_raddr);
         my_global_rport->init();
-		
+	
         cout<<"GNRS : Receiver started"<<endl;
 
-	ThreadPool<GNRS_Para*> insert_pool (global_INSERT_msg_handler, 
+	ThreadPool<MsgParameter*> insert_pool (global_INSERT_msg_handler, 
 		pool_size, //minimum threads
 		pool_size, //maximum threads
-		ThreadPool<GNRS_Para*>::UnlimitedLifetime  //thread lifetime
+		ThreadPool<MsgParameter*>::UnlimitedLifetime  //thread lifetime
 		);
 
-	ThreadPool<GNRS_Para*> lookup_pool (global_LOOKUP_msg_handler, 
+	ThreadPool<MsgParameter*> lookup_pool (global_LOOKUP_msg_handler, 
 		pool_size, 
 		pool_size, 
-		ThreadPool<GNRS_Para*>::UnlimitedLifetime
+		ThreadPool<MsgParameter*>::UnlimitedLifetime
 		);
 
+        ThreadPool<MsgParameter*> insert_ack_pool (global_INSERT_ACK_handler,
+                pool_size,
+                pool_size,
+                ThreadPool<MsgParameter*>::UnlimitedLifetime
+                );
+
+        ThreadPool<MsgParameter*> lookup_resp_pool (global_LOOKUP_RESP_handler,
+                pool_size,
+                pool_size,
+                ThreadPool<MsgParameter*>::UnlimitedLifetime
+                );
 	
 	//Packet *recvd_pkt;
 	common_header_t *hdr;
-	GNRS_Para *gnrs_para;
+	MsgParameter *gnrs_para;
 	int i=0,j=0;
 	int thres;
 	if(serv_req_num>0)
@@ -442,7 +488,7 @@ void* GNRS_daemon::g_receiver()
                  try{
                          recvd_pkt = my_global_rport->receivePacketDirectly();					
 		
-			 gnrs_para=new GNRS_Para;
+			 gnrs_para=new MsgParameter;
 			 gnrs_para->recvd_pkt=recvd_pkt;
 			 gnrs_para->gnrs_daemon=this;
 
@@ -483,7 +529,13 @@ void* GNRS_daemon::g_receiver()
 					    lookup_pool.Launch(gnrs_para);
 					    rec_lookup_num++;
 	                           	}
-                          } 
+				   else if(hdr->type == INSERT_ACK)  {
+					    insert_ack_pool.Launch(gnrs_para);			    
+				   }
+				   else if(hdr->type == LOOKUP_RESP)  {
+					    lookup_resp_pool.Launch(gnrs_para);
+				   }
+                          }
 			if(serv_req_num>0) i++;
                    }
            
@@ -717,7 +769,7 @@ int main(int argc,const char * argv[]) {
 	if(argc > 2) {
 	        char _pool_size[5];
         	strcpy(_pool_size,argv[2]);
-	        pool_size=Common::port_str2num(_pool_size);
+	        pool_size=atoi(_pool_size);
 		if(DEBUG>=1) cout<<"pool_size: "<<pool_size<<endl;
 	}
 	else
@@ -726,7 +778,7 @@ int main(int argc,const char * argv[]) {
 	if(argc > 3) {
         	char _serv_req_num[10];
 	        strcpy(_serv_req_num,argv[3]);
-	        serv_req_num=Common::port_str2num(_serv_req_num);
+	        serv_req_num=atoi(_serv_req_num);
 		if(DEBUG>=1) cout<<"server terminate after receiving: "<<serv_req_num<<endl;
 	}
 	else

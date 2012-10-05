@@ -35,9 +35,9 @@ struct dst_info {
 	bool ack_flag;  //true: got acked; false: not acked yet
 };
 struct msg_element {
-        uint32_t req_id;
-	Packet *_pkt;
+        //uint32_t req_id;
 	unsigned long long expire_ts; //expire timestamp for this packet
+	Packet *pkt;
         int ack_num;  //number of ack received
 	dst_info _dstInfo[K_NUM];
 };
@@ -47,24 +47,27 @@ public:
 
 GNRS_daemon();
 
-struct GNRS_Para  {
+struct MsgParameter  {
         Packet *recvd_pkt;
         GNRS_daemon *gnrs_daemon;
 };
 
-//vector used for insert ack checking
-vector<msg_element*> insert_cache;
+//map used for insert ack checking: key is the req_id
+static map<uint32_t,msg_element*> *insert_cache;
 
-static void insert_msg_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt, bool redirect_flag);
+static void insert_msg_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt, bool FromServer);
 
-//static void global_INSERT_packet_handler(GNRS_daemon * gnrs_daemon);
-static void global_INSERT_msg_handler(GNRS_Para *gnrs_para);
+static void global_INSERT_msg_handler(MsgParameter *gnrs_para);
 
 
 static void lookup_msg_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt);
 
-//static void global_LOOKUP_packet_handler(GNRS_daemon * gnrs_daemon);
-static void global_LOOKUP_msg_handler(GNRS_Para *gnrs_para);
+static void global_LOOKUP_msg_handler(MsgParameter *gnrs_para);
+
+
+static void global_INSERT_ACK_handler(MsgParameter *msg_para);
+
+static void global_LOOKUP_RESP_handler(MsgParameter *msg_para);
 
 void* g_receiver();
 
