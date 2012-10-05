@@ -272,6 +272,9 @@ void gnrsd::global_INSERT_msg_handler(MsgParameter *gnrs_para)
     unsigned short* weight = new unsigned short((ntohs(someNetAddr->weight)));
     someValue->weight->push_back(weight);
   }
+#ifdef DEBUG
+  cout << "Inserting into cache." << endl;
+#endif
 
   // Insert the new value into the cache.
   cache->insert(guid,someValue);
@@ -478,6 +481,9 @@ void gnrsd::global_LOOKUP_msg_handler(MsgParameter *gnrs_para)
   bool cacheMiss = false;
   // Got a cache entry, so check expiry
   if(cachedValue != NULL){
+#ifdef DEBUG
+  cout << "Got a cache hit. Verifying expiry data." << endl;
+#endif
     struct timeval _cur_time;
     gettimeofday(&_cur_time, NULL);
     string* netAddr;
@@ -553,12 +559,17 @@ void gnrsd::global_LOOKUP_msg_handler(MsgParameter *gnrs_para)
   }
   
   if(!cacheMiss){
+#ifdef DEBUG
+  cout << "Used cached value for lookup." << endl;
+#endif
     // TODO: Use cached value
     delete(recvd_pkt);
     delete gnrs_para;
     return;
   }
-
+#ifdef DEBUG
+  cout << "Missed the cache." << endl;
+#endif
   /* END CACHE */
 
   //tell whether the destination AS for the GUID mapping has been computed or not
