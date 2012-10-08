@@ -34,12 +34,18 @@ struct dst_info {
 	char dst_addr[SIZE_OF_NET_ADDR];
 	bool ack_flag;  //true: got acked; false: not acked yet
 };
-struct msg_element {
+struct insert_msg_element {
         //uint32_t req_id;
 	unsigned long long expire_ts; //expire timestamp for this packet
 	Packet *pkt;
         int ack_num;  //number of ack received
 	dst_info _dstInfo[K_NUM];
+};
+
+//lookup table
+struct lookup_msg_element {
+	char src_addr[SIZE_OF_NET_ADDR];
+	uint32_t src_listen_port;
 };
 
 class GNRS_daemon: public daemon{
@@ -53,7 +59,10 @@ struct MsgParameter  {
 };
 
 //map used for insert ack checking: key is the req_id
-static map<uint32_t,msg_element*> *insert_cache;
+static map<uint32_t,insert_msg_element*> *insert_table;
+
+//map used as lookup table
+static map<uint32_t,lookup_msg_element*> *lookup_table;
 
 static void insert_msg_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt, bool FromServer);
 

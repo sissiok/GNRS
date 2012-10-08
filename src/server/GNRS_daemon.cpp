@@ -16,7 +16,8 @@ int serv_req_num;
 
 
 unsigned long long _timestamp;
-map<uint32_t, msg_element*> * GNRS_daemon::insert_cache = NULL;
+map<uint32_t, insert_msg_element*> * GNRS_daemon::insert_table = NULL;
+map<uint32_t,lookup_msg_element*> * GNRS_daemon::lookup_table = NULL;
 
 GNRS_daemon::GNRS_daemon():g_hm()
 {
@@ -233,14 +234,14 @@ START_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");
             #endif
 
 	    //insert cache for acknowledgement checking
-	    msg_element* _temp = new msg_element;
+	    insert_msg_element* _temp = new insert_msg_element;
 	    //_temp->req_id = ntohl(hdr->req_id);
 	    _temp->pkt = recvd_pkt;
 	    struct timeval _req_time;
 	    gettimeofday(&_req_time, NULL);
 	    _temp->expire_ts = (unsigned long long)_req_time.tv_sec*1000000 + _req_time.tv_usec + INSERT_TIMEOUT;
 	    _temp->ack_num = 0;
-	    insert_cache->insert( pair<uint32_t,msg_element*>(ntohl(hdr->req_id),_temp) ); //TODO: need mutex here
+	    insert_table->insert( pair<uint32_t,insert_msg_element*>(ntohl(hdr->req_id),_temp) ); //TODO: need mutex here
 
 	    //K-replica and calculate destination AS for each replica
 	    for(int i=0;i<K_NUM;i++)  {
@@ -286,7 +287,8 @@ REGISTER_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");
                 pthread_mutex_unlock(&ins_pkt_sampling_mutex);
         }
 
-        delete(recvd_pkt);
+	//the received pkt will be removed when all ack(s) are received.
+        //delete(recvd_pkt);
 	delete gnrs_para;
     return (void)0;
 }
@@ -310,11 +312,11 @@ void GNRS_daemon::lookup_msg_handler(const char* hash_ip, HashMap _hm, Packet* r
                           lookup_handler(_hm,lkup,resp,0);
 
                           GNRS_server_sendtoaddr= new Address(hdr->sender_addr, ntohl(hdr->sender_listen_port));
-                       GNRS_sport->setRemoteAddress(GNRS_server_sendtoaddr);
+                          GNRS_sport->setRemoteAddress(GNRS_server_sendtoaddr);
 
                           p = new Packet();
                           p->setPayload((char*)resp, sizeof(lookup_response_message_t)+ntohs(resp->na_num)*sizeof(NA));
-                       GNRS_sport->sendPack(p);
+                          GNRS_sport->sendPack(p);
 
 			#ifdef DEBUG
                         if (DEBUG >=1) cout<<"lookup response packet sent from GNRS"<<endl;
@@ -333,6 +335,17 @@ void GNRS_daemon::lookup_msg_handler(const char* hash_ip, HashMap _hm, Packet* r
                          //send lookup packet to Hashed location
                          GNRS_server_sendtoaddr = new Address(hash_ip,GNRSConfig::daemon_listen_port+1);
                          GNRS_sport->setRemoteAddress(GNRS_server_sendtoaddr);
+			 
+			//add entry to lookup table
+			 lookup_msg_element* _temp = new lookup_msg_element;
+			 strcpy(_temp->src_addr, hdr->sender_addr);
+			 _temp->src_listen_port = ntohl(hdr->sender_listen_port);
+			 lookup_table->insert( pair<uint32_t,lookup_msg_element*>(ntohl(hdr->req_id),_temp) ); //TODO: need mutex here
+
+			 //update the sender address to the gnrs server's address, will be used for lookup response
+                         strcpy(hdr->sender_addr, GNRSConfig::server_addr.c_str());
+                         hdr->sender_listen_port = htonl(GNRSConfig::daemon_listen_port+1);
+
 			 #ifdef DEBUG
                          if (DEBUG >=1)    {
                                 cout << "Forwarding lookup: pkt type: " << (int)hdr->type << endl;
@@ -408,27 +421,69 @@ double sample_time=REGISTER_TIMING((char *)"GNRS_daemon:global_lookup_msg_handle
 
 
 //this is the working thread for insert ack pool: called by the listening thread
-void GNRS_daemon::global_INSERT_ACK_handler(MsgParameter *gnrs_para)
+void GNRS_daemon::global_INSERT_ACK_handler(MsgParameter *msg_para)
 {
-	Packet *recvd_pkt=gnrs_para->recvd_pkt;
+	Packet *recvd_pkt=msg_para->recvd_pkt;
         common_header_t *hdr=(common_header_t*)recvd_pkt->getPayloadPointer();
 
 	uint32_t index = ntohl(hdr->req_id);
-	if((*insert_cache)[index]->ack_num == K_num-1)  {
+	if((*insert_table)[index]->ack_num == K_NUM-1)  {
 		#ifdef DEBUG
 			cout<<"all insert ack received for req_id: " << index<<endl;
 		#endif
+		delete((*insert_table)[index]->pkt);
+		delete((*insert_table)[index]);
+		insert_table->erase(index);
 	}
 	else  {
+		#ifdef DEBUG
+                        cout<<"insert ack received for req_id: " << index<<"from server: "<<hdr->sender_addr<<endl;
+                #endif
 
+		(*insert_table)[index]->ack_num++;
+		int i;
+		for (i=0;i<K_NUM;i++)  {
+			if(strcmp((*insert_table)[index]->_dstInfo[i].dst_addr,hdr->sender_addr)==0)
+				break;
+		}
+		(*insert_table)[index]->_dstInfo[i].ack_flag = true;
 	}
+
+	delete(recvd_pkt);
 }
 
 
 //this is the working thread for lookup response pool: called by the listening thread
-void GNRS_daemon::global_LOOKUP_RESP_handler(MsgParameter *gnrs_para)
+//it will check the lookup_table to retrieve the client network address and listening port number which it can use for forwarding
+void GNRS_daemon::global_LOOKUP_RESP_handler(MsgParameter *msg_para)
 {
+	Packet *recvd_pkt=msg_para->recvd_pkt;
+	common_header_t *hdr=(common_header_t*)recvd_pkt->getPayloadPointer();
 
+	uint32_t index = ntohl(hdr->req_id);
+
+        #ifdef DEBUG
+               cout<<"lookup response received for req_id: " << index<<"from server: "<<hdr->sender_addr<<endl;
+        #endif
+
+	Address * GNRS_server_sendtoaddr;
+	OutgoingConnection *GNRS_sport=new OutgoingConnection();
+        GNRS_sport->init();
+
+	GNRS_server_sendtoaddr = new Address((*lookup_table)[index]->src_addr, (*lookup_table)[index]->src_listen_port);
+        GNRS_sport->setRemoteAddress(GNRS_server_sendtoaddr);
+
+        GNRS_sport->sendPack(recvd_pkt);
+        #ifdef DEBUG
+               cout<<"forward pkt to address: " << (*lookup_table)[index]->src_addr <<"and port number: " << (*lookup_table)[index]->src_listen_port << endl;
+        #endif
+
+	delete (*lookup_table)[index];
+	lookup_table->erase(index);
+
+	delete GNRS_sport;
+	delete GNRS_server_sendtoaddr;
+	delete recvd_pkt;
 }
 
 
@@ -442,7 +497,8 @@ void GNRS_daemon::global_LOOKUP_RESP_handler(MsgParameter *gnrs_para)
 void* GNRS_daemon::g_receiver()
 {
 
-	insert_cache = new map<uint32_t, msg_element*>;
+	insert_table = new map<uint32_t, insert_msg_element*>;
+	lookup_table = new map<uint32_t, lookup_msg_element*>;
 	//GNRSConfig::daemon_listen_port is previously reserved for LNRS while GNRSConfig::daemon_listen_port+1 for GNRS
         GNRS_server_raddr = new Address(GNRSConfig::server_addr.c_str(), GNRSConfig::daemon_listen_port+1); 
         my_global_rport = new IncomingConnection();
