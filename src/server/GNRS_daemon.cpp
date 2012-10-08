@@ -25,20 +25,6 @@ GNRS_daemon::GNRS_daemon():g_hm()
 	prev_index_num=0;
 	total_time=0;
 
-/*        DbEnv* env=new DbEnv(DB_CXX_NO_EXCEPTIONS);
-        Db* pdb;
-
-        int ret=env.open(NULL,DB_CREATE | DB_INIT_LOCK | DB_INIT_MPOOL | DB_PRIVATE, 0);
-        if (ret != 0) {
-                cout<<"db environment open fails!"<<endl;
-                exit(0);
-        }
-
-        pdb=new Db(&env, DB_CXX_NO_EXCEPTIONS);
-        pdb->open(NULL,NULL,NULL,DB_BTREE,DB_CREATE | DB_THREAD, 0);
-
-	g_hm(env,pdb);
-*/
 }
 
 int GNRS_daemon::timingStat(int index,double time_)
@@ -156,6 +142,9 @@ void* GNRS_daemon::InsertTimerProc(void *arg)  {
 		                                #endif
 
 						GNRS_sport->sendPack((*_it).second->pkt);
+
+						delete GNRS_sport;
+						delete GNRS_server_sendtoaddr;
 					}
 				//update the expiring timestamp
 				(*_it).second->expire_ts = _cur_time_us + INSERT_TIMEOUT;
@@ -280,7 +269,9 @@ START_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");
 	    gettimeofday(&_req_time, NULL);
 	    _temp->expire_ts = (unsigned long long)_req_time.tv_sec*1000000 + _req_time.tv_usec + INSERT_TIMEOUT;
 	    _temp->ack_num = 0;
-	    insert_table->insert( pair<uint32_t,insert_msg_element*>(ntohl(hdr->req_id),_temp) ); //TODO: need mutex here
+
+	    uint32_t index = ntohl(hdr->req_id);
+	    insert_table->insert( pair<uint32_t,insert_msg_element*>(index,_temp) ); //TODO: need mutex here
 
 	    //K-replica and calculate destination AS for each replica
 	    for(int i=0;i<K_NUM;i++)  {
@@ -310,12 +301,21 @@ START_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");
 	    delete p;
 	    delete GNRS_server_sendtoaddr;
 	    delete GNRS_sport;
+
+	    //when all replicas are stored locally, directly remove the entry in the insert table. normally only take place when K_NUM=1
+	    if(_temp->ack_num == K_NUM)  {
+		delete((*insert_table)[index]->pkt);
+                delete((*insert_table)[index]);
+                insert_table->erase(index);
+	    }
 	}
 	else	{
 		hashed_ip=GNRSConfig::server_addr;
 
 		if (DEBUG >=1)    cout<<"Hashed Server IP for INSERT: " << hashed_ip<<endl; 
 		insert_msg_handler(hashed_ip.c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt, true);
+			
+		delete recvd_pkt;
 	}
 	
 REGISTER_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");
