@@ -6,6 +6,7 @@
 
 #define MAX_RETRY_NUM 5
 #define INSERT_TIMEOUT 500000 //us
+#define WAKEUP_INTERVAL 200000 //us: used in the asyn timer of InsertTimerProc
 
 Driver *driver;
 Connection *con;
@@ -32,6 +33,7 @@ struct GNRS_Condition {
 //these two  structures are used for insert msg for ack reliability
 struct dst_info {
 	char dst_addr[SIZE_OF_NET_ADDR];
+	uint32_t dst_listen_port;
 	bool ack_flag;  //true: got acked; false: not acked yet
 };
 struct insert_msg_element {
@@ -58,6 +60,9 @@ struct MsgParameter  {
         GNRS_daemon *gnrs_daemon;
 };
 
+//resend the insert msg if timeout
+static void* InsertTimerProc(void *arg);
+
 //map used for insert ack checking: key is the req_id
 static map<uint32_t,insert_msg_element*> *insert_table;
 
@@ -78,7 +83,7 @@ static void global_INSERT_ACK_handler(MsgParameter *msg_para);
 
 static void global_LOOKUP_RESP_handler(MsgParameter *msg_para);
 
-void* g_receiver();
+int g_receiver();
 
 string GUID2Server(char* GUID, uint8_t hashIndex);
 void longestPrefixMatching(u32b IP, u8b &maxPrefLen, asNum &asNumber, Cidr &maxPrefCidr);

@@ -127,6 +127,45 @@ string GNRS_daemon::GUID2Server(char* GUID, uint8_t hashIndex)
 	return(h.MapAS2Server(destAS));
 }
 
+//async timer for the insert msg
+void* GNRS_daemon::InsertTimerProc(void *arg)  {
+
+	while(1)  {
+		usleep(WAKEUP_INTERVAL);
+		struct timeval _cur_time;
+        	gettimeofday(&_cur_time, NULL);
+		unsigned long long _cur_time_us = (unsigned long long)_cur_time.tv_sec*1000000 + _cur_time.tv_usec;
+	
+		map<uint32_t,insert_msg_element*>::iterator _it;
+		for(_it = insert_table->begin(); _it != insert_table->end(); _it++)  {
+			//resend if expire
+			if((*_it).second->expire_ts < _cur_time_us) {
+				for(int i=0; i<K_NUM; i++)  
+					if((*_it).second->_dstInfo[i].ack_flag == false)  {
+						OutgoingConnection *GNRS_sport=new OutgoingConnection();
+        					GNRS_sport->init();
+
+						Address * GNRS_server_sendtoaddr;
+						GNRS_server_sendtoaddr = new Address((*_it).second->_dstInfo[i].dst_addr, (*_it).second->_dstInfo[i].dst_listen_port);
+			                        GNRS_sport->setRemoteAddress(GNRS_server_sendtoaddr);
+
+						#ifdef DEBUG
+		                                if (DEBUG >=1){
+	                                        	cout<<"timer fire! re-forward insert packet to IP:"<<(*_it).second->_dstInfo[i].dst_addr<<endl;
+                                	        }
+		                                #endif
+
+						GNRS_sport->sendPack((*_it).second->pkt);
+					}
+				//update the expiring timestamp
+				(*_it).second->expire_ts = _cur_time_us + INSERT_TIMEOUT;
+			}
+		}
+	}
+}
+
+
+
 //hash_ip: Hashed Server IP for INSERT
 //FromServer: true: the msg is redirected from another gnrs server; false: the msg comes from a client
 void GNRS_daemon::insert_msg_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt, bool FromServer)
@@ -255,6 +294,7 @@ START_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");
 		const char * hash_ip = hashed_ip.c_str(); 
 		
 		strcpy(_temp->_dstInfo[i].dst_addr, hash_ip);
+		_temp->_dstInfo[i].dst_listen_port = GNRSConfig::daemon_listen_port+1;  //TODO: the dst listen port might be a variable when multiple gnrs server running on the same node
 		if(strcmp(hash_ip,GNRSConfig::server_addr.c_str())==0)  {
 			_temp->_dstInfo[i].ack_flag = true;  //no ack is needed if it will be inserted locally
 			_temp->ack_num++;
@@ -293,7 +333,7 @@ REGISTER_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");
     return (void)0;
 }
 
-
+//hash_ip: the ip address for the server that will serve the lookup request
 void GNRS_daemon::lookup_msg_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt)
 {
 	common_header_t *hdr=(common_header_t*)recvd_pkt->getPayloadPointer();
@@ -374,8 +414,6 @@ START_TIMING((char *)"GNRS_daemon:global_lookup_msg_handler");
                         	//* Handle Lookup Packet */
 		lookup_message_t *lkup = (lookup_message_t*)recvd_pkt->getPayloadPointer();
 
-		string hashed_ip;
-
 		//tell whether the destination AS for the GUID mapping has been computed or not
 		if(lkup->dest_flag==0)  {
 		    string hashed_ip[K_NUM];
@@ -388,14 +426,14 @@ START_TIMING((char *)"GNRS_daemon:global_lookup_msg_handler");
 				hashed_ip[i]=gnrs_para->gnrs_daemon->GUID2Server(lkup->guid, i);
 		    }
 			lkup->dest_flag==1;
-			if (DEBUG >=1)    cout<<"Hashed Server IP for LOOKUP: " << hashed_ip<<endl;
+			if (DEBUG >=1)    cout<<"Hashed Server IP for LOOKUP: " << hashed_ip[0] <<endl;
                         lookup_msg_handler(hashed_ip[0].c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt);
 		}
 		else  {
 			string hashed_ip=GNRSConfig::server_addr;
 			  
              		 if (DEBUG >=1)    cout<<"Hashed Server IP for LOOKUP: " << hashed_ip<<endl; 
-		      lookup_msg_handler(hashed_ip.c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt);
+		         lookup_msg_handler(hashed_ip.c_str(), gnrs_para->gnrs_daemon->g_hm, recvd_pkt);
 		}
 
 double sample_time=REGISTER_TIMING((char *)"GNRS_daemon:global_lookup_msg_handler");
@@ -494,7 +532,7 @@ void GNRS_daemon::global_LOOKUP_RESP_handler(MsgParameter *msg_para)
 *   Recieve insert ack: type 2
 *   Recieve lookup response: type 3
 */
-void* GNRS_daemon::g_receiver()
+int GNRS_daemon::g_receiver()
 {
 
 	insert_table = new map<uint32_t, insert_msg_element*>;
@@ -506,6 +544,12 @@ void* GNRS_daemon::g_receiver()
         my_global_rport->init();
 	
         cout<<"GNRS : Receiver started"<<endl;
+
+	pthread_t AsncTimingThread;
+	if(pthread_create(&AsncTimingThread, NULL, &InsertTimerProc, NULL))  {
+		cout<<"Error creating the async timing thread, aborting"<<endl;
+		return(-1);
+	}
 
 	ThreadPool<MsgParameter*> insert_pool (global_INSERT_msg_handler, 
 		pool_size, //minimum threads
@@ -609,7 +653,7 @@ void* GNRS_daemon::g_receiver()
 		pthread_cond_destroy(&gnrs_condition.condition);
 		delete(GNRS_server_raddr);
 		delete(my_global_rport);
-        return (void *)0;
+        return 0;
 
 }  // end of GNRS receiver
 
