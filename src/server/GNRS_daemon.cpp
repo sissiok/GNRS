@@ -124,6 +124,11 @@ void* GNRS_daemon::InsertTimerProc(void *arg)  {
 	
 		map<uint32_t,insert_msg_element*>::iterator _it;
 		for(_it = insert_table->begin(); _it != insert_table->end(); _it++)  {
+			#ifdef DEBUG
+			if(DEBUG >= 2)
+				cout<<"current time: "<<_cur_time_us<<" us, expiring time: "<<(*_it).second->expire_ts<<" us for req_id: "<<(*_it).first<<endl;
+			#endif
+			
 			//resend if expire
 			if((*_it).second->expire_ts < _cur_time_us) {
 				for(int i=0; i<K_NUM; i++)  
@@ -272,6 +277,9 @@ START_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");
 
 	    uint32_t index = ntohl(hdr->req_id);
 	    insert_table->insert( pair<uint32_t,insert_msg_element*>(index,_temp) ); //TODO: need mutex here
+	    #ifdef DEBUG
+		cout<<"insert an entry into insert table with req_id: "<<index<<endl;
+	    #endif
 
 	    //K-replica and calculate destination AS for each replica
 	    for(int i=0;i<K_NUM;i++)  {
@@ -304,6 +312,10 @@ START_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");
 
 	    //when all replicas are stored locally, directly remove the entry in the insert table. normally only take place when K_NUM=1
 	    if(_temp->ack_num == K_NUM)  {
+		#ifdef DEBUG
+			cout<<"remove an entry in the insert table with req_id: "<<index<<endl;
+		#endif
+		
 		delete((*insert_table)[index]->pkt);
                 delete((*insert_table)[index]);
                 insert_table->erase(index);
@@ -465,6 +477,8 @@ void GNRS_daemon::global_INSERT_ACK_handler(MsgParameter *msg_para)
         common_header_t *hdr=(common_header_t*)recvd_pkt->getPayloadPointer();
 
 	uint32_t index = ntohl(hdr->req_id);
+	
+	if(insert_table->find(index)!= insert_table->end())  {
 	if((*insert_table)[index]->ack_num == K_NUM-1)  {
 		#ifdef DEBUG
 			cout<<"all insert ack received for req_id: " << index<<endl;
@@ -486,6 +500,9 @@ void GNRS_daemon::global_INSERT_ACK_handler(MsgParameter *msg_para)
 		}
 		(*insert_table)[index]->_dstInfo[i].ack_flag = true;
 	}
+	}
+	else
+		cout<<"duplicate insert ack received for req_id: "<< index<<endl;
 
 	delete(recvd_pkt);
 }

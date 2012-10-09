@@ -5,7 +5,7 @@
 #include "./LPM/radixiplookup.hh"
 
 #define MAX_RETRY_NUM 5
-#define INSERT_TIMEOUT 500000 //us
+#define INSERT_TIMEOUT 5000000 //us
 #define WAKEUP_INTERVAL 200000 //us: used in the asyn timer of InsertTimerProc
 
 Driver *driver;
