@@ -69,12 +69,12 @@ static map<uint32_t,insert_msg_element*> *insert_table;
 //map used as lookup table
 static map<uint32_t,lookup_msg_element*> *lookup_table;
 
-static void insert_msg_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt, bool FromServer);
+static void insert_msg_handler(const char* hash_ip, HashMap& _hm, Packet* recvd_pkt, bool FromServer);
 
 static void global_INSERT_msg_handler(MsgParameter *gnrs_para);
 
 
-static void lookup_msg_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt);
+static void lookup_msg_handler(const char* hash_ip, HashMap& _hm, Packet* recvd_pkt);
 
 static void global_LOOKUP_msg_handler(MsgParameter *gnrs_para);
 

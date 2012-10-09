@@ -162,7 +162,7 @@ void* GNRS_daemon::InsertTimerProc(void *arg)  {
 
 //hash_ip: Hashed Server IP for INSERT
 //FromServer: true: the msg is redirected from another gnrs server; false: the msg comes from a client
-void GNRS_daemon::insert_msg_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt, bool FromServer)
+void GNRS_daemon::insert_msg_handler(const char* hash_ip, HashMap& _hm, Packet* recvd_pkt, bool FromServer)
 {
 	common_header_t *hdr=(common_header_t*)recvd_pkt->getPayloadPointer();
 	insert_message_t *ins = (insert_message_t*)recvd_pkt->getPayloadPointer();
@@ -346,7 +346,7 @@ REGISTER_TIMING((char *)"GNRS_daemon:global_insert_msg_handler");
 }
 
 //hash_ip: the ip address for the server that will serve the lookup request
-void GNRS_daemon::lookup_msg_handler(const char* hash_ip, HashMap _hm, Packet* recvd_pkt)
+void GNRS_daemon::lookup_msg_handler(const char* hash_ip, HashMap& _hm, Packet* recvd_pkt)
 {
 	common_header_t *hdr=(common_header_t*)recvd_pkt->getPayloadPointer();
 	lookup_message_t *lkup = (lookup_message_t*)recvd_pkt->getPayloadPointer();
