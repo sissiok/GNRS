@@ -609,13 +609,14 @@ void gnrsd::global_LOOKUP_msg_handler(MsgParameter *gnrs_para)
     _req_id=ntohl(hdr->req_id);
     pthread_mutex_lock(&lkup_pkt_sampling_mutex);
     proc_lookup_num++;
-    if(proc_lookup_num%STAT_STEP<STAT_RANGE) gnrs_para->gnrs_daemon->timingStat(proc_lookup_num-proc_lookup_num%STAT_STEP,sample_time);
+    if(proc_lookup_num%STAT_STEP<STAT_RANGE) {
+      gnrs_para->gnrs_daemon->timingStat(proc_lookup_num-proc_lookup_num%STAT_STEP,sample_time);
+    }
     PKT_SAMPLE_MAP::iterator _it=_pkt_sample.find(_req_id);
     if(_it!=_pkt_sample.end())  {
       clock_gettime(CLOCK_REALTIME, &_it->second.endtime);
     }  
     pthread_mutex_unlock(&lkup_pkt_sampling_mutex);
-  }
 #endif
 
   delete(recvd_pkt);
