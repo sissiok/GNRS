@@ -162,7 +162,7 @@ int GNRSClient::insertProc(char guid[SIZE_OF_GUID], NA *temp, uint16_t NA_num, u
   for (i=0;i<NA_num;i++)
   {
   	strncpy(nas[i].net_addr,temp->net_addr,SIZE_OF_NET_ADDR);
-	nas[i].TTL=htonl(temp->TTL);
+	nas[i].ttlMsec=htonl(temp->ttlMsec);
   	nas[i].weight=htons(temp->weight);
   }
   //put into a packet

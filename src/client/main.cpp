@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 	//temp->net_addr= "192.168.88.0:88" ;
 	strcpy(temp->net_addr,"192.168.88.0:88");
 	temp->weight=1;
-	temp->TTL=99999;
+	temp->ttlMsec=99999;
     //char  net_addr[SIZE_OF_NET_ADDR] = "192.168.88.0:88" ;
     cout << "Insert guid: " << guid << " netaddr: " <<temp->net_addr << endl;  
     if(clientHost->insert(guid,temp,1,0)) {
