@@ -552,18 +552,33 @@ void gnrsd::global_LOOKUP_msg_handler(MsgParameter *gnrs_para)
 
       // Send the packet
       sendSocket.sendPack(&p);
-      delete responseMsg;
+#ifdef DEBUG
+  cout << "About to delete responseMsg" << endl;
+#endif
+//      free(responseMsg);
+#ifdef DEBUG
+  cout << "Deleted responseMsg" << endl;
+#endif
     }
   }else{
     cacheMiss = true;
   }
+#ifdef DEBUG
+  cout << "Feixiong Rocks!"<< endl;
+#endif
   
   if(!cacheMiss){
 #ifdef DEBUG
   cout << "Used cached value for lookup." << endl;
 #endif
     // TODO: Use cached value
+#ifdef DEBUG
+  cout << "About to delete recvd_pkt" << endl;
+#endif
     delete(recvd_pkt);
+#ifdef DEBUG
+  cout << "About to delete gnrs_para" << endl;
+#endif
     delete gnrs_para;
     return;
   }
