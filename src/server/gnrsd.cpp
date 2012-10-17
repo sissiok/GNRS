@@ -377,12 +377,11 @@ void gnrsd::global_INSERT_msg_handler(MsgParameter *gnrs_para)
 
   REGISTER_TIMING((char *)"gnrsd:global_insert_msg_handler");
 
-
-  if(SAMPLING==1)  {
+#ifdef SAMPLING
     pthread_mutex_lock(&ins_pkt_sampling_mutex);
     proc_insert_num++;
     pthread_mutex_unlock(&ins_pkt_sampling_mutex);
-  }
+#endif
 
   //the received pkt will be removed when all ack(s) are received.
   //delete(recvd_pkt);
@@ -606,9 +605,8 @@ void gnrsd::global_LOOKUP_msg_handler(MsgParameter *gnrs_para)
   double sample_time=REGISTER_TIMING((char *)"gnrsd:global_lookup_msg_handler");
 
   uint32_t _req_id;
-  if(SAMPLING==1) _req_id=ntohl(hdr->req_id);
-
-  if(SAMPLING==1)  {
+#ifdef SAMPLING
+    _req_id=ntohl(hdr->req_id);
     pthread_mutex_lock(&lkup_pkt_sampling_mutex);
     proc_lookup_num++;
     if(proc_lookup_num%STAT_STEP<STAT_RANGE) gnrs_para->gnrs_daemon->timingStat(proc_lookup_num-proc_lookup_num%STAT_STEP,sample_time);
@@ -618,6 +616,7 @@ void gnrsd::global_LOOKUP_msg_handler(MsgParameter *gnrs_para)
     }  
     pthread_mutex_unlock(&lkup_pkt_sampling_mutex);
   }
+#endif
 
   delete(recvd_pkt);
   delete gnrs_para;
@@ -763,16 +762,17 @@ int gnrsd::g_receiver()
       gnrs_para=new MsgParameter;
       gnrs_para->recvd_pkt=recvd_pkt;
       gnrs_para->gnrs_daemon=this;
-
-      if(SAMPLING==1&&i==0&&j==0)  {
+#ifdef SAMPLING
+      if(i==0 && j==0)  {
         startStatistics(0.1);		
         j++;
       }
+#endif
       if(recvd_pkt != NULL)
       {    
         hdr = (common_header_t*)recvd_pkt->getPayloadPointer();
-
-        if(SAMPLING==1&&rec_lookup_num%1000==1)  {  //potential bug lies: here we assume if a lookup pkt comes, the following pkts are all lookup. but the packet might be insert packet, don't need to be counted.
+#ifdef SAMPLING
+        if(rec_lookup_num%1000==1)  {  //potential bug lies: here we assume if a lookup pkt comes, the following pkts are all lookup. but the packet might be insert packet, don't need to be counted.
           uint32_t _req_id=ntohl(hdr->req_id);
           pthread_mutex_lock(&lkup_pkt_sampling_mutex);
           clock_gettime(CLOCK_REALTIME, &_pkt_sample[_req_id].starttime);
@@ -780,7 +780,7 @@ int gnrsd::g_receiver()
           _pkt_sample[_req_id].endtime.tv_nsec=0;
           pthread_mutex_unlock(&lkup_pkt_sampling_mutex);
         }
-
+#endif
         //int flag1=1;
 #ifdef DEBUG
         if (DEBUG >=1) {
@@ -1010,7 +1010,7 @@ int main(int argc,const char * argv[]) {
     gnrsd.print_usage();
     exit(0);
   }
-  if(SAMPLING==1) {
+#ifdef SAMPLING
     ProcFile.open("/var/log/gnrs_proc_statistics.data"); 
     if (!ProcFile.is_open()){
       cerr << "Can't open OUTPUT gnrs statistics File !!! Returning..." <<endl;
@@ -1022,7 +1022,7 @@ int main(int argc,const char * argv[]) {
       cerr << "Can't open OUTPUT gnrs statistics File !!! Returning..." <<endl;
       return 1;
     }
-  }
+#endif
 
   rec_insert_num=rec_lookup_num=0;
   proc_insert_num=proc_lookup_num=0;
@@ -1090,11 +1090,11 @@ int main(int argc,const char * argv[]) {
 
   gnrsd.g_receiver();
 
-  if(SAMPLING==1)	{
+#ifdef SAMPLING
     ProcFile.close();
     ProcFile_.close();
     sampling_output();
-  }
+#endif
 
   pthread_mutex_destroy(&lkup_pkt_sampling_mutex);
   pthread_mutex_destroy(&ins_pkt_sampling_mutex);
