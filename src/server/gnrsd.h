@@ -27,7 +27,7 @@ vector<string> server_list;
 u32b MASK[32]; 
 PrefixTable curr_prefix;
 
-typedef LRUCache<const char*, const value*> guid_cache_t;
+typedef LRUCache<std::string, const value*> guid_cache_t;
 
 struct GNRS_Condition {
   pthread_mutex_t mutex;

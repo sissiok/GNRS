@@ -24,7 +24,7 @@ gnrsd::gnrsd():g_hm()
   prev_time_index=0;
   prev_index_num=0;
   total_time=0;
-  cache = new guid_cache_t(1024);
+  cache = new guid_cache_t(24);
 
 }
 
@@ -255,6 +255,7 @@ void gnrsd::global_INSERT_msg_handler(MsgParameter *gnrs_para)
   guid_cache_t* cache = server->getCache();
 
   char* guid = ins->guid;
+  std::string guidString(guid);
   uint16_t numNetAddrs = ntohs(ins->na_num);
   NA* netAddrs = ins->NAs;
   value* someValue = new value;
@@ -271,10 +272,11 @@ void gnrsd::global_INSERT_msg_handler(MsgParameter *gnrs_para)
   }
 
   // Insert the new value into the cache.
-  cache->insert(guid,someValue);
+  cache->insert(guidString,someValue);
 
 #ifdef DEBUG
   cout << "Inserting into cache for guid: " << guid <<" with number of NA tuple: "<< numNetAddrs <<endl;
+  cout << "Cache size is now " << cache->size() << endl;
 #endif
 
   /* END CACHE */
@@ -472,8 +474,12 @@ void gnrsd::global_LOOKUP_msg_handler(MsgParameter *gnrs_para)
   gnrsd* server = gnrs_para->gnrs_daemon;
   guid_cache_t* cache = server->getCache();
   char* guid = lkup->guid;
+  std::string guidString(guid);
   const value* cachedValue = NULL;
-  cachedValue = cache->fetch(guid);
+#ifdef DEBUG
+  cout << "Fetching from cache: "<<guidString <<" cache size " << cache->size() << endl;
+#endif
+  cachedValue = cache->fetch(guidString);
 
   bool cacheMiss = false;
   // Got a cache entry, so check expiry
