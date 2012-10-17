@@ -66,7 +66,7 @@ void* query_handler(vector<string> str_v, GNRSClient* clientHost)
 	NA query_na_struct[LOOKUP_MAX_NA];
 	uint16_t na_num;
 
-	if(SAMPLING==1&&snt_lookup_num%100==1)  {
+	if(SAMPLING==1&&snt_lookup_num%STAT_STEP==1)  {
 		pthread_mutex_lock(&lkup_pkt_sampling_mutex);
 		//cout<<"lookup_num:"<<lookup_num<<"  req_id:"<<req_ID<<endl;
 		clock_gettime(CLOCK_REALTIME, &_pkt_sample[req_ID].starttime);
