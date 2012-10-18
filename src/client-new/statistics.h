@@ -6,8 +6,7 @@
 #include "../common/gnrsconfig.h"
 using namespace std;
 
-#define STAT_STEP 1000
-#define STAT_RANGE 100
+#define STAT_STEP 1
 
 
 struct pkt_sample_data {
