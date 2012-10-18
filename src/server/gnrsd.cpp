@@ -552,13 +552,7 @@ void gnrsd::global_LOOKUP_msg_handler(MsgParameter *gnrs_para)
 
       // Send the packet
       sendSocket.sendPack(&p);
-#ifdef DEBUG
-  cout << "About to delete responseMsg" << endl;
-#endif
-//      free(responseMsg);
-#ifdef DEBUG
-  cout << "Deleted responseMsg" << endl;
-#endif
+      // The responseMsg is deleted by Packet when it is destructed
     }
   }else{
     cacheMiss = true;
