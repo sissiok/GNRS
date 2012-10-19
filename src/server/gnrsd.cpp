@@ -556,9 +556,6 @@ void gnrsd::global_LOOKUP_msg_handler(MsgParameter *gnrs_para)
   }else{
     cacheMiss = true;
   }
-#ifdef DEBUG
-  cout << "Feixiong Rocks!"<< endl;
-#endif
   
   if(!cacheMiss){
 #ifdef DEBUG
@@ -576,7 +573,7 @@ void gnrsd::global_LOOKUP_msg_handler(MsgParameter *gnrs_para)
     return;
   }
 #ifdef DEBUG
-  cout << "Missed the cache." << endl;
+  cout << "Missed the cache for guid: " << guid <<endl;
 #endif
   /* END CACHE */
 
