@@ -70,10 +70,10 @@ class gnrsd: public daemon{
     //resend the insert msg if timeout
     static void* InsertTimerProc(void *arg);
 
-    //map used for insert ack checking: key is the req_id
+    //map used for insert ack checking: key is the req_id (index number)
     static map<uint32_t,insert_msg_element*> *insert_table;
 
-    //map used as lookup table
+    //map used as lookup table: key is the req_id (index number)
     static map<uint32_t,lookup_msg_element*> *lookup_table;
 
     static void insert_msg_handler(const char* hash_ip, HashMap& _hm, Packet* recvd_pkt, bool FromServer);

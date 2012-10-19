@@ -143,7 +143,7 @@ void* daemon::insert_handler(HashMap& hm,insert_message_t *ins, int level)
 		NA* nas=(NA *)(ins+1);
 		while(i<htons(ins->na_num))
 		{
-			expires = ts.tv_sec+ntohl(nas[i].ttlMsec);  //translation of TTL to timestamp
+			expires = ts.tv_sec*1000 + ts.tv_usec/1000 + ntohl(nas[i].ttlMsec);  //translation of TTL to timestamp
 			temp->push_back(new string(locator_extractor(nas[i].net_addr,level)));							
 			temp_ttl->push_back(new unsigned int(expires));
 			temp_weight->push_back(new unsigned short(ntohs(nas[i].weight)));
@@ -234,7 +234,7 @@ bool daemon::lookup_handler(HashMap& hm,lookup_message_t *lkup, lookup_response_
 		while(i<TTLs->size())
 		{
 			//cout<<*(TTLs->at(i))<<" "<<ts.tv_sec<<endl;
-			_TTL=*(TTLs->at(i))-ts.tv_sec;
+			_TTL=*(TTLs->at(i))-ts.tv_sec*1000-ts.tv_usec/1000;  //tell whether the tuple is expired
 			//cout<<_TTL<<endl;
 			if(_TTL>0)
 			{
@@ -289,7 +289,7 @@ bool daemon::lookup_handler(HashMap& hm,lookup_message_t *lkup, lookup_response_
 		while(i<locators->size())
 		{
 			 strcpy(nas[i].net_addr, locators->at(i)->c_str());
-			 nas[i].ttlMsec=htonl(*TTLs->at(i)-ts.tv_sec);  //translation of timestamp to TTL
+			 nas[i].ttlMsec=htonl(*TTLs->at(i)-ts.tv_sec*1000 - ts.tv_usec/1000);  //translation of timestamp to TTL
 			 nas[i].weight=htons(*weights->at(i));
 			 i++;
 		}

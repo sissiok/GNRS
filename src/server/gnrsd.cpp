@@ -255,29 +255,27 @@ void gnrsd::global_INSERT_msg_handler(MsgParameter *gnrs_para)
   guid_cache_t* cache = server->getCache();
 
   char* guid = ins->guid;
-  uint16_t numNetAddrs = ins->na_num;
+  uint16_t numNetAddrs = ntohs(ins->na_num);
   NA* netAddrs = ins->NAs;
   value* someValue = new value;
   // Allocate the vectors needed
   someValue->locator = new vector<string*>();
   someValue->expire = new vector<unsigned int*>();
   someValue->weight = new vector<unsigned short*>();
-  for(NA* someNetAddr = netAddrs; 
-      someNetAddr < netAddrs+numNetAddrs; 
-      ++someNetAddr){
+  for(NA* someNetAddr = netAddrs;someNetAddr < netAddrs+numNetAddrs; ++someNetAddr){
     someValue->locator->push_back((new string(someNetAddr->net_addr)));
-    unsigned int* expireTime = new unsigned int(_req_time.tv_sec +
-        ntohl(someNetAddr->ttlMsec)/1000);
+    unsigned int* expireTime = new unsigned int(_req_time.tv_sec*1000 + _req_time.tv_usec/1000 + ntohl(someNetAddr->ttlMsec));  //translate TTL to expire timestamp
     someValue->expire->push_back(expireTime);
     unsigned short* weight = new unsigned short((ntohs(someNetAddr->weight)));
     someValue->weight->push_back(weight);
   }
-#ifdef DEBUG
-  cout << "Inserting into cache for guid: " << guid << endl;
-#endif
 
   // Insert the new value into the cache.
   cache->insert(guid,someValue);
+
+#ifdef DEBUG
+  cout << "Inserting into cache for guid: " << guid <<" with number of NA tuple: "<< numNetAddrs <<endl;
+#endif
 
   /* END CACHE */
 
@@ -496,17 +494,23 @@ void gnrsd::global_LOOKUP_msg_handler(MsgParameter *gnrs_para)
     for(; netIter != cachedValue->locator->end(); netIter++){
       expire = **expireIter;
 
-      if(expire > _cur_time.tv_sec){
+      #ifdef DEBUG
+	if(DEBUG >= 2) {
+		cout<<"cache expire timestamp: "<<expire<<endl;
+		cout<<"current time: "<<_cur_time.tv_sec*1000 + _cur_time.tv_usec/1000<<endl;
+	}
+      #endif
+
+      if(expire < _cur_time.tv_sec*1000 + _cur_time.tv_usec/1000){
         cacheMiss = true;
       }else {
         // Prep some output for the response message
         struct NA newNA;
         strncpy(newNA.net_addr,(*netIter)->c_str(),SIZE_OF_NET_ADDR);
-        newNA.ttlMsec = (uint32_t)(htonl(**expireIter));
+        newNA.ttlMsec = (uint32_t)(htonl(**expireIter - _cur_time.tv_sec*1000 - _cur_time.tv_usec/1000));  //translate the expiring timestamp to TTL
         newNA.weight = (uint16_t)(htons(**weightIter));
         naVector.push_back(newNA);
       }
-      
 
       // Increment for next round
       expireIter++;
@@ -561,14 +565,7 @@ void gnrsd::global_LOOKUP_msg_handler(MsgParameter *gnrs_para)
 #ifdef DEBUG
   cout << "Used cached value for lookup for guid: " << guid <<endl;
 #endif
-    // TODO: Use cached value
-#ifdef DEBUG
-  cout << "About to delete recvd_pkt" << endl;
-#endif
     delete(recvd_pkt);
-#ifdef DEBUG
-  cout << "About to delete gnrs_para" << endl;
-#endif
     delete gnrs_para;
     return;
   }
