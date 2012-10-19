@@ -42,7 +42,7 @@ void* insert_handler(vector<string> str_v, GNRSClient* clientHost)
 		vector<string> strTemp_v; 
 		Common::str2StrArr(str_v[i+3],',', strTemp_v); 
 		strcpy(insert_na_struct[i].net_addr,strTemp_v[0].c_str());
-		insert_na_struct[i].TTL=atol(strTemp_v[1].c_str());
+		insert_na_struct[i].ttlMsec=atol(strTemp_v[1].c_str());
 		insert_na_struct[i].weight=atoi(strTemp_v[2].c_str());
 	}
 	if(DEBUG>=1) cout<<"guid=="<<guid<<"weights:"<<insert_na_struct[0].weight<<endl;
