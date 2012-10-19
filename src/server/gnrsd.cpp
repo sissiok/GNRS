@@ -273,7 +273,7 @@ void gnrsd::global_INSERT_msg_handler(MsgParameter *gnrs_para)
     someValue->weight->push_back(weight);
   }
 #ifdef DEBUG
-  cout << "Inserting into cache." << endl;
+  cout << "Inserting into cache for guid: " << guid << endl;
 #endif
 
   // Insert the new value into the cache.
@@ -481,7 +481,7 @@ void gnrsd::global_LOOKUP_msg_handler(MsgParameter *gnrs_para)
   // Got a cache entry, so check expiry
   if(cachedValue != NULL){
 #ifdef DEBUG
-  cout << "Got a cache hit. Verifying expiry data." << endl;
+  cout << "Got a cache hit with guid: "<< guid <<". Verifying expiry data." << endl;
 #endif
     struct timeval _cur_time;
     gettimeofday(&_cur_time, NULL);
@@ -562,7 +562,7 @@ void gnrsd::global_LOOKUP_msg_handler(MsgParameter *gnrs_para)
   
   if(!cacheMiss){
 #ifdef DEBUG
-  cout << "Used cached value for lookup." << endl;
+  cout << "Used cached value for lookup for guid: " << guid <<endl;
 #endif
     // TODO: Use cached value
 #ifdef DEBUG
