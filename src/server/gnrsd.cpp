@@ -995,9 +995,9 @@ void gnrsd::print_usage()
 
 
 // we have three output files here:
-// gnrs_proc_statistics.data: print out the number of insert and lookup pkts processed per 0.1s
-// gnrs_time_statistics.data: print out the processing time of global_lookup_handler for certain sampled pkt.
-// pkt_sampling_output.data: print out the total service time of sampled pkt
+// gnrs_proc_statistics.data: print out the number of insert and lookup pkts processed per 0.1s. related function: void* statisticsProc(void* arg);int startStatistics(float delay);
+// gnrs_time_statistics.data: print out the processing time of global_lookup_handler for certain sampled pkt. related function: int gnrsd::timingStat(int index,double time_)
+// pkt_sampling_output.data: print out the total service time of sampled pkt. related function: int sampling_output();
 int main(int argc,const char * argv[]) {
 
   gnrsd gnrsd;
