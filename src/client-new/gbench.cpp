@@ -67,7 +67,7 @@ void* query_handler(vector<string> str_v, GNRSClient* clientHost)
 	uint16_t na_num;
 
 	#ifdef SAMPLING
-	if(snt_lookup_num%STAT_STEP==1)  {
+	if(snt_lookup_num%STAT_STEP==0)  {
 		pthread_mutex_lock(&lkup_pkt_sampling_mutex);
 		//cout<<"lookup_num:"<<lookup_num<<"  req_id:"<<req_ID<<endl;
 		clock_gettime(CLOCK_REALTIME, &_pkt_sample[req_ID].starttime);
@@ -150,7 +150,7 @@ void gbench_exec(char* req_filename, GNRSClient* clientHost,int req_interval){
 				case 'I':
 					START_TIMING("gbench: insert");
 					//usleep(800);
-					usleep(100);
+					usleep(2500);
 					insert_handler(strTemp_v, clientHost); 	
 					snt_insert_num++;
 					REGISTER_TIMING("gbench: insert");
@@ -285,7 +285,7 @@ int main(int argc, char* argv[]){
 
     gbench_exec(req_filename,clientHost,_req_interval);
 
-    sleep(140);
+    sleep(5);
     pthread_cancel(receivingThread);
     pthread_join(receivingThread,NULL);
 
