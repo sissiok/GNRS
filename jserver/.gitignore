@@ -1,0 +1,11 @@
+# Java stuff
+*.class
+target
+bin
+
+# Eclipse stuff
+.project
+.settings
+.classpath
+
+# Others

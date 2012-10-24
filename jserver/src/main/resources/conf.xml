@@ -1,0 +1,6 @@
+<edu.rutgers.winlab.mobilityfirst.Configuration>
+  <!-- Port number for incoming UDP packets -->
+  <listenPort>5001</listenPort>
+  <!-- Interface IP address to bind to. Leave blank for "any". -->
+  <bindIp></bindIp>
+</edu.rutgers.winlab.mobilityfirst.Configuration>
