@@ -7,7 +7,11 @@ not suitable for commercial or enterprise use.
 Be sure you have Java 1.6 and Maven 2 or higher installed.  On Ubuntu systems,
 you can do this with apt-get:
 
-    sudo apt-get install openjdk-6-jdk maven
+    # Ubuntu 12.04
+    sudo apt-get install openjdk-7-jdk maven
+
+    # Ubuntu 10.04
+    sudo apt-get install openjdk-6-jdk maven2
 
 Once that's installed, you can compile and build the .jar file with:
 
