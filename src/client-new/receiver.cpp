@@ -44,7 +44,7 @@ void* waitForAckReceiver(void* ptr){
 	  if(DEBUG>=1) cout<<"lookup response message received!"<< endl; 
 	  NA* nas=(NA *)(resp+1);
 	  uint16_t na_num=ntohs(resp->na_num);
-	if(SAMPLING==1)  {
+	#ifdef SAMPLING
 		uint32_t _req_id=ntohl(resp->c_hdr.req_id);
 		pthread_mutex_lock(&lkup_pkt_sampling_mutex);
 		//uint32_t _req_id=ntohl(hdr->req_id);
@@ -54,7 +54,7 @@ void* waitForAckReceiver(void* ptr){
 			clock_gettime(CLOCK_REALTIME, &_it->second.endtime);
 		}
 		pthread_mutex_unlock(&lkup_pkt_sampling_mutex);
-	}	  
+	#endif
 
 	  rec_lookup_num++;
 	}

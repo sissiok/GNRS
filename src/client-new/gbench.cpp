@@ -66,7 +66,8 @@ void* query_handler(vector<string> str_v, GNRSClient* clientHost)
 	NA query_na_struct[LOOKUP_MAX_NA];
 	uint16_t na_num;
 
-	if(SAMPLING==1&&snt_lookup_num%STAT_STEP==1)  {
+	#ifdef SAMPLING
+	if(snt_lookup_num%STAT_STEP==0)  {
 		pthread_mutex_lock(&lkup_pkt_sampling_mutex);
 		//cout<<"lookup_num:"<<lookup_num<<"  req_id:"<<req_ID<<endl;
 		clock_gettime(CLOCK_REALTIME, &_pkt_sample[req_ID].starttime);
@@ -74,6 +75,7 @@ void* query_handler(vector<string> str_v, GNRSClient* clientHost)
 		_pkt_sample[req_ID].endtime.tv_nsec=0;
 		pthread_mutex_unlock(&lkup_pkt_sampling_mutex);
 	 }
+	#endif
 	na_num=clientHost->lookupProc(guid, req_ID);
 
 }
@@ -124,7 +126,9 @@ void gbench_exec(char* req_filename, GNRSClient* clientHost,int req_interval){
 //	N=(int)(1000000/(n*0.00821));
 	N=(int)req_interval/0.00821;
 	unsigned long long _timestamp;
-	if(SAMPLING==1)  startStatistics(0.1);
+	#ifdef SAMPLING
+		startStatistics(0.1);
+	#endif
 	if (event_FHdlr.is_open()){
 		srand(time(&t));
 		while (event_FHdlr.good()){
@@ -146,7 +150,7 @@ void gbench_exec(char* req_filename, GNRSClient* clientHost,int req_interval){
 				case 'I':
 					START_TIMING("gbench: insert");
 					//usleep(800);
-					usleep(100);
+					usleep(2500);
 					insert_handler(strTemp_v, clientHost); 	
 					snt_insert_num++;
 					REGISTER_TIMING("gbench: insert");
@@ -281,12 +285,13 @@ int main(int argc, char* argv[]){
 
     gbench_exec(req_filename,clientHost,_req_interval);
 
-    sleep(140);
+    sleep(5);
     pthread_cancel(receivingThread);
     pthread_join(receivingThread,NULL);
 
-    if(SAMPLING==1)	
+    #ifdef SAMPLING	
 	sampling_output();
+    #endif
    
     printf("snt_insert_num:%d, snt_lookup_num:%d, rec_insert_num:%d, rec_lookup_num:%d\n",snt_insert_num, snt_lookup_num, rec_insert_num, rec_lookup_num);
  

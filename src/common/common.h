@@ -28,9 +28,6 @@ using namespace std;
 #ifndef DEBUG
 #define DEBUG 0 
 #endif
-#ifndef SAMPLING
-#define SAMPLING 1
-#endif
 
 //#ifndef ROUTING_TABLE 
 //#define ROUTING_FROM_FILE 0 
