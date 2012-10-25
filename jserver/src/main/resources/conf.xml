@@ -3,4 +3,12 @@
   <listenPort>5001</listenPort>
   <!-- Interface IP address to bind to. Leave blank for "any". -->
   <bindIp></bindIp>
+  <!-- The maximum number of unhandled messages of each type (lookup, insert, update). 
+       If this is set to 10, then there may be at most 30 queued messages in the server
+       at any given time. -->
+  <maxQueueSize>1024</maxQueueSize>
+  <!--  The number of worker threads to use when processing messages.  This number is
+        above and beyond the "main" thread which will process messages. If this
+        value is 0 or negative, then 1 worker thread will be used. -->
+  <numWorkerThreads>1</numWorkerThreads>
 </edu.rutgers.winlab.mobilityfirst.Configuration>
