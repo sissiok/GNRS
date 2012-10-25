@@ -4,10 +4,11 @@
 GNRSClient::GNRSClient( char* client_addr, char* server_addr)
 {
  //Init addresses  
+ //sending port = listening port + 1000
  if(client_addr[0]!='\0')
-	clientLocalAddress_ = new Address(client_addr, GNRSConfig::client_listen_port); 
+	clientLocalAddress_ = new Address(client_addr, GNRSConfig::client_listen_port+1000); 
  else
- 	clientLocalAddress_ = new Address(GNRSConfig::client_addr.c_str(), GNRSConfig::client_listen_port); 
+ 	clientLocalAddress_ = new Address(GNRSConfig::client_addr.c_str(), GNRSConfig::client_listen_port+1000); 
 
  if(server_addr[0]!='\0')
  	daemonRemoteAddress_ = new Address(server_addr, GNRSConfig::daemon_listen_port); 

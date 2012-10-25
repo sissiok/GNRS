@@ -35,6 +35,16 @@ void OutgoingConnection::init()
   if ((sockDescriptor_ = socket(AF_INET,SOCK_DGRAM,0)) < 0) {
      throw "Error while opening a UDP socket";
   }
+
+  Address *emptyAddr = new Address("", localAddress_.getPort());  //TODO:memory leak might exist here
+  struct sockaddr* addr = setSockAddress(emptyAddr, &localSockAddress_);
+  //bind to socket descriptor 
+  if (  bind(sockDescriptor_, addr, sizeof(struct sockaddr_in))  < 0 ){
+             perror("bind");
+             cerr << "error in binding receiving socket to addr " <<endl; 
+  }
+  delete emptyAddr; //emptyAddr is not needed, clear memory leak
+
   //Create sending buffer 
   sendingbuf_ = new char[MTU_SIZE +1];
   return; 
