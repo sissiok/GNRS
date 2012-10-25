@@ -138,7 +138,7 @@ void* gnrsd::InsertTimerProc(void *arg)  {
       if((*_it).second->expire_ts < _cur_time_us) {
         for(int i=0; i<K_NUM; i++)  
           if((*_it).second->_dstInfo[i].ack_flag == false)  {
-            OutgoingConnection *GNRS_sport=new OutgoingConnection();
+            OutgoingConnection *GNRS_sport=new OutgoingConnection((char *)GNRSConfig::server_addr.c_str(), GNRSConfig::daemon_listen_port + 1000);
             GNRS_sport->init();
 
             Address * GNRS_server_sendtoaddr;
@@ -172,7 +172,7 @@ void gnrsd::insert_msg_handler(const char* hash_ip, HashMap& _hm, Packet* recvd_
   common_header_t *hdr=(common_header_t*)recvd_pkt->getPayloadPointer();
   insert_message_t *ins = (insert_message_t*)recvd_pkt->getPayloadPointer();
   Address * GNRS_server_sendtoaddr;
-  OutgoingConnection *GNRS_sport=new OutgoingConnection();
+  OutgoingConnection *GNRS_sport=new OutgoingConnection((char *)GNRSConfig::server_addr.c_str(), GNRSConfig::daemon_listen_port + 1000);
   GNRS_sport->init();
 
   if(strcmp(hash_ip,GNRSConfig::server_addr.c_str())==0)
@@ -237,6 +237,7 @@ guid_cache_t* gnrsd::getCache(){
 }
 
 //this is the working thread for insert pool: called by the listening thread
+//forward msg to other gnrs server, or reply ack to the previous gnrs server that forwrds the msg
 void gnrsd::global_INSERT_msg_handler(MsgParameter *gnrs_para)
 {
   START_TIMING((char *)"gnrsd:global_insert_msg_handler");
@@ -246,8 +247,6 @@ void gnrsd::global_INSERT_msg_handler(MsgParameter *gnrs_para)
   gettimeofday(&_req_time, NULL);
 
   Packet *recvd_pkt=gnrs_para->recvd_pkt;
-  OutgoingConnection *GNRS_sport=new OutgoingConnection();
-  GNRS_sport->init();
   if (DEBUG >=1) cout<<"insert packet received at GNRS"<<endl;
   insert_message_t *ins = (insert_message_t*)recvd_pkt->getPayloadPointer();
   /* CACHE CODE */
@@ -293,7 +292,7 @@ void gnrsd::global_INSERT_msg_handler(MsgParameter *gnrs_para)
     common_header_t *hdr=(common_header_t*)recvd_pkt->getPayloadPointer();
 
     //reply a insert-ack to the client who sends out the insert request
-    OutgoingConnection *GNRS_sport=new OutgoingConnection();
+    OutgoingConnection *GNRS_sport=new OutgoingConnection((char *)GNRSConfig::server_addr.c_str(), GNRSConfig::daemon_listen_port + 1000);
     GNRS_sport->init();
     Address * GNRS_server_sendtoaddr;
     GNRS_server_sendtoaddr= new Address(hdr->sender_addr,ntohl(hdr->sender_listen_port));
@@ -309,6 +308,9 @@ void gnrsd::global_INSERT_msg_handler(MsgParameter *gnrs_para)
     p->setPayload((char*)ack, sizeof(insert_ack_message_t));
 
     GNRS_sport->sendPack(p);
+    delete GNRS_server_sendtoaddr;
+    delete GNRS_sport;
+
 #ifdef DEBUG
     if (DEBUG >=1) cout<<"ACK FOR INSERT SENT to CLIENT!"<<endl;
 #endif
@@ -352,8 +354,6 @@ void gnrsd::global_INSERT_msg_handler(MsgParameter *gnrs_para)
     }
 
     delete p;
-    delete GNRS_server_sendtoaddr;
-    delete GNRS_sport;
 
     //when all replicas are stored locally, directly remove the entry in the insert table. normally only take place when K_NUM=1
     if(_temp->ack_num == K_NUM)  {
@@ -394,7 +394,7 @@ void gnrsd::lookup_msg_handler(const char* hash_ip, HashMap& _hm, Packet* recvd_
 {
   common_header_t *hdr=(common_header_t*)recvd_pkt->getPayloadPointer();
   lookup_message_t *lkup = (lookup_message_t*)recvd_pkt->getPayloadPointer();
-  OutgoingConnection *GNRS_sport=new OutgoingConnection();
+  OutgoingConnection *GNRS_sport=new OutgoingConnection((char *)GNRSConfig::server_addr.c_str(), GNRSConfig::daemon_listen_port + 1000);
   GNRS_sport->init();
   Address * GNRS_server_sendtoaddr;
 
@@ -549,7 +549,7 @@ void gnrsd::global_LOOKUP_msg_handler(MsgParameter *gnrs_para)
       }
 
       // Allocate a socket to send the response message
-      OutgoingConnection sendSocket;
+      OutgoingConnection sendSocket((char *)GNRSConfig::server_addr.c_str(), GNRSConfig::daemon_listen_port + 1000);
       sendSocket.init();
       // Grab the address from the request
       Address dstAddress(hdr->sender_addr,ntohl(hdr->sender_listen_port));
@@ -677,7 +677,7 @@ void gnrsd::global_LOOKUP_RESP_handler(MsgParameter *msg_para)
 #endif
 
   Address * GNRS_server_sendtoaddr;
-  OutgoingConnection *GNRS_sport=new OutgoingConnection();
+  OutgoingConnection *GNRS_sport=new OutgoingConnection((char *)GNRSConfig::server_addr.c_str(), GNRSConfig::daemon_listen_port + 1000);
   GNRS_sport->init();
 
   GNRS_server_sendtoaddr = new Address((*lookup_table)[index]->src_addr, (*lookup_table)[index]->src_listen_port);
