@@ -11,4 +11,17 @@ package edu.rutgers.winlab.mobilityfirst.structures;
  */
 public class NetworkAddress {
 
+  /**
+   * Size of a network address in bytes.
+   */
+  public static final int SIZE_OF_NETWORK_ADDRESS = 30;
+  
+  private byte[] bytes;
+
+  public byte[] getBytes() {
+    return bytes;
+  }
+  
+  
+  
 }

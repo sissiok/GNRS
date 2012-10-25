@@ -11,7 +11,7 @@ import edu.rutgers.winlab.mobilityfirst.structures.GNRSRecord;
  * @author Robert Moore
  *
  */
-public class UpdateMessage {
+public class UpdateMessage extends AbstractMessage {
   private GNRSRecord[] originalRecords;
   private GNRSRecord[] replacementRecords;
 }

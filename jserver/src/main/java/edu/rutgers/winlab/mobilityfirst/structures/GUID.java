@@ -10,5 +10,19 @@ package edu.rutgers.winlab.mobilityfirst.structures;
  *
  */
 public class GUID {
+  
+  /**
+   * Number of bytes in a GUID value.
+   */
+  public static final int SIZE_OF_GUID = 20;
 
+  private byte[] guid;
+
+  public byte[] getGuid() {
+    return this.guid;
+  }
+
+  public void setGuid(byte[] guid) {
+    this.guid = guid;
+  }
 }

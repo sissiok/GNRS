@@ -12,22 +12,19 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 import org.apache.mina.filter.codec.demux.MessageEncoder;
 
-import edu.rutgers.winlab.mobilityfirst.structures.GUIDBinding;
-
 /**
  * @author Robert Moore
  *
  */
-public class LookupResponseEncoder implements
-    MessageEncoder<LookupResponseMessage> {
+public class InsertAckEncoder implements MessageEncoder<InsertAckMessage> {
 
   /* (non-Javadoc)
    * @see org.apache.mina.filter.codec.demux.MessageEncoder#encode(org.apache.mina.core.session.IoSession, java.lang.Object, org.apache.mina.filter.codec.ProtocolEncoderOutput)
    */
   @Override
-  public void encode(IoSession session, LookupResponseMessage message,
-      ProtocolEncoderOutput out) throws Exception {
-    // Common message stuff
+  public void encode(IoSession session, InsertAckMessage message, ProtocolEncoderOutput out)
+      throws Exception {
+ // Common message stuff
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     DataOutputStream dos = new DataOutputStream(baos);
     dos.writeInt((int)message.getRequestId());
@@ -35,14 +32,8 @@ public class LookupResponseEncoder implements
     dos.write(message.getSenderAddress().getBytes());
     dos.writeInt(message.getSenderPort());
     
-    // LookupResponseMessage-specific
+    // AckMessage-specific
     dos.writeByte(message.getResponseCode());
-    for(GUIDBinding binding : message.getBindings()){
-      dos.write(binding.getAddress().getBytes());
-      dos.writeInt((int)binding.getTtl());
-      dos.writeShort(binding.getWeight());
-    }
-    
     dos.flush();
     out.write(baos.toByteArray());
     dos.close();

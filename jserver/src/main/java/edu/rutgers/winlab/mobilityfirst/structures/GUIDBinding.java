@@ -10,5 +10,25 @@ package edu.rutgers.winlab.mobilityfirst.structures;
  *
  */
 public class GUIDBinding {
-
+  private NetworkAddress address;
+  private long ttl;
+  private int weight;
+  public NetworkAddress getAddress() {
+    return address;
+  }
+  public void setAddress(NetworkAddress address) {
+    this.address = address;
+  }
+  public long getTtl() {
+    return ttl;
+  }
+  public void setTtl(int ttl) {
+    this.ttl = ttl;
+  }
+  public int getWeight() {
+    return weight;
+  }
+  public void setWeight(int weight) {
+    this.weight = weight;
+  }
 }
