@@ -8,27 +8,58 @@ package edu.rutgers.winlab.mobilityfirst.messages;
 import edu.rutgers.winlab.mobilityfirst.structures.GUIDBinding;
 
 /**
+ * A Lookup Response message for GNRS.
+ * 
  * @author Robert Moore
- *
+ * 
  */
 public class LookupResponseMessage extends AbstractMessage {
-  private byte responseCode;
-  private GUIDBinding[] bindings;
+  /**
+   * ResponseCode for this message.
+   */
+  private ResponseCode responseCode;
   
-  public LookupResponseMessage(){
+  /**
+   * The bindings for this message.
+   */
+  private GUIDBinding[] bindings;
+
+  /**
+   * Creates a new Lookup Response message.
+   */
+  public LookupResponseMessage() {
     super();
     super.type = MessageType.LOOKUP_RESPONSE;
   }
-  
-  public byte getResponseCode() {
+
+  /**
+   * Gets the ResponseCode for this message.
+   * @return the ResponseCode for this message.
+   */
+  public ResponseCode getResponseCode() {
     return this.responseCode;
   }
-  public void setResponseCode(byte responseCode) {
+
+  /**
+   * Sets the ResponseCode for this message.
+   * @param responseCode the new ResponseCode
+   */
+  public void setResponseCode(ResponseCode responseCode) {
     this.responseCode = responseCode;
   }
+
+  /**
+   * Gets the bindings for this message.
+   * @return the bindings for this message, or {@code null} if there are none.
+   */
   public GUIDBinding[] getBindings() {
     return this.bindings;
   }
+
+  /**
+   * Sets the bindings for this message.
+   * @param bindings the new bindings for this message.
+   */
   public void setBindings(GUIDBinding[] bindings) {
     this.bindings = bindings;
   }

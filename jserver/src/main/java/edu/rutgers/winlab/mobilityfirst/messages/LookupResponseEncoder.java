@@ -16,13 +16,18 @@ import edu.rutgers.winlab.mobilityfirst.structures.GUIDBinding;
 
 /**
  * @author Robert Moore
- *
+ * 
  */
 public class LookupResponseEncoder implements
     MessageEncoder<LookupResponseMessage> {
 
-  /* (non-Javadoc)
-   * @see org.apache.mina.filter.codec.demux.MessageEncoder#encode(org.apache.mina.core.session.IoSession, java.lang.Object, org.apache.mina.filter.codec.ProtocolEncoderOutput)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.mina.filter.codec.demux.MessageEncoder#encode(org.apache.mina
+   * .core.session.IoSession, java.lang.Object,
+   * org.apache.mina.filter.codec.ProtocolEncoderOutput)
    */
   @Override
   public void encode(IoSession session, LookupResponseMessage message,
@@ -30,19 +35,25 @@ public class LookupResponseEncoder implements
     // Common message stuff
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     DataOutputStream dos = new DataOutputStream(baos);
-    dos.writeInt((int)message.getRequestId());
+    dos.writeInt((int) message.getRequestId());
     dos.writeByte(message.getType().value());
     dos.write(message.getSenderAddress().getBytes());
-    dos.writeInt(message.getSenderPort());
-    
+    dos.writeInt((int) message.getSenderPort());
+
     // LookupResponseMessage-specific
-    dos.writeByte(message.getResponseCode());
-    for(GUIDBinding binding : message.getBindings()){
-      dos.write(binding.getAddress().getBytes());
-      dos.writeInt((int)binding.getTtl());
-      dos.writeShort(binding.getWeight());
+    dos.writeByte(message.getResponseCode().value());
+    // Careful, perhaps there were no bindings.
+    if (message.getBindings() != null) {
+      dos.writeShort(message.getBindings().length);
+      for (GUIDBinding binding : message.getBindings()) {
+        dos.write(binding.getAddress().getBytes());
+        dos.writeInt((int) binding.getTtl());
+        dos.writeShort(binding.getWeight());
+      }
+    } else {
+      dos.writeShort(0);
     }
-    
+
     dos.flush();
     out.write(baos.toByteArray());
     dos.close();

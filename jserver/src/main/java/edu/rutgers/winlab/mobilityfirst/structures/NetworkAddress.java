@@ -21,6 +21,13 @@ public class NetworkAddress {
   public byte[] getBytes() {
     return bytes;
   }
+
+  public void setBytes(byte[] bytes) {
+    if(bytes == null || bytes.length != SIZE_OF_NETWORK_ADDRESS){
+      throw new IllegalArgumentException("NetworkAddress must be exactly " + SIZE_OF_NETWORK_ADDRESS +" bytes.");
+    }
+    this.bytes = bytes;
+  }
   
   
   

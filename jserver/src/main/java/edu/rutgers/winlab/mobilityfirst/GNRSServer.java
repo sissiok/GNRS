@@ -27,7 +27,6 @@ import com.thoughtworks.xstream.XStream;
 import edu.rutgers.winlab.mobilityfirst.messages.GNRSProtocolCodecFactory;
 import edu.rutgers.winlab.mobilityfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mobilityfirst.messages.LookupMessage;
-import edu.rutgers.winlab.mobilityfirst.messages.UpdateMessage;
 
 /**
  * @author Robert Moore
@@ -116,11 +115,6 @@ public class GNRSServer extends Thread {
   private final ConcurrentLinkedQueue<LookupMessage> lookupMessages = new ConcurrentLinkedQueue<LookupMessage>();
 
   /**
-   * Queue for update messages that have arrived but not yet been processed.
-   */
-  private final ConcurrentLinkedQueue<UpdateMessage> updateMessages = new ConcurrentLinkedQueue<UpdateMessage>();
-
-  /**
    * Thread pool for distributing tasks.
    */
   private final ExecutorService workers;
@@ -175,15 +169,6 @@ public class GNRSServer extends Thread {
       } else {
         log.debug("Inserted {} into the message queue.", message);
       }
-    } else if (message instanceof UpdateMessage) {
-      if (!this.updateMessages.offer((UpdateMessage) message)) {
-        log.warn("Unable to insert {} into the message queue.", message);
-        // Close after all write requests have finished
-        // TODO: Capture the CloseFuture here and have it processed by a thread
-        session.close(false);
-      } else {
-        log.debug("Inserted {} into the message queue.", message);
-      }
     } else if (message instanceof LookupMessage) {
       if (!this.lookupMessages.offer((LookupMessage) message)) {
         log.warn("Unable to insert {} into the message queue.", message);
@@ -211,11 +196,6 @@ public class GNRSServer extends Thread {
   @Override
   public void run() {
     while (this.keepRunning) {
-      // Check for update messages first. Want to avoid expiration if possible.
-      while (!this.updateMessages.isEmpty()) {
-
-      }
-
       /*
        * Next handle any new insert messages. These should be forwarded/inserted
        * before lookups.

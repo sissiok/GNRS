@@ -9,27 +9,31 @@ import org.apache.mina.filter.codec.demux.DemuxingProtocolCodecFactory;
 
 /**
  * @author Robert Moore
- *
+ * 
  */
 public class GNRSProtocolCodecFactory extends DemuxingProtocolCodecFactory {
-  public GNRSProtocolCodecFactory(boolean isServer)
-  {
+  /**
+   * Generates a new protocol codec factory for a server or client using the
+   * GNRS protocol.
+   * 
+   * @param isServer
+   *          {@code true} if the factory should be for a server
+   */
+  public GNRSProtocolCodecFactory(boolean isServer) {
     super();
-    if(isServer)
-    {
+    if (isServer) {
       super.addMessageDecoder(InsertDecoder.class);
-      super.addMessageDecoder(UpdateDecoder.class);
       super.addMessageDecoder(LookupDecoder.class);
-      
-      super.addMessageEncoder(LookupResponseMessage.class, LookupResponseEncoder.class);
-    }
-    else
-    {
+
+      super.addMessageEncoder(LookupResponseMessage.class,
+          LookupResponseEncoder.class);
+      super.addMessageEncoder(InsertAckMessage.class, InsertAckEncoder.class);
+    } else {
       super.addMessageEncoder(InsertMessage.class, InsertEncoder.class);
-      super.addMessageEncoder(UpdateMessage.class, UpdateEncoder.class);
       super.addMessageEncoder(LookupMessage.class, LookupEncoder.class);
-      
+
       super.addMessageDecoder(LookupResponseDecoder.class);
+      super.addMessageDecoder(InsertAckDecoder.class);
     }
   }
 }

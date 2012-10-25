@@ -30,7 +30,7 @@ public class LookupEncoder implements MessageEncoder<LookupMessage> {
     dos.writeInt((int)message.getRequestId());
     dos.writeByte(message.getType().value());
     dos.write(message.getSenderAddress().getBytes());
-    dos.writeInt(message.getSenderPort());
+    dos.writeInt((int)message.getSenderPort());
     
     // LookupMessage-specific
     dos.write(message.getGuid().getGuid());

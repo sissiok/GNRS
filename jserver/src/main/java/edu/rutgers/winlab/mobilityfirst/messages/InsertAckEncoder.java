@@ -14,24 +14,29 @@ import org.apache.mina.filter.codec.demux.MessageEncoder;
 
 /**
  * @author Robert Moore
- *
+ * 
  */
 public class InsertAckEncoder implements MessageEncoder<InsertAckMessage> {
 
-  /* (non-Javadoc)
-   * @see org.apache.mina.filter.codec.demux.MessageEncoder#encode(org.apache.mina.core.session.IoSession, java.lang.Object, org.apache.mina.filter.codec.ProtocolEncoderOutput)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.mina.filter.codec.demux.MessageEncoder#encode(org.apache.mina
+   * .core.session.IoSession, java.lang.Object,
+   * org.apache.mina.filter.codec.ProtocolEncoderOutput)
    */
   @Override
-  public void encode(IoSession session, InsertAckMessage message, ProtocolEncoderOutput out)
-      throws Exception {
- // Common message stuff
+  public void encode(IoSession session, InsertAckMessage message,
+      ProtocolEncoderOutput out) throws Exception {
+    // Common message stuff
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     DataOutputStream dos = new DataOutputStream(baos);
-    dos.writeInt((int)message.getRequestId());
+    dos.writeInt((int) message.getRequestId());
     dos.writeByte(message.getType().value());
     dos.write(message.getSenderAddress().getBytes());
-    dos.writeInt(message.getSenderPort());
-    
+    dos.writeInt((int)message.getSenderPort());
+
     // AckMessage-specific
     dos.writeByte(message.getResponseCode());
     dos.flush();
