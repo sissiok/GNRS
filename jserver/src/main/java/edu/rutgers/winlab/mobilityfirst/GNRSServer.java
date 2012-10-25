@@ -15,13 +15,16 @@ import java.util.concurrent.Executors;
 import org.apache.mina.core.filterchain.DefaultIoFilterChain;
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.XStream;
 
+import edu.rutgers.winlab.mobilityfirst.messages.GNRSProtocolCodecFactory;
 import edu.rutgers.winlab.mobilityfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mobilityfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mobilityfirst.messages.UpdateMessage;
@@ -143,6 +146,8 @@ public class GNRSServer extends Thread {
     acceptor.setHandler(new MessageHandler(this));
 
     DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
+    chain.addLast("gnrs codec", new ProtocolCodecFilter(
+        new GNRSProtocolCodecFactory(true)));
 
     DatagramSessionConfig sessionConfig = acceptor.getSessionConfig();
     sessionConfig.setReuseAddress(true);
@@ -208,9 +213,7 @@ public class GNRSServer extends Thread {
     while (this.keepRunning) {
       // Check for update messages first. Want to avoid expiration if possible.
       while (!this.updateMessages.isEmpty()) {
-        if (this.workers != null) {
 
-        }
       }
 
       /*
