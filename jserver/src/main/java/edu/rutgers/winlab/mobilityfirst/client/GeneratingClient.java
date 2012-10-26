@@ -50,7 +50,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
    * @throws InterruptedException if interrupted while waiting for the clients to finish.
    */
   public static void main(String[] args) throws InterruptedException {
-    if (args.length < 3) {
+    if (args.length < 4) {
       printUsageInfo();
       return;
     }
@@ -60,9 +60,9 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     Configuration config = (Configuration) x.fromXML(new File(args[0]));
     log.debug("Loaded configuration file \"{}\".", args[0]);
 
-    int delay = Integer.parseInt(args[1]);
-    int numClients = Integer.parseInt(args[2]);
-    int numLookups = 100000;
+    int delay = Integer.parseInt(args[2]);
+    int numClients = Integer.parseInt(args[3]);
+    int numLookups = Integer.parseInt(args[1]);
 
     GeneratingClient[] clients = new GeneratingClient[numClients];
     for (int i = 0; i < clients.length; ++i) {
@@ -88,7 +88,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
   }
 
   public static void printUsageInfo() {
-    System.out.println("Usage: <Config File> <Request Delay> <Num Clients>");
+    System.out.println("Usage: <Config File> <Num Request> <Request Delay> <Num Clients>");
   }
 
   private NioDatagramConnector connector;
