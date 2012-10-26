@@ -284,6 +284,7 @@ public class GNRSServer extends Thread {
        */
       log.debug("Checking for insert messages.");
       while (!this.insertMessages.isEmpty()) {
+        handledOne = true;
         // FIXME: Perform real insertion. This is just testing the network
         // protocols
         log.debug("Getting the next insert message.");
@@ -319,6 +320,7 @@ public class GNRSServer extends Thread {
        */
       log.debug("Checking for lookup messages.");
       while (!this.lookupMessages.isEmpty()) {
+        handledOne = true;
         // FIXME: Just a simple hack here to test the protocols
         log.debug("Getting the next lookup message.");
         MessageContainer container = this.lookupMessages.poll();
