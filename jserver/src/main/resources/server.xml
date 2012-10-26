@@ -7,8 +7,19 @@
        If this is set to 10, then there may be at most 30 queued messages in the server
        at any given time. -->
   <maxQueueSize>1024</maxQueueSize>
-  <!--  The number of worker threads to use when processing messages.  This number is
-        above and beyond the "main" thread which will process messages. If this
-        value is 0 or negative, then 1 worker thread will be used. -->
-  <numWorkerThreads>1</numWorkerThreads>
+  <!--  The minimum number of worker threads to use when processing messages.  
+        This number is  above and beyond the primary NIO thread which will process 
+        messages. If this value is 0 or negative, then 1 worker thread will 
+        be used. -->
+  <minWorkerThreads>1</minWorkerThreads>
+  <!-- Maximum number of worker threads to use when processing messages.  Once all
+       threads are in use, messages will be rejected by the server. If this value is
+       0 or negative, then only the minimum number of workers will be used. -->
+  <maxWorkerThreads>4</maxWorkerThreads>
+  <!-- How many milliseconds a thread can be idle before it is destroyed in the 
+       thread pool.  Because it costs resources to allocate and destroy threads, this
+       value should be set to a reasonably large size (several seconds).  This policy
+       does not affect the minimum number of threads available. If this value is 0 or 
+       negative, then 1 second is used as the value. -->
+  <threadIdleTime>10000</threadIdleTime>
 </edu.rutgers.winlab.mobilityfirst.Configuration>

@@ -30,9 +30,19 @@ public class Configuration {
   private int maxQueueSize = 4096;
   
   /**
-   * Number of worker threads to utilize.
+   * Minimum number of worker threads to utilize.
    */
-  private int numWorkerThreads = 1;
+  private int minWorkerThreads = 1;
+  
+  /**
+   * Maximum number of worker threads to utilize.
+   */
+  private int maxWorkerThreads = 16;
+  
+  /**
+   * Number of milliseconds to wait before destroying an unused thread.
+   */
+  private long threadIdleTime = 10000l;
 
   /**
    * Return the server's port for listening for UDP messages.
@@ -82,20 +92,28 @@ public class Configuration {
     this.maxQueueSize = maxQueueSize;
   }
 
-  /**
-   * Get the number of worker threads this server should utilize.
-   * @return the number of worker threads to use.
-   */
-  public int getNumWorkerThreads() {
-    return this.numWorkerThreads;
+  public int getMinWorkerThreads() {
+    return minWorkerThreads;
   }
 
-  /**
-   * Sets the number of worker threads to use.
-   * @param numWorkerThreads
-   */
-  public void setNumWorkerThreads(int numWorkerThreads) {
-    this.numWorkerThreads = numWorkerThreads;
+  public void setMinWorkerThreads(int minWorkerThreads) {
+    this.minWorkerThreads = minWorkerThreads;
+  }
+
+  public int getMaxWorkerThreads() {
+    return maxWorkerThreads;
+  }
+
+  public void setMaxWorkerThreads(int maxWorkerThreads) {
+    this.maxWorkerThreads = maxWorkerThreads;
+  }
+
+  public long getThreadIdleTime() {
+    return threadIdleTime;
+  }
+
+  public void setThreadIdleTime(long threadIdleTime) {
+    this.threadIdleTime = threadIdleTime;
   }
 
 }

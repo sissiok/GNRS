@@ -10,12 +10,12 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
 import org.slf4j.Logger;
@@ -72,6 +72,7 @@ public class GNRSServer extends Thread {
 
       // Add a hook to capture interrupts and shut down gracefully
       Runtime.getRuntime().addShutdownHook(new Thread() {
+        @Override
         public void run() {
           server.shutdown();
         }
@@ -119,9 +120,14 @@ public class GNRSServer extends Thread {
   private final ConcurrentLinkedQueue<MessageContainer> lookupMessages = new ConcurrentLinkedQueue<MessageContainer>();
 
   /**
+   * Object for the server to wait/notify on.
+   */
+  private final Object messageLock = new Object();
+
+  /**
    * Thread pool for distributing tasks.
    */
-  private final ExecutorService workers;
+  // private final ExecutorService workers;
 
   /**
    * Creates a new GNRS server with the specified configuration. The server will
@@ -129,23 +135,47 @@ public class GNRSServer extends Thread {
    * 
    * @param config
    *          the configuration to use.
+   * @throws IOException
+   *           if an IOException occurs during server set-up.
    */
   public GNRSServer(final Configuration config) throws IOException {
     this.config = config;
 
-    if (this.config.getNumWorkerThreads() > 0) {
-      this.workers = Executors.newFixedThreadPool(this.config
-          .getNumWorkerThreads());
-    } else {
-      this.workers = Executors.newSingleThreadExecutor();
-    }
+    // if (this.config.getNumWorkerThreads() > 0) {
+    // this.workers = Executors.newFixedThreadPool(this.config
+    // .getNumWorkerThreads());
+    // } else {
+    // this.workers = Executors.newSingleThreadExecutor();
+    // }
 
     NioDatagramAcceptor acceptor = new NioDatagramAcceptor();
     acceptor.setHandler(new MessageHandler(this));
 
     DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
+    // For encoding/decoding our messages
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
         new GNRSProtocolCodecFactory(true)));
+    // Configure extra threads to handle message processing
+    int minThreads = this.config.getMinWorkerThreads();
+    int maxThreads = this.config.getMaxWorkerThreads();
+    long threadIdleTime = this.config.getThreadIdleTime();
+    if (minThreads < 1) {
+      minThreads = 1;
+    }
+    if (maxThreads < minThreads) {
+      maxThreads = minThreads;
+    }
+    if (threadIdleTime < 1) {
+      threadIdleTime = 1000;
+    }
+    if (log.isDebugEnabled()) {
+      log.debug(String.format(
+          "Using threadpool of (%d, %d) threads. Lifetime is %,dms.",
+          Integer.valueOf(minThreads), Integer.valueOf(maxThreads),
+          Long.valueOf(threadIdleTime)));
+    }
+    chain.addLast("executor", new ExecutorFilter(minThreads, maxThreads,
+        threadIdleTime, TimeUnit.MILLISECONDS));
 
     DatagramSessionConfig sessionConfig = acceptor.getSessionConfig();
     sessionConfig.setReuseAddress(true);
@@ -164,6 +194,15 @@ public class GNRSServer extends Thread {
     this.keepRunning = false;
   }
 
+  /**
+   * Processes messages that have arrived at the server.
+   * 
+   * @param session
+   *          the session that the message arrived on.
+   * @param message
+   *          the message that arrived. Should be a subclass of
+   *          {@link AbstractMessage}.
+   */
   public void messageArrived(final IoSession session, final Object message) {
     log.debug("[{}] Received message {}", session, message);
     MessageContainer container = new MessageContainer();
@@ -195,8 +234,10 @@ public class GNRSServer extends Thread {
       // Close immediately, don't wait for outstanding write requests.
       session.close(true);
     }
-    // Wake up this thread if it was sleeping
-    this.interrupt();
+    // Notify the main thread that work can be done.
+    synchronized (this.messageLock) {
+      this.messageLock.notifyAll();
+    }
   }
 
   /**
@@ -232,8 +273,13 @@ public class GNRSServer extends Thread {
           continue;
         }
         response.setSenderPort(this.config.getListenPort() & 0xFFFFFFFFl);
-        log.debug("[{}] Writing {}", container.session, response);
-        container.session.write(response);
+        if (!container.session.isClosing()) {
+          log.debug("[{}] Writing {}", container.session, response);
+          container.session.write(response);
+        } else {
+          log.warn("[{}] Unable to write {} to closing session.",
+              container.session, response);
+        }
       }
 
       /*
@@ -264,8 +310,8 @@ public class GNRSServer extends Thread {
         container.session.write(response);
       }
       try {
-        synchronized (this.insertMessages) {
-          this.insertMessages.wait();
+        synchronized (this.messageLock) {
+          this.messageLock.wait();
         }
       } catch (InterruptedException ie) {
         // Busy work
