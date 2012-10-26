@@ -28,24 +28,30 @@ public class Configuration {
    * times this value.
    */
   private int maxQueueSize = 4096;
-  
+
   /**
    * Minimum number of worker threads to utilize.
    */
   private int minWorkerThreads = 1;
-  
+
   /**
    * Maximum number of worker threads to utilize.
    */
   private int maxWorkerThreads = 16;
-  
+
   /**
    * Number of milliseconds to wait before destroying an unused thread.
    */
   private long threadIdleTime = 10000l;
 
   /**
+   * Whether or not the server should collect and output statistics to the log.
+   */
+  private boolean collectStatistics = false;
+
+  /**
    * Return the server's port for listening for UDP messages.
+   * 
    * @return the server's listen port.
    */
   public int getListenPort() {
@@ -54,7 +60,9 @@ public class Configuration {
 
   /**
    * Set the server's listen port.
-   * @param listenPort the listen port.
+   * 
+   * @param listenPort
+   *          the listen port.
    */
   public void setListenPort(int listenPort) {
     this.listenPort = listenPort;
@@ -62,6 +70,7 @@ public class Configuration {
 
   /**
    * Get the IP address to bind to. Useful in a multi-homed server.
+   * 
    * @return the IP address the server should bind to.
    */
   public String getBindIp() {
@@ -70,7 +79,9 @@ public class Configuration {
 
   /**
    * Set the IP address that the server should bind to.
-   * @param bindIp the address the server should bind to.
+   * 
+   * @param bindIp
+   *          the address the server should bind to.
    */
   public void setBindIp(String bindIp) {
     this.bindIp = bindIp;
@@ -78,6 +89,7 @@ public class Configuration {
 
   /**
    * Return the maximum size of each message queue.
+   * 
    * @return the maximum size of each message queue.
    */
   public int getMaxQueueSize() {
@@ -86,7 +98,9 @@ public class Configuration {
 
   /**
    * Sets the maximum size for each message queue.
-   * @param maxQueueSize the maximum size for each message queue.
+   * 
+   * @param maxQueueSize
+   *          the maximum size for each message queue.
    */
   public void setMaxQueueSize(int maxQueueSize) {
     this.maxQueueSize = maxQueueSize;
@@ -114,6 +128,14 @@ public class Configuration {
 
   public void setThreadIdleTime(long threadIdleTime) {
     this.threadIdleTime = threadIdleTime;
+  }
+
+  public boolean isCollectStatistics() {
+    return collectStatistics;
+  }
+
+  public void setCollectStatistics(boolean collectStatistics) {
+    this.collectStatistics = collectStatistics;
   }
 
 }

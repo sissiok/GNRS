@@ -39,22 +39,22 @@ public class MessageHandler extends IoHandlerAdapter {
   
   @Override
   public void sessionClosed(IoSession session) throws Exception {
-    log.debug("[{}] Session closed.", session);
+    log.info("[{}] Session closed.", session);
   }
   
   @Override
   public void sessionCreated(IoSession session) throws Exception {
-    log.debug("[{}] Session created.", session);
+    log.info("[{}] Session created.", session);
   }
   
   @Override
   public void sessionIdle(IoSession session, IdleStatus status){
-    log.debug("[{}] Session idle: {}", session, status);
+    log.info("[{}] Session idle: {}", session, status);
   }
   
   @Override
   public void sessionOpened(IoSession session) throws Exception {
-    log.debug("[{}] Session opened.", session);
+    log.info("[{}] Session opened.", session);
   }
 }
 

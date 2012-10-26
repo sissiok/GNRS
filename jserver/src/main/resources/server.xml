@@ -22,4 +22,7 @@
        does not affect the minimum number of threads available. If this value is 0 or 
        negative, then 1 second is used as the value. -->
   <threadIdleTime>10000</threadIdleTime>
+  <!-- True if the server should collect statistics and log them, false for 
+       slightly faster code. -->
+  <collectStatistics>true</collectStatistics>
 </edu.rutgers.winlab.mobilityfirst.Configuration>

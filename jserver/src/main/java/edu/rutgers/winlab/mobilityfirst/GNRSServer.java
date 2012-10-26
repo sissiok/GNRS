@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -123,6 +125,18 @@ public class GNRSServer extends Thread {
    * Object for the server to wait/notify on.
    */
   private final Object messageLock = new Object();
+  
+  /**
+   * Whether or not to collect statistics about performance.
+   */
+  private final boolean collectStatistics;
+  
+  private final Timer statsTimer;
+  
+  /**
+   * Number of lookups performed since last stats output.
+   */
+  volatile int numLookups = 0;
 
   /**
    * Thread pool for distributing tasks.
@@ -139,7 +153,15 @@ public class GNRSServer extends Thread {
    *           if an IOException occurs during server set-up.
    */
   public GNRSServer(final Configuration config) throws IOException {
+    super();
     this.config = config;
+    this.collectStatistics = this.config.isCollectStatistics();
+    
+    if(this.collectStatistics){
+      this.statsTimer = new Timer();
+    }else {
+      this.statsTimer = null;
+    }
 
     // if (this.config.getNumWorkerThreads() > 0) {
     // this.workers = Executors.newFixedThreadPool(this.config
@@ -182,6 +204,10 @@ public class GNRSServer extends Thread {
     sessionConfig.setCloseOnPortUnreachable(false);
 
     acceptor.bind(new InetSocketAddress(this.config.getListenPort()));
+    
+    if(this.collectStatistics){
+      this.statsTimer.scheduleAtFixedRate(new StatsTask(this), 1000, 1000);
+    }
 
     log.info("Server listening on port {}.",
         Integer.valueOf(this.config.getListenPort()));
@@ -192,6 +218,9 @@ public class GNRSServer extends Thread {
    */
   public void shutdown() {
     this.keepRunning = false;
+    if(this.collectStatistics){
+      this.statsTimer.cancel();
+    }
   }
 
   /**
@@ -291,6 +320,9 @@ public class GNRSServer extends Thread {
         // FIXME: Just a simple hack here to test the protocols
         log.debug("Getting the next lookup message.");
         MessageContainer container = this.lookupMessages.poll();
+        
+        ++this.numLookups;
+        
         if (container == null) {
           break;
         }
@@ -316,6 +348,31 @@ public class GNRSServer extends Thread {
       } catch (InterruptedException ie) {
         // Busy work
       }
+    }
+  }
+  
+  private static final class StatsTask extends TimerTask{
+    private static final Logger log = LoggerFactory.getLogger(StatsTask.class);
+    private final GNRSServer server;
+    private long lastTimestamp = System.currentTimeMillis();
+    public StatsTask(final GNRSServer server){
+      super();
+      this.server = server;
+    }
+    
+    @Override
+    public void run(){
+      
+      int numLookups = this.server.numLookups;
+      long now = System.currentTimeMillis();
+      // FIXME: Probably gonna lose a few here. AtomicInteger?
+      this.server.numLookups = 0;
+      
+      long timeDiff = now - this.lastTimestamp;
+      this.lastTimestamp = now;
+      float numSeconds = timeDiff / 1000f;
+      float lookupsPerSecond = numLookups/numSeconds;
+      log.info(String.format("Lookups: %.3f per second (%.2f s)",lookupsPerSecond,numSeconds));
     }
   }
 
