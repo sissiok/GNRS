@@ -41,7 +41,7 @@ void OutgoingConnection::init()
   //bind to socket descriptor 
   if (  bind(sockDescriptor_, addr, sizeof(struct sockaddr_in))  < 0 ){
              perror("bind");
-             cerr << "error in binding receiving socket to addr " <<endl; 
+             cerr << "error in binding sending socket to addr " <<endl; 
   }
   delete emptyAddr; //emptyAddr is not needed, clear memory leak
 
