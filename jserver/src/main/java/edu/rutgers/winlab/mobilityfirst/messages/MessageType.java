@@ -5,6 +5,8 @@
  */
 package edu.rutgers.winlab.mobilityfirst.messages;
 
+import java.net.Authenticator.RequestorType;
+
 /**
  * @author Robert Moore
  * 
@@ -33,7 +35,12 @@ public enum MessageType {
    * 
    * @see LookupResponseMessage
    */
-  LOOKUP_RESPONSE((byte) 3);
+  LOOKUP_RESPONSE((byte) 3),
+
+  /**
+   * An unknown message type value.
+   */
+  UNKNOWN((byte) 255);
 
   /**
    * The protocol-compatible value of this message type.
@@ -56,5 +63,36 @@ public enum MessageType {
    */
   public byte value() {
     return this.value;
+  }
+
+  /**
+   * Parses a string and converts it to an appropriate MessageType, or the
+   * UNKNOWN type if the String value is incompatible or invalid.
+   * 
+   * Valid type values are:
+   * <ul>
+   *   <li>"I" for insert</li>
+   *   <li>"Q" for query</li>
+   *   <li>"A" for insert ack</li>
+   *   <li>"R" for query response</li>
+   * </ul>
+   * @param asString the string to parse
+   * @return a MessageType based on the String, or UNKNOWN if none are appropriate.
+   */
+  public static MessageType parseType(final String asString){
+    if(asString == null){
+      return UNKNOWN;
+    }
+    if("I".equalsIgnoreCase(asString)){
+      return INSERT;
+    }else if("Q".equalsIgnoreCase(asString)){
+      return LOOKUP;
+    }else if("A".equalsIgnoreCase(asString)){
+      return INSERT_ACK;
+    }else if("R".equalsIgnoreCase(asString)){
+      return LOOKUP_RESPONSE;
+    }else {
+      return UNKNOWN;
+    }
   }
 }

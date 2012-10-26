@@ -7,15 +7,17 @@ package edu.rutgers.winlab.mobilityfirst.client;
 
 /**
  * @author Robert Moore
- *
+ * 
  */
 public class Configuration {
 
   private String serverHost = "localhost";
-  
+
   private int serverPort = 5001;
-  
-  private int localPort = 4001;
+
+  private String clientHost = "localhost";
+
+  private int clientPort = 4001;
 
   public String getServerHost() {
     return serverHost;
@@ -33,12 +35,20 @@ public class Configuration {
     this.serverPort = serverPort;
   }
 
-  public int getLocalPort() {
-    return localPort;
+  public int getClientPort() {
+    return this.clientPort;
   }
 
-  public void setLocalPort(int localPort) {
-    this.localPort = localPort;
+  public void setClientPort(int clientPort) {
+    this.clientPort = clientPort;
+  }
+
+  public String getClientHost() {
+    return this.clientHost;
+  }
+
+  public void setClientHost(String clientHost) {
+    this.clientHost = clientHost;
   }
 
 }

@@ -16,7 +16,7 @@ public class InsertAckMessage extends AbstractMessage {
    * The response code for this message. Note that the wire protocol specifies
    * and unsigned 8-bit integer, but Java does not support unsigned types.
    */
-  private byte responseCode;
+  private ResponseCode responseCode;
 
   /**
    * Creates a new instance of the message.
@@ -32,7 +32,7 @@ public class InsertAckMessage extends AbstractMessage {
    * 
    * @return the response code of the Insert message.
    */
-  public byte getResponseCode() {
+  public ResponseCode getResponseCode() {
     return this.responseCode;
   }
 
@@ -44,7 +44,7 @@ public class InsertAckMessage extends AbstractMessage {
    * @param responseCode
    *          the new response code.
    */
-  public void setResponseCode(byte responseCode) {
+  public void setResponseCode(ResponseCode responseCode) {
     this.responseCode = responseCode;
   }
 }

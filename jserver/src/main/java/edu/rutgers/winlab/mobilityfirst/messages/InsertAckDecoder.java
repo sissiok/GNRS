@@ -86,7 +86,7 @@ public class InsertAckDecoder implements MessageDecoder {
     msg.setRequestId(requestId);
     msg.setSenderAddress(senderAddress);
     msg.setSenderPort(senderPort);
-    msg.setResponseCode(responseCode);
+    msg.setResponseCode(ResponseCode.valueOf(responseCode));
     
     // Write the decoded object to the next filter
     out.write(msg);

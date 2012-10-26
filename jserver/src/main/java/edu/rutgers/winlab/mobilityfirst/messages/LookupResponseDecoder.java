@@ -63,7 +63,7 @@ public class LookupResponseDecoder implements MessageDecoder {
      */
     long requestId = buffer.getUnsignedInt();
     byte type = buffer.get();
-    if (type != MessageType.LOOKUP.value()) {
+    if (type != MessageType.LOOKUP_RESPONSE.value()) {
       return MessageDecoderResult.NOT_OK;
     }
 

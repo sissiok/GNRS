@@ -7,6 +7,7 @@ package edu.rutgers.winlab.mobilityfirst;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
@@ -22,9 +23,14 @@ import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.XStream;
 
+import edu.rutgers.winlab.mobilityfirst.messages.AbstractMessage;
 import edu.rutgers.winlab.mobilityfirst.messages.GNRSProtocolCodecFactory;
+import edu.rutgers.winlab.mobilityfirst.messages.InsertAckMessage;
 import edu.rutgers.winlab.mobilityfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mobilityfirst.messages.LookupMessage;
+import edu.rutgers.winlab.mobilityfirst.messages.LookupResponseMessage;
+import edu.rutgers.winlab.mobilityfirst.messages.ResponseCode;
+import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
 
 /**
  * @author Robert Moore
@@ -105,12 +111,12 @@ public class GNRSServer extends Thread {
   /**
    * Queue for insert messages that have arrived but not yet been processed.
    */
-  private final ConcurrentLinkedQueue<InsertMessage> insertMessages = new ConcurrentLinkedQueue<InsertMessage>();
+  private final ConcurrentLinkedQueue<MessageContainer> insertMessages = new ConcurrentLinkedQueue<MessageContainer>();
 
   /**
    * Queue for lookup messages that have arrived but not yet been processed.
    */
-  private final ConcurrentLinkedQueue<LookupMessage> lookupMessages = new ConcurrentLinkedQueue<LookupMessage>();
+  private final ConcurrentLinkedQueue<MessageContainer> lookupMessages = new ConcurrentLinkedQueue<MessageContainer>();
 
   /**
    * Thread pool for distributing tasks.
@@ -143,6 +149,7 @@ public class GNRSServer extends Thread {
 
     DatagramSessionConfig sessionConfig = acceptor.getSessionConfig();
     sessionConfig.setReuseAddress(true);
+    sessionConfig.setCloseOnPortUnreachable(false);
 
     acceptor.bind(new InetSocketAddress(this.config.getListenPort()));
 
@@ -159,8 +166,12 @@ public class GNRSServer extends Thread {
 
   public void messageArrived(final IoSession session, final Object message) {
     log.debug("[{}] Received message {}", session, message);
+    MessageContainer container = new MessageContainer();
+    container.session = session;
+    container.message = (AbstractMessage) message;
     if (message instanceof InsertMessage) {
-      if (!this.insertMessages.offer((InsertMessage) message)) {
+
+      if (!this.insertMessages.offer(container)) {
         log.warn("Unable to insert {} into the message queue.", message);
         // Close after all write requests have finished
         // TODO: Capture the CloseFuture here and have it processed by a thread
@@ -169,7 +180,7 @@ public class GNRSServer extends Thread {
         log.debug("Inserted {} into the message queue.", message);
       }
     } else if (message instanceof LookupMessage) {
-      if (!this.lookupMessages.offer((LookupMessage) message)) {
+      if (!this.lookupMessages.offer(container)) {
         log.warn("Unable to insert {} into the message queue.", message);
         // Close after all write requests have finished
         // TODO: Capture the CloseFuture here and have it processed by a thread
@@ -199,19 +210,63 @@ public class GNRSServer extends Thread {
        * Next handle any new insert messages. These should be forwarded/inserted
        * before lookups.
        */
+      log.debug("Checking for insert messages.");
       while (!this.insertMessages.isEmpty()) {
+        // FIXME: Perform real insertion. This is just testing the network
+        // protocols
+        log.debug("Getting the next insert message.");
+        MessageContainer container = this.insertMessages.poll();
+        if (container == null) {
+          break;
+        }
+        InsertMessage msg = (InsertMessage) container.message;
+        InsertAckMessage response = new InsertAckMessage();
+        response.setRequestId(msg.getRequestId());
+        response.setResponseCode(ResponseCode.SUCCESS);
 
+        try {
+          response.setSenderAddress(NetworkAddress.fromASCII(this.config
+              .getBindIp()));
+        } catch (UnsupportedEncodingException e) {
+          log.error("Unable to parse bind IP for the server. Please check the configuration file.");
+          continue;
+        }
+        response.setSenderPort(this.config.getListenPort() & 0xFFFFFFFFl);
+        log.debug("[{}] Writing {}", container.session, response);
+        container.session.write(response);
       }
 
       /*
        * Finally let's handle any lookup messages. Now that we're probably
        * "caught up" on our new state, we can let others know what it is.
        */
+      log.debug("Checking for lookup messages.");
       while (!this.lookupMessages.isEmpty()) {
-
+        // FIXME: Just a simple hack here to test the protocols
+        log.debug("Getting the next lookup message.");
+        MessageContainer container = this.lookupMessages.poll();
+        if (container == null) {
+          break;
+        }
+        LookupMessage message = (LookupMessage) container.message;
+        LookupResponseMessage response = new LookupResponseMessage();
+        response.setRequestId(message.getRequestId());
+        response.setResponseCode(ResponseCode.ERROR);
+        try {
+          response.setSenderAddress(NetworkAddress.fromASCII(this.config
+              .getBindIp()));
+        } catch (UnsupportedEncodingException e) {
+          log.error("Unable to parse bind IP for the server. Please check the configuration file.");
+          continue;
+        }
+        response.setSenderPort(this.config.getListenPort());
+        log.debug("[{}] Writing {}", container.session, response);
+        container.session.write(response);
       }
       try {
-        Thread.sleep(10);
+        synchronized (this.insertMessages) {
+          this.insertMessages.wait();
+        }
       } catch (InterruptedException ie) {
         // Busy work
       }

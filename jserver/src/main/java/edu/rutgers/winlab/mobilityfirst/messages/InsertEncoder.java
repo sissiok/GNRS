@@ -8,6 +8,7 @@ package edu.rutgers.winlab.mobilityfirst.messages;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 
+import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 import org.apache.mina.filter.codec.demux.MessageEncoder;
@@ -55,7 +56,7 @@ public class InsertEncoder implements MessageEncoder<InsertMessage> {
       dos.writeShort(0);
     }
     dos.flush();
-    out.write(baos.toByteArray());
+    out.write(IoBuffer.wrap(baos.toByteArray()));
     dos.close();
 
   }
