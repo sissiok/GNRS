@@ -12,13 +12,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.mina.core.filterchain.DefaultIoFilterChain;
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -160,6 +158,7 @@ public class GNRSServer extends Thread {
   }
 
   public void messageArrived(final IoSession session, final Object message) {
+    log.debug("[{}] Received message {}", session, message);
     if (message instanceof InsertMessage) {
       if (!this.insertMessages.offer((InsertMessage) message)) {
         log.warn("Unable to insert {} into the message queue.", message);

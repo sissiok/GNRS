@@ -1,0 +1,5 @@
+<edu.rutgers.winlab.mobilityfirst.client.Configuration>
+  <serverHost>localhost</serverHost>
+  <serverPort>5001</serverPort>
+  <localPort>4001</localPort>
+</edu.rutgers.winlab.mobilityfirst.client.Configuration>

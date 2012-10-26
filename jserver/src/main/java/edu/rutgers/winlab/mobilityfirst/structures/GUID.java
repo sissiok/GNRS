@@ -7,10 +7,10 @@ package edu.rutgers.winlab.mobilityfirst.structures;
 
 /**
  * @author Robert Moore
- *
+ * 
  */
 public class GUID {
-  
+
   /**
    * Number of bytes in a GUID value.
    */

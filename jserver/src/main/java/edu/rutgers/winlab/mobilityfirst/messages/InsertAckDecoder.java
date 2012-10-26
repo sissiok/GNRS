@@ -31,7 +31,7 @@ public class InsertAckDecoder implements MessageDecoder {
     // Store the current cursor position in the buffer
     buffer.mark();
     // Need 5 bytes to check request ID and type
-    if (!buffer.prefixedDataAvailable(5)) {
+    if (buffer.remaining() < 5) {
       return MessageDecoderResult.NEED_DATA;
     }
 
