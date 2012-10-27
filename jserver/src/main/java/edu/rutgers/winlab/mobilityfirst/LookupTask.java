@@ -58,6 +58,7 @@ public class LookupTask implements Callable<Object> {
     response.setSenderPort(this.server.config.getListenPort());
     log.debug("[{}] Writing {}", container.session, response);
     container.session.write(response);
+    GNRSServer.messageLifetime += System.currentTimeMillis() - container.creationTimestamp;
     return null;
   }
 

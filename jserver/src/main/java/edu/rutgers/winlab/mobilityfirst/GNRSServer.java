@@ -139,6 +139,8 @@ public class GNRSServer {
    * Number of lookups performed since last stats output.
    */
   static volatile int numLookups = 0;
+  
+  static volatile long messageLifetime = 0l;
 
   /**
    * Thread pool for distributing tasks.
@@ -283,18 +285,20 @@ public class GNRSServer {
 
     @Override
     public void run() {
-
+      long totalNanos = this.server.messageLifetime;
       int numLookups = this.server.numLookups;
       long now = System.currentTimeMillis();
       // FIXME: Probably gonna lose a few here. AtomicInteger?
       this.server.numLookups = 0;
+      this.server.messageLifetime = 0l;
 
       long timeDiff = now - this.lastTimestamp;
       this.lastTimestamp = now;
       float numSeconds = timeDiff / 1000f;
       float lookupsPerSecond = numLookups / numSeconds;
-      log.info(String.format("Lookups: %.3f per second (%.2f s)",
-          lookupsPerSecond, numSeconds));
+      float averageLifetime = numLookups == 0 ? 0 : (totalNanos / (float)numLookups);
+      log.info(String.format("\nLookups: %.3f per second (%.2f s)\nLifetime: %.3fms",
+          lookupsPerSecond, numSeconds,averageLifetime));
     }
   }
 

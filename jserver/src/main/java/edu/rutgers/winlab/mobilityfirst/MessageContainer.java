@@ -17,5 +17,6 @@ public class MessageContainer {
 
   public AbstractMessage message;
   public IoSession session;
+  public final long creationTimestamp = System.currentTimeMillis();
 
 }
