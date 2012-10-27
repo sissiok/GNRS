@@ -40,7 +40,7 @@ import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
  * @author Robert Moore
  * 
  */
-public class GNRSServer extends Thread {
+public class GNRSServer {
 
   /**
    * Logging facility for this class.
@@ -83,7 +83,7 @@ public class GNRSServer extends Thread {
       });
 
       log.debug("GNRS server object successfully created.");
-      server.start();
+      server.startup();
       log.trace("GNRS server thread started.");
     } catch (IOException ioe) {
       log.error("Unable to start server.", ioe);
@@ -106,7 +106,7 @@ public class GNRSServer extends Thread {
   /**
    * Configuration file for the server.
    */
-  private final Configuration config;
+  final Configuration config;
 
   /**
    * Flag to shut down the server.
@@ -138,12 +138,14 @@ public class GNRSServer extends Thread {
   /**
    * Number of lookups performed since last stats output.
    */
-  volatile int numLookups = 0;
+  static volatile int numLookups = 0;
 
   /**
    * Thread pool for distributing tasks.
    */
    private final ExecutorService workers;
+   
+   private NioDatagramAcceptor acceptor;
 
   /**
    * Creates a new GNRS server with the specified configuration. The server will
@@ -172,10 +174,10 @@ public class GNRSServer extends Thread {
     // this.workers = Executors.newSingleThreadExecutor();
     // }
 
-    NioDatagramAcceptor acceptor = new NioDatagramAcceptor();
-    acceptor.setHandler(new MessageHandler(this));
+    this.acceptor = new NioDatagramAcceptor();
+    this.acceptor.setHandler(new MessageHandler(this));
 
-    DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
+    DefaultIoFilterChainBuilder chain = this.acceptor.getFilterChain();
     // For encoding/decoding our messages
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
         new GNRSProtocolCodecFactory(true)));
@@ -203,18 +205,24 @@ public class GNRSServer extends Thread {
 //    chain.addLast("executor", new ExecutorFilter(minThreads, maxThreads,
 //        threadIdleTime, TimeUnit.MILLISECONDS));
 
-    DatagramSessionConfig sessionConfig = acceptor.getSessionConfig();
+    DatagramSessionConfig sessionConfig = this.acceptor.getSessionConfig();
     sessionConfig.setReuseAddress(true);
     sessionConfig.setCloseOnPortUnreachable(false);
 
-    acceptor.bind(new InetSocketAddress(this.config.getListenPort()));
+    this.acceptor.bind(new InetSocketAddress(this.config.getListenPort()));
 
-    if (this.collectStatistics) {
-      this.statsTimer.scheduleAtFixedRate(new StatsTask(this), 1000, 1000);
-    }
+    
 
     log.info("Server listening on port {}.",
         Integer.valueOf(this.config.getListenPort()));
+  }
+  
+  public void startup(){
+    if (this.collectStatistics) {
+      this.statsTimer.scheduleAtFixedRate(new StatsTask(this), 1000, 1000);
+    }
+//    this.acceptor.unbind();
+//    this.acceptor.dispose();
   }
 
   /**
@@ -243,24 +251,10 @@ public class GNRSServer extends Thread {
     container.session = session;
     container.message = (AbstractMessage) message;
     if (message instanceof InsertMessage) {
-
-      if (!this.insertMessages.offer(container)) {
-        log.warn("Unable to insert {} into the message queue.", message);
-        // Close after all write requests have finished
-        // TODO: Capture the CloseFuture here and have it processed by a thread
-        session.close(false);
-      } else {
-        log.debug("Inserted {} into the message queue.", message);
-      }
+      this.workers.submit(new InsertTask(this,container));
+      
     } else if (message instanceof LookupMessage) {
-      if (!this.lookupMessages.offer(container)) {
-        log.warn("Unable to insert {} into the message queue.", message);
-        // Close after all write requests have finished
-        // TODO: Capture the CloseFuture here and have it processed by a thread
-        session.close(false);
-      } else {
-        log.debug("Inserted {} into the message queue.", message);
-      }
+      this.workers.submit(new LookupTask(this,container));
     }
     // Unrecognized or invalid message received
     else {
@@ -274,93 +268,8 @@ public class GNRSServer extends Thread {
     }
   }
 
-  /**
-   * Handle messages by priority (Update, Insert, Lookup). Handing them off to a
-   * worker if necessary.
-   */
-  @Override
-  public void run() {
-    boolean handledOne = false;
-    while (this.keepRunning) {
-      handledOne = false;
-      /*
-       * Next handle any new insert messages. These should be forwarded/inserted
-       * before lookups.
-       */
-      log.debug("Checking for insert messages.");
-      while (!this.insertMessages.isEmpty()) {
-        handledOne = true;
-        // FIXME: Perform real insertion. This is just testing the network
-        // protocols
-        log.debug("Getting the next insert message.");
-        MessageContainer container = this.insertMessages.poll();
-        if (container == null) {
-          break;
-        }
-        InsertMessage msg = (InsertMessage) container.message;
-        InsertAckMessage response = new InsertAckMessage();
-        response.setRequestId(msg.getRequestId());
-        response.setResponseCode(ResponseCode.SUCCESS);
-
-        try {
-          response.setSenderAddress(NetworkAddress.fromASCII(this.config
-              .getBindIp()));
-        } catch (UnsupportedEncodingException e) {
-          log.error("Unable to parse bind IP for the server. Please check the configuration file.");
-          continue;
-        }
-        response.setSenderPort(this.config.getListenPort() & 0xFFFFFFFFl);
-        if (!container.session.isClosing()) {
-          log.debug("[{}] Writing {}", container.session, response);
-          container.session.write(response);
-        } else {
-          log.warn("[{}] Unable to write {} to closing session.",
-              container.session, response);
-        }
-      }
-
-      /*
-       * Finally let's handle any lookup messages. Now that we're probably
-       * "caught up" on our new state, we can let others know what it is.
-       */
-      log.debug("Checking for lookup messages.");
-      while (!this.lookupMessages.isEmpty()) {
-        handledOne = true;
-        // FIXME: Just a simple hack here to test the protocols
-        log.debug("Getting the next lookup message.");
-        MessageContainer container = this.lookupMessages.poll();
-
-        ++this.numLookups;
-
-        if (container == null) {
-          break;
-        }
-        LookupMessage message = (LookupMessage) container.message;
-        LookupResponseMessage response = new LookupResponseMessage();
-        response.setRequestId(message.getRequestId());
-        response.setResponseCode(ResponseCode.ERROR);
-        try {
-          response.setSenderAddress(NetworkAddress.fromASCII(this.config
-              .getBindIp()));
-        } catch (UnsupportedEncodingException e) {
-          log.error("Unable to parse bind IP for the server. Please check the configuration file.");
-          continue;
-        }
-        response.setSenderPort(this.config.getListenPort());
-        log.debug("[{}] Writing {}", container.session, response);
-        container.session.write(response);
-      }
-      if (!handledOne) {
-        try {
-          synchronized (this.messageLock) {
-            this.messageLock.wait();
-          }
-        } catch (InterruptedException ie) {
-          // Busy work
-        }
-      }
-    }
-  }
+ 
+  
 
   private static final class StatsTask extends TimerTask {
     private static final Logger log = LoggerFactory.getLogger(StatsTask.class);
