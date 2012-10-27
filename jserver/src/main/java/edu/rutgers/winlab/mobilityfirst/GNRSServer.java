@@ -15,6 +15,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.core.session.IoSession;
@@ -138,16 +140,19 @@ public class GNRSServer {
   /**
    * Number of lookups performed since last stats output.
    */
-  static volatile int numLookups = 0;
-  
-  static volatile long messageLifetime = 0l;
+  static AtomicInteger numLookups = new AtomicInteger(0);
+
+  /**
+   * Total number of nanoseconds spent processing messages since last stats report.
+   */
+  static AtomicLong messageLifetime = new AtomicLong(0);
 
   /**
    * Thread pool for distributing tasks.
    */
-   private final ExecutorService workers;
-   
-   private NioDatagramAcceptor acceptor;
+  private final ExecutorService workers;
+
+  private NioDatagramAcceptor acceptor;
 
   /**
    * Creates a new GNRS server with the specified configuration. The server will
@@ -184,28 +189,13 @@ public class GNRSServer {
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
         new GNRSProtocolCodecFactory(true)));
     // Configure extra threads to handle message processing
-    int minThreads = this.config.getMinWorkerThreads();
-    int maxThreads = this.config.getMaxWorkerThreads();
-    long threadIdleTime = this.config.getThreadIdleTime();
-    if (minThreads < 1) {
-      minThreads = 1;
+    int numThreads = this.config.getNumWorkerThreads();
+    if (numThreads < 1) {
+      numThreads = 1;
     }
-    if (maxThreads < minThreads) {
-      maxThreads = minThreads;
-    }
-    if (threadIdleTime < 1) {
-      threadIdleTime = 1000;
-    }
-    if (log.isDebugEnabled()) {
-      log.debug(String.format(
-          "Using threadpool of (%d, %d) threads. Lifetime is %,dms.",
-          Integer.valueOf(minThreads), Integer.valueOf(maxThreads),
-          Long.valueOf(threadIdleTime)));
-    }
-    this.workers = Executors.newFixedThreadPool(minThreads);
-    
-//    chain.addLast("executor", new ExecutorFilter(minThreads, maxThreads,
-//        threadIdleTime, TimeUnit.MILLISECONDS));
+
+    log.debug("Using threadpool of {} threads.", Integer.valueOf(numThreads));
+    this.workers = Executors.newFixedThreadPool(numThreads);
 
     DatagramSessionConfig sessionConfig = this.acceptor.getSessionConfig();
     sessionConfig.setReuseAddress(true);
@@ -213,18 +203,14 @@ public class GNRSServer {
 
     this.acceptor.bind(new InetSocketAddress(this.config.getListenPort()));
 
-    
-
     log.info("Server listening on port {}.",
         Integer.valueOf(this.config.getListenPort()));
   }
-  
-  public void startup(){
+
+  public void startup() {
     if (this.collectStatistics) {
       this.statsTimer.scheduleAtFixedRate(new StatsTask(this), 1000, 1000);
     }
-//    this.acceptor.unbind();
-//    this.acceptor.dispose();
   }
 
   /**
@@ -253,10 +239,10 @@ public class GNRSServer {
     container.session = session;
     container.message = (AbstractMessage) message;
     if (message instanceof InsertMessage) {
-      this.workers.submit(new InsertTask(this,container));
-      
+      this.workers.submit(new InsertTask(this, container));
+
     } else if (message instanceof LookupMessage) {
-      this.workers.submit(new LookupTask(this,container));
+      this.workers.submit(new LookupTask(this, container));
     }
     // Unrecognized or invalid message received
     else {
@@ -270,9 +256,6 @@ public class GNRSServer {
     }
   }
 
- 
-  
-
   private static final class StatsTask extends TimerTask {
     private static final Logger log = LoggerFactory.getLogger(StatsTask.class);
     private final GNRSServer server;
@@ -285,20 +268,20 @@ public class GNRSServer {
 
     @Override
     public void run() {
-      long totalNanos = this.server.messageLifetime;
-      int numLookups = this.server.numLookups;
+      long totalNanos = GNRSServer.messageLifetime.getAndSet(0l);
+      int numLookups = GNRSServer.numLookups.getAndSet(0);
       long now = System.currentTimeMillis();
-      // FIXME: Probably gonna lose a few here. AtomicInteger?
-      this.server.numLookups = 0;
-      this.server.messageLifetime = 0l;
+     
 
       long timeDiff = now - this.lastTimestamp;
       this.lastTimestamp = now;
       float numSeconds = timeDiff / 1000f;
       float lookupsPerSecond = numLookups / numSeconds;
-      float averageLifetime = numLookups == 0 ? 0 : (totalNanos / (float)numLookups);
-      log.info(String.format("\nLookups: %.3f per second (%.2f s)\nLifetime: %.3fms",
-          lookupsPerSecond, numSeconds,averageLifetime));
+      float averageLifetimeUsec = numLookups == 0 ? 0
+          : ((totalNanos / (float) numLookups) / 1000);
+      log.info(String.format(
+          "\nLookups: %.3f per second (%.2f s)\nAverage Lifetime: %,.0fus",
+          lookupsPerSecond, numSeconds, averageLifetimeUsec));
     }
   }
 

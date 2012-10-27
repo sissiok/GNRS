@@ -39,12 +39,12 @@ public class LookupTask implements Callable<Object> {
   public Object call() throws Exception {
     
 
-    ++GNRSServer.numLookups;
+    GNRSServer.numLookups.incrementAndGet();
 
-    if (container == null) {
+    if (this.container == null) {
       return null;
     }
-    LookupMessage message = (LookupMessage) container.message;
+    LookupMessage message = (LookupMessage) this.container.message;
     LookupResponseMessage response = new LookupResponseMessage();
     response.setRequestId(message.getRequestId());
     response.setResponseCode(ResponseCode.ERROR);
@@ -56,9 +56,9 @@ public class LookupTask implements Callable<Object> {
       return null;
     }
     response.setSenderPort(this.server.config.getListenPort());
-    log.debug("[{}] Writing {}", container.session, response);
-    container.session.write(response);
-    GNRSServer.messageLifetime += System.currentTimeMillis() - container.creationTimestamp;
+    log.debug("[{}] Writing {}", this.container.session, response);
+    this.container.session.write(response);
+    GNRSServer.messageLifetime.addAndGet(System.nanoTime() - this.container.creationTimestamp);
     return null;
   }
 
