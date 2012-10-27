@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
+import java.util.concurrent.locks.LockSupport;
 
 import org.apache.mina.core.file.DefaultFileRegion;
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
@@ -47,7 +48,8 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
 
   /**
    * @param args
-   * @throws InterruptedException if interrupted while waiting for the clients to finish.
+   * @throws InterruptedException
+   *           if interrupted while waiting for the clients to finish.
    */
   public static void main(String[] args) throws InterruptedException {
     if (args.length < 4) {
@@ -68,27 +70,27 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     for (int i = 0; i < clients.length; ++i) {
       clients[i] = new GeneratingClient(config, delay, numLookups);
     }
-    
+
     Thread[] threads = new Thread[numClients];
 
-    
     for (int i = 0; i < clients.length; ++i) {
       threads[i] = new Thread(clients[i]);
     }
 
     log.info("Created {} clients.", numClients);
 
-    for(int i = 0; i < clients.length; ++i){
+    for (int i = 0; i < clients.length; ++i) {
       threads[i].start();
     }
-    
-    for(int i = 0; i < clients.length; ++i){
+
+    for (int i = 0; i < clients.length; ++i) {
       threads[i].join();
     }
   }
 
   public static void printUsageInfo() {
-    System.out.println("Usage: <Config File> <Num Request> <Request Delay> <Num Clients>");
+    System.out
+        .println("Usage: <Config File> <Num Request> <Request Delay> <Num Clients>");
   }
 
   private NioDatagramConnector connector;
@@ -115,9 +117,9 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
         new GNRSProtocolCodecFactory(false)));
 
   }
-  
+
   @Override
-  public void run(){
+  public void run() {
     this.connect();
   }
 
@@ -126,7 +128,8 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     ConnectFuture connectFuture = this.connector.connect(new InetSocketAddress(
         this.config.getServerHost(), this.config.getServerPort()));
 
-    // FIXME: Must call awaitUninterruptably. This is a known issue in MINA <https://issues.apache.org/jira/browse/DIRMINA-911>
+    // FIXME: Must call awaitUninterruptably. This is a known issue in MINA
+    // <https://issues.apache.org/jira/browse/DIRMINA-911>
     connectFuture.awaitUninterruptibly();
 
     connectFuture.addListener(new IoFutureListener<ConnectFuture>() {
@@ -182,10 +185,8 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
 
         log.debug("Writing {} to {}", message, session);
         session.write(message);
-        try {
-          Thread.sleep(this.delay);
-        } catch (InterruptedException ie) {
-          // Ignored
+        if(this.delay > 0){
+          LockSupport.parkNanos(this.delay*1000);
         }
 
       }
@@ -203,9 +204,9 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
   public void messageReceived(IoSession session, Object message) {
     log.debug("[{}] Received {}", session, message);
   }
-  
+
   @Override
-  public void sessionCreated(IoSession session){
-    log.info("[{}] Session created.",session);
+  public void sessionCreated(IoSession session) {
+    log.info("[{}] Session created.", session);
   }
 }
