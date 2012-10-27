@@ -12,6 +12,8 @@ import java.net.InetSocketAddress;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
@@ -141,7 +143,7 @@ public class GNRSServer extends Thread {
   /**
    * Thread pool for distributing tasks.
    */
-  // private final ExecutorService workers;
+   private final ExecutorService workers;
 
   /**
    * Creates a new GNRS server with the specified configuration. The server will
@@ -196,8 +198,10 @@ public class GNRSServer extends Thread {
           Integer.valueOf(minThreads), Integer.valueOf(maxThreads),
           Long.valueOf(threadIdleTime)));
     }
-    chain.addLast("executor", new ExecutorFilter(minThreads, maxThreads,
-        threadIdleTime, TimeUnit.MILLISECONDS));
+    this.workers = Executors.newFixedThreadPool(minThreads);
+    
+//    chain.addLast("executor", new ExecutorFilter(minThreads, maxThreads,
+//        threadIdleTime, TimeUnit.MILLISECONDS));
 
     DatagramSessionConfig sessionConfig = acceptor.getSessionConfig();
     sessionConfig.setReuseAddress(true);
@@ -221,6 +225,7 @@ public class GNRSServer extends Thread {
     if (this.collectStatistics) {
       this.statsTimer.cancel();
     }
+    this.workers.shutdown();
   }
 
   /**
