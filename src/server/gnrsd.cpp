@@ -685,7 +685,7 @@ void gnrsd::global_LOOKUP_RESP_handler(MsgParameter *msg_para)
 
   GNRS_sport->sendPack(recvd_pkt);
 #ifdef DEBUG
-  cout<<"forward pkt to address: " << (*lookup_table)[index]->src_addr <<"and port number: " << (*lookup_table)[index]->src_listen_port << endl;
+  cout<<"forward pkt to address: " << (*lookup_table)[index]->src_addr <<" ,and port number: " << (*lookup_table)[index]->src_listen_port << endl;
 #endif
 
   delete (*lookup_table)[index];
