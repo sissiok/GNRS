@@ -137,7 +137,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
       public void operationComplete(ConnectFuture future) {
         if (future.isConnected()) {
           GeneratingClient.log.info("Connected to {}", future.getSession());
-          GeneratingClient.this.generateSamples(future.getSession());
+          GeneratingClient.this.generateLookups(future.getSession());
           future.getSession().close(true);
           GeneratingClient.this.connector.dispose(true);
         }
@@ -150,11 +150,16 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     return true;
   }
 
-  void generateSamples(final IoSession session) {
+  /**
+   * Creates a stream of lookup messages to send to the server.
+   * @param session the session on which to send the messages.
+   */
+  void generateLookups(final IoSession session) {
     log.info("Generating {} lookups.",this.numLookups);
 
     
     String line = null;
+    // FIXME: Get the origin address in the datagram correct
     NetworkAddress fromAddress = null;
     try {
       fromAddress = NetworkAddress.fromASCII(this.config.getClientHost());

@@ -13,7 +13,14 @@ you can do this with apt-get:
     # Ubuntu 10.04
     sudo apt-get install openjdk-6-jdk maven2
 
-Once that's installed, you can compile and build the .jar file with:
+Next you have to install the external JAR dependencies. A handy Python script
+is provided to automate this task for you. Just run:
+
+    python install-to-project-repo.py -i
+
+When prompted, the version is "0.6" (option 2) and the artifactId is
+"patricia-trie" (option 1).  Once that's installed, you can compile and build
+the .jar file with:
 
     mvn clean package
 
