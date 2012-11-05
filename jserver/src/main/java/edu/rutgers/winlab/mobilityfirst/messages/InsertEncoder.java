@@ -42,7 +42,7 @@ public class InsertEncoder implements MessageEncoder<InsertMessage> {
     dos.writeInt((int) message.getSenderPort());
 
     // InsertMessage-specific
-    dos.write(message.getGuid().getGuid());
+    dos.write(message.getGuid().getBinaryForm());
     dos.writeByte(message.getDestinationFlag());
     if (message.getBindings() != null) {
       dos.writeShort(message.getBindings().length);

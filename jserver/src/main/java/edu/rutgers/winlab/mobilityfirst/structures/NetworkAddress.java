@@ -15,10 +15,13 @@ import java.util.Arrays;
 public class NetworkAddress {
 
   /**
-   * Size of a network address in bytes.
+   * Size of a network address in bytes. Currently 30.
    */
   public static final int SIZE_OF_NETWORK_ADDRESS = 30;
 
+  /**
+   * Raw (binary) form of this network address.
+   */
   private byte[] bytes;
 
   /**
@@ -33,12 +36,12 @@ public class NetworkAddress {
    * @throws UnsupportedEncodingException
    *           if the String cannot be decoded to ASCII characters
    */
-  public static NetworkAddress fromASCII(String s) throws UnsupportedEncodingException {
+  public static NetworkAddress fromASCII(final String s)
+      throws UnsupportedEncodingException {
     if (s == null || s.length() == 0) {
       return null;
     }
 
-    
     // FIXME: Improve to avoid double-allocation with copy
     byte[] stringBytes = s.getBytes("US-ASCII");
     NetworkAddress address = new NetworkAddress();
@@ -46,16 +49,49 @@ public class NetworkAddress {
     return address;
   }
 
-  public byte[] getBinaryForm() {
-    return bytes;
+  /**
+   * Creates a new NetworkAddress from the binary value of the integer. The 4
+   * bytes of the integer value are copied into the high bytes (index 0-3) of
+   * the network address.
+   * 
+   * @param i
+   *          the integer to create an address from.
+   * @return the created network address.
+   */
+  public static NetworkAddress fromInteger(final int i) {
+    NetworkAddress address = new NetworkAddress();
+    address.bytes = new byte[SIZE_OF_NETWORK_ADDRESS];
+    address.bytes[0] = (byte) (i >> 24);
+    address.bytes[1] = (byte) (i >> 16);
+    address.bytes[2] = (byte) (i >> 8);
+    address.bytes[3] = (byte) (i);
+
+    return address;
   }
 
+  /**
+   * Returns the raw (binary) form of this network address as a byte array.
+   * 
+   * @return this network address as a byte array.
+   */
+  public byte[] getBinaryForm() {
+    return this.bytes;
+  }
+
+  /**
+   * Sets the new value of this network address from a byte array. The array
+   * {@code bytes} must be exactly
+   * {@link NetworkAddress#SIZE_OF_NETWORK_ADDRESS} bytes long.
+   * 
+   * @param bytes
+   *          the new value of this network address.
+   */
   public void setBinaryForm(byte[] bytes) {
     if (bytes == null || bytes.length != SIZE_OF_NETWORK_ADDRESS) {
       throw new IllegalArgumentException("NetworkAddress must be exactly "
           + SIZE_OF_NETWORK_ADDRESS + " bytes.");
     }
-    this.bytes = bytes;
+    this.bytes = Arrays.copyOf(bytes, SIZE_OF_NETWORK_ADDRESS);
   }
 
 }

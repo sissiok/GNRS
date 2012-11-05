@@ -9,11 +9,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 
-import org.apache.mina.core.file.DefaultFileRegion;
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.future.IoFutureListener;
@@ -22,7 +20,6 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramConnector;
-import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,9 +40,14 @@ import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
  */
 public class TraceClient extends IoHandlerAdapter {
 
+  /**
+   * Logging for this class.
+   */
   static final Logger log = LoggerFactory.getLogger(TraceClient.class);
 
   /**
+   * Sends messages to a server based on a trace file.
+   * 
    * @param args
    */
   public static void main(String[] args) {
@@ -72,15 +74,41 @@ public class TraceClient extends IoHandlerAdapter {
     log.debug("Finished main thread.");
   }
 
+  /**
+   * Information about how to call the application from the commandline.
+   */
   public static void printUsageInfo() {
     System.out.println("Usage: <Config File> <Trace File> <Delay Value>");
   }
 
-  private NioDatagramConnector connector;
+  /**
+   * Connector to communicate with the server.
+   */
+  NioDatagramConnector connector;
+  /**
+   * Configuration for the client.
+   */
   private final Configuration config;
+  /**
+   * Trace file containing the messages to send.
+   */
   private final File traceFile;
+  /**
+   * How long to wait between messages (microseconds).
+   */
   private final int delay;
 
+  /**
+   * Creates a new client with the specified configuration file, trace file, and
+   * intermessage delay (microsecond).
+   * 
+   * @param config
+   *          the configuration file for the client.
+   * @param traceFile
+   *          the set of messages to send.
+   * @param delay
+   *          how long to pause between messages, in microseconds.
+   */
   public TraceClient(final Configuration config, final File traceFile,
       final int delay) {
     super();
@@ -100,6 +128,12 @@ public class TraceClient extends IoHandlerAdapter {
 
   }
 
+  /**
+   * Sets-up the necessary networking components so that communication with the
+   * server can begin.
+   * 
+   * @return {@code true} if everything goes well, else {@code false}.
+   */
   public boolean connect() {
     log.debug("Creating connect future.");
     ConnectFuture connectFuture = this.connector.connect(new InetSocketAddress(
@@ -125,6 +159,12 @@ public class TraceClient extends IoHandlerAdapter {
     return true;
   }
 
+  /**
+   * Reads the trace file and sends the messages it contains.
+   * 
+   * @param session
+   *          the connection to the server.
+   */
   void runTrace(final IoSession session) {
     log.info("Starting trace from {}.", this.traceFile);
     BufferedReader reader = loadFile(this.traceFile);
@@ -181,6 +221,13 @@ public class TraceClient extends IoHandlerAdapter {
     }
   }
 
+  /**
+   * Parses a message from the trace file.
+   * 
+   * @param s
+   *          a line from the trace file.
+   * @return the parsed message, or {@code null} if none was parsed.
+   */
   public static AbstractMessage parseMessage(final String s) {
     log.debug("Parsing \"{}\"", s);
     // Extract any comments and discard
@@ -217,7 +264,7 @@ public class TraceClient extends IoHandlerAdapter {
       String[] bindingValues = generalComponents[3].split(",");
       if (bindingValues.length % 3 != 0) {
         log.error("Binding values are not a multiple of 3: {}",
-            bindingValues.length);
+            Integer.valueOf(bindingValues.length));
         break;
       }
       GUIDBinding[] bindings = new GUIDBinding[bindingValues.length / 3];
@@ -258,6 +305,14 @@ public class TraceClient extends IoHandlerAdapter {
     return msg;
   }
 
+  /**
+   * Wrapper to load files without throwing an exception.
+   * 
+   * @param file
+   *          the file to load into a reader.
+   * @return the BufferedReader for the loaded file, or {@code null} if an
+   *         exception occurred.
+   */
   private BufferedReader loadFile(final File file) {
     try {
       BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -273,6 +328,7 @@ public class TraceClient extends IoHandlerAdapter {
     log.error("Caught unhandled exception.", cause);
   }
 
+  @Override
   public void messageReceived(IoSession session, Object message) {
     log.debug("[{}] Received {}", session, message);
   }

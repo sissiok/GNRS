@@ -85,7 +85,7 @@ public class InsertDecoder implements MessageDecoder {
     byte[] guidBytes = new byte[GUID.SIZE_OF_GUID];
     buffer.get(guidBytes);
     GUID guid = new GUID();
-    guid.setGuid(guidBytes);
+    guid.setBinaryForm(guidBytes);
 
     byte destinationFlag = buffer.get();
 

@@ -44,7 +44,7 @@ public class MessageDigestHasher implements GUIDHasher {
   /**
    * Name of the algorithm to use.
    */
-  private final String algorithmName;
+  final String algorithmName;
   
   /**
    * Thread-specific set of message digest objects.
@@ -56,7 +56,6 @@ public class MessageDigestHasher implements GUIDHasher {
    * 
    * @param algorithmName
    *          the algorithm to use for hashing.
-   * @throws NoSuchAlgorithmException if the algorithm is not supported.
    */
   public MessageDigestHasher(final String algorithmName) {
     super();
@@ -70,7 +69,7 @@ public class MessageDigestHasher implements GUIDHasher {
         }catch(NoSuchAlgorithmException nsae){
           return null;
         }
-      };
+      }
     };
   }
 
@@ -96,7 +95,7 @@ public class MessageDigestHasher implements GUIDHasher {
 
     // Generate some bytes!
     for (int i = 0; i < numberDigests; ++i) {
-      digest.update(guid.getGuid());
+      digest.update(guid.getBinaryForm());
       digest.update(previousDigest);
       previousDigest = digest.digest();
       buffer.put(previousDigest);

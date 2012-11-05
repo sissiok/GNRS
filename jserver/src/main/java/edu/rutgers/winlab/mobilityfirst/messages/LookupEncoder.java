@@ -39,7 +39,7 @@ public class LookupEncoder implements MessageEncoder<LookupMessage> {
     dos.writeInt((int) message.getSenderPort());
 
     // LookupMessage-specific
-    dos.write(message.getGuid().getGuid());
+    dos.write(message.getGuid().getBinaryForm());
     dos.writeByte(message.getDestinationFlag());
 
     dos.flush();

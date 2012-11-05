@@ -5,16 +5,12 @@
  */
 package edu.rutgers.winlab.mobilityfirst.client;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.locks.LockSupport;
 
-import org.apache.mina.core.file.DefaultFileRegion;
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.future.IoFutureListener;
@@ -23,27 +19,27 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramConnector;
-import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.XStream;
 
-import edu.rutgers.winlab.mobilityfirst.messages.AbstractMessage;
 import edu.rutgers.winlab.mobilityfirst.messages.GNRSProtocolCodecFactory;
-import edu.rutgers.winlab.mobilityfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mobilityfirst.messages.LookupMessage;
-import edu.rutgers.winlab.mobilityfirst.messages.MessageType;
 import edu.rutgers.winlab.mobilityfirst.structures.GUID;
-import edu.rutgers.winlab.mobilityfirst.structures.GUIDBinding;
 import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
 
 /**
+ * A simple GNRS client that generates lots of lookup messages.
+ * 
  * @author Robert Moore
  * 
  */
 public class GeneratingClient extends IoHandlerAdapter implements Runnable {
 
+  /**
+   * Logging facility for this class.
+   */
   static final Logger log = LoggerFactory.getLogger(GeneratingClient.class);
 
   /**
@@ -77,7 +73,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
       threads[i] = new Thread(clients[i]);
     }
 
-    log.info("Created {} clients.", numClients);
+    log.info("Created {} clients.", Integer.valueOf(numClients));
 
     for (int i = 0; i < clients.length; ++i) {
       threads[i].start();
@@ -88,17 +84,44 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     }
   }
 
+  /**
+   * Prints out how to invoke this client from the command line.
+   */
   public static void printUsageInfo() {
     System.out
         .println("Usage: <Config File> <Num Request> <Request Delay> <Num Clients>");
   }
 
-  private NioDatagramConnector connector;
+  /**
+   * Connector to communicate with the server.
+   */
+  NioDatagramConnector connector;
+  
+  /**
+   * Configuration for this client.
+   */
   private final Configuration config;
 
+  /**
+   * How long to wait between messages, in microseconds.
+   */
   private final int delay;
+  /**
+   * Total number of lookup messages to generate.
+   */
   private final int numLookups;
 
+  /**
+   * Creates a new GeneratingClient with the configuration and delay values
+   * provided.
+   * 
+   * @param config
+   *          configuration for the client.
+   * @param delay
+   *          how long to wait (in microseconds) between messages.
+   * @param numLookups
+   *          total number of messages to send.
+   */
   public GeneratingClient(final Configuration config, final int delay,
       final int numLookups) {
     super();
@@ -123,6 +146,11 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     this.connect();
   }
 
+  /**
+   * Sets up the networking connection to the server.
+   * 
+   * @return {@code true} if everything goes well, else {@code false}.
+   */
   public boolean connect() {
     log.debug("Creating connect future.");
     ConnectFuture connectFuture = this.connector.connect(new InetSocketAddress(
@@ -152,12 +180,13 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
 
   /**
    * Creates a stream of lookup messages to send to the server.
-   * @param session the session on which to send the messages.
+   * 
+   * @param session
+   *          the session on which to send the messages.
    */
   void generateLookups(final IoSession session) {
-    log.info("Generating {} lookups.",this.numLookups);
+    log.info("Generating {} lookups.", Integer.valueOf(this.numLookups));
 
-    
     String line = null;
     // FIXME: Get the origin address in the datagram correct
     NetworkAddress fromAddress = null;
@@ -171,18 +200,19 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
 
     int fromPort = this.config.getClientPort();
     NetworkAddress clientAddress = null;
-    try {clientAddress = NetworkAddress.fromASCII(this.config.getClientHost());
-    
-    }catch(UnsupportedEncodingException uee){
-      log.error("Unable to parse client hostname from configuration file.",uee);
+    try {
+      clientAddress = NetworkAddress.fromASCII(this.config.getClientHost());
+
+    } catch (UnsupportedEncodingException uee) {
+      log.error("Unable to parse client hostname from configuration file.", uee);
       return;
     }
-    LookupMessage message = null; 
+    LookupMessage message = null;
     try {
-      for(int i = 0; i < this.numLookups; ++i) {
-        
+      for (int i = 0; i < this.numLookups; ++i) {
+
         message = new LookupMessage();
-        message.setDestinationFlag((byte)0);
+        message.setDestinationFlag((byte) 0);
         message.setGuid(GUID.fromASCII("123"));
         message.setRequestId(i);
         message.setSenderAddress(clientAddress);
@@ -190,8 +220,8 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
 
         log.debug("Writing {} to {}", message, session);
         session.write(message);
-        if(this.delay > 0){
-          LockSupport.parkNanos(this.delay*1000);
+        if (this.delay > 0) {
+          LockSupport.parkNanos(this.delay * 1000);
         }
 
       }

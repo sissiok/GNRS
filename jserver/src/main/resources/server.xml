@@ -13,4 +13,6 @@
   <collectStatistics>true</collectStatistics>
   <!-- The hashing algorithm to use.  Should be one of: MD2, MD5, SHA-1, SHA-256, SHA-384, or SHA-512. -->
   <hashAlgorithm>SHA-1</hashAlgorithm>
+  <!-- Prefix filename. Maps network address prefixes to AS numbers. Will be removed in future versions. -->
+  <prefixFile>src/main/resources/prefixes.ipv4</prefixFile>
 </edu.rutgers.winlab.mobilityfirst.Configuration>

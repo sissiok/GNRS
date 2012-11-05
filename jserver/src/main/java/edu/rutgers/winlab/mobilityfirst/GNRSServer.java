@@ -5,8 +5,11 @@
  */
 package edu.rutgers.winlab.mobilityfirst;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -32,8 +35,12 @@ import edu.rutgers.winlab.mobilityfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mobilityfirst.storage.GUIDHasher;
 import edu.rutgers.winlab.mobilityfirst.storage.MessageDigestHasher;
 import edu.rutgers.winlab.mobilityfirst.storage.NetworkAddressMapper;
+import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
 
 /**
+ * Java implementation of a GNRS server.
+ * 
+ * 
  * @author Robert Moore
  * 
  */
@@ -174,6 +181,9 @@ public class GNRSServer {
     // Hash GUID to Network Address
     this.guidHasher = new MessageDigestHasher(this.config.getHashAlgorithm());
 
+    // Load the network prefix announcements
+    this.loadPrefixes(this.config.getPrefixFile());
+
     this.acceptor = new NioDatagramAcceptor();
     this.acceptor.setHandler(new MessageHandler(this));
 
@@ -198,6 +208,59 @@ public class GNRSServer {
 
     log.info("Server listening on port {}.",
         Integer.valueOf(this.config.getListenPort()));
+  }
+
+  /**
+   * Loads network prefix mappings from a file.
+   * 
+   * @param prefixFilename
+   *          the filename of the prefix mapping file.
+   * @throws IOException
+   *           if an exception occurs while reading the file.
+   */
+  private void loadPrefixes(final String prefixFilename) throws IOException {
+    File prefixFile = new File(prefixFilename);
+    BufferedReader lineReader = new BufferedReader(new FileReader(prefixFile));
+
+    String line = lineReader.readLine();
+    while (line != null) {
+      // Eliminate leading/trailing whitespace
+      line = line.trim();
+      // Skip comments
+      if (line.length() == 0 || line.startsWith("#")) {
+        line = lineReader.readLine();
+        continue;
+      }
+
+      log.debug("Parsing \"{}\"", line);
+      // Extract any comments and discard
+      String content = line.split("#")[0];
+
+      String[] generalComponents = content.split("\\s+");
+      if (generalComponents.length < 2) {
+        log.warn("Not enough components to parse the line \"{}\".", line);
+        continue;
+      }
+      // Extract the base address and prefix length
+      String[] prefixParts = generalComponents[0].split("/");
+      InetAddress addx = InetAddress.getByName(prefixParts[0]);
+      byte[] addxBytes = addx.getAddress();
+      // FIXME: Assuming IPv4 (4 bytes)
+      int addxAsInt = (addxBytes[0] << 24) | (addxBytes[1] << 16)
+          | (addxBytes[2] << 8) | (addxBytes[3]);
+      // Extract prefix length
+      int prefixLength = Integer.parseInt(prefixParts[1]);
+      // Apply the prefix
+      addxAsInt = addxAsInt & (0x80000000 >> prefixLength);
+
+      NetworkAddress na = NetworkAddress.fromInteger(addxAsInt);
+      GNRSServer.networkAddressMap.put(na, generalComponents[1]);
+
+      line = lineReader.readLine();
+    }
+    lineReader.close();
+    log.info("Finished loading prefix map.");
+
   }
 
   /**

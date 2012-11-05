@@ -38,6 +38,12 @@ public class Configuration {
    */
   private String hashAlgorithm = "MD5";
 
+  // TODO: This is a short-term solution. Need something more flexible.
+  /**
+   * Filename for network address prefix->AS bindings.
+   */
+  private String prefixFile = "src/main/resources/prefixes.ipv4";
+
   /**
    * Return the server's port for listening for UDP messages.
    * 
@@ -78,6 +84,7 @@ public class Configuration {
 
   /**
    * Gets the current number of worker threads used.
+   * 
    * @return the number of worker threads in use.
    */
   public int getNumWorkerThreads() {
@@ -86,7 +93,9 @@ public class Configuration {
 
   /**
    * Sets the number of worker threads to use.
-   * @param minWorkerThreads the new number of worker threads.
+   * 
+   * @param minWorkerThreads
+   *          the new number of worker threads.
    */
   public void setNumWorkerThreads(int minWorkerThreads) {
     this.numWorkerThreads = minWorkerThreads;
@@ -94,6 +103,7 @@ public class Configuration {
 
   /**
    * Flag to indicate if statistics are being collected.
+   * 
    * @return {@code true} if they are being collected, else {@code false}.
    */
   public boolean isCollectStatistics() {
@@ -102,14 +112,18 @@ public class Configuration {
 
   /**
    * Sets statistics collection on or off.
-   * @param collectStatistics {@code true} to collect statistics.
+   * 
+   * @param collectStatistics
+   *          {@code true} to collect statistics.
    */
   public void setCollectStatistics(boolean collectStatistics) {
     this.collectStatistics = collectStatistics;
   }
 
   /**
-   * Gets the name of the hashing algorithm in use for GUID -> server address bindings.
+   * Gets the name of the hashing algorithm in use for GUID -> server address
+   * bindings.
+   * 
    * @return the name of the hashing algorithm.
    */
   public String getHashAlgorithm() {
@@ -117,11 +131,33 @@ public class Configuration {
   }
 
   /**
-   * Sets the hashing algorithm to use when mapping GUID values to server addresses.
-   * @param hashAlgorithm the hashing algorithm to use.
+   * Sets the hashing algorithm to use when mapping GUID values to server
+   * addresses.
+   * 
+   * @param hashAlgorithm
+   *          the hashing algorithm to use.
    */
   public void setHashAlgorithm(String hashAlgorithm) {
     this.hashAlgorithm = hashAlgorithm;
+  }
+
+  /**
+   * Gets the name of the network address prefix file loaded at startup.
+   * 
+   * @return the name of the prefix file used.
+   */
+  public String getPrefixFile() {
+    return this.prefixFile;
+  }
+
+  /**
+   * Sets the network address prefix filename.
+   * 
+   * @param prefixFile
+   *          the new prefix filename.
+   */
+  public void setPrefixFile(String prefixFile) {
+    this.prefixFile = prefixFile;
   }
 
 }

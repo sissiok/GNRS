@@ -19,7 +19,10 @@ public class GUID {
    */
   public static final int SIZE_OF_GUID = 20;
 
-  private byte[] guid;
+  /**
+   * Binary representation of the GUID.
+   */
+  private byte[] bytes;
 
   /**
    * Converts the specified ASCII-encoded String to a GUID. More specifically,
@@ -41,15 +44,26 @@ public class GUID {
     // FIXME: Improve to avoid double allocation with copy
     byte[] stringBytes = s.getBytes("US-ASCII");
     GUID guid = new GUID();
-    guid.setGuid(Arrays.copyOf(stringBytes, SIZE_OF_GUID));
+    guid.setBinaryForm(Arrays.copyOf(stringBytes, SIZE_OF_GUID));
     return guid;
   }
 
-  public byte[] getGuid() {
-    return this.guid;
+  /**
+   * Gets this GUID as a byte array.
+   * 
+   * @return this GUID in binary form.
+   */
+  public byte[] getBinaryForm() {
+    return this.bytes;
   }
 
-  public void setGuid(byte[] guid) {
-    this.guid = guid;
+  /**
+   * Sets the binary form of this GUID from a byte array.
+   * 
+   * @param guid
+   *          the new value of this GUID.
+   */
+  public void setBinaryForm(byte[] guid) {
+    this.bytes = guid;
   }
 }
