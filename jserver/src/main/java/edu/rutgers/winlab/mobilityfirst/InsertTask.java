@@ -17,28 +17,44 @@ import edu.rutgers.winlab.mobilityfirst.messages.ResponseCode;
 import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
 
 /**
+ * Task to handle Insert messages within the server. Designed to operate
+ * independently of any other messages.
+ * 
  * @author Robert Moore
- *
+ * 
  */
 public class InsertTask implements Callable<Object> {
-  
+
+  /**
+   * Logging for this class.
+   */
   private static final Logger log = LoggerFactory.getLogger(InsertTask.class);
-  
+
+  /**
+   * The message and some metadata for this task.
+   */
   private final MessageContainer container;
-  private final GNRSServer server;
   
-  public InsertTask(final GNRSServer server, final MessageContainer container){
+  /**
+   * The server that is handling the message.
+   */
+  private final GNRSServer server;
+
+  /**
+   * Creates a new InsertTask for the specified server and message container.
+   * @param server the server that received or is handling the message.
+   * @param container the message and some metadata.
+   */
+  public InsertTask(final GNRSServer server, final MessageContainer container) {
     super();
     this.server = server;
     this.container = container;
   }
 
-  /* (non-Javadoc)
-   * @see java.util.concurrent.Callable#call()
-   */
   @Override
   public Object call() throws Exception {
-    InsertMessage msg = (InsertMessage) container.message;
+    // Just send back a SUCCESS message for now.
+    InsertMessage msg = (InsertMessage) this.container.message;
     InsertAckMessage response = new InsertAckMessage();
     response.setRequestId(msg.getRequestId());
     response.setResponseCode(ResponseCode.SUCCESS);
@@ -48,15 +64,15 @@ public class InsertTask implements Callable<Object> {
           .getBindIp()));
     } catch (UnsupportedEncodingException e) {
       log.error("Unable to parse bind IP for the server. Please check the configuration file.");
-     return null;
+      return null;
     }
     response.setSenderPort(this.server.config.getListenPort() & 0xFFFFFFFFl);
-    if (!container.session.isClosing()) {
-      log.debug("[{}] Writing {}", container.session, response);
-      container.session.write(response);
+    if (!this.container.session.isClosing()) {
+      log.debug("[{}] Writing {}", this.container.session, response);
+      this.container.session.write(response);
     } else {
       log.warn("[{}] Unable to write {} to closing session.",
-          container.session, response);
+          this.container.session, response);
     }
     return null;
   }

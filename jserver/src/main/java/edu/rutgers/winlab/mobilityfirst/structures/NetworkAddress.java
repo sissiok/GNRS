@@ -42,15 +42,15 @@ public class NetworkAddress {
     // FIXME: Improve to avoid double-allocation with copy
     byte[] stringBytes = s.getBytes("US-ASCII");
     NetworkAddress address = new NetworkAddress();
-    address.setBytes(Arrays.copyOf(stringBytes, SIZE_OF_NETWORK_ADDRESS));
+    address.setBinaryForm(Arrays.copyOf(stringBytes, SIZE_OF_NETWORK_ADDRESS));
     return address;
   }
 
-  public byte[] getBytes() {
+  public byte[] getBinaryForm() {
     return bytes;
   }
 
-  public void setBytes(byte[] bytes) {
+  public void setBinaryForm(byte[] bytes) {
     if (bytes == null || bytes.length != SIZE_OF_NETWORK_ADDRESS) {
       throw new IllegalArgumentException("NetworkAddress must be exactly "
           + SIZE_OF_NETWORK_ADDRESS + " bytes.");

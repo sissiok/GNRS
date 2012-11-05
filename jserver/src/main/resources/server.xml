@@ -11,4 +11,6 @@
   <!-- True if the server should collect statistics and log them, false for 
        slightly faster code. -->
   <collectStatistics>true</collectStatistics>
+  <!-- The hashing algorithm to use.  Should be one of: MD2, MD5, SHA-1, SHA-256, SHA-384, or SHA-512. -->
+  <hashAlgorithm>SHA-1</hashAlgorithm>
 </edu.rutgers.winlab.mobilityfirst.Configuration>

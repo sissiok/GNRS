@@ -5,7 +5,6 @@
  */
 package edu.rutgers.winlab.mobilityfirst.messages;
 
-import java.net.Authenticator.RequestorType;
 
 /**
  * @author Robert Moore

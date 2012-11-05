@@ -38,7 +38,7 @@ public class LookupResponseEncoder implements
     DataOutputStream dos = new DataOutputStream(baos);
     dos.writeInt((int) message.getRequestId());
     dos.writeByte(message.getType().value());
-    dos.write(message.getSenderAddress().getBytes());
+    dos.write(message.getSenderAddress().getBinaryForm());
     dos.writeInt((int) message.getSenderPort());
 
     // LookupResponseMessage-specific
@@ -47,7 +47,7 @@ public class LookupResponseEncoder implements
     if (message.getBindings() != null) {
       dos.writeShort(message.getBindings().length);
       for (GUIDBinding binding : message.getBindings()) {
-        dos.write(binding.getAddress().getBytes());
+        dos.write(binding.getAddress().getBinaryForm());
         dos.writeInt((int) binding.getTtl());
         dos.writeShort(binding.getWeight());
       }

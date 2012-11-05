@@ -33,6 +33,12 @@ public class Configuration {
   private boolean collectStatistics = false;
 
   /**
+   * The hashing algorithm to use when converting a GUID to a Network Address
+   * for insert or retrieval in the GNRS.
+   */
+  private String hashAlgorithm = "MD5";
+
+  /**
    * Return the server's port for listening for UDP messages.
    * 
    * @return the server's listen port.
@@ -70,20 +76,52 @@ public class Configuration {
     this.bindIp = bindIp;
   }
 
+  /**
+   * Gets the current number of worker threads used.
+   * @return the number of worker threads in use.
+   */
   public int getNumWorkerThreads() {
     return this.numWorkerThreads;
   }
 
+  /**
+   * Sets the number of worker threads to use.
+   * @param minWorkerThreads the new number of worker threads.
+   */
   public void setNumWorkerThreads(int minWorkerThreads) {
     this.numWorkerThreads = minWorkerThreads;
   }
 
+  /**
+   * Flag to indicate if statistics are being collected.
+   * @return {@code true} if they are being collected, else {@code false}.
+   */
   public boolean isCollectStatistics() {
     return this.collectStatistics;
   }
 
+  /**
+   * Sets statistics collection on or off.
+   * @param collectStatistics {@code true} to collect statistics.
+   */
   public void setCollectStatistics(boolean collectStatistics) {
     this.collectStatistics = collectStatistics;
+  }
+
+  /**
+   * Gets the name of the hashing algorithm in use for GUID -> server address bindings.
+   * @return the name of the hashing algorithm.
+   */
+  public String getHashAlgorithm() {
+    return this.hashAlgorithm;
+  }
+
+  /**
+   * Sets the hashing algorithm to use when mapping GUID values to server addresses.
+   * @param hashAlgorithm the hashing algorithm to use.
+   */
+  public void setHashAlgorithm(String hashAlgorithm) {
+    this.hashAlgorithm = hashAlgorithm;
   }
 
 }

@@ -72,7 +72,7 @@ public class LookupResponseDecoder implements MessageDecoder {
     byte[] senderAddressBytes = new byte[NetworkAddress.SIZE_OF_NETWORK_ADDRESS];
     buffer.get(senderAddressBytes);
     NetworkAddress senderAddress = new NetworkAddress();
-    senderAddress.setBytes(senderAddressBytes);
+    senderAddress.setBinaryForm(senderAddressBytes);
 
     long senderPort = buffer.getUnsignedInt();
 
@@ -88,7 +88,7 @@ public class LookupResponseDecoder implements MessageDecoder {
         byte[] addressBytes = new byte[NetworkAddress.SIZE_OF_NETWORK_ADDRESS];
         buffer.get(addressBytes);
         NetworkAddress address = new NetworkAddress();
-        address.setBytes(addressBytes);
+        address.setBinaryForm(addressBytes);
 
         long ttl = buffer.getUnsignedInt();
         int weight = buffer.getUnsignedShort();

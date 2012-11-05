@@ -12,15 +12,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Simple class required by MINA to handle messaging-releated events. Most
+ * importantly, it passes any received messages to the GNRS server via
+ * {@link GNRSServer#messageArrived(IoSession, Object)}.
+ * 
  * @author Robert Moore
  * 
  */
 public class MessageHandler extends IoHandlerAdapter {
-  
-  private static final Logger log = LoggerFactory.getLogger(MessageHandler.class);
 
-  private GNRSServer server;
+  /**
+   * Logging for this class.
+   */
+  private static final Logger log = LoggerFactory
+      .getLogger(MessageHandler.class);
 
+  /**
+   * The server that will process the messages.
+   */
+  private final GNRSServer server;
+
+  /**
+   * Creates a new message handler for the server.
+   * @param server
+   */
   public MessageHandler(final GNRSServer server) {
     super();
     this.server = server;
@@ -28,33 +43,34 @@ public class MessageHandler extends IoHandlerAdapter {
 
   @Override
   public void exceptionCaught(IoSession session, Throwable cause) {
-    log.error(String.format("[%s] Unhandled exception.",session.toString()), cause);
+    log.error(String.format("[%s] Unhandled exception.", session.toString()),
+        cause);
   }
 
   @Override
-  public void messageReceived(IoSession session, Object message) throws Exception{
+  public void messageReceived(IoSession session, Object message)
+      throws Exception {
     log.debug("[{}] Received message: {}", session, message);
     this.server.messageArrived(session, message);
   }
-  
+
   @Override
   public void sessionClosed(IoSession session) throws Exception {
     log.info("[{}] Session closed.", session);
   }
-  
+
   @Override
   public void sessionCreated(IoSession session) throws Exception {
     log.info("[{}] Session created.", session);
   }
-  
+
   @Override
-  public void sessionIdle(IoSession session, IdleStatus status){
+  public void sessionIdle(IoSession session, IdleStatus status) {
     log.info("[{}] Session idle: {}", session, status);
   }
-  
+
   @Override
   public void sessionOpened(IoSession session) throws Exception {
     log.info("[{}] Session opened.", session);
   }
 }
-

@@ -73,7 +73,7 @@ public class InsertAckDecoder implements MessageDecoder {
     byte[] senderAddressBytes = new byte[NetworkAddress.SIZE_OF_NETWORK_ADDRESS];
     buffer.get(senderAddressBytes);
     NetworkAddress senderAddress = new NetworkAddress();
-    senderAddress.setBytes(senderAddressBytes);
+    senderAddress.setBinaryForm(senderAddressBytes);
     
     long senderPort = buffer.getUnsignedInt();
     

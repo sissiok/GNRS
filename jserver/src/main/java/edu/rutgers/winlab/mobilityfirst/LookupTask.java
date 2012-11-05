@@ -17,27 +17,44 @@ import edu.rutgers.winlab.mobilityfirst.messages.ResponseCode;
 import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
 
 /**
+ *  Task to handle Lookup messages within the server. Designed to operate
+ * independently of any other messages.
+ * 
  * @author Robert Moore
- *
+ * 
  */
 public class LookupTask implements Callable<Object> {
+  /**
+   * Logging facility for this class.
+   */
   private static final Logger log = LoggerFactory.getLogger(LookupTask.class);
 
+  /**
+   * The message and some metadata.
+   */
   private final MessageContainer container;
+  /**
+   * The server processing the message.
+   */
   private final GNRSServer server;
-  
-  public LookupTask(final GNRSServer server, final MessageContainer container){
+
+  /**
+   * Creates a new lookup task for the specified server and lookup message
+   * container.
+   * 
+   * @param server
+   *          the server that is handling the message.
+   * @param container
+   *          the message to process and some metadata.
+   */
+  public LookupTask(final GNRSServer server, final MessageContainer container) {
     super();
     this.container = container;
     this.server = server;
   }
-  
-  /* (non-Javadoc)
-   * @see java.util.concurrent.Callable#call()
-   */
+
   @Override
   public Object call() throws Exception {
-    
 
     GNRSServer.numLookups.incrementAndGet();
 
@@ -58,10 +75,9 @@ public class LookupTask implements Callable<Object> {
     response.setSenderPort(this.server.config.getListenPort());
     log.debug("[{}] Writing {}", this.container.session, response);
     this.container.session.write(response);
-    GNRSServer.messageLifetime.addAndGet(System.nanoTime() - this.container.creationTimestamp);
+    GNRSServer.messageLifetime.addAndGet(System.nanoTime()
+        - this.container.creationTimestamp);
     return null;
   }
-
- 
 
 }

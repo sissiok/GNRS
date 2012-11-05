@@ -38,7 +38,7 @@ public class InsertEncoder implements MessageEncoder<InsertMessage> {
     DataOutputStream dos = new DataOutputStream(baos);
     dos.writeInt((int) message.getRequestId());
     dos.writeByte(message.getType().value());
-    dos.write(message.getSenderAddress().getBytes());
+    dos.write(message.getSenderAddress().getBinaryForm());
     dos.writeInt((int) message.getSenderPort());
 
     // InsertMessage-specific
@@ -48,7 +48,7 @@ public class InsertEncoder implements MessageEncoder<InsertMessage> {
       dos.writeShort(message.getBindings().length);
 
       for (GUIDBinding binding : message.getBindings()) {
-        dos.write(binding.getAddress().getBytes());
+        dos.write(binding.getAddress().getBinaryForm());
         dos.writeInt((int) binding.getTtl());
         dos.writeShort(binding.getWeight());
       }

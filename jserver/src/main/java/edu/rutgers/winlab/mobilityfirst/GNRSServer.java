@@ -7,21 +7,17 @@ package edu.rutgers.winlab.mobilityfirst;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
-import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
 import org.slf4j.Logger;
@@ -31,12 +27,11 @@ import com.thoughtworks.xstream.XStream;
 
 import edu.rutgers.winlab.mobilityfirst.messages.AbstractMessage;
 import edu.rutgers.winlab.mobilityfirst.messages.GNRSProtocolCodecFactory;
-import edu.rutgers.winlab.mobilityfirst.messages.InsertAckMessage;
 import edu.rutgers.winlab.mobilityfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mobilityfirst.messages.LookupMessage;
-import edu.rutgers.winlab.mobilityfirst.messages.LookupResponseMessage;
-import edu.rutgers.winlab.mobilityfirst.messages.ResponseCode;
-import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
+import edu.rutgers.winlab.mobilityfirst.storage.GUIDHasher;
+import edu.rutgers.winlab.mobilityfirst.storage.MessageDigestHasher;
+import edu.rutgers.winlab.mobilityfirst.storage.NetworkAddressMapper;
 
 /**
  * @author Robert Moore
@@ -111,21 +106,6 @@ public class GNRSServer {
   final Configuration config;
 
   /**
-   * Flag to shut down the server.
-   */
-  private boolean keepRunning = true;
-
-  /**
-   * Queue for insert messages that have arrived but not yet been processed.
-   */
-  private final ConcurrentLinkedQueue<MessageContainer> insertMessages = new ConcurrentLinkedQueue<MessageContainer>();
-
-  /**
-   * Queue for lookup messages that have arrived but not yet been processed.
-   */
-  private final ConcurrentLinkedQueue<MessageContainer> lookupMessages = new ConcurrentLinkedQueue<MessageContainer>();
-
-  /**
    * Object for the server to wait/notify on.
    */
   private final Object messageLock = new Object();
@@ -135,6 +115,9 @@ public class GNRSServer {
    */
   private final boolean collectStatistics;
 
+  /**
+   * Timer for printing statistics.
+   */
   private final Timer statsTimer;
 
   /**
@@ -143,7 +126,8 @@ public class GNRSServer {
   static AtomicInteger numLookups = new AtomicInteger(0);
 
   /**
-   * Total number of nanoseconds spent processing messages since last stats report.
+   * Total number of nanoseconds spent processing messages since last stats
+   * report.
    */
   static AtomicLong messageLifetime = new AtomicLong(0);
 
@@ -152,7 +136,20 @@ public class GNRSServer {
    */
   private final ExecutorService workers;
 
+  /**
+   * Incoming UDP datagram acceptor (Apache MINA).
+   */
   private NioDatagramAcceptor acceptor;
+
+  /**
+   * Mapping network address prefixes to AS/addresses.
+   */
+  public static final NetworkAddressMapper networkAddressMap = new NetworkAddressMapper();
+
+  /**
+   * Hash function for converting a GUID to a set of Network Address vaules.
+   */
+  public final GUIDHasher guidHasher;
 
   /**
    * Creates a new GNRS server with the specified configuration. The server will
@@ -174,12 +171,8 @@ public class GNRSServer {
       this.statsTimer = null;
     }
 
-    // if (this.config.getNumWorkerThreads() > 0) {
-    // this.workers = Executors.newFixedThreadPool(this.config
-    // .getNumWorkerThreads());
-    // } else {
-    // this.workers = Executors.newSingleThreadExecutor();
-    // }
+    // Hash GUID to Network Address
+    this.guidHasher = new MessageDigestHasher(this.config.getHashAlgorithm());
 
     this.acceptor = new NioDatagramAcceptor();
     this.acceptor.setHandler(new MessageHandler(this));
@@ -207,6 +200,9 @@ public class GNRSServer {
         Integer.valueOf(this.config.getListenPort()));
   }
 
+  /**
+   * Starts any necessary threads.
+   */
   public void startup() {
     if (this.collectStatistics) {
       this.statsTimer.scheduleAtFixedRate(new StatsTask(this), 1000, 1000);
@@ -217,7 +213,7 @@ public class GNRSServer {
    * Terminates the server in a graceful way.
    */
   public void shutdown() {
-    this.keepRunning = false;
+
     if (this.collectStatistics) {
       this.statsTimer.cancel();
     }
@@ -256,11 +252,32 @@ public class GNRSServer {
     }
   }
 
+  /**
+   * Timer task that reports server-related statistics when called.
+   * 
+   * @author Robert Moore
+   * 
+   */
   private static final class StatsTask extends TimerTask {
+    /**
+     * Logging for this task.
+     */
     private static final Logger log = LoggerFactory.getLogger(StatsTask.class);
+    /**
+     * The server to report statistics about.
+     */
     private final GNRSServer server;
+    /**
+     * The last time statistics were generated.
+     */
     private long lastTimestamp = System.currentTimeMillis();
 
+    /**
+     * Creates a new task for the specified server.
+     * 
+     * @param server
+     *          the GNRS server to report statistics about.
+     */
     public StatsTask(final GNRSServer server) {
       super();
       this.server = server;
@@ -271,7 +288,6 @@ public class GNRSServer {
       long totalNanos = GNRSServer.messageLifetime.getAndSet(0l);
       int numLookups = GNRSServer.numLookups.getAndSet(0);
       long now = System.currentTimeMillis();
-     
 
       long timeDiff = now - this.lastTimestamp;
       this.lastTimestamp = now;
@@ -281,7 +297,8 @@ public class GNRSServer {
           : ((totalNanos / (float) numLookups) / 1000);
       log.info(String.format(
           "\nLookups: %.3f per second (%.2f s)\nAverage Lifetime: %,.0fus",
-          lookupsPerSecond, numSeconds, averageLifetimeUsec));
+          Float.valueOf(lookupsPerSecond), Float.valueOf(numSeconds),
+          Float.valueOf(averageLifetimeUsec)));
     }
   }
 
