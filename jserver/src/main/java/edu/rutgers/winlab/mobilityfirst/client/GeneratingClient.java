@@ -9,7 +9,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.LockSupport;
 
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
@@ -28,6 +30,8 @@ import com.thoughtworks.xstream.XStream;
 
 import edu.rutgers.winlab.mobilityfirst.messages.GNRSProtocolCodecFactory;
 import edu.rutgers.winlab.mobilityfirst.messages.LookupMessage;
+import edu.rutgers.winlab.mobilityfirst.messages.LookupResponseMessage;
+import edu.rutgers.winlab.mobilityfirst.messages.ResponseCode;
 import edu.rutgers.winlab.mobilityfirst.structures.GUID;
 import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
 
@@ -43,6 +47,10 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
    * Logging facility for this class.
    */
   static final Logger log = LoggerFactory.getLogger(GeneratingClient.class);
+
+  // Linux supports a 50 microsecond precision
+  static final long SYSTEM_SLEEP_PRECISION = System.getProperty("os.name")
+      .equalsIgnoreCase("linux") ? 50000 : 1000000;
 
   /**
    * @param args
@@ -98,7 +106,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
    * Connector to communicate with the server.
    */
   NioDatagramConnector connector;
-  
+
   /**
    * Configuration for this client.
    */
@@ -112,6 +120,16 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
    * Total number of lookup messages to generate.
    */
   private final int numLookups;
+  
+  /**
+   * Total number of successes.
+   */
+  private final AtomicInteger numSuccess = new AtomicInteger(0);
+  
+  /**
+   * Total number of failures.
+   */
+  private final AtomicInteger numFailures = new AtomicInteger(0);
 
   /**
    * Creates a new GeneratingClient with the configuration and delay values
@@ -141,6 +159,9 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
         new GNRSProtocolCodecFactory(false)));
 
+    log.info(String.format("Assuming timer precision of %,dns.",
+        SYSTEM_SLEEP_PRECISION));
+
   }
 
   @Override
@@ -168,6 +189,16 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
         if (future.isConnected()) {
           GeneratingClient.log.info("Connected to {}", future.getSession());
           GeneratingClient.this.generateLookups(future.getSession());
+          try {
+            Thread.sleep(5000);
+          }catch(InterruptedException ie){
+            // Ignored
+          }
+          int succ = GeneratingClient.this.numSuccess.get();
+          int total = succ + GeneratingClient.this.numFailures.get();
+          float success = ((succ*1f)/total)*100;
+          float loss = ((GeneratingClient.this.numLookups - total*1f)/GeneratingClient.this.numLookups)*100;
+          log.info(String.format("Total: %,d  |  Success: %,.2f%%  |  Loss: %,.2f%%)", total, success, loss));
           future.getSession().close(true);
           GeneratingClient.this.connector.dispose(true);
         }
@@ -210,27 +241,39 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
       return;
     }
     LookupMessage message = null;
-    try {
-      for (int i = 0; i < this.numLookups; ++i) {
+    long nextSend = System.nanoTime();
+    long lastSend = 0l;
+    final Random r = new Random(System.currentTimeMillis());
 
-        message = new LookupMessage();
-        message.setDestinationFlag((byte) 0);
-        message.setGuid(GUID.fromASCII("123"));
-        message.setRequestId(i);
-        message.setSenderAddress(clientAddress);
-        message.setSenderPort(fromPort);
+    for (int i = 0; i < this.numLookups; ++i) {
 
-        log.debug("Writing {} to {}", message, session);
-        WriteFuture future = session.write(message);
-        future.awaitUninterruptibly(this.delay*1000, TimeUnit.MICROSECONDS);
-        if (this.delay > 0) {
-          LockSupport.parkNanos(this.delay * 1000);
-        }
+      message = new LookupMessage();
+      message.setDestinationFlag((byte) 0);
+      message.setGuid(GUID.fromInt(('0'+r.nextInt(10))<<24));
+      message.setRequestId(i);
+      message.setSenderAddress(clientAddress);
+      message.setSenderPort(fromPort);
+      lastSend = System.nanoTime();
+      WriteFuture future = session.write(message);
 
+      future.awaitUninterruptibly();
+
+      nextSend = lastSend + (this.delay * 1000);
+      long waitTime = getNanoSleep(nextSend - System.nanoTime());
+
+      if (waitTime > 0) {
+        LockSupport.parkNanos(waitTime);
       }
-    } catch (IOException ioe) {
-      log.error("Exception occurred while generating lookups.", ioe);
     }
+    
+    
+
+  }
+
+  public static long getNanoSleep(final long desiredSleep) {
+    long halfPrecision = SYSTEM_SLEEP_PRECISION / 4;
+    long roundHalf = desiredSleep / (halfPrecision);
+    return roundHalf * (halfPrecision) - SYSTEM_SLEEP_PRECISION;
   }
 
   @Override
@@ -240,7 +283,18 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
 
   @Override
   public void messageReceived(IoSession session, Object message) {
-    log.debug("[{}] Received {}", session, message);
+    if(message instanceof LookupResponseMessage){
+      this.handleResponse((LookupResponseMessage)message);
+    }
+  }
+  
+  public void handleResponse(final LookupResponseMessage msg){
+    if(ResponseCode.SUCCESS.equals(msg.getResponseCode()))
+    {
+      this.numSuccess.incrementAndGet();
+    }else{
+      this.numFailures.incrementAndGet();
+    }
   }
 
   @Override
