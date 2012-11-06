@@ -49,6 +49,25 @@ public class GUID {
   }
 
   /**
+   * Creates a new GUID from an integer. The 4 bytes of the integer are placed
+   * in the first 4 bytes of the GUID value. The remaining bytes are padded with
+   * 0's.
+   * 
+   * @param i
+   *          the integer value.
+   * @return a GUID with the integer in its high (first) 4 bytes.
+   */
+  public static GUID fromInt(final int i) {
+    GUID g = new GUID();
+    g.bytes = new byte[SIZE_OF_GUID];
+    g.bytes[0] = (byte) (i >> 24);
+    g.bytes[1] = (byte) (i >> 16);
+    g.bytes[2] = (byte) (i >> 8);
+    g.bytes[3] = (byte) (i);
+    return g;
+  }
+
+  /**
    * Gets this GUID as a byte array.
    * 
    * @return this GUID in binary form.
@@ -66,36 +85,41 @@ public class GUID {
   public void setBinaryForm(byte[] guid) {
     this.bytes = guid;
   }
-  
+
   @Override
-  public String toString(){
-    StringBuilder sb = new StringBuilder(SIZE_OF_GUID*2+6);
+  public String toString() {
+    StringBuilder sb = new StringBuilder(SIZE_OF_GUID * 2 + 6);
     sb.append("GUID(");
-    for(byte b : this.bytes){
+    for (byte b : this.bytes) {
       sb.append(String.format("%02x", Byte.valueOf(b)));
     }
     sb.append(')');
     return sb.toString();
   }
+
   @Override
-  public int hashCode(){
+  public int hashCode() {
     return Arrays.hashCode(this.bytes);
   }
-  
+
   @Override
-  public boolean equals(Object o){
-    if(o instanceof GUID){
-      return this.equals((GUID)o);
+  public boolean equals(Object o) {
+    if (o instanceof GUID) {
+      return this.equals((GUID) o);
     }
     return super.equals(o);
   }
-  
+
   /**
-   * Determines if this GUID and another are equal based on their binary representations.
-   * @param g another GUID.
-   * @return {@code true} if the other GUID'd binary value is equal to this GUID's.
+   * Determines if this GUID and another are equal based on their binary
+   * representations.
+   * 
+   * @param g
+   *          another GUID.
+   * @return {@code true} if the other GUID'd binary value is equal to this
+   *         GUID's.
    */
-  public boolean equals(final GUID g){
-    return Arrays.equals(this.bytes,g.bytes);
+  public boolean equals(final GUID g) {
+    return Arrays.equals(this.bytes, g.bytes);
   }
 }
