@@ -8,6 +8,7 @@ package edu.rutgers.winlab.mobilityfirst.storage;
 import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.collection.Trie;
 
+import edu.rutgers.winlab.mobilityfirst.structures.AddressType;
 import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
 
 /**
@@ -20,8 +21,13 @@ public class NetworkAddressMapper {
   /**
    * Prefix trie used to find the closest match of a network address.
    */
-  private final Trie<NetworkAddress, String> storageTrie = new PatriciaTrie<NetworkAddress, String>(
-      NetworkAddressKeyAnalyzer.create());
+  private final Trie<NetworkAddress, String> storageTrie;
+
+  public NetworkAddressMapper(final AddressType type) {
+    super();
+    this.storageTrie = new PatriciaTrie<NetworkAddress, String>(
+        NetworkAddressKeyAnalyzer.create(type));
+  }
 
   /**
    * Inserts a binding into this mapper for the specified network address.

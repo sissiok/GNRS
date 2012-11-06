@@ -75,7 +75,7 @@ public class InsertDecoder implements MessageDecoder {
     byte[] senderAddressBytes = new byte[NetworkAddress.SIZE_OF_NETWORK_ADDRESS];
     buffer.get(senderAddressBytes);
     NetworkAddress senderAddress = new NetworkAddress();
-    senderAddress.setBinaryForm(senderAddressBytes);
+    senderAddress.setValue(senderAddressBytes);
 
     long senderPort = buffer.getUnsignedInt();
 
@@ -100,7 +100,7 @@ public class InsertDecoder implements MessageDecoder {
         byte[] addressBytes = new byte[NetworkAddress.SIZE_OF_NETWORK_ADDRESS];
         buffer.get(addressBytes);
         NetworkAddress address = new NetworkAddress();
-        address.setBinaryForm(addressBytes);
+        address.setValue(addressBytes);
 
         long ttl = buffer.getUnsignedInt();
 
@@ -114,7 +114,7 @@ public class InsertDecoder implements MessageDecoder {
     }
 
     msg.setRequestId(requestId);
-    msg.setSenderAddress(senderAddress);
+    msg.setOriginAddress(senderAddress);
     msg.setSenderPort(senderPort);
 
     msg.setGuid(guid);

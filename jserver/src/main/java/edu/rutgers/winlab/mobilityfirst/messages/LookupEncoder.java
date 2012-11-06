@@ -35,7 +35,7 @@ public class LookupEncoder implements MessageEncoder<LookupMessage> {
     DataOutputStream dos = new DataOutputStream(baos);
     dos.writeInt((int) message.getRequestId());
     dos.writeByte(message.getType().value());
-    dos.write(message.getSenderAddress().getBinaryForm());
+    dos.write(message.getOriginAddress().getValue());
     dos.writeInt((int) message.getSenderPort());
 
     // LookupMessage-specific

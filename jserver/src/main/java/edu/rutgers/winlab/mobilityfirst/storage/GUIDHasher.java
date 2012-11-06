@@ -8,6 +8,7 @@ package edu.rutgers.winlab.mobilityfirst.storage;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 
+import edu.rutgers.winlab.mobilityfirst.structures.AddressType;
 import edu.rutgers.winlab.mobilityfirst.structures.GUID;
 import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
 
@@ -19,14 +20,15 @@ import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
  * 
  */
 public interface GUIDHasher {
-  
-  
+
   /**
    * Hashes the provided GUID value to produce a collection of
    * {@code numAddresses} network address values.
    * 
    * @param guid
    *          the GUID value to hash.
+   * @param type
+   *          the type of address to generate
    * @param numAddresses
    *          the number of addresses to generate.
    * @return the set of generated addresses
@@ -34,6 +36,7 @@ public interface GUIDHasher {
    *           if the required hashing algorithm is not supported on the host
    *           platform.
    */
-  public Collection<NetworkAddress> hash(final GUID guid, final int numAddresses)
+  public Collection<NetworkAddress> hash(final GUID guid,
+      final AddressType type, final int numAddresses)
       throws NoSuchAlgorithmException;
 }

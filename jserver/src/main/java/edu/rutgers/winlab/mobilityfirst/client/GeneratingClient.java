@@ -21,6 +21,7 @@ import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramConnector;
 import org.slf4j.Logger;
@@ -158,7 +159,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     DefaultIoFilterChainBuilder chain = this.connector.getFilterChain();
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
         new GNRSProtocolCodecFactory(false)));
-
+  
     log.info(String.format("Assuming timer precision of %,dns.",
         SYSTEM_SLEEP_PRECISION));
 
@@ -224,7 +225,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     // FIXME: Get the origin address in the datagram correct
     NetworkAddress fromAddress = null;
     try {
-      fromAddress = NetworkAddress.fromASCII(this.config.getClientHost());
+      fromAddress = NetworkAddress.ipv4FromASCII(this.config.getClientHost());
     } catch (UnsupportedEncodingException uee) {
       log.error(
           "Unable to parse local host name from configuration parameter.", uee);
@@ -234,7 +235,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     int fromPort = this.config.getClientPort();
     NetworkAddress clientAddress = null;
     try {
-      clientAddress = NetworkAddress.fromASCII(this.config.getClientHost());
+      clientAddress = NetworkAddress.ipv4FromASCII(this.config.getClientHost());
 
     } catch (UnsupportedEncodingException uee) {
       log.error("Unable to parse client hostname from configuration file.", uee);
@@ -251,7 +252,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
       message.setDestinationFlag((byte) 0);
       message.setGuid(GUID.fromInt(('0'+r.nextInt(10))<<24));
       message.setRequestId(i);
-      message.setSenderAddress(clientAddress);
+      message.setOriginAddress(clientAddress);
       message.setSenderPort(fromPort);
       lastSend = System.nanoTime();
       WriteFuture future = session.write(message);

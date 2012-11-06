@@ -20,6 +20,11 @@ public abstract class AbstractMessage {
   protected long requestId;
 
   /**
+   * Version number of the protocol format.
+   */
+  protected byte version = 0;
+  
+  /**
    * Unsigned 8-bit type value
    */
   protected MessageType type;
@@ -27,12 +32,7 @@ public abstract class AbstractMessage {
   /**
    * Who sent the message originally.
    */
-  protected NetworkAddress senderAddress;
-
-  /**
-   * The listen port of the sender.
-   */
-  protected long senderPort;
+  protected NetworkAddress originAddress;
 
   /**
    * Protected constructor. Only to be called by subclasses.
@@ -66,19 +66,8 @@ public abstract class AbstractMessage {
    * 
    * @return the NetworkAddress of the message originator.
    */
-  public NetworkAddress getSenderAddress() {
-    return this.senderAddress;
-  }
-
-  /**
-   * Gets the sender port for this message. Note that the wire protocol
-   * specifies an unsigned 32-bit integer, but Java doesn't support unsigned
-   * types.
-   * 
-   * @return the sender port value of this message.
-   */
-  public long getSenderPort() {
-    return this.senderPort;
+  public NetworkAddress getOriginAddress() {
+    return this.originAddress;
   }
 
   /**
@@ -103,24 +92,12 @@ public abstract class AbstractMessage {
   }
 
   /**
-   * Sets the sender (originator) address for this message.
+   * Sets the originator address for this message.
    * 
-   * @param senderAddress
-   *          the sender address for this message.
+   * @param address
+   *          the originator address for this message.
    */
-  public void setSenderAddress(NetworkAddress senderAddress) {
-    this.senderAddress = senderAddress;
-  }
-
-  /**
-   * Sets the sender (originator) port for this message. Note that the wire
-   * protocol specifies an unsigned 32-bit value, but Java does not support
-   * unsigned types.
-   * 
-   * @param senderPort
-   *          the sender port value.
-   */
-  public void setSenderPort(long senderPort) {
-    this.senderPort = senderPort;
+  public void setOriginAddress(NetworkAddress address) {
+    this.originAddress = address;
   }
 }

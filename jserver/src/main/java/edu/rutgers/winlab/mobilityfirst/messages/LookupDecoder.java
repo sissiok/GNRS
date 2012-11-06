@@ -72,7 +72,7 @@ public class LookupDecoder implements MessageDecoder {
     byte[] senderAddressBytes = new byte[NetworkAddress.SIZE_OF_NETWORK_ADDRESS];
     buffer.get(senderAddressBytes);
     NetworkAddress senderAddress = new NetworkAddress();
-    senderAddress.setBinaryForm(senderAddressBytes);
+    senderAddress.setValue(senderAddressBytes);
 
     long senderPort = buffer.getUnsignedInt();
 
@@ -87,7 +87,7 @@ public class LookupDecoder implements MessageDecoder {
     byte destinationFlag = buffer.get();
 
     msg.setRequestId(requestId);
-    msg.setSenderAddress(senderAddress);
+    msg.setOriginAddress(senderAddress);
     msg.setSenderPort(senderPort);
     msg.setGuid(guid);
     msg.setDestinationFlag(destinationFlag);

@@ -14,6 +14,7 @@ import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.rutgers.winlab.mobilityfirst.structures.AddressType;
 import edu.rutgers.winlab.mobilityfirst.structures.GUID;
 import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
 
@@ -35,17 +36,18 @@ import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
  * 
  */
 public class MessageDigestHasher implements GUIDHasher {
-  
+
   /**
    * Logging for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(MessageDigestHasher.class);
+  private static final Logger log = LoggerFactory
+      .getLogger(MessageDigestHasher.class);
 
   /**
    * Name of the algorithm to use.
    */
   final String algorithmName;
-  
+
   /**
    * Thread-specific set of message digest objects.
    */
@@ -61,12 +63,13 @@ public class MessageDigestHasher implements GUIDHasher {
     super();
     this.algorithmName = algorithmName.toUpperCase();
     // Create a new MessageDigest for each thread.
-    this.localDigest = new ThreadLocal<MessageDigest> () {
+    this.localDigest = new ThreadLocal<MessageDigest>() {
       @Override
-      public MessageDigest initialValue(){
+      public MessageDigest initialValue() {
         try {
-          return MessageDigest.getInstance(MessageDigestHasher.this.algorithmName);
-        }catch(NoSuchAlgorithmException nsae){
+          return MessageDigest
+              .getInstance(MessageDigestHasher.this.algorithmName);
+        } catch (NoSuchAlgorithmException nsae) {
           return null;
         }
       }
@@ -74,20 +77,21 @@ public class MessageDigestHasher implements GUIDHasher {
   }
 
   @Override
-  public Collection<NetworkAddress> hash(GUID guid, int numAddresses)
+  public Collection<NetworkAddress> hash(final GUID guid,
+      final AddressType type, final int numAddresses)
       throws NoSuchAlgorithmException {
     ArrayList<NetworkAddress> addresses = new ArrayList<NetworkAddress>(
         numAddresses);
     MessageDigest digest = this.localDigest.get();
-    if(digest == null){
-      log.error("Unable to hash because \"{}\" is not supported.",this.algorithmName);
+    if (digest == null) {
+      log.error("Unable to hash because \"{}\" is not supported.",
+          this.algorithmName);
       return null;
     }
     int digestBytes = digest.getDigestLength();
     // Figure out how many bytes we need to buffer for our network addresses
-    int numberDigests = (int) Math.ceil((NetworkAddress.SIZE_OF_NETWORK_ADDRESS
-        * numAddresses * 1f)
-        / digestBytes);
+    int numberDigests = (int) Math
+        .ceil((type.getMaxLength() * numAddresses * 1f) / digestBytes);
     ByteBuffer buffer = ByteBuffer.allocate(numberDigests * digestBytes);
 
     // Initializes to 0
@@ -107,12 +111,12 @@ public class MessageDigestHasher implements GUIDHasher {
     // Generate the addresses and put them in the collection
     for (int i = 0; i < numAddresses; ++i) {
       NetworkAddress na = new NetworkAddress();
-      byte[] bytes = new byte[NetworkAddress.SIZE_OF_NETWORK_ADDRESS];
+      byte[] bytes = new byte[type.getMaxLength()];
       buffer.get(bytes);
-      na.setBinaryForm(bytes);
+      na.setValue(bytes);
       addresses.add(na);
     }
-    
+
     return addresses;
   }
 

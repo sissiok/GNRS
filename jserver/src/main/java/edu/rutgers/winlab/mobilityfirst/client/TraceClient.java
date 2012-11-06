@@ -175,7 +175,7 @@ public class TraceClient extends IoHandlerAdapter {
     String line = null;
     NetworkAddress fromAddress = null;
     try {
-      fromAddress = NetworkAddress.fromASCII(this.config.getClientHost());
+      fromAddress = NetworkAddress.ipv4FromASCII(this.config.getClientHost());
     } catch (UnsupportedEncodingException uee) {
       log.error(
           "Unable to parse local host name from configuration parameter.", uee);
@@ -197,7 +197,7 @@ public class TraceClient extends IoHandlerAdapter {
           continue;
         }
 
-        message.setSenderAddress(fromAddress);
+        message.setOriginAddress(fromAddress);
         message.setSenderPort(fromPort);
 
         log.debug("Writing {} to {}", message, session);
@@ -271,7 +271,7 @@ public class TraceClient extends IoHandlerAdapter {
       for (int i = 0; i < bindings.length; ++i) {
         NetworkAddress na = null;
         try {
-          na = NetworkAddress.fromASCII(bindingValues[0]);
+          na = NetworkAddress.ipv4FromASCII(bindingValues[0]);
         } catch (UnsupportedEncodingException uee) {
           log.error("Unable to parse network address from ASCII string.", uee);
           break;

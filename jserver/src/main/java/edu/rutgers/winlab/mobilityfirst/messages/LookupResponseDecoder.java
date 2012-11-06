@@ -32,12 +32,13 @@ public class LookupResponseDecoder implements MessageDecoder {
     // Store the current cursor position in the buffer
     buffer.mark();
     // Need 5 bytes to check request ID and type
-    if (buffer.remaining() < 5) {
+    if (buffer.remaining() < 2) {
       return MessageDecoderResult.NEED_DATA;
     }
 
-    // Skip the request ID
-    buffer.getInt();
+    // Skip the version field
+    // TODO: What to do with versions?
+    buffer.get();
     byte type = buffer.get();
     // Reset the cursor so we don't modify the buffer data.
     buffer.reset();
@@ -72,7 +73,7 @@ public class LookupResponseDecoder implements MessageDecoder {
     byte[] senderAddressBytes = new byte[NetworkAddress.SIZE_OF_NETWORK_ADDRESS];
     buffer.get(senderAddressBytes);
     NetworkAddress senderAddress = new NetworkAddress();
-    senderAddress.setBinaryForm(senderAddressBytes);
+    senderAddress.setValue(senderAddressBytes);
 
     long senderPort = buffer.getUnsignedInt();
 
@@ -88,7 +89,7 @@ public class LookupResponseDecoder implements MessageDecoder {
         byte[] addressBytes = new byte[NetworkAddress.SIZE_OF_NETWORK_ADDRESS];
         buffer.get(addressBytes);
         NetworkAddress address = new NetworkAddress();
-        address.setBinaryForm(addressBytes);
+        address.setValue(addressBytes);
 
         long ttl = buffer.getUnsignedInt();
         int weight = buffer.getUnsignedShort();
@@ -100,7 +101,7 @@ public class LookupResponseDecoder implements MessageDecoder {
       msg.setBindings(bindings);
     }
     msg.setRequestId(requestId);
-    msg.setSenderAddress(senderAddress);
+    msg.setOriginAddress(senderAddress);
     msg.setSenderPort(senderPort);
     msg.setResponseCode(ResponseCode.valueOf(responseCode));
     

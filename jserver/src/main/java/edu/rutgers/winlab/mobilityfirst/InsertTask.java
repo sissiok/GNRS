@@ -34,7 +34,7 @@ public class InsertTask implements Callable<Object> {
    * The message and some metadata for this task.
    */
   private final MessageContainer container;
-  
+
   /**
    * The server that is handling the message.
    */
@@ -42,8 +42,11 @@ public class InsertTask implements Callable<Object> {
 
   /**
    * Creates a new InsertTask for the specified server and message container.
-   * @param server the server that received or is handling the message.
-   * @param container the message and some metadata.
+   * 
+   * @param server
+   *          the server that received or is handling the message.
+   * @param container
+   *          the message and some metadata.
    */
   public InsertTask(final GNRSServer server, final MessageContainer container) {
     super();
@@ -55,28 +58,26 @@ public class InsertTask implements Callable<Object> {
   public Object call() throws Exception {
     // Just send back a SUCCESS message for now.
     InsertMessage msg = (InsertMessage) this.container.message;
-    
-    boolean success = this.server.insertBindings(msg.getGuid(), msg.getBindings());
-    
+
+    boolean success = this.server.insertBindings(msg.getGuid(),
+        msg.getBindings());
+
     InsertAckMessage response = new InsertAckMessage();
     response.setRequestId(msg.getRequestId());
-    response.setResponseCode(success ? ResponseCode.SUCCESS : ResponseCode.ERROR);
+    response.setResponseCode(success ? ResponseCode.SUCCESS
+        : ResponseCode.ERROR);
 
     try {
-      response.setSenderAddress(NetworkAddress.fromASCII(this.server.config
+      response.setOriginAddress(NetworkAddress.ipv4FromASCII(this.server.config
           .getBindIp()));
     } catch (UnsupportedEncodingException e) {
       log.error("Unable to parse bind IP for the server. Please check the configuration file.");
       return null;
     }
     response.setSenderPort(this.server.config.getListenPort() & 0xFFFFFFFFl);
-    if (!this.container.session.isClosing()) {
-      log.debug("[{}] Writing {}", this.container.session, response);
-      this.container.session.write(response);
-    } else {
-      log.warn("[{}] Unable to write {} to closing session.",
-          this.container.session, response);
-    }
+
+    this.container.session.write(response);
+
     return null;
   }
 

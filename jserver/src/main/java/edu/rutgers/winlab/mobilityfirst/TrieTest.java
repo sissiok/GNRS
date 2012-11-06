@@ -11,6 +11,7 @@ import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.collection.Trie;
 
 import edu.rutgers.winlab.mobilityfirst.storage.NetworkAddressKeyAnalyzer;
+import edu.rutgers.winlab.mobilityfirst.structures.AddressType;
 import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
 
 /**
@@ -30,17 +31,11 @@ public class TrieTest {
    */
   public static void main(String[] args) {
     Trie<NetworkAddress, String> testTrie = new PatriciaTrie<NetworkAddress, String>(
-        NetworkAddressKeyAnalyzer.create());
-    NetworkAddress na1 = new NetworkAddress();
-    na1.setBinaryForm(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 });
+        NetworkAddressKeyAnalyzer.create(AddressType.INET_4_UDP));
+    NetworkAddress na1 = NetworkAddress.ipv4FromInteger(1);
 
-    NetworkAddress na2 = new NetworkAddress();
-    na2.setBinaryForm(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 });
-    NetworkAddress na258 = new NetworkAddress();
-    na258.setBinaryForm(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2 });
+    NetworkAddress na2 = NetworkAddress.ipv4FromInteger(2);
+    NetworkAddress na258 = NetworkAddress.ipv4FromInteger(258);
 
     testTrie.put(na1, "one");
     // testTrie.put(na2,"two");
