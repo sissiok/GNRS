@@ -97,7 +97,7 @@ public class LookupTask implements Callable<Object> {
 
       // Loopback? Then the local server should handle it.
       // TODO: Check if this is the server's local address
-      if (replicaAddress.getAddress().isLoopbackAddress()) {
+      if (replicaAddress.getAddress().isLoopbackAddress() || replicaAddress.equals(this.server.localAddress)) {
         resolvedLocally = true;
         break;
       }
@@ -113,7 +113,7 @@ public class LookupTask implements Callable<Object> {
 
       LookupResponseMessage response = new LookupResponseMessage();
       response.setRequestId(message.getRequestId());
-      response.setResponseCode(ResponseCode.SUCCESS);
+      
 
       try {
         response.setSenderAddress(NetworkAddress.fromASCII(this.server.config
@@ -125,6 +125,7 @@ public class LookupTask implements Callable<Object> {
       response.setSenderPort(this.server.config.getListenPort());
 
       response.setBindings(this.server.getBindings(message.getGuid()));
+      response.setResponseCode(ResponseCode.SUCCESS);
       t40 = System.nanoTime();
 //      log.debug("[{}] Writing {}", this.container.session, response);
       WriteFuture future = this.container.session.write(response);
@@ -144,7 +145,6 @@ public class LookupTask implements Callable<Object> {
       log.debug(String.format("Processing: %,dns [Hash: %,dns, NetMap: %,dns, GetBind: %,dns, Write: %,dns] \n",
                                         t50-t10,      t20-t10,       t30-t20,        t40-t30,      t50-t40));
     }
-    
     return null;
   }
 
