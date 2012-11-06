@@ -73,4 +73,11 @@ public class LookupMessage extends AbstractMessage {
   public void setDestinationFlag(byte destinationFlag) {
     this.destinationFlag = destinationFlag;
   }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder("LKP #").append(this.getRequestId()).append(" (");
+    sb.append(this.guid).append(")");
+    return sb.toString();
+  }
 }

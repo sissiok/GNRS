@@ -1,4 +1,4 @@
-# AS mapping for IPv4 addresses
+# AS mapping for IPv4 addresses. Each field is delimited by whitespace.
 # Each line is: AS number, IP address, UDP port
 
 # Example bindings (see also prefixes.ipv4)

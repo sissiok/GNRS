@@ -8,6 +8,9 @@
         messages. If this value is 0 or negative, then 1 worker thread will 
         be used. -->
   <numWorkerThreads>1</numWorkerThreads>
+  <!-- The number of replicas to use for insertions or retrievals of GUID bindings in the global
+       GNRS network. -->
+  <numReplicas>5</numReplicas>
   <!-- True if the server should collect statistics and log them, false for 
        slightly faster code. -->
   <collectStatistics>true</collectStatistics>
@@ -15,4 +18,7 @@
   <hashAlgorithm>SHA-1</hashAlgorithm>
   <!-- Prefix filename. Maps network address prefixes to AS numbers. Will be removed in future versions. -->
   <prefixFile>src/main/resources/prefixes.ipv4</prefixFile>
+  <!-- AS bindings filename. Maps Autonomous Systems to their network identities (IP address, port). Will be removed
+       in future versions. -->
+  <asBindingFile>src/main/resources/as-binding.ipv4</asBindingFile>
 </edu.rutgers.winlab.mobilityfirst.Configuration>

@@ -66,4 +66,36 @@ public class GUID {
   public void setBinaryForm(byte[] guid) {
     this.bytes = guid;
   }
+  
+  @Override
+  public String toString(){
+    StringBuilder sb = new StringBuilder(SIZE_OF_GUID*2+6);
+    sb.append("GUID(");
+    for(byte b : this.bytes){
+      sb.append(String.format("%02x", Byte.valueOf(b)));
+    }
+    sb.append(')');
+    return sb.toString();
+  }
+  @Override
+  public int hashCode(){
+    return Arrays.hashCode(this.bytes);
+  }
+  
+  @Override
+  public boolean equals(Object o){
+    if(o instanceof GUID){
+      return this.equals((GUID)o);
+    }
+    return super.equals(o);
+  }
+  
+  /**
+   * Determines if this GUID and another are equal based on their binary representations.
+   * @param g another GUID.
+   * @return {@code true} if the other GUID'd binary value is equal to this GUID's.
+   */
+  public boolean equals(final GUID g){
+    return Arrays.equals(this.bytes,g.bytes);
+  }
 }

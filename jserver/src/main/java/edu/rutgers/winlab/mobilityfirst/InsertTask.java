@@ -55,9 +55,12 @@ public class InsertTask implements Callable<Object> {
   public Object call() throws Exception {
     // Just send back a SUCCESS message for now.
     InsertMessage msg = (InsertMessage) this.container.message;
+    
+    boolean success = this.server.insertBindings(msg.getGuid(), msg.getBindings());
+    
     InsertAckMessage response = new InsertAckMessage();
     response.setRequestId(msg.getRequestId());
-    response.setResponseCode(ResponseCode.SUCCESS);
+    response.setResponseCode(success ? ResponseCode.SUCCESS : ResponseCode.ERROR);
 
     try {
       response.setSenderAddress(NetworkAddress.fromASCII(this.server.config

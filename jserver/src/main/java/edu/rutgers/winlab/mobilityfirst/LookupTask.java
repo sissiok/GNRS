@@ -6,6 +6,8 @@
 package edu.rutgers.winlab.mobilityfirst;
 
 import java.io.UnsupportedEncodingException;
+import java.net.InetSocketAddress;
+import java.util.Collection;
 import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
@@ -62,21 +64,56 @@ public class LookupTask implements Callable<Object> {
       return null;
     }
     LookupMessage message = (LookupMessage) this.container.message;
-    LookupResponseMessage response = new LookupResponseMessage();
-    response.setRequestId(message.getRequestId());
-    response.setResponseCode(ResponseCode.ERROR);
-    try {
-      response.setSenderAddress(NetworkAddress.fromASCII(this.server.config
-          .getBindIp()));
-    } catch (UnsupportedEncodingException e) {
-      log.error("Unable to parse bind IP for the server. Please check the configuration file.");
+    log.debug("Received {}", message);
+    
+    Collection<NetworkAddress> hashedAddxes = this.server.guidHasher.hash(message.getGuid(), this.server.config.getNumReplicas());
+    
+    if(hashedAddxes == null){
+      log.error("No binding generated for {}.",message.getGuid());
       return null;
     }
-    response.setSenderPort(this.server.config.getListenPort());
-    log.debug("[{}] Writing {}", this.container.session, response);
-    this.container.session.write(response);
-    GNRSServer.messageLifetime.addAndGet(System.nanoTime()
-        - this.container.creationTimestamp);
+    
+    log.debug("Hashed {} -> {}",message.getGuid(),hashedAddxes);
+    
+    for(NetworkAddress addx : hashedAddxes){
+      String asNumString = this.server.networkAddressMap.get(addx);
+      if(asNumString == null){
+        log.error("Missing GNRS server for {}",addx);
+        continue;
+      }
+      InetSocketAddress replicaAddress = this.server.asAddresses.get(Integer.parseInt(asNumString));
+      if(replicaAddress == null){
+        log.error("No network information for AS {}.",replicaAddress);
+        continue;
+      }
+      
+      // Loopback? Then the local server should handle it.
+      if(replicaAddress.getAddress().isLoopbackAddress()){
+        log.debug("Retrieving binding locally.");
+        LookupResponseMessage response = new LookupResponseMessage();
+        response.setRequestId(message.getRequestId());
+        response.setResponseCode(ResponseCode.SUCCESS);
+        try {
+          response.setSenderAddress(NetworkAddress.fromASCII(this.server.config
+              .getBindIp()));
+        } catch (UnsupportedEncodingException e) {
+          log.error("Unable to parse bind IP for the server. Please check the configuration file.");
+          return null;
+        }
+        response.setSenderPort(this.server.config.getListenPort());
+        
+        response.setBindings(this.server.getBindings(message.getGuid()));
+        
+        log.debug("[{}] Writing {}", this.container.session, response);
+        this.container.session.write(response);
+        GNRSServer.messageLifetime.addAndGet(System.nanoTime()
+            - this.container.creationTimestamp);
+      }
+      
+      // TODO: Check if this is the server's local address
+    }
+    
+    
     return null;
   }
 

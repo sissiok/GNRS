@@ -13,8 +13,11 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -33,8 +36,12 @@ import edu.rutgers.winlab.mobilityfirst.messages.GNRSProtocolCodecFactory;
 import edu.rutgers.winlab.mobilityfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mobilityfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mobilityfirst.storage.GUIDHasher;
+import edu.rutgers.winlab.mobilityfirst.storage.GUIDStore;
 import edu.rutgers.winlab.mobilityfirst.storage.MessageDigestHasher;
 import edu.rutgers.winlab.mobilityfirst.storage.NetworkAddressMapper;
+import edu.rutgers.winlab.mobilityfirst.structures.GNRSRecord;
+import edu.rutgers.winlab.mobilityfirst.structures.GUID;
+import edu.rutgers.winlab.mobilityfirst.structures.GUIDBinding;
 import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
 
 /**
@@ -151,12 +158,22 @@ public class GNRSServer {
   /**
    * Mapping network address prefixes to AS/addresses.
    */
-  public static final NetworkAddressMapper networkAddressMap = new NetworkAddressMapper();
+  public final NetworkAddressMapper networkAddressMap = new NetworkAddressMapper();
+  
+  /**
+   * Mapping of Autonomous System numbers to their network locations.
+   */
+  public final ConcurrentHashMap<Integer, InetSocketAddress> asAddresses = new ConcurrentHashMap<Integer, InetSocketAddress>();
 
   /**
    * Hash function for converting a GUID to a set of Network Address vaules.
    */
   public final GUIDHasher guidHasher;
+  
+  /**
+   * GUID binding storage object.
+   */
+  private final GUIDStore store = new GUIDStore();
 
   /**
    * Creates a new GNRS server with the specified configuration. The server will
@@ -183,6 +200,9 @@ public class GNRSServer {
 
     // Load the network prefix announcements
     this.loadPrefixes(this.config.getPrefixFile());
+    
+    // Load the AS network address binding values
+    this.loadAsNetworkBindings(this.config.getASBindingFile());
 
     this.acceptor = new NioDatagramAcceptor();
     this.acceptor.setHandler(new MessageHandler(this));
@@ -254,12 +274,51 @@ public class GNRSServer {
       addxAsInt = addxAsInt & (0x80000000 >> prefixLength);
 
       NetworkAddress na = NetworkAddress.fromInteger(addxAsInt);
-      GNRSServer.networkAddressMap.put(na, generalComponents[1]);
+      this.networkAddressMap.put(na, generalComponents[1]);
 
       line = lineReader.readLine();
     }
     lineReader.close();
     log.info("Finished loading prefix map.");
+
+  }
+  
+  private void loadAsNetworkBindings(final String asBindingFilename) throws IOException {
+    File asBindingFile = new File(asBindingFilename);
+    BufferedReader lineReader = new BufferedReader(new FileReader(asBindingFile));
+
+    String line = lineReader.readLine();
+    while (line != null) {
+      // Eliminate leading/trailing whitespace
+      line = line.trim();
+      // Skip comments
+      if (line.length() == 0 || line.startsWith("#")) {
+        line = lineReader.readLine();
+        continue;
+      }
+
+      log.debug("Parsing \"{}\"", line);
+      // Extract any comments and discard
+      String content = line.split("#")[0];
+
+      // Extract the 3 parts (AS #, IP address, port)
+      String[] generalComponents = content.split("\\s+");
+      if (generalComponents.length < 3) {
+        log.warn("Not enough components to parse the line \"{}\".", line);
+        continue;
+      }
+      
+      Integer asNumber = Integer.valueOf(generalComponents[0]);
+      String ipAddrString = generalComponents[1];
+      int port = Integer.parseInt(generalComponents[2]);
+
+      InetSocketAddress sockAddx = new InetSocketAddress(ipAddrString, port);
+      this.asAddresses.put(asNumber,sockAddx);
+      
+      line = lineReader.readLine();
+    }
+    lineReader.close();
+    log.info("Finished loading AS network binding values.");
 
   }
 
@@ -313,6 +372,40 @@ public class GNRSServer {
     synchronized (this.messageLock) {
       this.messageLock.notifyAll();
     }
+  }
+  
+  /**
+   * Returns the set of bindings for a GUID value.
+   * @param guid the GUID value to get bindings for.
+   * @return the current binding values.
+   */
+  public GUIDBinding[] getBindings(final GUID guid){
+    Future<GNRSRecord> future = this.store.getBinding(guid);
+    GNRSRecord record = null;
+    try {
+      record = future.get();
+    } catch (InterruptedException e) {
+      log.error("Interrupted while waiting for binding.",e);
+      return null;
+    } catch (ExecutionException e) {
+      log.error("Unable to retrieve binding.",e);
+      return null;
+    }
+    
+    if(record == null){
+      log.info("No binding found for {}", guid);
+      return null;
+    }
+    
+    return record.getBindingsArray();
+  }
+  
+  public boolean insertBindings(final GUID guid, final GUIDBinding[] bindings){
+    for(GUIDBinding b : bindings){
+      // TODO: Handle the future.
+      this.store.insertBinding(guid, b);
+    }
+    return true;
   }
 
   /**

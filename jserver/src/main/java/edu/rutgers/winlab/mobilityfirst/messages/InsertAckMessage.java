@@ -47,4 +47,11 @@ public class InsertAckMessage extends AbstractMessage {
   public void setResponseCode(ResponseCode responseCode) {
     this.responseCode = responseCode;
   }
+  
+  @Override
+  public String toString(){
+    StringBuilder sb = new StringBuilder("INR #");
+    sb.append(this.getRequestId()).append("/").append(this.responseCode);
+    return sb.toString();
+  }
 }

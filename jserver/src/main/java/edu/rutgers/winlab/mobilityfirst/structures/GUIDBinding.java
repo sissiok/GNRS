@@ -90,4 +90,36 @@ public class GUIDBinding {
   public void setWeight(int weight) {
     this.weight = weight;
   }
+  
+  @Override
+  public int hashCode(){
+    return this.address.hashCode();
+  }
+  
+  @Override
+  public boolean equals(Object o){
+    if(o instanceof GUIDBinding){
+      return this.equals((GUIDBinding)o);
+    }
+    return super.equals(o);
+  }
+  
+  /**
+   * Determines equality of this GUIDBinding and another based on the values of 
+   * their NetworkAddresses.
+   * @param b the other GUIDBinding.
+   * @return {@code true} if and only if {@code this.address.equals(b.address)}
+   */
+  public boolean equals(final GUIDBinding b){
+    return this.address.equals(b.address);
+  }
+  
+  @Override
+  public String toString(){
+    StringBuilder sb = new StringBuilder();
+    sb.append("Bind (").append(this.address).append(", ").append(this.ttl).append(", ").append(this.weight).append(")");
+    return sb.toString();
+    
+  }
+  
 }

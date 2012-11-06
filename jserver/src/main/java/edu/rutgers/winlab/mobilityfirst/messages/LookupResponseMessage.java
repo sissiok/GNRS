@@ -18,7 +18,7 @@ public class LookupResponseMessage extends AbstractMessage {
    * ResponseCode for this message.
    */
   private ResponseCode responseCode;
-  
+
   /**
    * The bindings for this message.
    */
@@ -34,6 +34,7 @@ public class LookupResponseMessage extends AbstractMessage {
 
   /**
    * Gets the ResponseCode for this message.
+   * 
    * @return the ResponseCode for this message.
    */
   public ResponseCode getResponseCode() {
@@ -42,7 +43,9 @@ public class LookupResponseMessage extends AbstractMessage {
 
   /**
    * Sets the ResponseCode for this message.
-   * @param responseCode the new ResponseCode
+   * 
+   * @param responseCode
+   *          the new ResponseCode
    */
   public void setResponseCode(ResponseCode responseCode) {
     this.responseCode = responseCode;
@@ -50,6 +53,7 @@ public class LookupResponseMessage extends AbstractMessage {
 
   /**
    * Gets the bindings for this message.
+   * 
    * @return the bindings for this message, or {@code null} if there are none.
    */
   public GUIDBinding[] getBindings() {
@@ -58,9 +62,27 @@ public class LookupResponseMessage extends AbstractMessage {
 
   /**
    * Sets the bindings for this message.
-   * @param bindings the new bindings for this message.
+   * 
+   * @param bindings
+   *          the new bindings for this message.
    */
   public void setBindings(GUIDBinding[] bindings) {
     this.bindings = bindings;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder("LKR #").append(this.getRequestId())
+        .append("/").append(this.responseCode).append(" {");
+    if (this.bindings != null) {
+      for (int i = 0; i < this.bindings.length; ++i) {
+        if (i > 0) {
+          sb.append(", ");
+        }
+        sb.append(this.bindings[i]);
+      }
+    }
+    sb.append("}");
+    return sb.toString();
   }
 }

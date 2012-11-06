@@ -94,4 +94,38 @@ public class NetworkAddress {
     this.bytes = Arrays.copyOf(bytes, SIZE_OF_NETWORK_ADDRESS);
   }
 
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder(SIZE_OF_NETWORK_ADDRESS * 2 + 4);
+    sb.append("NA(");
+
+    for(byte b : this.bytes){
+      sb.append(String.format("%02x",Byte.valueOf(b)));
+    }
+    sb.append(')');
+    return sb.toString();
+  }
+  
+  @Override
+  public int hashCode(){
+    return Arrays.hashCode(this.bytes);
+  }
+  
+  @Override
+  public boolean equals(Object o){
+    if(o instanceof NetworkAddress){
+      return this.equals((NetworkAddress)o);
+    }
+    return super.equals(o);
+  }
+
+  /**
+   * Determines if this NetworkAddress equals another based on the values of their binary forms.
+   * @param na another NetworkAddress
+   * @return {@code true} if their binary forms are equal.
+   */
+  public boolean equals(final NetworkAddress na){
+    return Arrays.equals(this.bytes,na.bytes);
+  }
+
 }

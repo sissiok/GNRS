@@ -44,6 +44,18 @@ public class Configuration {
    */
   private String prefixFile = "src/main/resources/prefixes.ipv4";
 
+  // TODO: This is a short-term solution. Need something more flexible.
+  /**
+   * Filename for AS network binding values.
+   */
+  private String asBindingFile = "src/main/resources/as-binding.ipv4";
+
+  /**
+   * The number of replicas to use when inserting or retrieving bindings from
+   * the network.
+   */
+  private int numReplicas = 5;
+
   /**
    * Return the server's port for listening for UDP messages.
    * 
@@ -158,6 +170,34 @@ public class Configuration {
    */
   public void setPrefixFile(String prefixFile) {
     this.prefixFile = prefixFile;
+  }
+
+  /**
+   * Returns the name of the Autonomous System (AS) network address bindings
+   * file.
+   * 
+   * @return the filename of the AS bindings.
+   */
+  public String getASBindingFile() {
+    return this.asBindingFile;
+  }
+
+  /**
+   * Sets the AS network binding file name.
+   * 
+   * @param asBindingFile
+   *          the new filename.
+   */
+  public void setASBindingFile(String asBindingFile) {
+    this.asBindingFile = asBindingFile;
+  }
+
+  public int getNumReplicas() {
+    return numReplicas;
+  }
+
+  public void setNumReplicas(int numReplicas) {
+    this.numReplicas = numReplicas;
   }
 
 }
