@@ -33,6 +33,7 @@ public class LookupResponseEncoder implements
   @Override
   public void encode(IoSession session, LookupResponseMessage message,
       ProtocolEncoderOutput out) throws Exception {
+    
     // Common message stuff
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     DataOutputStream dos = new DataOutputStream(baos);
@@ -54,10 +55,11 @@ public class LookupResponseEncoder implements
     } else {
       dos.writeShort(0);
     }
-
+    
     dos.flush();
     out.write(IoBuffer.wrap(baos.toByteArray()));
     dos.close();
+    
   }
 
 }

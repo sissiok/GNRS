@@ -352,7 +352,7 @@ public class GNRSServer {
    *          {@link AbstractMessage}.
    */
   public void messageArrived(final IoSession session, final Object message) {
-    log.debug("[{}] Received message {}", session, message);
+//    log.debug("[{}] Received message {}", session, message);
     MessageContainer container = new MessageContainer();
     container.session = session;
     container.message = (AbstractMessage) message;
@@ -380,22 +380,9 @@ public class GNRSServer {
    * @return the current binding values.
    */
   public GUIDBinding[] getBindings(final GUID guid){
-    Future<GNRSRecord> future = this.store.getBinding(guid);
-    GNRSRecord record = null;
-    try {
-      record = future.get();
-    } catch (InterruptedException e) {
-      log.error("Interrupted while waiting for binding.",e);
-      return null;
-    } catch (ExecutionException e) {
-      log.error("Unable to retrieve binding.",e);
-      return null;
-    }
     
-    if(record == null){
-      log.info("No binding found for {}", guid);
-      return null;
-    }
+    GNRSRecord record = this.store.getBinding(guid);
+    
     
     return record.getBindingsArray();
   }

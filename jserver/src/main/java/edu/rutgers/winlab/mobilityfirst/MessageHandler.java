@@ -50,7 +50,7 @@ public class MessageHandler extends IoHandlerAdapter {
   @Override
   public void messageReceived(IoSession session, Object message)
       throws Exception {
-    log.debug("[{}] Received message: {}", session, message);
+//    log.debug("[{}] Received message: {}", session, message);
     this.server.messageArrived(session, message);
   }
 

@@ -9,11 +9,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.future.IoFutureListener;
+import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
@@ -219,7 +221,8 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
         message.setSenderPort(fromPort);
 
         log.debug("Writing {} to {}", message, session);
-        session.write(message);
+        WriteFuture future = session.write(message);
+        future.awaitUninterruptibly(this.delay*1000, TimeUnit.MICROSECONDS);
         if (this.delay > 0) {
           LockSupport.parkNanos(this.delay * 1000);
         }

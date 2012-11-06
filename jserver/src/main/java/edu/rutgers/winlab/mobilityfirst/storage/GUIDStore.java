@@ -35,41 +35,12 @@ public class GUIDStore {
    *          the GUID value.
    * @return any current binding this server has.
    */
-  public Future<GNRSRecord> getBinding(final GUID guid) {
+  public GNRSRecord getBinding(final GUID guid) {
 
     // TODO: Contact remote servers
     // TODO: Expiration based on TTL
 
-    return new Future<GNRSRecord>() {
-
-      @Override
-      public boolean cancel(boolean mayInterruptIfRunning) {
-        // TODO Auto-generated method stub
-        return false;
-      }
-
-      @Override
-      public GNRSRecord get() throws InterruptedException, ExecutionException {
-        return GUIDStore.this.memoryMap.get(guid);
-      }
-
-      @Override
-      public GNRSRecord get(long timeout, TimeUnit unit)
-          throws InterruptedException, ExecutionException, TimeoutException {
-        return GUIDStore.this.memoryMap.get(guid);
-      }
-
-      @Override
-      public boolean isCancelled() {
-        // TODO Auto-generated method stub
-        return false;
-      }
-
-      @Override
-      public boolean isDone() {
-        return true;
-      }
-    };
+    return this.memoryMap.get(guid);
   }
 
   /**
