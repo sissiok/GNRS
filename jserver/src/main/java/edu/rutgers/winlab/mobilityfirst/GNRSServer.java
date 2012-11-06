@@ -174,6 +174,11 @@ public class GNRSServer {
    * GUID binding storage object.
    */
   private final GUIDStore store = new GUIDStore();
+  
+  /**
+   * The IP address and port that identifies this server.
+   */
+  public final InetSocketAddress localAddress;
 
   /**
    * Creates a new GNRS server with the specified configuration. The server will
@@ -188,6 +193,8 @@ public class GNRSServer {
     super();
     this.config = config;
     this.collectStatistics = this.config.isCollectStatistics();
+    
+    this.localAddress = new InetSocketAddress(this.config.getBindIp(), this.config.getListenPort());
 
     if (this.collectStatistics) {
       this.statsTimer = new Timer();
@@ -217,7 +224,7 @@ public class GNRSServer {
       numThreads = 1;
     }
 
-    log.debug("Using threadpool of {} threads.", Integer.valueOf(numThreads));
+    log.info("Using threadpool of {} threads.", Integer.valueOf(numThreads));
     this.workers = Executors.newFixedThreadPool(numThreads);
 
     DatagramSessionConfig sessionConfig = this.acceptor.getSessionConfig();
@@ -382,7 +389,9 @@ public class GNRSServer {
   public GUIDBinding[] getBindings(final GUID guid){
     
     GNRSRecord record = this.store.getBinding(guid);
-    
+    if(record == null){
+      return null;
+    }
     
     return record.getBindingsArray();
   }
