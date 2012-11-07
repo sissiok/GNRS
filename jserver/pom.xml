@@ -70,7 +70,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>edu.rutgers.winlab.mobilityfirst.GNRSServer</mainClass>
+							<mainClass>edu.rutgers.winlab.mfirst.GNRSServer</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

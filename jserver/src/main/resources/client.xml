@@ -1,4 +1,4 @@
-<edu.rutgers.winlab.mobilityfirst.client.Configuration>
+<edu.rutgers.winlab.mfirst.client.Configuration>
   <!-- The hostname or IP address of the GNRS server -->
   <serverHost>localhost</serverHost>
   <!-- The UDP port on which the server is listening for messages -->
@@ -8,4 +8,4 @@
   <!-- The hostname the client will send to the server. Also used for binding
        sockets when necessary. -->
   <clientHost>localhost</clientHost>
-</edu.rutgers.winlab.mobilityfirst.client.Configuration>
+</edu.rutgers.winlab.mfirst.client.Configuration>
