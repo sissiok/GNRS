@@ -27,13 +27,13 @@ public class GNRSProtocolCodecFactory extends DemuxingProtocolCodecFactory {
 
       super.addMessageEncoder(LookupResponseMessage.class,
           LookupResponseEncoder.class);
-      super.addMessageEncoder(InsertAckMessage.class, InsertAckEncoder.class);
+      super.addMessageEncoder(InsertResponseMessage.class, InsertResponseEncoder.class);
     } else {
       super.addMessageEncoder(InsertMessage.class, InsertEncoder.class);
       super.addMessageEncoder(LookupMessage.class, LookupEncoder.class);
 
       super.addMessageDecoder(LookupResponseDecoder.class);
-      super.addMessageDecoder(InsertAckDecoder.class);
+      super.addMessageDecoder(InsertResponseDecoder.class);
     }
   }
 }

@@ -5,25 +5,24 @@
  */
 package edu.rutgers.winlab.mobilityfirst.messages;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 import org.apache.mina.filter.codec.demux.MessageEncoder;
 
-import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
-
 /**
  * @author Robert Moore
  * 
  */
-public class LookupResponseEncoder implements
-    MessageEncoder<LookupResponseMessage> {
+public class InsertResponseEncoder implements MessageEncoder<InsertResponseMessage> {
 
-  
+ 
   @Override
-  public void encode(IoSession session, LookupResponseMessage message,
+  public void encode(IoSession session, InsertResponseMessage message,
       ProtocolEncoderOutput out) throws Exception {
-    
     // Common Response stuff
     IoBuffer buffer = IoBuffer.allocate(message.getMessageLength());
     buffer.put(message.getVersion());
@@ -40,19 +39,8 @@ public class LookupResponseEncoder implements
     // Padding
     buffer.putUnsignedShort(0);
     
-    // Lookup response-specific
-    buffer.putUnsignedInt(message.getNumBindings());
-    if(message.getNumBindings() > 0){
-      for(NetworkAddress addx : message.getBindings()){
-        buffer.putUnsignedShort(addx.getType().value());
-        buffer.putUnsignedShort(addx.getLength());
-        buffer.put(addx.getValue());
-      }
-    }
-    
     buffer.flip();
     out.write(buffer);
-    
   }
 
 }

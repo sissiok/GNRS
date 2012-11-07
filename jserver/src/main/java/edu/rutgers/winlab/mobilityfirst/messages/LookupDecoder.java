@@ -11,6 +11,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.apache.mina.filter.codec.demux.MessageDecoder;
 import org.apache.mina.filter.codec.demux.MessageDecoderResult;
 
+import edu.rutgers.winlab.mobilityfirst.structures.AddressType;
 import edu.rutgers.winlab.mobilityfirst.structures.GUID;
 import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
 
@@ -20,24 +21,19 @@ import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
  */
 public class LookupDecoder implements MessageDecoder {
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.mina.filter.codec.demux.MessageDecoder#decodable(org.apache.
-   * mina.core.session.IoSession, org.apache.mina.core.buffer.IoBuffer)
-   */
+  
   @Override
   public MessageDecoderResult decodable(IoSession session, IoBuffer buffer) {
     // Store the current cursor position in the buffer
     buffer.mark();
     // Need 5 bytes to check request ID and type
-    if (buffer.remaining() < 5) {
+    if (buffer.remaining() < 2) {
       return MessageDecoderResult.NEED_DATA;
     }
 
-    // Skip the request ID
-    buffer.getInt();
+    // Skip the version
+    // TODO: What to do with version?
+    buffer.get();
     byte type = buffer.get();
     // Reset the cursor so we don't modify the buffer data.
     buffer.reset();
@@ -47,50 +43,38 @@ public class LookupDecoder implements MessageDecoder {
     return MessageDecoderResult.NOT_OK;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.mina.filter.codec.demux.MessageDecoder#decode(org.apache.mina
-   * .core.session.IoSession, org.apache.mina.core.buffer.IoBuffer,
-   * org.apache.mina.filter.codec.ProtocolDecoderOutput)
-   */
   @Override
   public MessageDecoderResult decode(IoSession session, IoBuffer buffer,
       ProtocolDecoderOutput out) throws Exception {
     /*
      * Common message header stuff
      */
-    long requestId = buffer.getUnsignedInt();
+    byte version = buffer.get();
     byte type = buffer.get();
-    if (type != MessageType.LOOKUP.value()) {
-      return MessageDecoderResult.NOT_OK;
-    }
+    int messageLength = buffer.getUnsignedShort();
+    long requestId = buffer.getUnsignedInt();
+
+    // Origin address
+    AddressType addrType = AddressType.valueOf(buffer.getUnsignedShort());
+
+    int originAddrLength = buffer.getUnsignedShort();
+    byte[] originAddr = new byte[originAddrLength];
+    buffer.get(originAddr);
+    NetworkAddress originAddress = new NetworkAddress(addrType, originAddr);
 
     LookupMessage msg = new LookupMessage();
-
-    byte[] senderAddressBytes = new byte[NetworkAddress.SIZE_OF_NETWORK_ADDRESS];
-    buffer.get(senderAddressBytes);
-    NetworkAddress senderAddress = new NetworkAddress();
-    senderAddress.setValue(senderAddressBytes);
-
-    long senderPort = buffer.getUnsignedInt();
-
-    /*
-     * LookupMessage-specific stuff now
-     */
+    msg.setVersion(version);
+    msg.setRequestId(requestId);
+    msg.setOriginAddress(originAddress);
+    
+    // Lookup-specific stuff
     byte[] guidBytes = new byte[GUID.SIZE_OF_GUID];
     buffer.get(guidBytes);
-    GUID guid = new GUID();
-    guid.setBinaryForm(guidBytes);
-
-    byte destinationFlag = buffer.get();
-
-    msg.setRequestId(requestId);
-    msg.setOriginAddress(senderAddress);
-    msg.setSenderPort(senderPort);
-    msg.setGuid(guid);
-    msg.setDestinationFlag(destinationFlag);
+    GUID queryGUID = new GUID();
+    queryGUID.setBinaryForm(guidBytes);
+    long options = buffer.getUnsignedInt();
+    msg.setGuid(queryGUID);
+    msg.setOptions(options);
 
     // Send the decoded message to the next filter
     out.write(msg);
@@ -100,14 +84,6 @@ public class LookupDecoder implements MessageDecoder {
 
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.mina.filter.codec.demux.MessageDecoder#finishDecode(org.apache
-   * .mina.core.session.IoSession,
-   * org.apache.mina.filter.codec.ProtocolDecoderOutput)
-   */
   @Override
   public void finishDecode(IoSession arg0, ProtocolDecoderOutput arg1)
       throws Exception {

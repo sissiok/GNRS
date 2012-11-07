@@ -100,4 +100,19 @@ public abstract class AbstractMessage {
   public void setOriginAddress(NetworkAddress address) {
     this.originAddress = address;
   }
+  
+  public int getMessageLength(){
+    // Version, type, length, request id, requestor address
+    return 8 + 4 + this.originAddress.getLength() + this.getPayloadLength();
+  }
+  
+  protected abstract int getPayloadLength();
+
+  public byte getVersion() {
+    return this.version;
+  }
+
+  public void setVersion(byte version) {
+    this.version = version;
+  }
 }

@@ -11,8 +11,8 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.apache.mina.filter.codec.demux.MessageDecoder;
 import org.apache.mina.filter.codec.demux.MessageDecoderResult;
 
+import edu.rutgers.winlab.mobilityfirst.structures.AddressType;
 import edu.rutgers.winlab.mobilityfirst.structures.GUID;
-import edu.rutgers.winlab.mobilityfirst.structures.GUIDBinding;
 import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
 
 /**
@@ -21,25 +21,19 @@ import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
  */
 public class InsertDecoder implements MessageDecoder {
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.mina.filter.codec.demux.MessageDecoder#decodable(org.apache.
-   * mina.core.session.IoSession, org.apache.mina.core.buffer.IoBuffer)
-   */
   @Override
   public MessageDecoderResult decodable(IoSession session, IoBuffer buffer) {
     // Store the current cursor position in the buffer
     buffer.mark();
-    // Need 5 bytes to check request ID and type
-    if (buffer.remaining() < 5) {
+    // Need 2 bytes to check version and type
+    if (buffer.remaining() < 2) {
       buffer.reset();
       return MessageDecoderResult.NEED_DATA;
     }
 
-    // Skip the request ID
-    buffer.getInt();
+    // Skip the version number
+    // TODO: What to do with the version?
+    buffer.get();
     byte type = buffer.get();
     // Reset the cursor so we don't modify the buffer data.
     buffer.reset();
@@ -64,61 +58,48 @@ public class InsertDecoder implements MessageDecoder {
     /*
      * Common message header stuff
      */
-    long requestId = buffer.getUnsignedInt();
+    byte version = buffer.get();
     byte type = buffer.get();
-    if (type != MessageType.INSERT.value()) {
-      return MessageDecoderResult.NOT_OK;
-    }
+    int messageLength = buffer.getUnsignedShort();
+    long requestId = buffer.getUnsignedInt();
+
+    // Origin address
+    AddressType addrType = AddressType.valueOf(buffer.getUnsignedShort());
+
+    int originAddrLength = buffer.getUnsignedShort();
+    byte[] originAddr = new byte[originAddrLength];
+    buffer.get(originAddr);
+    NetworkAddress originAddress = new NetworkAddress(addrType, originAddr);
 
     InsertMessage msg = new InsertMessage();
+    msg.setVersion(version);
+    msg.setRequestId(requestId);
+    msg.setOriginAddress(originAddress);
 
-    byte[] senderAddressBytes = new byte[NetworkAddress.SIZE_OF_NETWORK_ADDRESS];
-    buffer.get(senderAddressBytes);
-    NetworkAddress senderAddress = new NetworkAddress();
-    senderAddress.setValue(senderAddressBytes);
-
-    long senderPort = buffer.getUnsignedInt();
-
-    /*
-     * InsertMessage-specific stuff
-     */
+    // Insert-specific stuff
+    GUID guid = new GUID();
     byte[] guidBytes = new byte[GUID.SIZE_OF_GUID];
     buffer.get(guidBytes);
-    GUID guid = new GUID();
     guid.setBinaryForm(guidBytes);
-
-    byte destinationFlag = buffer.get();
-
-    int numBindings = buffer.getUnsignedShort();
-
-    if (numBindings > 0) {
-
-      GUIDBinding[] bindings = new GUIDBinding[numBindings];
-      for (int i = 0; i < numBindings; ++i) {
-        bindings[i] = new GUIDBinding();
-
-        byte[] addressBytes = new byte[NetworkAddress.SIZE_OF_NETWORK_ADDRESS];
-        buffer.get(addressBytes);
-        NetworkAddress address = new NetworkAddress();
-        address.setValue(addressBytes);
-
-        long ttl = buffer.getUnsignedInt();
-
-        int weight = buffer.getUnsignedShort();
-
-        bindings[i].setAddress(address);
-        bindings[i].setTtl(ttl);
-        bindings[i].setWeight(weight);
-      }
-      msg.setBindings(bindings);
-    }
-
-    msg.setRequestId(requestId);
-    msg.setOriginAddress(senderAddress);
-    msg.setSenderPort(senderPort);
-
     msg.setGuid(guid);
-    msg.setDestinationFlag(destinationFlag);
+
+    long options = buffer.getUnsignedInt();
+    msg.setOptions(options);
+
+    long numBindings = buffer.getUnsignedInt();
+    NetworkAddress[] bindings = new NetworkAddress[(int)numBindings];
+
+    for (int i = 0; i < numBindings; ++i) {
+      int addxType = buffer.getUnsignedShort();
+      int addxLength = buffer.getUnsignedShort();
+      byte[] addxBytes = new byte[addxLength];
+      buffer.get(addxBytes);
+
+      NetworkAddress na = new NetworkAddress(AddressType.valueOf(addxType),
+          addxBytes);
+      bindings[i] = na;
+    }
+    msg.setBindings(bindings);
 
     // Send the decoded message to the next filter
     out.write(msg);
@@ -127,14 +108,7 @@ public class InsertDecoder implements MessageDecoder {
     return MessageDecoderResult.OK;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.mina.filter.codec.demux.MessageDecoder#finishDecode(org.apache
-   * .mina.core.session.IoSession,
-   * org.apache.mina.filter.codec.ProtocolDecoderOutput)
-   */
+  
   @Override
   public void finishDecode(IoSession arg0, ProtocolDecoderOutput arg1)
       throws Exception {

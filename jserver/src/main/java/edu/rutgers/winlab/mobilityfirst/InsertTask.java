@@ -11,7 +11,7 @@ import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.rutgers.winlab.mobilityfirst.messages.InsertAckMessage;
+import edu.rutgers.winlab.mobilityfirst.messages.InsertResponseMessage;
 import edu.rutgers.winlab.mobilityfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mobilityfirst.messages.ResponseCode;
 import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
@@ -62,19 +62,19 @@ public class InsertTask implements Callable<Object> {
     boolean success = this.server.insertBindings(msg.getGuid(),
         msg.getBindings());
 
-    InsertAckMessage response = new InsertAckMessage();
+    InsertResponseMessage response = new InsertResponseMessage();
     response.setRequestId(msg.getRequestId());
     response.setResponseCode(success ? ResponseCode.SUCCESS
-        : ResponseCode.ERROR);
+        : ResponseCode.FAILED);
 
     try {
       response.setOriginAddress(NetworkAddress.ipv4FromASCII(this.server.config
-          .getBindIp()));
+          .getBindIp() +":" + this.server.config.getListenPort()));
     } catch (UnsupportedEncodingException e) {
       log.error("Unable to parse bind IP for the server. Please check the configuration file.");
       return null;
     }
-    response.setSenderPort(this.server.config.getListenPort() & 0xFFFFFFFFl);
+
 
     this.container.session.write(response);
 

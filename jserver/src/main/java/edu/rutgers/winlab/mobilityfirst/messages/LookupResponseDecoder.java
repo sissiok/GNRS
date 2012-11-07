@@ -11,6 +11,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.apache.mina.filter.codec.demux.MessageDecoder;
 import org.apache.mina.filter.codec.demux.MessageDecoderResult;
 
+import edu.rutgers.winlab.mobilityfirst.structures.AddressType;
 import edu.rutgers.winlab.mobilityfirst.structures.GUIDBinding;
 import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
 
@@ -20,18 +21,11 @@ import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
  */
 public class LookupResponseDecoder implements MessageDecoder {
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.mina.filter.codec.demux.MessageDecoder#decodable(org.apache.
-   * mina.core.session.IoSession, org.apache.mina.core.buffer.IoBuffer)
-   */
   @Override
   public MessageDecoderResult decodable(IoSession session, IoBuffer buffer) {
     // Store the current cursor position in the buffer
     buffer.mark();
-    // Need 5 bytes to check request ID and type
+    // Need 2 bytes to check version and type
     if (buffer.remaining() < 2) {
       return MessageDecoderResult.NEED_DATA;
     }
@@ -48,63 +42,58 @@ public class LookupResponseDecoder implements MessageDecoder {
     return MessageDecoderResult.NOT_OK;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.mina.filter.codec.demux.MessageDecoder#decode(org.apache.mina
-   * .core.session.IoSession, org.apache.mina.core.buffer.IoBuffer,
-   * org.apache.mina.filter.codec.ProtocolDecoderOutput)
-   */
   @Override
   public MessageDecoderResult decode(IoSession session, IoBuffer buffer,
       ProtocolDecoderOutput out) throws Exception {
     /*
      * Common message header stuff
      */
-    long requestId = buffer.getUnsignedInt();
+    // TODO: What to do with version?
+    byte version = buffer.get();
     byte type = buffer.get();
+
     if (type != MessageType.LOOKUP_RESPONSE.value()) {
       return MessageDecoderResult.NOT_OK;
     }
+    int msgLength = buffer.getUnsignedShort();
+    long requestId = buffer.getUnsignedInt();
 
-    LookupResponseMessage msg = new LookupResponseMessage();
+    // Origin Address
+    AddressType addrType = AddressType.valueOf(buffer.getUnsignedShort());
 
-    byte[] senderAddressBytes = new byte[NetworkAddress.SIZE_OF_NETWORK_ADDRESS];
-    buffer.get(senderAddressBytes);
-    NetworkAddress senderAddress = new NetworkAddress();
-    senderAddress.setValue(senderAddressBytes);
+    int originAddrLength = buffer.getUnsignedShort();
+    byte[] originAddr = new byte[originAddrLength];
+    buffer.get(originAddr);
+    NetworkAddress originAddress = new NetworkAddress(addrType, originAddr);
 
-    long senderPort = buffer.getUnsignedInt();
-
-    // LookupResponseMessage-specific stuff
-    byte responseCode = buffer.get();
-    int numBindings = buffer.getUnsignedShort();
-
-    if (numBindings > 0) {
-      GUIDBinding[] bindings = new GUIDBinding[numBindings];
-      for (int i = 0; i < numBindings; ++i) {
-        bindings[i] = new GUIDBinding();
-
-        byte[] addressBytes = new byte[NetworkAddress.SIZE_OF_NETWORK_ADDRESS];
-        buffer.get(addressBytes);
-        NetworkAddress address = new NetworkAddress();
-        address.setValue(addressBytes);
-
-        long ttl = buffer.getUnsignedInt();
-        int weight = buffer.getUnsignedShort();
-
-        bindings[i].setAddress(address);
-        bindings[i].setTtl(ttl);
-        bindings[i].setWeight(weight);
-      }
-      msg.setBindings(bindings);
-    }
-    msg.setRequestId(requestId);
-    msg.setOriginAddress(senderAddress);
-    msg.setSenderPort(senderPort);
-    msg.setResponseCode(ResponseCode.valueOf(responseCode));
+    // Response code
+    ResponseCode responseCode = ResponseCode.valueOf(buffer.getUnsignedShort());
+    // Padding
+    buffer.getShort();
     
+    LookupResponseMessage msg = new LookupResponseMessage();
+    msg.setOriginAddress(originAddress);
+    msg.setRequestId(requestId);
+    msg.setResponseCode(responseCode);
+    
+    
+    // Lookup response-specific
+
+    // Lookup response-specific stuff
+    long numBindings = buffer.getUnsignedInt();
+    NetworkAddress[] bindings = new NetworkAddress[(int) numBindings];
+
+    for (int i = 0; i < numBindings; ++i) {
+      int addxType = buffer.getUnsignedShort();
+      int addxLength = buffer.getUnsignedShort();
+      byte[] addxBytes = new byte[addxLength];
+      buffer.get(addxBytes);
+
+      NetworkAddress na = new NetworkAddress(AddressType.valueOf(addxType),
+          addxBytes);
+      bindings[i] = na;
+    }
+    msg.setBindings(bindings);
 
     // Write decoded message to next filter.
     out.write(msg);

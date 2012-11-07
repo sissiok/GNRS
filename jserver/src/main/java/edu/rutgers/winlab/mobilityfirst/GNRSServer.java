@@ -226,7 +226,6 @@ public class GNRSServer {
     // For encoding/decoding our messages
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
         new GNRSProtocolCodecFactory(true)));
-    chain.addLast("workers", new ExecutorFilter(2));
 
     // Configure extra threads to handle message processing
     int numThreads = this.config.getNumWorkerThreads();
@@ -269,7 +268,7 @@ public class GNRSServer {
         continue;
       }
 
-      log.debug("Parsing \"{}\"", line);
+//      log.debug("Parsing \"{}\"", line);
       // Extract any comments and discard
       String content = line.split("#")[0];
 
@@ -316,7 +315,7 @@ public class GNRSServer {
         continue;
       }
 
-      log.debug("Parsing \"{}\"", line);
+//      log.debug("Parsing \"{}\"", line);
       // Extract any comments and discard
       String content = line.split("#")[0];
 
@@ -400,19 +399,23 @@ public class GNRSServer {
    *          the GUID value to get bindings for.
    * @return the current binding values.
    */
-  public GUIDBinding[] getBindings(final GUID guid) {
+  public NetworkAddress[] getBindings(final GUID guid) {
 
     GNRSRecord record = this.store.getBinding(guid);
     if (record == null) {
       return null;
     }
 
-    return record.getBindingsArray();
+    return record.getBindings();
   }
 
-  public boolean insertBindings(final GUID guid, final GUIDBinding[] bindings) {
-    for (GUIDBinding b : bindings) {
+  public boolean insertBindings(final GUID guid, final NetworkAddress[] bindings) {
+    for (NetworkAddress a : bindings) {
       // TODO: Handle the future.
+      GUIDBinding b = new GUIDBinding();
+      b.setAddress(a);
+      b.setTtl(0);
+      b.setWeight(0);
       this.store.insertBinding(guid, b);
     }
     return true;

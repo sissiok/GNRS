@@ -34,15 +34,23 @@ public class NetworkAddress {
    */
   private AddressType type;
 
-  /**
-   * The length of the address (in bytes).
-   */
-  private short length;
+  
 
   /**
    * Raw (binary) form of this network address. Depends on the type of address.
    */
   private byte[] value;
+  
+  public NetworkAddress(){
+    super();
+  }
+  
+  public NetworkAddress(final AddressType type, final byte[] value){
+    super();
+    this.setType(type);
+    this.setValue(value);
+    
+  }
 
   /**
    * Converts the specified ASCII-encoded String to a Network Address value.
@@ -78,12 +86,12 @@ public class NetworkAddress {
     }
 
     NetworkAddress address = new NetworkAddress();
-    address.value = new byte[AddressType.INET_4_UDP.getMaxLength()];
-    System.arraycopy(inet.getAddress(), 0, address.value, 0, 4);
-    address.value[address.value.length - 2] = (byte) (port >> 8);
-    address.value[address.value.length - 1] = (byte) port;
-    address.type = AddressType.INET_4_UDP;
-    address.length = (short) address.value.length;
+    byte[] newValue= new byte[AddressType.INET_4_UDP.getMaxLength()];
+    System.arraycopy(inet.getAddress(), 0, newValue, 0, 4);
+    newValue[newValue.length - 2] = (byte) (port >> 8);
+    newValue[newValue.length - 1] = (byte) port;
+    address.setType(AddressType.INET_4_UDP);
+    address.setValue(newValue);
     return address;
   }
 
@@ -98,14 +106,14 @@ public class NetworkAddress {
    */
   public static NetworkAddress ipv4FromInteger(final int i) {
     NetworkAddress address = new NetworkAddress();
-    address.value = new byte[AddressType.INET_4_UDP.getMaxLength()];
-    address.value[0] = (byte) (i >> 24);
-    address.value[1] = (byte) (i >> 16);
-    address.value[2] = (byte) (i >> 8);
-    address.value[3] = (byte) (i);
-    address.length = (short)address.value.length;
-    address.type = AddressType.INET_4_UDP;
-
+    byte[] newValue = new byte[AddressType.INET_4_UDP.getMaxLength()];
+    newValue[0] = (byte) (i >> 24);
+    newValue[1] = (byte) (i >> 16);
+    newValue[2] = (byte) (i >> 8);
+    newValue[3] = (byte) (i);
+    address.setType(AddressType.INET_4_UDP);
+    address.setValue(newValue);
+    
     return address;
   }
 
@@ -125,13 +133,15 @@ public class NetworkAddress {
    *          the new value of this network address.
    */
   public void setValue(byte[] bytes) {
+    if(bytes != null && bytes.length > 0xFFFF){
+      throw new IllegalArgumentException("NetworkAddress value exceeds maximum length of 65535 bytes.");
+    }
     this.value = bytes;
-    this.length = (short) (this.value == null ? 0 : this.value.length);
   }
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(this.length * 2 + 4);
+    StringBuilder sb = new StringBuilder(this.getLength() * 2 + 4);
     sb.append("NA(");
 
     for (byte b : this.value) {
@@ -190,8 +200,8 @@ public class NetworkAddress {
    * 
    * @return the length of this address in bytes.
    */
-  public short getLength() {
-    return this.length;
+  public int getLength() {
+    return this.value == null ? 0 : this.value.length;
   }
 
 }

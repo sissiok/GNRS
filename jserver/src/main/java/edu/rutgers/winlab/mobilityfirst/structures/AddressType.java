@@ -10,25 +10,23 @@ package edu.rutgers.winlab.mobilityfirst.structures;
  * 
  */
 public enum AddressType {
-  UNKNOWN((short) 0, (short) 0),
+  INET_4_UDP(0,  6);
 
-  INET_4_UDP((short) 1, (short) 6);
+  private String[] STRINGS = { "IPv4"};
 
-  private String[] STRINGS = { "UNKNOWN", "IPv4"};
+  private int type;
+  private int maxLength;
 
-  private short type;
-  private short maxLength;
-
-  private AddressType(final short type, final short maxLength) {
+  private AddressType(final int type, final int maxLength) {
     this.type = type;
     this.maxLength = maxLength;
   }
 
-  public static AddressType valueOf(final short s) {
+  public static AddressType valueOf(final int s) {
     if (s == INET_4_UDP.type) {
       return INET_4_UDP;
     } 
-    return UNKNOWN;
+    return null;
   }
 
   @Override
@@ -41,7 +39,7 @@ public enum AddressType {
    * 
    * @return the short value of this type.
    */
-  public short getType() {
+  public int value() {
     return this.type;
   }
 
@@ -50,7 +48,7 @@ public enum AddressType {
    * 
    * @return the maximum length of this address type.
    */
-  public short getMaxLength() {
+  public int getMaxLength() {
     return this.maxLength;
   }
 }

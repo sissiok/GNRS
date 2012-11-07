@@ -5,7 +5,6 @@
  */
 package edu.rutgers.winlab.mobilityfirst.messages;
 
-
 /**
  * @author Robert Moore
  * 
@@ -23,18 +22,29 @@ public enum MessageType {
    * @see LookupMessage
    */
   LOOKUP((byte) 1),
+
+  /**
+   * An Update message.
+   */
+  UPDATE((byte) 2),
+
   /**
    * An InsertAck message.
    * 
    * @see InsertAckMessage
    */
-  INSERT_ACK((byte) 2),
+  INSERT_RESPONSE((byte) 0x80),
   /**
    * A LookupResponse message.
    * 
    * @see LookupResponseMessage
    */
-  LOOKUP_RESPONSE((byte) 3),
+  LOOKUP_RESPONSE((byte) 0x81),
+
+  /**
+   * An Update Response message.
+   */
+  UPDATE_RESPONSE((byte) 0x82),
 
   /**
    * An unknown message type value.
@@ -70,27 +80,30 @@ public enum MessageType {
    * 
    * Valid type values are:
    * <ul>
-   *   <li>"I" for insert</li>
-   *   <li>"Q" for query</li>
-   *   <li>"A" for insert ack</li>
-   *   <li>"R" for query response</li>
+   * <li>"I" for insert</li>
+   * <li>"Q" for query</li>
+   * <li>"A" for insert ack</li>
+   * <li>"R" for query response</li>
    * </ul>
-   * @param asString the string to parse
-   * @return a MessageType based on the String, or UNKNOWN if none are appropriate.
+   * 
+   * @param asString
+   *          the string to parse
+   * @return a MessageType based on the String, or UNKNOWN if none are
+   *         appropriate.
    */
-  public static MessageType parseType(final String asString){
-    if(asString == null){
+  public static MessageType parseType(final String asString) {
+    if (asString == null) {
       return UNKNOWN;
     }
-    if("I".equalsIgnoreCase(asString)){
+    if ("I".equalsIgnoreCase(asString)) {
       return INSERT;
-    }else if("Q".equalsIgnoreCase(asString)){
+    } else if ("Q".equalsIgnoreCase(asString)) {
       return LOOKUP;
-    }else if("A".equalsIgnoreCase(asString)){
-      return INSERT_ACK;
-    }else if("R".equalsIgnoreCase(asString)){
+    } else if ("A".equalsIgnoreCase(asString)) {
+      return INSERT_RESPONSE;
+    } else if ("R".equalsIgnoreCase(asString)) {
       return LOOKUP_RESPONSE;
-    }else {
+    } else {
       return UNKNOWN;
     }
   }

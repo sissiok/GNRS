@@ -113,12 +113,12 @@ public class LookupTask implements Callable<Object> {
 
     try {
       response.setOriginAddress(NetworkAddress.ipv4FromASCII(this.server.config
-          .getBindIp()));
+          .getBindIp() + ":" + this.server.config.getListenPort()));
     } catch (UnsupportedEncodingException e) {
       log.error("Unable to parse bind IP for the server. Please check the configuration file.");
       return null;
     }
-    response.setSenderPort(this.server.config.getListenPort());
+    
 
     // At least one IP prefix binding was for the local server
     if (resolvedLocally) {
@@ -128,7 +128,7 @@ public class LookupTask implements Callable<Object> {
       response.setResponseCode(ResponseCode.SUCCESS);
 
     } else {
-      response.setResponseCode(ResponseCode.ERROR);
+      response.setResponseCode(ResponseCode.FAILED);
     }
     long t40 = System.nanoTime();
     // log.debug("[{}] Writing {}", this.container.session, response);

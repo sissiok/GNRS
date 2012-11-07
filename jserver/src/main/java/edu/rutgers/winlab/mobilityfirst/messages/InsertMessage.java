@@ -7,6 +7,7 @@ package edu.rutgers.winlab.mobilityfirst.messages;
 
 import edu.rutgers.winlab.mobilityfirst.structures.GUID;
 import edu.rutgers.winlab.mobilityfirst.structures.GUIDBinding;
+import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
 
 /**
  * A message for inserting a GUID->NetworkAddress binding into the GNRS server.
@@ -21,15 +22,14 @@ public class InsertMessage extends AbstractMessage {
   private GUID guid;
 
   /**
-   * Indicates whether or not the final destination of this insert message has
-   * been computed. If the value is 1, then the destination is computed; 0 means
-   * it has not yet been computed.
-   */
-  private byte destinationFlag;
-  /**
    * The set of GUID&rarr;NetworkAddress bindings for this Insert message.
    */
-  private GUIDBinding[] bindings;
+  private NetworkAddress[] bindings;
+
+  /**
+   * Set of message options.
+   */
+  private long options;
 
   /**
    * Creates a new Insert message.
@@ -59,36 +59,20 @@ public class InsertMessage extends AbstractMessage {
   }
 
   /**
-   * Gets the destination flag for this message. A flag value of 0 denotes that
-   * the destination of the GUID binding has not yet been computed; a value of 1
-   * indicates that it has. Note that the wire protocol specifies an 8-bit
-   * unsigned integer, but Java does not support unsigned types.
-   * 
-   * @return the destination flag for this message.
-   */
-  public byte getDestinationFlag() {
-    return this.destinationFlag;
-  }
-
-  /**
-   * Sets the destination flag value for this message. Note that the wire
-   * protocol specifies an 8-bit unsigned integer, but Java does not support
-   * unsigned types.
-   * 
-   * @param destinationFlag
-   *          the new destination flag value for this message.
-   */
-  public void setDestinationFlag(byte destinationFlag) {
-    this.destinationFlag = destinationFlag;
-  }
-
-  /**
    * Gets the set of GUID&rarr;Network Address bindings for this message.
    * 
    * @return the Network Address bindings for this message.
    */
-  public GUIDBinding[] getBindings() {
+  public NetworkAddress[] getBindings() {
     return this.bindings;
+  }
+  
+  /**
+   * Returns the number of bindings in this message.
+   * @return the number of bindings.
+   */
+  public long getNumBindings(){
+    return this.bindings == null ? 0 : this.bindings.length;
   }
 
   /**
@@ -97,14 +81,15 @@ public class InsertMessage extends AbstractMessage {
    * @param bindings
    *          the new Network Address bindings for this message.
    */
-  public void setBindings(GUIDBinding[] bindings) {
+  public void setBindings(NetworkAddress[] bindings) {
     this.bindings = bindings;
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder("INS #");
-    sb.append(this.getRequestId()).append(' ').append(this.guid).append(" -> {");
+    sb.append(this.getRequestId()).append(' ').append(this.guid)
+        .append(" -> {");
     if (this.bindings != null) {
       for (int i = 0; i < this.bindings.length; ++i) {
         if (i > 0) {
@@ -116,4 +101,47 @@ public class InsertMessage extends AbstractMessage {
     sb.append("}");
     return sb.toString();
   }
+
+  @Override
+  protected int getPayloadLength() {
+    // GUID, Options, num bindings, bindings
+    return this.guid.getBinaryForm().length + 8 + this.getBindingsLength();
+  }
+
+  /**
+   * The length (in bytes) of the bindings contained in this message. Only to be
+   * used for network encoding.
+   * 
+   * @return the length (in bytes) of the bindings when encoded for the network
+   *         protocol.
+   */
+  protected int getBindingsLength() {
+    int length = 0;
+    if (this.bindings != null) {
+      for (NetworkAddress addr : this.bindings) {
+        length += (4 + addr.getLength());
+      }
+    }
+    return length;
+  }
+
+  /**
+   * Gets the message options.
+   * 
+   * @return the message options value.
+   */
+  public long getOptions() {
+    return options;
+  }
+
+  /**
+   * Sets the message options.
+   * 
+   * @param options
+   *          the new message options value.
+   */
+  public void setOptions(long options) {
+    this.options = options & 0xFFFFFFFF;
+  }
+
 }

@@ -175,7 +175,8 @@ public class TraceClient extends IoHandlerAdapter {
     String line = null;
     NetworkAddress fromAddress = null;
     try {
-      fromAddress = NetworkAddress.ipv4FromASCII(this.config.getClientHost());
+      fromAddress = NetworkAddress.ipv4FromASCII(this.config.getClientHost()
+          + ":" + this.config.getClientPort());
     } catch (UnsupportedEncodingException uee) {
       log.error(
           "Unable to parse local host name from configuration parameter.", uee);
@@ -198,7 +199,6 @@ public class TraceClient extends IoHandlerAdapter {
         }
 
         message.setOriginAddress(fromAddress);
-        message.setSenderPort(fromPort);
 
         log.debug("Writing {} to {}", message, session);
         session.write(message);
@@ -267,7 +267,7 @@ public class TraceClient extends IoHandlerAdapter {
             Integer.valueOf(bindingValues.length));
         break;
       }
-      GUIDBinding[] bindings = new GUIDBinding[bindingValues.length / 3];
+      NetworkAddress[] bindings = new NetworkAddress[bindingValues.length / 3];
       for (int i = 0; i < bindings.length; ++i) {
         NetworkAddress na = null;
         try {
@@ -278,27 +278,24 @@ public class TraceClient extends IoHandlerAdapter {
         }
         long ttl = Long.parseLong(bindingValues[1]);
         int weight = Integer.parseInt(bindingValues[2]);
-        bindings[i] = new GUIDBinding();
-        bindings[i].setAddress(na);
-        bindings[i].setTtl(ttl);
-        bindings[i].setWeight(weight);
+        bindings[i] = na;
+
       }
 
       InsertMessage insMsg = new InsertMessage();
       msg = insMsg;
       insMsg.setBindings(bindings);
-      insMsg.setDestinationFlag((byte) 0);
       insMsg.setGuid(guid);
       insMsg.setRequestId(sequenceNumber);
       break;
     }
-    case LOOKUP:
+    case LOOKUP: {
       LookupMessage lookMsg = new LookupMessage();
       msg = lookMsg;
-      lookMsg.setDestinationFlag((byte) 0);
       lookMsg.setGuid(guid);
       lookMsg.setRequestId(sequenceNumber);
       break;
+    }
     default:
       log.error("Unknown message type {}", type);
     }
@@ -331,5 +328,10 @@ public class TraceClient extends IoHandlerAdapter {
   @Override
   public void messageReceived(IoSession session, Object message) {
     log.debug("[{}] Received {}", session, message);
+  }
+
+  @Override
+  public void messageSent(IoSession session, Object message) {
+    log.debug("[{}] Sent {}", session, message);
   }
 }

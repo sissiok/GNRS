@@ -6,6 +6,7 @@
 package edu.rutgers.winlab.mobilityfirst.messages;
 
 import edu.rutgers.winlab.mobilityfirst.structures.GUIDBinding;
+import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
 
 /**
  * A Lookup Response message for GNRS.
@@ -13,7 +14,7 @@ import edu.rutgers.winlab.mobilityfirst.structures.GUIDBinding;
  * @author Robert Moore
  * 
  */
-public class LookupResponseMessage extends AbstractMessage {
+public class LookupResponseMessage extends AbstractResponseMessage {
   /**
    * ResponseCode for this message.
    */
@@ -22,7 +23,7 @@ public class LookupResponseMessage extends AbstractMessage {
   /**
    * The bindings for this message.
    */
-  private GUIDBinding[] bindings;
+  private NetworkAddress[] bindings;
 
   /**
    * Creates a new Lookup Response message.
@@ -56,7 +57,7 @@ public class LookupResponseMessage extends AbstractMessage {
    * 
    * @return the bindings for this message, or {@code null} if there are none.
    */
-  public GUIDBinding[] getBindings() {
+  public NetworkAddress[] getBindings() {
     return this.bindings;
   }
 
@@ -66,7 +67,7 @@ public class LookupResponseMessage extends AbstractMessage {
    * @param bindings
    *          the new bindings for this message.
    */
-  public void setBindings(GUIDBinding[] bindings) {
+  public void setBindings(NetworkAddress[] bindings) {
     this.bindings = bindings;
   }
 
@@ -84,5 +85,31 @@ public class LookupResponseMessage extends AbstractMessage {
     }
     sb.append("}");
     return sb.toString();
+  }
+
+  @Override
+  protected int getResponsePayloadLength() {
+    // Num bindings, bindings
+    return 4 + this.getBindingLength();
+    
+  }
+
+  protected int getBindingLength() {
+    int length = 0;
+    if (this.bindings != null) {
+      for (NetworkAddress addx : this.bindings) {
+        // Type, length, value
+        length += (addx.getLength() + 4);
+      }
+    }
+    return length;
+  }
+  
+  /**
+   * Returns the number of bindings in this message.
+   * @return the number of bindings in this message.
+   */
+  public long getNumBindings(){
+    return this.bindings == null ? 0 : this.bindings.length;
   }
 }

@@ -11,86 +11,79 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.apache.mina.filter.codec.demux.MessageDecoder;
 import org.apache.mina.filter.codec.demux.MessageDecoderResult;
 
+import edu.rutgers.winlab.mobilityfirst.structures.AddressType;
 import edu.rutgers.winlab.mobilityfirst.structures.NetworkAddress;
 
 /**
  * @author Robert Moore
  * 
  */
-public class InsertAckDecoder implements MessageDecoder {
+public class InsertResponseDecoder implements MessageDecoder {
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.mina.filter.codec.demux.MessageDecoder#decodable(org.apache.
-   * mina.core.session.IoSession, org.apache.mina.core.buffer.IoBuffer)
-   */
   @Override
   public MessageDecoderResult decodable(IoSession session, IoBuffer buffer) {
     // Store the current cursor position in the buffer
     buffer.mark();
     // Need 5 bytes to check request ID and type
-    if (buffer.remaining() < 5) {
+    if (buffer.remaining() < 2) {
       return MessageDecoderResult.NEED_DATA;
     }
 
-    // Skip the request ID
-    buffer.getUnsignedInt();
+    // Skip the version number
+    // TODO: What happens with version number?
+    buffer.get();
     byte type = buffer.get();
     // Reset the cursor so we don't modify the buffer data.
     buffer.reset();
-    if (type == MessageType.INSERT_ACK.value()) {
+    if (type == MessageType.INSERT_RESPONSE.value()) {
       return MessageDecoderResult.OK;
     }
     return MessageDecoderResult.NOT_OK;
 
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.mina.filter.codec.demux.MessageDecoder#decode(org.apache.mina
-   * .core.session.IoSession, org.apache.mina.core.buffer.IoBuffer,
-   * org.apache.mina.filter.codec.ProtocolDecoderOutput)
-   */
+ 
   @Override
   public MessageDecoderResult decode(IoSession session, IoBuffer buffer,
       ProtocolDecoderOutput out) throws Exception {
     /*
      * Common message header stuff
      */
-    long requestId = buffer.getUnsignedInt();
-    
+    // TODO: What to do with version?
+    byte version = buffer.get();
     byte type = buffer.get();
-    if (type != MessageType.INSERT_ACK.value()) {
+
+    if (type != MessageType.INSERT_RESPONSE.value()) {
       return MessageDecoderResult.NOT_OK;
     }
+    // Don't really care about message length
+    int msgLength = buffer.getUnsignedShort();
+    long requestId = buffer.getUnsignedInt();
     
-    InsertAckMessage msg = new InsertAckMessage();
+    AddressType addrType = AddressType.valueOf(buffer.getUnsignedShort());
     
-    byte[] senderAddressBytes = new byte[NetworkAddress.SIZE_OF_NETWORK_ADDRESS];
-    buffer.get(senderAddressBytes);
-    NetworkAddress senderAddress = new NetworkAddress();
-    senderAddress.setValue(senderAddressBytes);
+    int originAddrLength = buffer.getUnsignedShort();
+    byte[] originAddr = new byte[originAddrLength];
+    buffer.get(originAddr);
+    NetworkAddress originAddress = new NetworkAddress(addrType, originAddr);
     
-    long senderPort = buffer.getUnsignedInt();
-    
-    /*
-     * InsertAck-specific stuff
-     */
-    
-    byte responseCode = buffer.get();
-    
+    InsertResponseMessage msg = new InsertResponseMessage();
+    msg.setVersion(version);
+    msg.setOriginAddress(originAddress);
     msg.setRequestId(requestId);
-    msg.setOriginAddress(senderAddress);
-    msg.setSenderPort(senderPort);
+
+    // Response-specific stuff
+    
+    int responseCode = buffer.getUnsignedShort();
+
     msg.setResponseCode(ResponseCode.valueOf(responseCode));
     
+    // Remove unused padding
+    buffer.getUnsignedShort();
+
     // Write the decoded object to the next filter
     out.write(msg);
-    
+
     // Everything OK!
     return MessageDecoderResult.OK;
   }

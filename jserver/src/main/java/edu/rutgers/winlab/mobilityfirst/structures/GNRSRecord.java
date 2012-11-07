@@ -67,19 +67,15 @@ public class GNRSRecord {
    * 
    * @return an array of current bindings for this record
    */
-  public GUIDBinding[] getBindingsArray() {
-    return this.bindings.toArray(new GUIDBinding[] {});
+  public NetworkAddress[] getBindings() {
+    NetworkAddress[] addresses = new NetworkAddress[this.bindings.size()];
+    int i = 0;
+    for(GUIDBinding b : this.bindings){
+      addresses[i] = b.getAddress();
+      ++i;
+    }
+    return addresses;
   }
 
-  /**
-   * Gets the current bindings. The return value of this method may change from
-   * one call to another as bindings are added/replaced/expired.
-   * 
-   * @return the collection of current bindings for this record
-   */
-  public List<GUIDBinding> getBindings() {
-    LinkedList<GUIDBinding> b = new LinkedList<GUIDBinding>();
-    b.addAll(this.bindings);
-    return b;
-  }
+  
 }

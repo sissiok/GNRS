@@ -13,21 +13,21 @@ public enum ResponseCode {
   /**
    * Indicates a successful action.
    */
-  SUCCESS((byte) 0),
+  SUCCESS(0),
   /**
    * Indicates a general or unspecified error.
    */
-  ERROR((byte) 1);
+  FAILED(1);
   
   /**
    * Used for toString() method.
    */
-  private static final  String[] STRINGS = {"SUCCESS", "ERROR"};
+  private static final  String[] STRINGS = {"SUCCESS", "FAILED"};
 
   /**
    * The value of the response code for sending over the network.
    */
-  private byte value;
+  private int value;
 
   /**
    * Creates a new ResponseCode.
@@ -35,7 +35,7 @@ public enum ResponseCode {
    * @param value
    *          the value to send over the network.
    */
-  private ResponseCode(final byte value) {
+  private ResponseCode(final int value) {
     this.value = value;
   }
 
@@ -44,7 +44,7 @@ public enum ResponseCode {
    * 
    * @return the byte value of this ResponseCode.
    */
-  public byte value() {
+  public int value() {
     return this.value;
   }
   
@@ -53,8 +53,8 @@ public enum ResponseCode {
    * @param b a byte value from the GNRS network protocol.
    * @return a ResponseCode appropriate for the value.
    */
-  public static ResponseCode valueOf(byte b){
-    return b == SUCCESS.value ? SUCCESS : ERROR;
+  public static ResponseCode valueOf(int b){
+    return b == SUCCESS.value ? SUCCESS : FAILED;
   }
   
   /**

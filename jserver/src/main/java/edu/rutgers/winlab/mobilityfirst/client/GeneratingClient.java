@@ -121,12 +121,12 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
    * Total number of lookup messages to generate.
    */
   private final int numLookups;
-  
+
   /**
    * Total number of successes.
    */
   private final AtomicInteger numSuccess = new AtomicInteger(0);
-  
+
   /**
    * Total number of failures.
    */
@@ -159,7 +159,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     DefaultIoFilterChainBuilder chain = this.connector.getFilterChain();
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
         new GNRSProtocolCodecFactory(false)));
-  
+
     log.info(String.format("Assuming timer precision of %,dns.",
         SYSTEM_SLEEP_PRECISION));
 
@@ -192,14 +192,16 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
           GeneratingClient.this.generateLookups(future.getSession());
           try {
             Thread.sleep(5000);
-          }catch(InterruptedException ie){
+          } catch (InterruptedException ie) {
             // Ignored
           }
           int succ = GeneratingClient.this.numSuccess.get();
           int total = succ + GeneratingClient.this.numFailures.get();
-          float success = ((succ*1f)/total)*100;
-          float loss = ((GeneratingClient.this.numLookups - total*1f)/GeneratingClient.this.numLookups)*100;
-          log.info(String.format("Total: %,d  |  Success: %,.2f%%  |  Loss: %,.2f%%)", total, success, loss));
+          float success = ((succ * 1f) / total) * 100;
+          float loss = ((GeneratingClient.this.numLookups - total * 1f) / GeneratingClient.this.numLookups) * 100;
+          log.info(String.format(
+              "Total: %,d  |  Success: %,.2f%%  |  Loss: %,.2f%%)", total,
+              success, loss));
           future.getSession().close(true);
           GeneratingClient.this.connector.dispose(true);
         }
@@ -235,7 +237,8 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     int fromPort = this.config.getClientPort();
     NetworkAddress clientAddress = null;
     try {
-      clientAddress = NetworkAddress.ipv4FromASCII(this.config.getClientHost());
+      clientAddress = NetworkAddress.ipv4FromASCII(this.config.getClientHost()
+          + ":" + this.config.getClientPort());
 
     } catch (UnsupportedEncodingException uee) {
       log.error("Unable to parse client hostname from configuration file.", uee);
@@ -249,11 +252,10 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     for (int i = 0; i < this.numLookups; ++i) {
 
       message = new LookupMessage();
-      message.setDestinationFlag((byte) 0);
-      message.setGuid(GUID.fromInt(('0'+r.nextInt(10))<<24));
+
+      message.setGuid(GUID.fromInt(('0' + r.nextInt(10)) << 24));
       message.setRequestId(i);
       message.setOriginAddress(clientAddress);
-      message.setSenderPort(fromPort);
       lastSend = System.nanoTime();
       WriteFuture future = session.write(message);
 
@@ -266,8 +268,6 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
         LockSupport.parkNanos(waitTime);
       }
     }
-    
-    
 
   }
 
@@ -284,16 +284,15 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
 
   @Override
   public void messageReceived(IoSession session, Object message) {
-    if(message instanceof LookupResponseMessage){
-      this.handleResponse((LookupResponseMessage)message);
+    if (message instanceof LookupResponseMessage) {
+      this.handleResponse((LookupResponseMessage) message);
     }
   }
-  
-  public void handleResponse(final LookupResponseMessage msg){
-    if(ResponseCode.SUCCESS.equals(msg.getResponseCode()))
-    {
+
+  public void handleResponse(final LookupResponseMessage msg) {
+    if (ResponseCode.SUCCESS.equals(msg.getResponseCode())) {
       this.numSuccess.incrementAndGet();
-    }else{
+    } else {
       this.numFailures.incrementAndGet();
     }
   }
