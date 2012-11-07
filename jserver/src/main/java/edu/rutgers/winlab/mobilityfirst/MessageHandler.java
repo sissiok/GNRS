@@ -52,9 +52,6 @@ public class MessageHandler extends IoHandlerAdapter {
       throws Exception {
     this.server.messageArrived(session, message);
   }
-  @Override
-  public void messageSent(IoSession session, Object message){
-  }
 
   @Override
   public void sessionClosed(IoSession session) throws Exception {
