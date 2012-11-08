@@ -6,6 +6,7 @@
 package edu.rutgers.winlab.mfirst.net;
 
 import edu.rutgers.winlab.mfirst.messages.AbstractMessage;
+import edu.rutgers.winlab.mfirst.structures.NetworkAddress;
 
 /**
  * Interface that provides network communication for the GNRS server.
@@ -24,8 +25,8 @@ public interface NetworkAccessObject {
 
   /**
    * Stops the listener from receiving messages as they arrive. Messages may
-   * continue arrive after this method is called if they were buffered
-   * by the NetworkAccessObject.
+   * continue arrive after this method is called if they were buffered by the
+   * NetworkAccessObject.
    * 
    * @param listener
    *          the listener to remove
@@ -43,6 +44,30 @@ public interface NetworkAccessObject {
   public void sendMessage(final SessionParameters parameters,
       final AbstractMessage message);
 
+  /**
+   * Invoked when a session terminates and the NAO should clean-up any stored
+   * state.
+   * 
+   * @param parameters
+   *          session parameters.
+   */
   public void endSession(final SessionParameters parameters);
+
+  /**
+   * Determine whether a specified network address object references the local
+   * server.
+   * 
+   * @param address
+   *          the address to check.
+   * @return {@code true} if the NetworkAddress identifies this server, else
+   *         {@code false}.
+   */
+  public boolean isLocal(final NetworkAddress address);
+  
+  /**
+   * Returns this server's "origin" address as sent in request or response messages.
+   * @return
+   */
+  public NetworkAddress getOriginAddress();
 
 }

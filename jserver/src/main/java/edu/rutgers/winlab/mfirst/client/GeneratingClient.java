@@ -33,6 +33,7 @@ import edu.rutgers.winlab.mfirst.messages.GNRSProtocolCodecFactory;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.ResponseCode;
+import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPAddress;
 import edu.rutgers.winlab.mfirst.structures.GUID;
 import edu.rutgers.winlab.mfirst.structures.NetworkAddress;
 
@@ -227,7 +228,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     // FIXME: Get the origin address in the datagram correct
     NetworkAddress fromAddress = null;
     try {
-      fromAddress = NetworkAddress.ipv4FromASCII(this.config.getClientHost());
+      fromAddress = IPv4UDPAddress.fromASCII(this.config.getClientHost());
     } catch (UnsupportedEncodingException uee) {
       log.error(
           "Unable to parse local host name from configuration parameter.", uee);
@@ -237,7 +238,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     int fromPort = this.config.getClientPort();
     NetworkAddress clientAddress = null;
     try {
-      clientAddress = NetworkAddress.ipv4FromASCII(this.config.getClientHost()
+      clientAddress = IPv4UDPAddress.fromASCII(this.config.getClientHost()
           + ":" + this.config.getClientPort());
 
     } catch (UnsupportedEncodingException uee) {

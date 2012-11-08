@@ -30,8 +30,14 @@
   <asBindingFile>src/main/resources/as-binding.ipv4</asBindingFile>
   
   <!-- 
-       The type of networking to be used by the server.  Possible values are:
+       The type of networking to be used by the server. Changes to this value
+       mean that the networkConfiguration parameter be reference the correct
+       configuration file.  
+       Possible values are:
          * "ipv4udp" - IPv4 with UDP
    -->
   <networkType>ipv4udp</networkType>
+  
+  <!-- Configuration file name for the network access object. -->
+  <networkConfiguration>src/main/resources/net-ipv4.xml</networkConfiguration>
 </edu.rutgers.winlab.mfirst.Configuration>

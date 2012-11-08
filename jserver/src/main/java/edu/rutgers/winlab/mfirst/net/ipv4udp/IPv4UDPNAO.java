@@ -5,9 +5,10 @@
  */
 package edu.rutgers.winlab.mfirst.net.ipv4udp;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,12 +21,17 @@ import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
 import org.apache.mina.util.ConcurrentHashSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.thoughtworks.xstream.XStream;
 
 import edu.rutgers.winlab.mfirst.messages.AbstractMessage;
 import edu.rutgers.winlab.mfirst.messages.GNRSProtocolCodecFactory;
 import edu.rutgers.winlab.mfirst.net.MessageListener;
 import edu.rutgers.winlab.mfirst.net.NetworkAccessObject;
 import edu.rutgers.winlab.mfirst.net.SessionParameters;
+import edu.rutgers.winlab.mfirst.structures.NetworkAddress;
 
 /**
  * @author Robert Moore
@@ -34,41 +40,44 @@ import edu.rutgers.winlab.mfirst.net.SessionParameters;
 public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject {
 
   /**
+   * Logging for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(IPv4UDPNAO.class);
+  
+  /**
    * Set of listeners for this NAO.
    */
   private final Set<MessageListener> listeners = new ConcurrentHashSet<MessageListener>();
 
   /**
-   * Whether or not writes should be asynchronous (non-blocking). Default is
-   * synchronous (blocking) writes.
+   * Configuration options for this NAO.
    */
-  private boolean asyncWrites = false;
+  private Configuration config;
 
   /**
    * SessionParameter objects for each IoSession.
    */
   private final Map<IoSession, IPv4UDPParameters> sessionMap = new ConcurrentHashMap<IoSession, IPv4UDPParameters>();
 
+  /**
+   * Incoming datagram acceptor.
+   */
   private final NioDatagramAcceptor acceptor;
 
   /**
    * Creates a new instance of network access object for IPv4/UDP networking.
    * 
-   * @param asynchronous
-   *          whether or not message sending should be asynchronous.
-   *          Asynchronous writes to the network may cause internal buffering,
-   *          synchronous writes will block.
-   * @param port
-   *          for incoming UDP packets.
+   * @param configFilename
+   *          name of configuration file for this NAO.
    * @throws IOException
    *           if an IOException occurs while binding to the listen port.
    */
-  // FIXME: Need to have specific configuration.
-  public IPv4UDPNAO(final boolean asynchronous, final int listenPort)
-      throws IOException {
+  public IPv4UDPNAO(final String configFilename) throws IOException {
     super();
-    this.asyncWrites = asynchronous;
-
+    if (!this.loadConfiguration(configFilename)) {
+      throw new IllegalArgumentException("Unable to load configuration file \""
+          + configFilename + "\".");
+    }
     this.acceptor = new NioDatagramAcceptor();
     this.acceptor.setHandler(this);
 
@@ -81,7 +90,29 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject 
     sessionConfig.setReuseAddress(true);
     sessionConfig.setCloseOnPortUnreachable(false);
 
-    this.acceptor.bind(new InetSocketAddress(listenPort));
+    // Bind to wildcard (all) interface
+    if (this.config.getBindAddress() == null
+        || this.config.getBindAddress().trim().length() == 0) {
+      this.acceptor.bind(new InetSocketAddress(this.config.getBindPort()));
+    }
+    // Bind to a specific IP address.
+    else {
+      this.acceptor.bind(new InetSocketAddress(this.config.getBindAddress(),
+          this.config.getBindPort()));
+    }
+  }
+
+  /**
+   * Loads this NAOs configuration file from the filename provided.
+   * 
+   * @param filename
+   *          the name of the configuration file.
+   * @return {@code true} if loading succeeds.
+   */
+  private boolean loadConfiguration(final String filename) {
+    XStream x = new XStream();
+    this.config = (Configuration) x.fromXML(new File(filename));
+    return true;
   }
 
   @Override
@@ -95,9 +126,10 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject 
       throw new IllegalArgumentException(
           "Not an instance of IPv4UDP networking parameters: " + parameters);
     }
+
     IPv4UDPParameters p = (IPv4UDPParameters) parameters;
     WriteFuture f = p.session.write(message);
-    if (this.asyncWrites) {
+    if (!this.config.isAscynchronousWrite()) {
       f.awaitUninterruptibly();
     }
   }
@@ -117,6 +149,24 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject 
     this.listeners.remove(listener);
   }
 
+  @Override
+  public boolean isLocal(final NetworkAddress na) {
+    // TODO: Remote servers
+    return true;
+  }
+
+  @Override
+  public NetworkAddress getOriginAddress() {
+    try {
+      return IPv4UDPAddress.fromASCII(this.config.getBindAddress() + ":"
+          + this.config.getBindPort());
+    } catch (UnsupportedEncodingException e) {
+      log.error("Unable to create origin address due to encoding problems.", e);
+      return null;
+    }
+
+  }
+  
   /*
    * MINA stuff
    */
@@ -145,4 +195,10 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject 
   public void sessionClosed(final IoSession session) {
     this.sessionMap.remove(session);
   }
+  
+  @Override
+  public void exceptionCaught(final IoSession session, final Throwable cause){
+    log.error("Exception caught.",cause);
+  }
+ 
 }

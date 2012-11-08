@@ -30,6 +30,7 @@ import edu.rutgers.winlab.mfirst.messages.GNRSProtocolCodecFactory;
 import edu.rutgers.winlab.mfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mfirst.messages.MessageType;
+import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPAddress;
 import edu.rutgers.winlab.mfirst.structures.GUID;
 import edu.rutgers.winlab.mfirst.structures.GUIDBinding;
 import edu.rutgers.winlab.mfirst.structures.NetworkAddress;
@@ -175,7 +176,7 @@ public class TraceClient extends IoHandlerAdapter {
     String line = null;
     NetworkAddress fromAddress = null;
     try {
-      fromAddress = NetworkAddress.ipv4FromASCII(this.config.getClientHost()
+      fromAddress = IPv4UDPAddress.fromASCII(this.config.getClientHost()
           + ":" + this.config.getClientPort());
     } catch (UnsupportedEncodingException uee) {
       log.error(
@@ -271,7 +272,7 @@ public class TraceClient extends IoHandlerAdapter {
       for (int i = 0; i < bindings.length; ++i) {
         NetworkAddress na = null;
         try {
-          na = NetworkAddress.ipv4FromASCII(bindingValues[0]);
+          na = IPv4UDPAddress.fromASCII(bindingValues[0]);
         } catch (UnsupportedEncodingException uee) {
           log.error("Unable to parse network address from ASCII string.", uee);
           break;
