@@ -41,10 +41,8 @@ public class GUID {
       return null;
     }
 
-    // FIXME: Improve to avoid double allocation with copy
-    byte[] stringBytes = s.getBytes("US-ASCII");
     GUID guid = new GUID();
-    guid.setBinaryForm(Arrays.copyOf(stringBytes, SIZE_OF_GUID));
+    guid.setBinaryForm(Arrays.copyOf(s.getBytes("US-ASCII"), SIZE_OF_GUID));
     return guid;
   }
 

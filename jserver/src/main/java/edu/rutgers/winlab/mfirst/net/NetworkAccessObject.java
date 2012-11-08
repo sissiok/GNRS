@@ -6,7 +6,6 @@
 package edu.rutgers.winlab.mfirst.net;
 
 import edu.rutgers.winlab.mfirst.messages.AbstractMessage;
-import edu.rutgers.winlab.mfirst.structures.NetworkAddress;
 
 /**
  * Interface that provides network communication for the GNRS server.
@@ -63,10 +62,13 @@ public interface NetworkAccessObject {
    *         {@code false}.
    */
   public boolean isLocal(final NetworkAddress address);
-  
+
   /**
-   * Returns this server's "origin" address as sent in request or response messages.
-   * @return
+   * Returns this server's "origin" address as sent in request or response
+   * messages.
+   * 
+   * @return the value of the "Origin Address" field for messages originating at
+   *         this server.
    */
   public NetworkAddress getOriginAddress();
 

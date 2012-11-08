@@ -14,8 +14,8 @@ import org.slf4j.LoggerFactory;
 import edu.rutgers.winlab.mfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mfirst.messages.InsertResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.ResponseCode;
+import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.SessionParameters;
-import edu.rutgers.winlab.mfirst.structures.NetworkAddress;
 
 /**
  * Task to handle Insert messages within the server. Designed to operate

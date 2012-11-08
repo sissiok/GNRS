@@ -8,8 +8,8 @@ package edu.rutgers.winlab.mfirst.storage;
 import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.collection.Trie;
 
-import edu.rutgers.winlab.mfirst.structures.AddressType;
-import edu.rutgers.winlab.mfirst.structures.NetworkAddress;
+import edu.rutgers.winlab.mfirst.net.AddressType;
+import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 
 /**
  * Network Address -> hostname (String) mapping for GNRS servers.

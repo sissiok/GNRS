@@ -13,11 +13,13 @@ import org.apache.mina.filter.codec.demux.MessageDecoderResult;
 
 import edu.rutgers.winlab.mfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mfirst.messages.MessageType;
-import edu.rutgers.winlab.mfirst.structures.AddressType;
+import edu.rutgers.winlab.mfirst.net.AddressType;
+import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.structures.GUID;
-import edu.rutgers.winlab.mfirst.structures.NetworkAddress;
 
 /**
+ * Apache MINA message decoder for InsertMessage objects.
+ * 
  * @author Robert Moore
  * 
  */
@@ -61,8 +63,10 @@ public class InsertDecoder implements MessageDecoder {
      * Common message header stuff
      */
     byte version = buffer.get();
-    byte type = buffer.get();
-    int messageLength = buffer.getUnsignedShort();
+    // Ignore type, since this is checked in decodable(IoSession, IoBuffer)
+    buffer.get();
+    // Ignore message length (not used)
+    buffer.getUnsignedShort();
     long requestId = buffer.getUnsignedInt();
 
     // Origin address
@@ -89,7 +93,7 @@ public class InsertDecoder implements MessageDecoder {
     msg.setOptions(options);
 
     long numBindings = buffer.getUnsignedInt();
-    NetworkAddress[] bindings = new NetworkAddress[(int)numBindings];
+    NetworkAddress[] bindings = new NetworkAddress[(int) numBindings];
 
     for (int i = 0; i < numBindings; ++i) {
       int addxType = buffer.getUnsignedShort();
@@ -110,7 +114,6 @@ public class InsertDecoder implements MessageDecoder {
     return MessageDecoderResult.OK;
   }
 
-  
   @Override
   public void finishDecode(IoSession arg0, ProtocolDecoderOutput arg1)
       throws Exception {

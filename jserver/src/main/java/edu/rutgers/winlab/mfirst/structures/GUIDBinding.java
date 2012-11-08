@@ -5,6 +5,8 @@
  */
 package edu.rutgers.winlab.mfirst.structures;
 
+import edu.rutgers.winlab.mfirst.net.NetworkAddress;
+
 /**
  * @author Robert Moore
  * 

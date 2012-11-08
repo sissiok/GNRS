@@ -14,10 +14,12 @@ import org.apache.mina.filter.codec.demux.MessageDecoderResult;
 import edu.rutgers.winlab.mfirst.messages.InsertResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.MessageType;
 import edu.rutgers.winlab.mfirst.messages.ResponseCode;
-import edu.rutgers.winlab.mfirst.structures.AddressType;
-import edu.rutgers.winlab.mfirst.structures.NetworkAddress;
+import edu.rutgers.winlab.mfirst.net.AddressType;
+import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 
 /**
+ * Apache MINA message decoder for Insert Response messages.
+ * 
  * @author Robert Moore
  * 
  */
@@ -60,7 +62,7 @@ public class InsertResponseDecoder implements MessageDecoder {
       return MessageDecoderResult.NOT_OK;
     }
     // Don't really care about message length
-    int msgLength = buffer.getUnsignedShort();
+    buffer.getUnsignedShort();
     long requestId = buffer.getUnsignedInt();
     
     AddressType addrType = AddressType.valueOf(buffer.getUnsignedShort());

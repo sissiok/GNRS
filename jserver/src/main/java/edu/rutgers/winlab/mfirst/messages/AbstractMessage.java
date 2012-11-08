@@ -5,7 +5,7 @@
  */
 package edu.rutgers.winlab.mfirst.messages;
 
-import edu.rutgers.winlab.mfirst.structures.NetworkAddress;
+import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 
 /**
  * @author Robert Moore

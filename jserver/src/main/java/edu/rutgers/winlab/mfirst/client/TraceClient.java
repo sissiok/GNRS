@@ -30,10 +30,10 @@ import edu.rutgers.winlab.mfirst.messages.GNRSProtocolCodecFactory;
 import edu.rutgers.winlab.mfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mfirst.messages.MessageType;
+import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPAddress;
 import edu.rutgers.winlab.mfirst.structures.GUID;
 import edu.rutgers.winlab.mfirst.structures.GUIDBinding;
-import edu.rutgers.winlab.mfirst.structures.NetworkAddress;
 
 /**
  * @author Robert Moore

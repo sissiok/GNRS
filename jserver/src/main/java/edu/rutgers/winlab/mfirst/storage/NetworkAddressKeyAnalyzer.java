@@ -8,8 +8,8 @@ package edu.rutgers.winlab.mfirst.storage;
 import org.ardverk.collection.ByteArrayKeyAnalyzer;
 import org.ardverk.collection.KeyAnalyzer;
 
-import edu.rutgers.winlab.mfirst.structures.AddressType;
-import edu.rutgers.winlab.mfirst.structures.NetworkAddress;
+import edu.rutgers.winlab.mfirst.net.AddressType;
+import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 
 /**
  * @author Robert Moore

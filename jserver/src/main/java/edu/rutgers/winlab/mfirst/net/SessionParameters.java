@@ -13,5 +13,5 @@ package edu.rutgers.winlab.mfirst.net;
  * 
  */
 public interface SessionParameters {
-
+  // Nothing is required, just a placeholder interface
 }

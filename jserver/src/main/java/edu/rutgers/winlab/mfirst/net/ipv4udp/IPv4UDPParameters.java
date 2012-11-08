@@ -7,7 +7,6 @@ package edu.rutgers.winlab.mfirst.net.ipv4udp;
 
 import org.apache.mina.core.session.IoSession;
 
-import edu.rutgers.winlab.mfirst.messages.AbstractMessage;
 import edu.rutgers.winlab.mfirst.net.SessionParameters;
 
 /**

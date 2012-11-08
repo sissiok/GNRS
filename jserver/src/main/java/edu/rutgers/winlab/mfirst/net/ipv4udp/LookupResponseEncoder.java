@@ -11,7 +11,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 import org.apache.mina.filter.codec.demux.MessageEncoder;
 
 import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
-import edu.rutgers.winlab.mfirst.structures.NetworkAddress;
+import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 
 /**
  * @author Robert Moore

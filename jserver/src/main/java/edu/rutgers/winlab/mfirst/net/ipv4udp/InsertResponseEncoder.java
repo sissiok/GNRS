@@ -5,9 +5,6 @@
  */
 package edu.rutgers.winlab.mfirst.net.ipv4udp;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;

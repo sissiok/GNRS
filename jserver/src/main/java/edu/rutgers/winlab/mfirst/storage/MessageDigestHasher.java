@@ -14,9 +14,9 @@ import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.rutgers.winlab.mfirst.structures.AddressType;
+import edu.rutgers.winlab.mfirst.net.AddressType;
+import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.structures.GUID;
-import edu.rutgers.winlab.mfirst.structures.NetworkAddress;
 
 /**
  * Hashes GUID values based on Java-supported hashing algorithms. Incorporates
@@ -94,7 +94,7 @@ public class MessageDigestHasher implements GUIDHasher {
         .ceil((type.getMaxLength() * numAddresses * 1f) / digestBytes);
     ByteBuffer buffer = ByteBuffer.allocate(numberDigests * digestBytes);
 
-    // Initializes to 0
+    // Initializes values to 0
     byte[] previousDigest = new byte[digestBytes];
 
     // Generate some bytes!
@@ -110,10 +110,10 @@ public class MessageDigestHasher implements GUIDHasher {
 
     // Generate the addresses and put them in the collection
     for (int i = 0; i < numAddresses; ++i) {
-      NetworkAddress na = new NetworkAddress();
+      
       byte[] bytes = new byte[type.getMaxLength()];
       buffer.get(bytes);
-      na.setValue(bytes);
+      NetworkAddress na = new NetworkAddress(type,bytes);
       addresses.add(na);
     }
 

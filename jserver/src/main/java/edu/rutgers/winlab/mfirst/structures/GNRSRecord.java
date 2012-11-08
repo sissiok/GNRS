@@ -11,6 +11,8 @@ import java.util.List;
 
 import org.apache.mina.util.ConcurrentHashSet;
 
+import edu.rutgers.winlab.mfirst.net.NetworkAddress;
+
 /**
  * Representation of a set of GUID bindings for GNRS servers.
  * 

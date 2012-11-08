@@ -8,9 +8,9 @@ package edu.rutgers.winlab.mfirst.storage;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 
-import edu.rutgers.winlab.mfirst.structures.AddressType;
+import edu.rutgers.winlab.mfirst.net.AddressType;
+import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.structures.GUID;
-import edu.rutgers.winlab.mfirst.structures.NetworkAddress;
 
 /**
  * Simple interface to be implemented by classes that can hash a GUID value to a

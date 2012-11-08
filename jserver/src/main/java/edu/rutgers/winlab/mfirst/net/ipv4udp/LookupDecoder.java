@@ -13,11 +13,13 @@ import org.apache.mina.filter.codec.demux.MessageDecoderResult;
 
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mfirst.messages.MessageType;
-import edu.rutgers.winlab.mfirst.structures.AddressType;
+import edu.rutgers.winlab.mfirst.net.AddressType;
+import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.structures.GUID;
-import edu.rutgers.winlab.mfirst.structures.NetworkAddress;
 
 /**
+ * Apache MINA message decoder for Lookup messages.
+ * 
  * @author Robert Moore
  * 
  */
@@ -52,8 +54,10 @@ public class LookupDecoder implements MessageDecoder {
      * Common message header stuff
      */
     byte version = buffer.get();
-    byte type = buffer.get();
-    int messageLength = buffer.getUnsignedShort();
+    // Ignoring message type, checked in decodable(IoSession, IoBuffer)
+    buffer.get();
+    // Don't need message length
+    buffer.getUnsignedShort();
     long requestId = buffer.getUnsignedInt();
 
     // Origin address

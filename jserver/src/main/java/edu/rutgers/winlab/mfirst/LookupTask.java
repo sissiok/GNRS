@@ -17,10 +17,10 @@ import org.slf4j.LoggerFactory;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.ResponseCode;
+import edu.rutgers.winlab.mfirst.net.AddressType;
+import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.SessionParameters;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPParameters;
-import edu.rutgers.winlab.mfirst.structures.AddressType;
-import edu.rutgers.winlab.mfirst.structures.NetworkAddress;
 
 /**
  * Task to handle Lookup messages within the server. Designed to operate

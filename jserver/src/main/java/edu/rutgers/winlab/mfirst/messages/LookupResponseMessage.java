@@ -5,8 +5,8 @@
  */
 package edu.rutgers.winlab.mfirst.messages;
 
+import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.structures.GUIDBinding;
-import edu.rutgers.winlab.mfirst.structures.NetworkAddress;
 
 /**
  * A Lookup Response message for GNRS.

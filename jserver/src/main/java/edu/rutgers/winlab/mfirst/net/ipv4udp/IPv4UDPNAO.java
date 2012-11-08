@@ -30,8 +30,8 @@ import edu.rutgers.winlab.mfirst.messages.AbstractMessage;
 import edu.rutgers.winlab.mfirst.messages.GNRSProtocolCodecFactory;
 import edu.rutgers.winlab.mfirst.net.MessageListener;
 import edu.rutgers.winlab.mfirst.net.NetworkAccessObject;
+import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.SessionParameters;
-import edu.rutgers.winlab.mfirst.structures.NetworkAddress;
 
 /**
  * @author Robert Moore
@@ -151,7 +151,7 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject 
 
   @Override
   public boolean isLocal(final NetworkAddress na) {
-    // TODO: Remote servers
+    // FIXME: Remote servers
     return true;
   }
 

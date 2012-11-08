@@ -3,20 +3,17 @@
  * Copyright (C) 2012 Robert Moore and Rutgers University
  * All rights reserved.
  */
-package edu.rutgers.winlab.mfirst.structures;
+package edu.rutgers.winlab.mfirst.net;
 
-import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.rutgers.winlab.mfirst.GNRSServer;
-
 /**
- * Network Address structure based
+ * Network Address class for GNRS. Represents a network endpoint for
+ * communication with or identification of other hosts or content in the
+ * network.
  * 
  * @author Robert Moore
  * 
@@ -26,6 +23,7 @@ public class NetworkAddress {
   /**
    * Logging for this class.
    */
+  @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory
       .getLogger(NetworkAddress.class);
 
@@ -34,25 +32,29 @@ public class NetworkAddress {
    */
   protected AddressType type;
 
-  
-
   /**
    * Raw (binary) form of this network address. Depends on the type of address.
    */
-  private byte[] value;
-  
-  public NetworkAddress(){
+  protected byte[] value;
+
+  /**
+   * Creates a new NetworkAddress object with the specified type and value
+   * 
+   * @param type
+   *          the type of the address
+   * @param value
+   *          the binary value of the address
+   */
+  public NetworkAddress(final AddressType type, final byte[] value) {
     super();
-  }
-  
-  public NetworkAddress(final AddressType type, final byte[] value){
-    super();
+    if (value != null && value.length > type.getMaxLength()) {
+      throw new IllegalArgumentException(
+          "NetworkAddress value length is greater than max allowed by " + type);
+    }
     this.setType(type);
     this.setValue(value);
-    
-  }
 
-  
+  }
 
   /**
    * Returns the raw (binary) form of this network address as a byte array.
@@ -70,8 +72,9 @@ public class NetworkAddress {
    *          the new value of this network address.
    */
   public void setValue(byte[] bytes) {
-    if(bytes != null && bytes.length > 0xFFFF){
-      throw new IllegalArgumentException("NetworkAddress value exceeds maximum length of 65535 bytes.");
+    if (bytes != null && bytes.length > 0xFFFF) {
+      throw new IllegalArgumentException(
+          "NetworkAddress value exceeds maximum length of 65535 bytes.");
     }
     this.value = bytes;
   }

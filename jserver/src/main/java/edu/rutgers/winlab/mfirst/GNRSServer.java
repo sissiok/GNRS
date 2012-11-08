@@ -30,8 +30,10 @@ import edu.rutgers.winlab.mfirst.messages.AbstractMessage;
 import edu.rutgers.winlab.mfirst.messages.GNRSProtocolCodecFactory;
 import edu.rutgers.winlab.mfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
+import edu.rutgers.winlab.mfirst.net.AddressType;
 import edu.rutgers.winlab.mfirst.net.MessageListener;
 import edu.rutgers.winlab.mfirst.net.NetworkAccessObject;
+import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.SessionParameters;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPAddress;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPNAO;
@@ -40,11 +42,9 @@ import edu.rutgers.winlab.mfirst.storage.GUIDHasher;
 import edu.rutgers.winlab.mfirst.storage.GUIDStore;
 import edu.rutgers.winlab.mfirst.storage.MessageDigestHasher;
 import edu.rutgers.winlab.mfirst.storage.NetworkAddressMapper;
-import edu.rutgers.winlab.mfirst.structures.AddressType;
 import edu.rutgers.winlab.mfirst.structures.GNRSRecord;
 import edu.rutgers.winlab.mfirst.structures.GUID;
 import edu.rutgers.winlab.mfirst.structures.GUIDBinding;
-import edu.rutgers.winlab.mfirst.structures.NetworkAddress;
 
 /**
  * Java implementation of a GNRS server.

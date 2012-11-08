@@ -14,11 +14,12 @@ import org.apache.mina.filter.codec.demux.MessageDecoderResult;
 import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.MessageType;
 import edu.rutgers.winlab.mfirst.messages.ResponseCode;
-import edu.rutgers.winlab.mfirst.structures.AddressType;
-import edu.rutgers.winlab.mfirst.structures.GUIDBinding;
-import edu.rutgers.winlab.mfirst.structures.NetworkAddress;
+import edu.rutgers.winlab.mfirst.net.AddressType;
+import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 
 /**
+ * Apache MINA message decoder for Lookup Response messages.
+ * 
  * @author Robert Moore
  * 
  */
@@ -52,13 +53,13 @@ public class LookupResponseDecoder implements MessageDecoder {
      * Common message header stuff
      */
     // TODO: What to do with version?
-    byte version = buffer.get();
-    byte type = buffer.get();
+    buffer.get();
 
-    if (type != MessageType.LOOKUP_RESPONSE.value()) {
-      return MessageDecoderResult.NOT_OK;
-    }
-    int msgLength = buffer.getUnsignedShort();
+    // Already checked message type in decodable(IoSession, IoBuffer)
+    buffer.get();
+
+    // Don't need message length
+    buffer.getUnsignedShort();
     long requestId = buffer.getUnsignedInt();
 
     // Origin Address
@@ -73,13 +74,12 @@ public class LookupResponseDecoder implements MessageDecoder {
     ResponseCode responseCode = ResponseCode.valueOf(buffer.getUnsignedShort());
     // Padding
     buffer.getShort();
-    
+
     LookupResponseMessage msg = new LookupResponseMessage();
     msg.setOriginAddress(originAddress);
     msg.setRequestId(requestId);
     msg.setResponseCode(responseCode);
-    
-    
+
     // Lookup response-specific
 
     // Lookup response-specific stuff
