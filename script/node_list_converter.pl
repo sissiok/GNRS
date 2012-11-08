@@ -7,6 +7,8 @@
 # output: 
 # node_list_perline.data: node list: one line for one node
 # ID_list.data: node ID
+#
+# usage: ./node_list_converter.pl <node list>
 
 use v5.10;
 use strict;
