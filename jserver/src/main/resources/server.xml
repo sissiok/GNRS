@@ -1,10 +1,4 @@
 <edu.rutgers.winlab.mfirst.Configuration>
-  <!-- Port number for incoming UDP packets -->
-  <listenPort>5001</listenPort>
-
-  <!-- Interface IP address to bind to. Leave blank for "any". -->
-  <bindIp>localhost</bindIp>
-
   <!--  The number of worker threads to use when processing messages.  
         This number is  above and beyond the primary NIO thread which will process 
         messages. If this value is 0 or negative, then 1 worker thread will 
