@@ -39,7 +39,7 @@ public class IPv4UDPAddress extends NetworkAddress {
    */
   private static final Logger log = LoggerFactory
       .getLogger(IPv4UDPAddress.class);
-
+  
   /**
    * Converts the specified ASCII-encoded String to a Network Address value.
    * More specifically, the raw bytes of asString, when ASCII-encoded, are
@@ -52,7 +52,7 @@ public class IPv4UDPAddress extends NetworkAddress {
    * @throws UnsupportedEncodingException
    *           if the String cannot be decoded to ASCII characters
    */
-  public static NetworkAddress fromASCII(final String s)
+  public static IPv4UDPAddress fromASCII(final String s)
       throws UnsupportedEncodingException {
     if (s == null || s.length() == 0) {
       return null;
@@ -78,7 +78,7 @@ public class IPv4UDPAddress extends NetworkAddress {
     newValue[newValue.length - 2] = (byte) (port >> 8);
     newValue[newValue.length - 1] = (byte) port;
 
-    return new NetworkAddress(AddressType.INET_4_UDP, newValue);
+    return new IPv4UDPAddress(newValue);
   }
 
   /**
@@ -90,7 +90,7 @@ public class IPv4UDPAddress extends NetworkAddress {
    *          the integer to create an address from.
    * @return the created network address.
    */
-  public static NetworkAddress fromInteger(final int i) {
+  public static IPv4UDPAddress fromInteger(final int i) {
 
     byte[] newValue = new byte[AddressType.INET_4_UDP.getMaxLength()];
     newValue[0] = (byte) (i >> 24);
@@ -98,7 +98,7 @@ public class IPv4UDPAddress extends NetworkAddress {
     newValue[2] = (byte) (i >> 8);
     newValue[3] = (byte) (i);
 
-    return new NetworkAddress(AddressType.INET_4_UDP, newValue);
+    return new IPv4UDPAddress(newValue);
   }
 
   /**
@@ -128,5 +128,39 @@ public class IPv4UDPAddress extends NetworkAddress {
       log.error("Could not create InetSocketAddress from NetworkAddress.", e);
       return null;
     }
+  }
+
+  /**
+   * Creates a NetworkAddress object from an InetSocketAddress (IP address and
+   * port).
+   * 
+   * @param addx
+   *          the socket address to use
+   * @return a new NetworkAddress object that represents the same address/port
+   *         as the InetSocketAddress.
+   */
+  public static IPv4UDPAddress fromInetSocketAddress(
+      final InetSocketAddress addx) {
+    byte[] fullAddx = new byte[6];
+    System.arraycopy(addx.getAddress().getAddress(), 0, fullAddx, 0, 4);
+    int port = addx.getPort();
+    fullAddx[4] = (byte) (port >> 8);
+    fullAddx[5] = (byte) port;
+    return new IPv4UDPAddress(fullAddx);
+
+  }
+  @Override
+  public String toString(){
+    StringBuilder sb = new StringBuilder();
+    sb.append(Integer.toString(this.value[0]&0xFF));
+    sb.append('.');
+    sb.append(Integer.toString(this.value[1]&0xFF));
+    sb.append('.');
+    sb.append(Integer.toString(this.value[2]&0xFF));
+    sb.append('.');
+    sb.append(Integer.toString(this.value[3]&0xFF));
+    sb.append(':');
+    sb.append(Integer.toString( (((int)this.value[4] << 8) | (this.value[5]&0xFF))&0xFFFF ) );
+    return sb.toString();
   }
 }

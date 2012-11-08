@@ -68,23 +68,25 @@ public class LookupTask implements Callable<Object> {
     long t10 = System.nanoTime();
     GNRSServer.numLookups.incrementAndGet();
 
-    Collection<NetworkAddress> hashedAddxes = this.server.getMappings(
+    Collection<NetworkAddress> serverAddxes = this.server.getMappings(
         message.getGuid(), message.getOriginAddress().getType());
 
     long t20 = System.nanoTime();
 
+    
+    
     LookupResponseMessage response = new LookupResponseMessage();
     response.setRequestId(this.message.getRequestId());
 
-    if (hashedAddxes == null) {
+    if (serverAddxes == null) {
       response.setResponseCode(ResponseCode.FAILED);
     }
 
     // log.debug("Hashed {} -> {}", message.getGuid(), hashedAddxes);
 
     boolean resolvedLocally = false;
-    if (hashedAddxes != null) {
-      for (NetworkAddress addx : hashedAddxes) {
+    if (serverAddxes != null) {
+      for (NetworkAddress addx : serverAddxes) {
         // Loopback? Then the local server should handle it.
         if (this.server.isLocalAddress(addx)) {
           resolvedLocally = true;

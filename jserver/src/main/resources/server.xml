@@ -9,11 +9,8 @@
        GNRS network. -->
   <numReplicas>5</numReplicas>
 
-  <!-- True if the server should collect statistics and log them, false for 
-       slightly faster code. -->
+  <!-- True if the server should collect statistics and log them -->
   <collectStatistics>true</collectStatistics>
-
-  
   
   <!-- 
        The type of networking to be used by the server. Changes to this value
