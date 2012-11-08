@@ -33,6 +33,7 @@ import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mfirst.net.MessageListener;
 import edu.rutgers.winlab.mfirst.net.NetworkAccessObject;
 import edu.rutgers.winlab.mfirst.net.SessionParameters;
+import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPAddress;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPNAO;
 
 import edu.rutgers.winlab.mfirst.storage.GUIDHasher;
@@ -162,11 +163,6 @@ public class GNRSServer implements MessageListener {
   private NetworkAccessObject networkAccess;
 
   /**
-   * Incoming UDP datagram acceptor (Apache MINA).
-   */
-  // private NioDatagramAcceptor acceptor;
-
-  /**
    * Mapping network address prefixes to AS/addresses.
    */
   public final NetworkAddressMapper networkAddressMap = new NetworkAddressMapper(
@@ -188,11 +184,6 @@ public class GNRSServer implements MessageListener {
   private final GUIDStore store = new GUIDStore();
 
   /**
-   * The IP address and port that identifies this server.
-   */
-  public final InetSocketAddress localAddress;
-
-  /**
    * Creates a new GNRS server with the specified configuration. The server will
    * not start running until the {@code #start()} method is invoked.
    * 
@@ -205,9 +196,6 @@ public class GNRSServer implements MessageListener {
     super();
     this.config = config;
     this.collectStatistics = this.config.isCollectStatistics();
-
-    this.localAddress = new InetSocketAddress(this.config.getBindIp(),
-        this.config.getListenPort());
 
     if (this.collectStatistics) {
       this.statsTimer = new Timer();
@@ -240,8 +228,6 @@ public class GNRSServer implements MessageListener {
           "Unable to create network access object.");
     }
 
-    log.info("Server listening on port {}.",
-        Integer.valueOf(this.config.getListenPort()));
   }
 
   /**
@@ -287,7 +273,8 @@ public class GNRSServer implements MessageListener {
       // Apply the prefix
       addxAsInt = addxAsInt & (0x80000000 >> prefixLength);
 
-      NetworkAddress na = NetworkAddress.ipv4FromInteger(addxAsInt);
+      // FIXME: Still bound to IPv4
+      NetworkAddress na = IPv4UDPAddress.fromInteger(addxAsInt);
       this.networkAddressMap.put(na, generalComponents[1]);
 
       line = lineReader.readLine();
@@ -361,9 +348,10 @@ public class GNRSServer implements MessageListener {
     // IPv4 + UDP
     if ("ipv4udp".equalsIgnoreCase(networkType)) {
       try {
-      this.networkAccess = new IPv4UDPNAO(false, this.config.getListenPort());
-      }catch(IOException ioe){
-        log.error("Unable to create IPv4/UDP network access.",ioe);
+        this.networkAccess = new IPv4UDPNAO(
+            this.config.getNetworkConfiguration());
+      } catch (IOException ioe) {
+        log.error("Unable to create IPv4/UDP network access.", ioe);
         return false;
       }
       this.networkAccess.addMessageListener(this);
@@ -469,11 +457,32 @@ public class GNRSServer implements MessageListener {
    * Convenience method for tasks to send a message.
    * 
    * @param params
+   *          network paramters for the NAO.
    * @param message
+   *          the message to send.
+   * @see NetworkAccessObject#sendMessage(SessionParameters, AbstractMessage)
    */
   public void sendMessage(final SessionParameters params,
       final AbstractMessage message) {
+    this.networkAccess.sendMessage(params, message);
+  }
 
+  /**
+   * Convenience method for tasks to check if a NetworkAddress references the
+   * local server or not.
+   * 
+   * @param na
+   *          the address to check
+   * @return {@code true} if the address identifies this server, else
+   *         {@code false}.
+   * @see NetworkAccessObject#isLocal(NetworkAddress)
+   */
+  public boolean isLocalAddress(final NetworkAddress na) {
+    return this.networkAccess.isLocal(na);
+  }
+
+  public NetworkAddress getOriginAddress() {
+    return this.networkAccess.getOriginAddress();
   }
 
   @Override

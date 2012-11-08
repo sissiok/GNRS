@@ -32,7 +32,7 @@ public class NetworkAddress {
   /**
    * The type of address.
    */
-  private AddressType type;
+  protected AddressType type;
 
   
 
@@ -52,70 +52,7 @@ public class NetworkAddress {
     
   }
 
-  /**
-   * Converts the specified ASCII-encoded String to a Network Address value.
-   * More specifically, the raw bytes of asString, when ASCII-encoded, are
-   * stored in the bytes field. The resulting Network Address will be truncated
-   * or padded with zeros as necessary.
-   * 
-   * @param s
-   *          the String to convert.
-   * @return a Network Address with the value of the String
-   * @throws UnsupportedEncodingException
-   *           if the String cannot be decoded to ASCII characters
-   */
-  public static NetworkAddress ipv4FromASCII(final String s)
-      throws UnsupportedEncodingException {
-    if (s == null || s.length() == 0) {
-      return null;
-    }
-
-    String[] components = s.split(":");
-
-    InetAddress inet;
-    try {
-      inet = InetAddress.getByName(components[0]);
-    } catch (UnknownHostException e) {
-      log.error("Unable to parse IPv4 address.", e);
-      return null;
-    }
-
-    short port = GNRSServer.DEFAULT_PORT;
-    if (components.length > 1) {
-      port = Short.parseShort(components[1]);
-    }
-
-    NetworkAddress address = new NetworkAddress();
-    byte[] newValue= new byte[AddressType.INET_4_UDP.getMaxLength()];
-    System.arraycopy(inet.getAddress(), 0, newValue, 0, 4);
-    newValue[newValue.length - 2] = (byte) (port >> 8);
-    newValue[newValue.length - 1] = (byte) port;
-    address.setType(AddressType.INET_4_UDP);
-    address.setValue(newValue);
-    return address;
-  }
-
-  /**
-   * Creates a new NetworkAddress from the binary value of the integer. The 4
-   * bytes of the integer value are copied into the high bytes (index 0-3) of
-   * the network address.
-   * 
-   * @param i
-   *          the integer to create an address from.
-   * @return the created network address.
-   */
-  public static NetworkAddress ipv4FromInteger(final int i) {
-    NetworkAddress address = new NetworkAddress();
-    byte[] newValue = new byte[AddressType.INET_4_UDP.getMaxLength()];
-    newValue[0] = (byte) (i >> 24);
-    newValue[1] = (byte) (i >> 16);
-    newValue[2] = (byte) (i >> 8);
-    newValue[3] = (byte) (i);
-    address.setType(AddressType.INET_4_UDP);
-    address.setValue(newValue);
-    
-    return address;
-  }
+  
 
   /**
    * Returns the raw (binary) form of this network address as a byte array.

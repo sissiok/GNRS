@@ -15,6 +15,12 @@ import edu.rutgers.winlab.mfirst.structures.NetworkAddress;
 public abstract class AbstractMessage {
 
   /**
+   * The time at which this object was created, in nanosecond. Note that
+   * nanosecond time is only relative and has nothing to do with "wall time".
+   */
+  public final long createdNanos = System.nanoTime();
+
+  /**
    * Actually used as 32-bit unsigned int
    */
   protected long requestId;
@@ -23,7 +29,7 @@ public abstract class AbstractMessage {
    * Version number of the protocol format.
    */
   protected byte version = 0;
-  
+
   /**
    * Unsigned 8-bit type value
    */
@@ -100,12 +106,12 @@ public abstract class AbstractMessage {
   public void setOriginAddress(NetworkAddress address) {
     this.originAddress = address;
   }
-  
-  public int getMessageLength(){
+
+  public int getMessageLength() {
     // Version, type, length, request id, requestor address
     return 8 + 4 + this.originAddress.getLength() + this.getPayloadLength();
   }
-  
+
   protected abstract int getPayloadLength();
 
   public byte getVersion() {

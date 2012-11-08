@@ -71,14 +71,7 @@ public class InsertTask implements Callable<Object> {
     response.setRequestId(this.message.getRequestId());
     response.setResponseCode(success ? ResponseCode.SUCCESS
         : ResponseCode.FAILED);
-
-    try {
-      response.setOriginAddress(NetworkAddress.ipv4FromASCII(this.server.config
-          .getBindIp() + ":" + this.server.config.getListenPort()));
-    } catch (UnsupportedEncodingException e) {
-      log.error("Unable to parse bind IP for the server. Please check the configuration file.");
-      return null;
-    }
+    response.setOriginAddress(this.server.getOriginAddress());
 
     this.server.sendMessage(this.params, response);
 

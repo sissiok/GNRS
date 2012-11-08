@@ -1,10 +1,4 @@
 <edu.rutgers.winlab.mfirst.Configuration>
-  <!-- Port number for incoming UDP packets -->
-  <listenPort>5001</listenPort>
-
-  <!-- Interface IP address to bind to. Leave blank for "any". -->
-  <bindIp>localhost</bindIp>
-
   <!--  The number of worker threads to use when processing messages.  
         This number is  above and beyond the primary NIO thread which will process 
         messages. If this value is 0 or negative, then 1 worker thread will 
@@ -30,8 +24,14 @@
   <asBindingFile>src/main/resources/as-binding.ipv4</asBindingFile>
   
   <!-- 
-       The type of networking to be used by the server.  Possible values are:
+       The type of networking to be used by the server. Changes to this value
+       mean that the networkConfiguration parameter be reference the correct
+       configuration file.  
+       Possible values are:
          * "ipv4udp" - IPv4 with UDP
    -->
   <networkType>ipv4udp</networkType>
+  
+  <!-- Configuration file name for the network access object. -->
+  <networkConfiguration>src/main/resources/net-ipv4.xml</networkConfiguration>
 </edu.rutgers.winlab.mfirst.Configuration>

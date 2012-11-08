@@ -97,9 +97,7 @@ public class LookupTask implements Callable<Object> {
       }
 
       // Loopback? Then the local server should handle it.
-      // TODO: Check if this is the server's local address
-      if (replicaAddress.getAddress().isLoopbackAddress()
-          || replicaAddress.equals(this.server.localAddress)) {
+      if (this.server.isLocalAddress(addx)) {
         resolvedLocally = true;
         break;
       }
@@ -111,14 +109,6 @@ public class LookupTask implements Callable<Object> {
     LookupResponseMessage response = new LookupResponseMessage();
     response.setRequestId(this.message.getRequestId());
 
-    try {
-      response.setOriginAddress(NetworkAddress.ipv4FromASCII(this.server.config
-          .getBindIp() + ":" + this.server.config.getListenPort()));
-    } catch (UnsupportedEncodingException e) {
-      log.error("Unable to parse bind IP for the server. Please check the configuration file.");
-      return null;
-    }
-
     // At least one IP prefix binding was for the local server
     if (resolvedLocally) {
       // log.debug("Resolving {} locally.", message);
@@ -129,19 +119,16 @@ public class LookupTask implements Callable<Object> {
     } else {
       response.setResponseCode(ResponseCode.FAILED);
     }
+    response.setOriginAddress(this.server.getOriginAddress());
     long t40 = System.nanoTime();
     // log.debug("[{}] Writing {}", this.container.session, response);
     this.server.sendMessage(this.params, response);
 
-    // FIXME: Remove the following line to allow messages to be buffered and
-    // keep going
-//    future.awaitUninterruptibly();
-
     long t50 = System.nanoTime();
 
     // TODO: Get stats working again.
-    // GNRSServer.messageLifetime.addAndGet(System.nanoTime()
-    // - this.container.creationTimestamp);
+     GNRSServer.messageLifetime.addAndGet(System.nanoTime()
+     - message.createdNanos);
 
     if (log.isDebugEnabled()) {
       log.debug(String
