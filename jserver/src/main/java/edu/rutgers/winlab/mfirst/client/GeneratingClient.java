@@ -29,11 +29,11 @@ import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.XStream;
 
-import edu.rutgers.winlab.mfirst.messages.GNRSProtocolCodecFactory;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.ResponseCode;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
+import edu.rutgers.winlab.mfirst.net.ipv4udp.GNRSProtocolCodecFactory;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPAddress;
 import edu.rutgers.winlab.mfirst.structures.GUID;
 

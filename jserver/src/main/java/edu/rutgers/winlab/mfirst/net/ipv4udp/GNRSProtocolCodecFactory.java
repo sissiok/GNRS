@@ -3,18 +3,14 @@
  * Copyright (C) 2012 Robert Moore and Rutgers University
  * All rights reserved.
  */
-package edu.rutgers.winlab.mfirst.messages;
+package edu.rutgers.winlab.mfirst.net.ipv4udp;
 
 import org.apache.mina.filter.codec.demux.DemuxingProtocolCodecFactory;
 
-import edu.rutgers.winlab.mfirst.net.ipv4udp.InsertDecoder;
-import edu.rutgers.winlab.mfirst.net.ipv4udp.InsertEncoder;
-import edu.rutgers.winlab.mfirst.net.ipv4udp.InsertResponseDecoder;
-import edu.rutgers.winlab.mfirst.net.ipv4udp.InsertResponseEncoder;
-import edu.rutgers.winlab.mfirst.net.ipv4udp.LookupDecoder;
-import edu.rutgers.winlab.mfirst.net.ipv4udp.LookupEncoder;
-import edu.rutgers.winlab.mfirst.net.ipv4udp.LookupResponseDecoder;
-import edu.rutgers.winlab.mfirst.net.ipv4udp.LookupResponseEncoder;
+import edu.rutgers.winlab.mfirst.messages.InsertMessage;
+import edu.rutgers.winlab.mfirst.messages.InsertResponseMessage;
+import edu.rutgers.winlab.mfirst.messages.LookupMessage;
+import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
 
 /**
  * @author Robert Moore

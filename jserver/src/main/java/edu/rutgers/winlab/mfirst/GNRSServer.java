@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.Collection;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,8 +27,9 @@ import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.XStream;
 
+import edu.rutgers.winlab.mfirst.mapping.GUIDMapper;
+import edu.rutgers.winlab.mfirst.mapping.ipv4udp.IPv4UDPGUIDMapper;
 import edu.rutgers.winlab.mfirst.messages.AbstractMessage;
-import edu.rutgers.winlab.mfirst.messages.GNRSProtocolCodecFactory;
 import edu.rutgers.winlab.mfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mfirst.net.AddressType;
@@ -35,6 +37,7 @@ import edu.rutgers.winlab.mfirst.net.MessageListener;
 import edu.rutgers.winlab.mfirst.net.NetworkAccessObject;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.SessionParameters;
+import edu.rutgers.winlab.mfirst.net.ipv4udp.GNRSProtocolCodecFactory;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPAddress;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPNAO;
 
@@ -163,20 +166,9 @@ public class GNRSServer implements MessageListener {
   private NetworkAccessObject networkAccess;
 
   /**
-   * Mapping network address prefixes to AS/addresses.
+   * Mapping provider for converting a GUID to a set of Network Address values.
    */
-  public final NetworkAddressMapper networkAddressMap = new NetworkAddressMapper(
-      AddressType.INET_4_UDP);
-
-  /**
-   * Mapping of Autonomous System numbers to their network locations.
-   */
-  public final ConcurrentHashMap<Integer, InetSocketAddress> asAddresses = new ConcurrentHashMap<Integer, InetSocketAddress>();
-
-  /**
-   * Hash function for converting a GUID to a set of Network Address vaules.
-   */
-  public final GUIDHasher guidHasher;
+  public GUIDMapper guidMapper;
 
   /**
    * GUID binding storage object.
@@ -203,14 +195,11 @@ public class GNRSServer implements MessageListener {
       this.statsTimer = null;
     }
 
-    // Hash GUID to Network Address
-    this.guidHasher = new MessageDigestHasher(this.config.getHashAlgorithm());
-
-    // Load the network prefix announcements
-    this.loadPrefixes(this.config.getPrefixFile());
-
-    // Load the AS network address binding values
-    this.loadAsNetworkBindings(this.config.getASBindingFile());
+    if (!this.createMapper(this.config.getNetworkType())) {
+      log.error("Unable to create GUID mapper of type {}",
+          this.config.getNetworkType());
+      throw new IllegalArgumentException("Unable to create GUID mapper object.");
+    }
 
     // Configure extra threads to handle message processing
     int numThreads = this.config.getNumWorkerThreads();
@@ -227,101 +216,6 @@ public class GNRSServer implements MessageListener {
       throw new IllegalArgumentException(
           "Unable to create network access object.");
     }
-
-  }
-
-  /**
-   * Loads network prefix mappings from a file.
-   * 
-   * @param prefixFilename
-   *          the filename of the prefix mapping file.
-   * @throws IOException
-   *           if an exception occurs while reading the file.
-   */
-  private void loadPrefixes(final String prefixFilename) throws IOException {
-    File prefixFile = new File(prefixFilename);
-    BufferedReader lineReader = new BufferedReader(new FileReader(prefixFile));
-
-    String line = lineReader.readLine();
-    while (line != null) {
-      // Eliminate leading/trailing whitespace
-      line = line.trim();
-      // Skip comments
-      if (line.length() == 0 || line.startsWith("#")) {
-        line = lineReader.readLine();
-        continue;
-      }
-
-      // log.debug("Parsing \"{}\"", line);
-      // Extract any comments and discard
-      String content = line.split("#")[0];
-
-      String[] generalComponents = content.split("\\s+");
-      if (generalComponents.length < 2) {
-        log.warn("Not enough components to parse the line \"{}\".", line);
-        continue;
-      }
-      // Extract the base address and prefix length
-      String[] prefixParts = generalComponents[0].split("/");
-      InetAddress addx = InetAddress.getByName(prefixParts[0]);
-      byte[] addxBytes = addx.getAddress();
-      // FIXME: Assuming IPv4 (4 bytes)
-      int addxAsInt = (addxBytes[0] << 24) | (addxBytes[1] << 16)
-          | (addxBytes[2] << 8) | (addxBytes[3]);
-      // Extract prefix length
-      int prefixLength = Integer.parseInt(prefixParts[1]);
-      // Apply the prefix
-      addxAsInt = addxAsInt & (0x80000000 >> prefixLength);
-
-      // FIXME: Still bound to IPv4
-      NetworkAddress na = IPv4UDPAddress.fromInteger(addxAsInt);
-      this.networkAddressMap.put(na, generalComponents[1]);
-
-      line = lineReader.readLine();
-    }
-    lineReader.close();
-    log.info("Finished loading prefix map.");
-
-  }
-
-  private void loadAsNetworkBindings(final String asBindingFilename)
-      throws IOException {
-    File asBindingFile = new File(asBindingFilename);
-    BufferedReader lineReader = new BufferedReader(
-        new FileReader(asBindingFile));
-
-    String line = lineReader.readLine();
-    while (line != null) {
-      // Eliminate leading/trailing whitespace
-      line = line.trim();
-      // Skip comments
-      if (line.length() == 0 || line.startsWith("#")) {
-        line = lineReader.readLine();
-        continue;
-      }
-
-      // log.debug("Parsing \"{}\"", line);
-      // Extract any comments and discard
-      String content = line.split("#")[0];
-
-      // Extract the 3 parts (AS #, IP address, port)
-      String[] generalComponents = content.split("\\s+");
-      if (generalComponents.length < 3) {
-        log.warn("Not enough components to parse the line \"{}\".", line);
-        continue;
-      }
-
-      Integer asNumber = Integer.valueOf(generalComponents[0]);
-      String ipAddrString = generalComponents[1];
-      int port = Integer.parseInt(generalComponents[2]);
-
-      InetSocketAddress sockAddx = new InetSocketAddress(ipAddrString, port);
-      this.asAddresses.put(asNumber, sockAddx);
-
-      line = lineReader.readLine();
-    }
-    lineReader.close();
-    log.info("Finished loading AS network binding values.");
 
   }
 
@@ -355,6 +249,24 @@ public class GNRSServer implements MessageListener {
         return false;
       }
       this.networkAccess.addMessageListener(this);
+    } else {
+      log.error("Unrecognized networking type: {}", networkType);
+      return false;
+    }
+
+    return true;
+  }
+
+  private boolean createMapper(final String networkType) {
+    // IPv4 + UDP
+    if ("ipv4udp".equalsIgnoreCase(networkType)) {
+      try {
+        this.guidMapper = new IPv4UDPGUIDMapper(
+            this.config.getMappingConfiguration());
+      } catch (IOException ioe) {
+        log.error("Unable to create IPv4/UDP GUID mapper.", ioe);
+        return false;
+      }
     } else {
       log.error("Unrecognized networking type: {}", networkType);
       return false;
@@ -401,6 +313,23 @@ public class GNRSServer implements MessageListener {
       this.store.insertBinding(guid, b);
     }
     return true;
+  }
+
+  /**
+   * Convenience accessor method for tasks to retrieve the correct mapping for a
+   * GUID.
+   * 
+   * @param guid
+   *          the GUID to map.
+   * @param numAddresses
+   *          the number of addresses of each type to map (number of replicas).
+   * @return a Collection containing the appropriate network mappings, or
+   *         {@code null} if none could be created.
+   */
+  public Collection<NetworkAddress> getMappings(final GUID guid,
+      final AddressType... types) {
+    return this.guidMapper
+        .getMapping(guid, this.config.getNumReplicas(), types);
   }
 
   /**

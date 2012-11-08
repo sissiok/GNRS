@@ -27,6 +27,8 @@ public class Configuration {
    */
   private boolean ascynchronousWrite = false;
 
+  
+
   /**
    * The address to which the server should bind.
    * 

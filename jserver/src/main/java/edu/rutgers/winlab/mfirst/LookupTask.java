@@ -68,46 +68,33 @@ public class LookupTask implements Callable<Object> {
     long t10 = System.nanoTime();
     GNRSServer.numLookups.incrementAndGet();
 
-    Collection<NetworkAddress> hashedAddxes = this.server.guidHasher.hash(
-        this.message.getGuid(), AddressType.INET_4_UDP,
-        this.server.config.getNumReplicas());
+    Collection<NetworkAddress> hashedAddxes = this.server.getMappings(
+        message.getGuid(), message.getOriginAddress().getType());
 
     long t20 = System.nanoTime();
 
+    LookupResponseMessage response = new LookupResponseMessage();
+    response.setRequestId(this.message.getRequestId());
+
     if (hashedAddxes == null) {
-      log.error("No binding generated for {}.", this.message.getGuid());
-      return null;
+      response.setResponseCode(ResponseCode.FAILED);
     }
 
     // log.debug("Hashed {} -> {}", message.getGuid(), hashedAddxes);
 
     boolean resolvedLocally = false;
+    if (hashedAddxes != null) {
+      for (NetworkAddress addx : hashedAddxes) {
+        // Loopback? Then the local server should handle it.
+        if (this.server.isLocalAddress(addx)) {
+          resolvedLocally = true;
+          break;
+        }
 
-    for (NetworkAddress addx : hashedAddxes) {
-      String asNumString = this.server.networkAddressMap.get(addx);
-      if (asNumString == null) {
-        log.error("Missing GNRS server for {}", addx);
-        continue;
       }
-      InetSocketAddress replicaAddress = this.server.asAddresses.get(Integer
-          .parseInt(asNumString));
-      if (replicaAddress == null) {
-        log.error("No network information for AS {}.", replicaAddress);
-        continue;
-      }
-
-      // Loopback? Then the local server should handle it.
-      if (this.server.isLocalAddress(addx)) {
-        resolvedLocally = true;
-        break;
-      }
-
     }
 
     long t30 = System.nanoTime();
-
-    LookupResponseMessage response = new LookupResponseMessage();
-    response.setRequestId(this.message.getRequestId());
 
     // At least one IP prefix binding was for the local server
     if (resolvedLocally) {
@@ -127,8 +114,8 @@ public class LookupTask implements Callable<Object> {
     long t50 = System.nanoTime();
 
     // TODO: Get stats working again.
-     GNRSServer.messageLifetime.addAndGet(System.nanoTime()
-     - message.createdNanos);
+    GNRSServer.messageLifetime.addAndGet(System.nanoTime()
+        - message.createdNanos);
 
     if (log.isDebugEnabled()) {
       log.debug(String

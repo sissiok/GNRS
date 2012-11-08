@@ -13,15 +13,7 @@
        slightly faster code. -->
   <collectStatistics>true</collectStatistics>
 
-  <!-- The hashing algorithm to use.  Should be one of: MD2, MD5, SHA-1, SHA-256, SHA-384, or SHA-512. -->
-  <hashAlgorithm>SHA-1</hashAlgorithm>
-
-  <!-- Prefix filename. Maps network address prefixes to AS numbers. Will be removed in future versions. -->
-  <prefixFile>src/main/resources/prefixes.ipv4</prefixFile>
-
-  <!-- AS bindings filename. Maps Autonomous Systems to their network identities (IP address, port). Will be removed
-       in future versions. -->
-  <asBindingFile>src/main/resources/as-binding.ipv4</asBindingFile>
+  
   
   <!-- 
        The type of networking to be used by the server. Changes to this value
@@ -34,4 +26,7 @@
   
   <!-- Configuration file name for the network access object. -->
   <networkConfiguration>src/main/resources/net-ipv4.xml</networkConfiguration>
+  
+  <!-- Configuration file name for the GUID mapping object. -->
+  <mappingConfiguration>src/main/resources/map-ipv4.xml</mappingConfiguration>
 </edu.rutgers.winlab.mfirst.Configuration>
