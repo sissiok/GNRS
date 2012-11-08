@@ -12,6 +12,8 @@ import edu.rutgers.winlab.mfirst.net.AddressType;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 
 /**
+ * Patricia Trie key analyzer for NetworkAddress objects.
+ * 
  * @author Robert Moore
  * 
  */
@@ -24,9 +26,8 @@ public class NetworkAddressKeyAnalyzer implements KeyAnalyzer<NetworkAddress> {
 
   /**
    * Constructor kept private.
+   * @param type the type of address this analyzer will process.
    * 
-   * @param byteLength
-   *          the length of the byte array.
    */
   private NetworkAddressKeyAnalyzer(final AddressType type) {
     super();
@@ -36,7 +37,8 @@ public class NetworkAddressKeyAnalyzer implements KeyAnalyzer<NetworkAddress> {
   /**
    * Creates a new NetworkAddressKeyAnalyzer for addresses of the specified
    * length.
-   * @param byteLength the length of the addresses in bytes.
+   * @param type the type of address to create an analyzer for.
+   * 
    * @return some analyzer for addresses of the specified length.
    */
   public static NetworkAddressKeyAnalyzer create(final AddressType type) {
