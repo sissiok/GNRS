@@ -93,8 +93,6 @@ public class LookupTask implements Callable<Object> {
       }
     }
 
-    long t30 = System.nanoTime();
-
     // At least one IP prefix binding was for the local server
     if (resolvedLocally) {
       // log.debug("Resolving {} locally.", message);
@@ -106,22 +104,20 @@ public class LookupTask implements Callable<Object> {
       response.setResponseCode(ResponseCode.FAILED);
     }
     response.setOriginAddress(this.server.getOriginAddress());
-    long t40 = System.nanoTime();
+    long t30 = System.nanoTime();
     // log.debug("[{}] Writing {}", this.container.session, response);
     this.server.sendMessage(this.params, response);
 
-    long t50 = System.nanoTime();
-
-    GNRSServer.messageLifetime.addAndGet(System.nanoTime()
-        - this.message.createdNanos);
-
+    long t40 = System.nanoTime();
+    if (this.server.config.isCollectStatistics()) {
+      GNRSServer.messageLifetime.addAndGet(System.nanoTime()
+          - this.message.createdNanos);
+    }
     if (log.isDebugEnabled()) {
-      log.debug(String
-          .format(
-              "Processing: %,dns [Hash: %,dns, NetMap: %,dns, GetBind: %,dns, Write: %,dns] \n",
-              Long.valueOf(t50 - t10), Long.valueOf(t20 - t10),
-              Long.valueOf(t30 - t20), Long.valueOf(t40 - t30),
-              Long.valueOf(t50 - t40)));
+      log.debug(String.format(
+          "Processing: %,dns [Map: %,dns, GetBind: %,dns, Write: %,dns] \n",
+          Long.valueOf(t40 - t10), Long.valueOf(t20 - t10),
+          Long.valueOf(t30 - t20), Long.valueOf(t40 - t30)));
     }
     return null;
   }

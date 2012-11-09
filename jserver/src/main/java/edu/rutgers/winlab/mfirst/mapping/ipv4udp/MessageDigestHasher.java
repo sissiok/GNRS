@@ -3,7 +3,7 @@
  * Copyright (C) 2012 Robert Moore and Rutgers University
  * All rights reserved.
  */
-package edu.rutgers.winlab.mfirst.storage;
+package edu.rutgers.winlab.mfirst.mapping.ipv4udp;
 
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;

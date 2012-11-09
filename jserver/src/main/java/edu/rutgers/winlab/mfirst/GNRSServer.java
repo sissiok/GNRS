@@ -135,13 +135,13 @@ public class GNRSServer implements MessageListener {
   /**
    * Number of lookups performed since last stats output.
    */
-  static AtomicInteger numLookups = new AtomicInteger(0);
+  static final AtomicInteger numLookups = new AtomicInteger(0);
 
   /**
    * Total number of nanoseconds spent processing messages since last stats
    * report.
    */
-  static AtomicLong messageLifetime = new AtomicLong(0);
+  static final AtomicLong messageLifetime = new AtomicLong(0);
 
   /**
    * Thread pool for distributing tasks.

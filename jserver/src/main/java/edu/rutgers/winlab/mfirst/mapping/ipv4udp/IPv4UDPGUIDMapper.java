@@ -31,8 +31,6 @@ import edu.rutgers.winlab.mfirst.net.NetworkAccessObject;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.mapping.ipv4udp.Configuration;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPAddress;
-import edu.rutgers.winlab.mfirst.storage.GUIDHasher;
-import edu.rutgers.winlab.mfirst.storage.MessageDigestHasher;
 import edu.rutgers.winlab.mfirst.storage.NetworkAddressMapper;
 import edu.rutgers.winlab.mfirst.structures.GUID;
 
@@ -249,7 +247,7 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
             log.error("Found mapping hole for {}",na);
             continue;
           }
-          InetSocketAddress asGNRSAddr = this.asAddresses.get(Integer.parseInt(autonomousSystem));
+          InetSocketAddress asGNRSAddr = this.asAddresses.get(Integer.decode(autonomousSystem));
           NetworkAddress finalAddr = IPv4UDPAddress.fromInetSocketAddress(asGNRSAddr);
           if(finalAddr != null){
             returnedAddresses.add(finalAddr);
