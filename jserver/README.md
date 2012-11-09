@@ -59,7 +59,7 @@ monitoring the server directly.
 
 ## Test Client ##
 A test client is included and can be run from the same JAR by specifying the
-correct class `edu.rutgers.winlab.mobilityfirst.client.TraceClient`.  Once
+correct class `edu.rutgers.winlab.mfirst.client.TraceClient`.  Once
 again, this is a bit unwieldy, so a convenient Bash script, `gbench` has been
 created to simplify things.
 
@@ -79,7 +79,7 @@ you've just finished building the JAR file with Maven, you can launch the
 client (using the included example files) like this:
 
     java -cp target/gnrs-server-1.0.0-SNAPSHOT-jar-with-dependencies.jar \\
-      edu.rutgers.winlab.mobilityfirst.client.TraceClient \\
+      edu.rutgers.winlab.mfirst.client.TraceClient \\
       src/main/resources/client.xml src/main/resources/example.trace 1
 
 Of course, who can remember all that?  Why not copy your configuration and
