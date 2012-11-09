@@ -45,6 +45,7 @@ import edu.rutgers.winlab.mfirst.storage.GUIDHasher;
 import edu.rutgers.winlab.mfirst.storage.GUIDStore;
 import edu.rutgers.winlab.mfirst.storage.MessageDigestHasher;
 import edu.rutgers.winlab.mfirst.storage.NetworkAddressMapper;
+import edu.rutgers.winlab.mfirst.storage.SimpleGUIDStore;
 import edu.rutgers.winlab.mfirst.structures.GNRSRecord;
 import edu.rutgers.winlab.mfirst.structures.GUID;
 import edu.rutgers.winlab.mfirst.structures.GUIDBinding;
@@ -173,7 +174,7 @@ public class GNRSServer implements MessageListener {
   /**
    * GUID binding storage object.
    */
-  private final GUIDStore store = new GUIDStore();
+  private final GUIDStore store = new SimpleGUIDStore();
 
   /**
    * Creates a new GNRS server with the specified configuration. The server will

@@ -39,7 +39,7 @@ public class IPv4UDPAddress extends NetworkAddress {
    */
   private static final Logger log = LoggerFactory
       .getLogger(IPv4UDPAddress.class);
-  
+
   /**
    * Converts the specified ASCII-encoded String to a Network Address value.
    * More specifically, the raw bytes of asString, when ASCII-encoded, are
@@ -149,18 +149,25 @@ public class IPv4UDPAddress extends NetworkAddress {
     return new IPv4UDPAddress(fullAddx);
 
   }
+
   @Override
-  public String toString(){
+  public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append(Integer.toString(this.value[0]&0xFF));
+    sb.append(Integer.toString(this.value[0] & 0xFF));
     sb.append('.');
-    sb.append(Integer.toString(this.value[1]&0xFF));
+    sb.append(Integer
+        .toString(this.value.length > 1 ? this.value[1] & 0xFF : 0));
     sb.append('.');
-    sb.append(Integer.toString(this.value[2]&0xFF));
+    sb.append(Integer
+        .toString(this.value.length > 2 ? this.value[2] & 0xFF : 0));
     sb.append('.');
-    sb.append(Integer.toString(this.value[3]&0xFF));
-    sb.append(':');
-    sb.append(Integer.toString( (((int)this.value[4] << 8) | (this.value[5]&0xFF))&0xFFFF ) );
+    sb.append(Integer
+        .toString(this.value.length > 3 ? this.value[3] & 0xFF : 0));
+    if (this.value.length > 4) {
+      sb.append(':');
+      sb.append(Integer
+          .toString((((int) this.value[4] << 8) | (this.value[5] & 0xFF)) & 0xFFFF));
+    }
     return sb.toString();
   }
 }

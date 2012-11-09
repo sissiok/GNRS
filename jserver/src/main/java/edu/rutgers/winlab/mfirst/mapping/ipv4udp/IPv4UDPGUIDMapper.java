@@ -13,6 +13,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.LinkedList;
@@ -125,15 +126,32 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
       String[] prefixParts = generalComponents[0].split("/");
       InetAddress addx = InetAddress.getByName(prefixParts[0]);
       byte[] addxBytes = addx.getAddress();
-      // FIXME: Assuming IPv4 (4 bytes)
-      int addxAsInt = (addxBytes[0] << 24) | (addxBytes[1] << 16)
-          | (addxBytes[2] << 8) | (addxBytes[3]);
+      int addxAsInt = ((addxBytes[0] << 24)&0xFF000000) | ((addxBytes[1] << 16)&0xFF0000)
+          | ((addxBytes[2] << 8)&0xFF00) | ((addxBytes[3])&0xFF);
+      
+    
       // Extract prefix length
       int prefixLength = Integer.parseInt(prefixParts[1]);
       // Apply the prefix
       addxAsInt = addxAsInt & (0x80000000 >> prefixLength);
 
+      
+      
       NetworkAddress na = IPv4UDPAddress.fromInteger(addxAsInt);
+      byte[] naBytes= na.getValue();
+      int realLength = 0;
+      for(byte b : naBytes){
+        if(b == 0){
+          break;
+        }
+        ++realLength;
+      }
+      if(realLength < naBytes.length){
+        na.setValue(Arrays.copyOf(naBytes,realLength));
+      }
+      
+     
+      
       this.networkAddressMap.put(na, generalComponents[1]);
 
       line = lineReader.readLine();
@@ -228,7 +246,7 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
           String autonomousSystem = this.networkAddressMap.get(na);
           if(autonomousSystem == null){
             // FIXME: Rehash?
-            log.error("Found mapping hold for {}",na);
+            log.error("Found mapping hole for {}",na);
             continue;
           }
           InetSocketAddress asGNRSAddr = this.asAddresses.get(Integer.parseInt(autonomousSystem));

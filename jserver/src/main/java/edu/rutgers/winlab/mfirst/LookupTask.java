@@ -82,8 +82,6 @@ public class LookupTask implements Callable<Object> {
       response.setResponseCode(ResponseCode.FAILED);
     }
 
-    // log.debug("Hashed {} -> {}", message.getGuid(), hashedAddxes);
-
     boolean resolvedLocally = false;
     if (serverAddxes != null) {
       for (NetworkAddress addx : serverAddxes) {

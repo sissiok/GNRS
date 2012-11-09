@@ -7,6 +7,8 @@ package edu.rutgers.winlab.mfirst.storage;
 
 import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.collection.Trie;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.rutgers.winlab.mfirst.net.AddressType;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
@@ -18,6 +20,12 @@ import edu.rutgers.winlab.mfirst.net.NetworkAddress;
  * 
  */
 public class NetworkAddressMapper {
+  
+  /**
+   * Logging for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(NetworkAddressMapper.class);
+  
   /**
    * Prefix trie used to find the closest match of a network address.
    */
@@ -58,6 +66,9 @@ public class NetworkAddressMapper {
     if (this.storageTrie.isEmpty()) {
       return null;
     }
-    return this.storageTrie.selectValue(na);
+    
+    NetworkAddress mappedValue = this.storageTrie.selectKey(na);
+    
+   return this.storageTrie.selectValue(na);
   }
 }
