@@ -5,7 +5,6 @@
  */
 package edu.rutgers.winlab.mfirst;
 
-import java.io.UnsupportedEncodingException;
 import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
@@ -14,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import edu.rutgers.winlab.mfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mfirst.messages.InsertResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.ResponseCode;
-import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.SessionParameters;
 
 /**
@@ -29,6 +27,7 @@ public class InsertTask implements Callable<Object> {
   /**
    * Logging for this class.
    */
+  @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(InsertTask.class);
 
   /**
@@ -36,6 +35,9 @@ public class InsertTask implements Callable<Object> {
    */
   private final SessionParameters params;
 
+  /**
+   * The received insert message.
+   */
   private final InsertMessage message;
 
   /**

@@ -33,7 +33,6 @@ import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.GNRSProtocolCodecFactory;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPAddress;
 import edu.rutgers.winlab.mfirst.structures.GUID;
-import edu.rutgers.winlab.mfirst.structures.GUIDBinding;
 
 /**
  * @author Robert Moore
@@ -176,15 +175,14 @@ public class TraceClient extends IoHandlerAdapter {
     String line = null;
     NetworkAddress fromAddress = null;
     try {
-      fromAddress = IPv4UDPAddress.fromASCII(this.config.getClientHost()
-          + ":" + this.config.getClientPort());
+      fromAddress = IPv4UDPAddress.fromASCII(this.config.getClientHost() + ":"
+          + this.config.getClientPort());
     } catch (UnsupportedEncodingException uee) {
       log.error(
           "Unable to parse local host name from configuration parameter.", uee);
       return;
     }
 
-    int fromPort = this.config.getClientPort();
     try {
       while ((line = reader.readLine()) != null) {
         line = line.trim();
@@ -277,8 +275,7 @@ public class TraceClient extends IoHandlerAdapter {
           log.error("Unable to parse network address from ASCII string.", uee);
           break;
         }
-        long ttl = Long.parseLong(bindingValues[1]);
-        int weight = Integer.parseInt(bindingValues[2]);
+
         bindings[i] = na;
 
       }

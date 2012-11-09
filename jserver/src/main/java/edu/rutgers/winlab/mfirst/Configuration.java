@@ -23,8 +23,6 @@ public class Configuration {
    */
   private boolean collectStatistics = false;
 
-  
-
   /**
    * The number of replicas to use when inserting or retrieving bindings from
    * the network.
@@ -87,34 +85,92 @@ public class Configuration {
     this.collectStatistics = collectStatistics;
   }
 
+  /**
+   * The number of replica GNRS servers to utilize.
+   * 
+   * @return the current number of replicas.
+   */
   public int getNumReplicas() {
-    return numReplicas;
+    return this.numReplicas;
   }
 
+  /**
+   * Sets the number of replica GNRS servers to utilize.
+   * 
+   * @param numReplicas
+   *          the new number of replicas.
+   */
   public void setNumReplicas(int numReplicas) {
     this.numReplicas = numReplicas;
   }
 
+  /**
+   * Gets the network type for the server.
+   * 
+   * 
+   * @return the network type value.
+   */
   public String getNetworkType() {
-    return networkType;
+    return this.networkType;
   }
 
+  /**
+   * Sets the network type for the server.
+   * <p>
+   * Currently-supported types:
+   * </p>
+   * <table>
+   * <thead>
+   * <th style="text-align: left">Value</th>
+   * <th style="text-align: left">Description</th>
+   * </thead>
+   * <tr>
+   * <td><code>ipv4udp</code></td>
+   * <td>Internet Protocol version 4 with UDP.</td>
+   * </tr>
+   * </table>
+   * 
+   * @param networkType
+   *          the new network type value.
+   */
   public void setNetworkType(String networkType) {
     this.networkType = networkType;
   }
 
+  /**
+   * Get the name of the network configuration file.
+   * 
+   * @return the network configuration filename.
+   */
   public String getNetworkConfiguration() {
-    return networkConfiguration;
+    return this.networkConfiguration;
   }
 
+  /**
+   * Sets the network configuration filename.
+   * 
+   * @param networkConfiguration
+   *          the new network configuration filename.
+   */
   public void setNetworkConfiguration(String networkConfiguration) {
     this.networkConfiguration = networkConfiguration;
   }
 
+  /**
+   * Gets the GUID mapping configuration filename.
+   * 
+   * @return the GUID mapping configuration filename.
+   */
   public String getMappingConfiguration() {
-    return mappingConfiguration;
+    return this.mappingConfiguration;
   }
 
+  /**
+   * Sets the GUID mapping configuration filename.
+   * 
+   * @param mappingConfiguration
+   *          the new filename.
+   */
   public void setMappingConfiguration(String mappingConfiguration) {
     this.mappingConfiguration = mappingConfiguration;
   }

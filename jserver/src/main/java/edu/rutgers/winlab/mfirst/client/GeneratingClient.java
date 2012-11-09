@@ -6,11 +6,9 @@
 package edu.rutgers.winlab.mfirst.client;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.LockSupport;
 
@@ -21,7 +19,6 @@ import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
-import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramConnector;
 import org.slf4j.Logger;
@@ -50,6 +47,9 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
    */
   static final Logger log = LoggerFactory.getLogger(GeneratingClient.class);
 
+  /**
+   * Rough estimate of how precise the system nanosecond timer is.
+   */
   // Linux supports a 50 microsecond precision
   static final long SYSTEM_SLEEP_PRECISION = System.getProperty("os.name")
       .equalsIgnoreCase("linux") ? 50000 : 1000000;
@@ -121,17 +121,17 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
   /**
    * Total number of lookup messages to generate.
    */
-  private final int numLookups;
+  final int numLookups;
 
   /**
    * Total number of successes.
    */
-  private final AtomicInteger numSuccess = new AtomicInteger(0);
+  final AtomicInteger numSuccess = new AtomicInteger(0);
 
   /**
    * Total number of failures.
    */
-  private final AtomicInteger numFailures = new AtomicInteger(0);
+  final AtomicInteger numFailures = new AtomicInteger(0);
 
   /**
    * Creates a new GeneratingClient with the configuration and delay values
@@ -162,7 +162,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
         new GNRSProtocolCodecFactory(false)));
 
     log.info(String.format("Assuming timer precision of %,dns.",
-        SYSTEM_SLEEP_PRECISION));
+        Long.valueOf(SYSTEM_SLEEP_PRECISION)));
 
   }
 
@@ -201,8 +201,9 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
           float success = ((succ * 1f) / total) * 100;
           float loss = ((GeneratingClient.this.numLookups - total * 1f) / GeneratingClient.this.numLookups) * 100;
           log.info(String.format(
-              "Total: %,d  |  Success: %,.2f%%  |  Loss: %,.2f%%)", total,
-              success, loss));
+              "Total: %,d  |  Success: %,.2f%%  |  Loss: %,.2f%%)",
+              Integer.valueOf(total), Float.valueOf(success),
+              Float.valueOf(loss)));
           future.getSession().close(true);
           GeneratingClient.this.connector.dispose(true);
         }
@@ -224,18 +225,15 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
   void generateLookups(final IoSession session) {
     log.info("Generating {} lookups.", Integer.valueOf(this.numLookups));
 
-    String line = null;
-    // FIXME: Get the origin address in the datagram correct
-    NetworkAddress fromAddress = null;
     try {
-      fromAddress = IPv4UDPAddress.fromASCII(this.config.getClientHost());
+      IPv4UDPAddress.fromASCII(this.config.getClientHost());
     } catch (UnsupportedEncodingException uee) {
       log.error(
           "Unable to parse local host name from configuration parameter.", uee);
       return;
     }
 
-    int fromPort = this.config.getClientPort();
+    this.config.getClientPort();
     NetworkAddress clientAddress = null;
     try {
       clientAddress = IPv4UDPAddress.fromASCII(this.config.getClientHost()
@@ -272,6 +270,14 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
 
   }
 
+  /**
+   * Determine how long to call on Lock.parkNanos(long) based on estimation of
+   * the system sleep precision.
+   * 
+   * @param desiredSleep
+   *          how long we would actually like to sleep.
+   * @return the actual sleep time to use.
+   */
   public static long getNanoSleep(final long desiredSleep) {
     long halfPrecision = SYSTEM_SLEEP_PRECISION / 4;
     long roundHalf = desiredSleep / (halfPrecision);
@@ -290,6 +296,12 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     }
   }
 
+  /**
+   * Handles a response message from the server.
+   * 
+   * @param msg
+   *          the response message.
+   */
   public void handleResponse(final LookupResponseMessage msg) {
     if (ResponseCode.SUCCESS.equals(msg.getResponseCode())) {
       this.numSuccess.incrementAndGet();

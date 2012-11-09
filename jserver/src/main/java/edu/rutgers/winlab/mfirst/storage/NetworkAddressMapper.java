@@ -20,17 +20,25 @@ import edu.rutgers.winlab.mfirst.net.NetworkAddress;
  * 
  */
 public class NetworkAddressMapper {
-  
+
   /**
    * Logging for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(NetworkAddressMapper.class);
-  
+  @SuppressWarnings("unused")
+  private static final Logger log = LoggerFactory
+      .getLogger(NetworkAddressMapper.class);
+
   /**
    * Prefix trie used to find the closest match of a network address.
    */
   private final Trie<NetworkAddress, String> storageTrie;
 
+  /**
+   * Creates a new mapper for the specified NetworkAddress type.
+   * 
+   * @param type
+   *          the AddressType for the mapper.
+   */
   public NetworkAddressMapper(final AddressType type) {
     super();
     this.storageTrie = new PatriciaTrie<NetworkAddress, String>(
@@ -66,9 +74,10 @@ public class NetworkAddressMapper {
     if (this.storageTrie.isEmpty()) {
       return null;
     }
-    
-    NetworkAddress mappedValue = this.storageTrie.selectKey(na);
-    
-   return this.storageTrie.selectValue(na);
+
+    // FIXME: Issue #9
+    // <https://bitbucket.org/romoore/gnrs/issue/9/ipv4-guid-mapping-should-rehash-then-find>
+
+    return this.storageTrie.selectValue(na);
   }
 }

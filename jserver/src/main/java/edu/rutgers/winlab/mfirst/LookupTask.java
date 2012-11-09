@@ -5,22 +5,17 @@
  */
 package edu.rutgers.winlab.mfirst;
 
-import java.io.UnsupportedEncodingException;
-import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.concurrent.Callable;
 
-import org.apache.mina.core.future.WriteFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.ResponseCode;
-import edu.rutgers.winlab.mfirst.net.AddressType;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.SessionParameters;
-import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPParameters;
 
 /**
  * Task to handle Lookup messages within the server. Designed to operate
@@ -35,8 +30,14 @@ public class LookupTask implements Callable<Object> {
    */
   private static final Logger log = LoggerFactory.getLogger(LookupTask.class);
 
+  /**
+   * The received lookup message.
+   */
   private final LookupMessage message;
 
+  /**
+   * Session parameters received with the message.
+   */
   private final SessionParameters params;
   /**
    * The server processing the message.
@@ -69,12 +70,10 @@ public class LookupTask implements Callable<Object> {
     GNRSServer.numLookups.incrementAndGet();
 
     Collection<NetworkAddress> serverAddxes = this.server.getMappings(
-        message.getGuid(), message.getOriginAddress().getType());
+        this.message.getGuid(), this.message.getOriginAddress().getType());
 
     long t20 = System.nanoTime();
 
-    
-    
     LookupResponseMessage response = new LookupResponseMessage();
     response.setRequestId(this.message.getRequestId());
 
@@ -113,15 +112,16 @@ public class LookupTask implements Callable<Object> {
 
     long t50 = System.nanoTime();
 
-    // TODO: Get stats working again.
     GNRSServer.messageLifetime.addAndGet(System.nanoTime()
-        - message.createdNanos);
+        - this.message.createdNanos);
 
     if (log.isDebugEnabled()) {
       log.debug(String
           .format(
               "Processing: %,dns [Hash: %,dns, NetMap: %,dns, GetBind: %,dns, Write: %,dns] \n",
-              t50 - t10, t20 - t10, t30 - t20, t40 - t30, t50 - t40));
+              Long.valueOf(t50 - t10), Long.valueOf(t20 - t10),
+              Long.valueOf(t30 - t20), Long.valueOf(t40 - t30),
+              Long.valueOf(t50 - t40)));
     }
     return null;
   }

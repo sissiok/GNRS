@@ -5,20 +5,13 @@
  */
 package edu.rutgers.winlab.mfirst;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -37,14 +30,8 @@ import edu.rutgers.winlab.mfirst.net.MessageListener;
 import edu.rutgers.winlab.mfirst.net.NetworkAccessObject;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.SessionParameters;
-import edu.rutgers.winlab.mfirst.net.ipv4udp.GNRSProtocolCodecFactory;
-import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPAddress;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPNAO;
-
-import edu.rutgers.winlab.mfirst.storage.GUIDHasher;
 import edu.rutgers.winlab.mfirst.storage.GUIDStore;
-import edu.rutgers.winlab.mfirst.storage.MessageDigestHasher;
-import edu.rutgers.winlab.mfirst.storage.NetworkAddressMapper;
 import edu.rutgers.winlab.mfirst.storage.SimpleGUIDStore;
 import edu.rutgers.winlab.mfirst.structures.GNRSRecord;
 import edu.rutgers.winlab.mfirst.structures.GUID;
@@ -164,12 +151,12 @@ public class GNRSServer implements MessageListener {
   /**
    * Networking interface for the server.
    */
-  private NetworkAccessObject networkAccess;
+  private final NetworkAccessObject networkAccess;
 
   /**
    * Mapping provider for converting a GUID to a set of Network Address values.
    */
-  public GUIDMapper guidMapper;
+  private final GUIDMapper guidMapper;
 
   /**
    * GUID binding storage object.
@@ -196,7 +183,9 @@ public class GNRSServer implements MessageListener {
       this.statsTimer = null;
     }
 
-    if (!this.createMapper(this.config.getNetworkType())) {
+    this.guidMapper = createMapper(this.config);
+    if (this.guidMapper == null) {
+
       log.error("Unable to create GUID mapper of type {}",
           this.config.getNetworkType());
       throw new IllegalArgumentException("Unable to create GUID mapper object.");
@@ -211,22 +200,26 @@ public class GNRSServer implements MessageListener {
     log.info("Using threadpool of {} threads.", Integer.valueOf(numThreads));
     this.workers = Executors.newFixedThreadPool(numThreads);
 
-    if (!this.createNAO(this.config.getNetworkType())) {
+    this.networkAccess = createNAO(this.config);
+    if (this.networkAccess == null) {
       log.error("Unable to create network access of type {}",
           this.config.getNetworkType());
       throw new IllegalArgumentException(
           "Unable to create network access object.");
     }
+    this.networkAccess.addMessageListener(this);
 
   }
 
   /**
    * Starts any necessary threads.
+   * 
+   * @return {@code true} if everything starts correctly.
    */
   public boolean startup() {
 
     if (this.collectStatistics) {
-      this.statsTimer.scheduleAtFixedRate(new StatsTask(this), 1000, 1000);
+      this.statsTimer.scheduleAtFixedRate(new StatsTask(), 1000, 1000);
     }
     return true;
   }
@@ -234,46 +227,50 @@ public class GNRSServer implements MessageListener {
   /**
    * Configures the server to use a specific type of networking.
    * 
-   * @param networkType
-   *          the network type value to use
+   * @param config
+   *          the server configuration.
+   * 
    * @return {@code true} if configuration succeeds, else {@code false}.
    */
   // TODO: Add new network types here.
-  private boolean createNAO(final String networkType) {
+  private static NetworkAccessObject createNAO(final Configuration config) {
     // IPv4 + UDP
-    if ("ipv4udp".equalsIgnoreCase(networkType)) {
+    if ("ipv4udp".equalsIgnoreCase(config.getNetworkType())) {
       try {
-        this.networkAccess = new IPv4UDPNAO(
-            this.config.getNetworkConfiguration());
+        return new IPv4UDPNAO(config.getNetworkConfiguration());
       } catch (IOException ioe) {
         log.error("Unable to create IPv4/UDP network access.", ioe);
-        return false;
+        return null;
       }
-      this.networkAccess.addMessageListener(this);
-    } else {
-      log.error("Unrecognized networking type: {}", networkType);
-      return false;
-    }
 
-    return true;
+    }
+    log.error("Unrecognized networking type: {}", config.getNetworkType());
+    return null;
+
   }
 
-  private boolean createMapper(final String networkType) {
+  /**
+   * Initializes the GUID&rarr;NetworkAddress mapper for the specified network
+   * type.
+   * 
+   * @param config
+   *          the server configuration.
+   * 
+   * @return {@code true} if the binding was successful, else {@code false}.
+   */
+  private static GUIDMapper createMapper(final Configuration config) {
     // IPv4 + UDP
-    if ("ipv4udp".equalsIgnoreCase(networkType)) {
+    if ("ipv4udp".equalsIgnoreCase(config.getNetworkType())) {
       try {
-        this.guidMapper = new IPv4UDPGUIDMapper(
-            this.config.getMappingConfiguration());
+        return new IPv4UDPGUIDMapper(config.getMappingConfiguration());
       } catch (IOException ioe) {
         log.error("Unable to create IPv4/UDP GUID mapper.", ioe);
-        return false;
+        return null;
       }
-    } else {
-      log.error("Unrecognized networking type: {}", networkType);
-      return false;
     }
+    log.error("Unrecognized networking type: {}", config.getNetworkType());
+    return null;
 
-    return true;
   }
 
   /**
@@ -304,6 +301,15 @@ public class GNRSServer implements MessageListener {
     return record.getBindings();
   }
 
+  /**
+   * Convenience method for Tasks to insert GUID bindings.
+   * 
+   * @param guid
+   *          the GUID to bind.
+   * @param bindings
+   *          the new bindings for the GUID
+   * @return {@code true} if the insert succeeds, else {@code false}.
+   */
   public boolean insertBindings(final GUID guid, final NetworkAddress[] bindings) {
     for (NetworkAddress a : bindings) {
       // TODO: Handle the future.
@@ -322,8 +328,9 @@ public class GNRSServer implements MessageListener {
    * 
    * @param guid
    *          the GUID to map.
-   * @param numAddresses
-   *          the number of addresses of each type to map (number of replicas).
+   * @param types
+   *          the set of AddressTypes to create mappings for. If no types are
+   *          specified, then the server's default address type is created.
    * @return a Collection containing the appropriate network mappings, or
    *         {@code null} if none could be created.
    */
@@ -331,56 +338,6 @@ public class GNRSServer implements MessageListener {
       final AddressType... types) {
     return this.guidMapper
         .getMapping(guid, this.config.getNumReplicas(), types);
-  }
-
-  /**
-   * Timer task that reports server-related statistics when called.
-   * 
-   * @author Robert Moore
-   * 
-   */
-  private static final class StatsTask extends TimerTask {
-    /**
-     * Logging for this task.
-     */
-    private static final Logger log = LoggerFactory.getLogger(StatsTask.class);
-    /**
-     * The server to report statistics about.
-     */
-    private final GNRSServer server;
-    /**
-     * The last time statistics were generated.
-     */
-    private long lastTimestamp = System.currentTimeMillis();
-
-    /**
-     * Creates a new task for the specified server.
-     * 
-     * @param server
-     *          the GNRS server to report statistics about.
-     */
-    public StatsTask(final GNRSServer server) {
-      super();
-      this.server = server;
-    }
-
-    @Override
-    public void run() {
-      long totalNanos = GNRSServer.messageLifetime.getAndSet(0l);
-      int numLookups = GNRSServer.numLookups.getAndSet(0);
-      long now = System.currentTimeMillis();
-
-      long timeDiff = now - this.lastTimestamp;
-      this.lastTimestamp = now;
-      float numSeconds = timeDiff / 1000f;
-      float lookupsPerSecond = numLookups / numSeconds;
-      float averageLifetimeUsec = numLookups == 0 ? 0
-          : ((totalNanos / (float) numLookups) / 1000);
-      log.info(String.format(
-          "\nLookups: %.3f per second (%.2f s)\nAverage Lifetime: %,.0fus",
-          Float.valueOf(lookupsPerSecond), Float.valueOf(numSeconds),
-          Float.valueOf(averageLifetimeUsec)));
-    }
   }
 
   /**
@@ -411,6 +368,12 @@ public class GNRSServer implements MessageListener {
     return this.networkAccess.isLocal(na);
   }
 
+  /**
+   * Gets this server's origin address. The type is dependent on the NAO being
+   * used.
+   * 
+   * @return the origin address value for this server.
+   */
   public NetworkAddress getOriginAddress() {
     return this.networkAccess.getOriginAddress();
   }
@@ -436,6 +399,53 @@ public class GNRSServer implements MessageListener {
       this.messageLock.notifyAll();
     }
 
+  }
+
+  /**
+   * Timer task that reports server-related statistics when called.
+   * 
+   * @author Robert Moore
+   * 
+   */
+  private static final class StatsTask extends TimerTask {
+
+    /**
+     * Logging for the statistics class.
+     */
+    @SuppressWarnings("hiding")
+    private static final Logger log = LoggerFactory.getLogger(StatsTask.class);
+
+    /**
+     * The last time statistics were generated.
+     */
+    private long lastTimestamp = System.currentTimeMillis();
+
+    /**
+     * Creates a new task for the specified server.
+     * 
+     */
+    public StatsTask() {
+      super();
+
+    }
+
+    @Override
+    public void run() {
+      long totalNanos = GNRSServer.messageLifetime.getAndSet(0l);
+      int numLookups = GNRSServer.numLookups.getAndSet(0);
+      long now = System.currentTimeMillis();
+
+      long timeDiff = now - this.lastTimestamp;
+      this.lastTimestamp = now;
+      float numSeconds = timeDiff / 1000f;
+      float lookupsPerSecond = numLookups / numSeconds;
+      float averageLifetimeUsec = numLookups == 0 ? 0
+          : ((totalNanos / (float) numLookups) / 1000);
+      log.info(String.format(
+          "\nLookups: %.3f per second (%.2f s)\nAverage Lifetime: %,.0fus",
+          Float.valueOf(lookupsPerSecond), Float.valueOf(numSeconds),
+          Float.valueOf(averageLifetimeUsec)));
+    }
   }
 
 }
