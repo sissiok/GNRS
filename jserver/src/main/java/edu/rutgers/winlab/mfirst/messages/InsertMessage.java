@@ -7,7 +7,6 @@ package edu.rutgers.winlab.mfirst.messages;
 
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.structures.GUID;
-import edu.rutgers.winlab.mfirst.structures.GUIDBinding;
 
 /**
  * A message for inserting a GUID->NetworkAddress binding into the GNRS server.
@@ -131,7 +130,7 @@ public class InsertMessage extends AbstractMessage {
    * @return the message options value.
    */
   public long getOptions() {
-    return options;
+    return this.options;
   }
 
   /**

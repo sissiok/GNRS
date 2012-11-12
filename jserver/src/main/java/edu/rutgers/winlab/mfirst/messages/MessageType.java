@@ -31,7 +31,7 @@ public enum MessageType {
   /**
    * An InsertAck message.
    * 
-   * @see InsertAckMessage
+   * @see InsertResponseMessage
    */
   INSERT_RESPONSE((byte) 0x80),
   /**

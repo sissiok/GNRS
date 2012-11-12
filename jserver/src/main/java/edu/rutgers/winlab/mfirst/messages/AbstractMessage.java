@@ -8,6 +8,8 @@ package edu.rutgers.winlab.mfirst.messages;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 
 /**
+ * Common fields for all GNRS application messages.
+ * 
  * @author Robert Moore
  * 
  */
@@ -107,17 +109,39 @@ public abstract class AbstractMessage {
     this.originAddress = address;
   }
 
+  /**
+   * The total encoded length of this message, in bytes.
+   * 
+   * @return the length of this message, in bytes, when encoded according to the
+   *         network protocol.
+   */
   public int getMessageLength() {
     // Version, type, length, request id, requestor address
     return 8 + 4 + this.originAddress.getLength() + this.getPayloadLength();
   }
 
+  /**
+   * The length of the "payload" section of this message.
+   * 
+   * @return the length of the payload of this message.
+   */
   protected abstract int getPayloadLength();
 
+  /**
+   * The version value of this message.
+   * 
+   * @return the version of this message.
+   */
   public byte getVersion() {
     return this.version;
   }
 
+  /**
+   * Sets the version value of this message.
+   * 
+   * @param version
+   *          the new version value.
+   */
   public void setVersion(byte version) {
     this.version = version;
   }

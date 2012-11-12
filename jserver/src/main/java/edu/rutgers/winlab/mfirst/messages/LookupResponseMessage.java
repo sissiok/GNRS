@@ -6,7 +6,6 @@
 package edu.rutgers.winlab.mfirst.messages;
 
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
-import edu.rutgers.winlab.mfirst.structures.GUIDBinding;
 
 /**
  * A Lookup Response message for GNRS.
@@ -15,10 +14,6 @@ import edu.rutgers.winlab.mfirst.structures.GUIDBinding;
  * 
  */
 public class LookupResponseMessage extends AbstractResponseMessage {
-  /**
-   * ResponseCode for this message.
-   */
-  private ResponseCode responseCode;
 
   /**
    * The bindings for this message.
@@ -31,25 +26,6 @@ public class LookupResponseMessage extends AbstractResponseMessage {
   public LookupResponseMessage() {
     super();
     super.type = MessageType.LOOKUP_RESPONSE;
-  }
-
-  /**
-   * Gets the ResponseCode for this message.
-   * 
-   * @return the ResponseCode for this message.
-   */
-  public ResponseCode getResponseCode() {
-    return this.responseCode;
-  }
-
-  /**
-   * Sets the ResponseCode for this message.
-   * 
-   * @param responseCode
-   *          the new ResponseCode
-   */
-  public void setResponseCode(ResponseCode responseCode) {
-    this.responseCode = responseCode;
   }
 
   /**
@@ -90,11 +66,17 @@ public class LookupResponseMessage extends AbstractResponseMessage {
   @Override
   protected int getResponsePayloadLength() {
     // Num bindings, bindings
-    return 4 + this.getBindingLength();
-    
+    return 4 + this.getBindingsLength();
+
   }
 
-  protected int getBindingLength() {
+  /**
+   * The length of the bindings in this message. Used to compute the message
+   * length.
+   * 
+   * @return the length, in bytes, of the bindings in this message.
+   */
+  protected int getBindingsLength() {
     int length = 0;
     if (this.bindings != null) {
       for (NetworkAddress addx : this.bindings) {
@@ -104,12 +86,13 @@ public class LookupResponseMessage extends AbstractResponseMessage {
     }
     return length;
   }
-  
+
   /**
    * Returns the number of bindings in this message.
+   * 
    * @return the number of bindings in this message.
    */
-  public long getNumBindings(){
+  public long getNumBindings() {
     return this.bindings == null ? 0 : this.bindings.length;
   }
 }
