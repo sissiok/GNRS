@@ -31,7 +31,7 @@ import edu.rutgers.winlab.mfirst.net.NetworkAccessObject;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.mapping.ipv4udp.Configuration;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPAddress;
-import edu.rutgers.winlab.mfirst.storage.NetworkAddressMapper;
+import edu.rutgers.winlab.mfirst.net.ipv4udp.NetworkAddressMapper;
 import edu.rutgers.winlab.mfirst.structures.GUID;
 
 /**

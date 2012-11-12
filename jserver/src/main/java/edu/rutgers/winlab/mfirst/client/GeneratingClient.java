@@ -127,6 +127,11 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
    * Total number of successes.
    */
   final AtomicInteger numSuccess = new AtomicInteger(0);
+  
+  /**
+   * Total number of responses with bindings.
+   */
+  final AtomicInteger numHits = new AtomicInteger(0);
 
   /**
    * Total number of failures.
@@ -200,9 +205,10 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
           int total = succ + GeneratingClient.this.numFailures.get();
           float success = ((succ * 1f) / total) * 100;
           float loss = ((GeneratingClient.this.numLookups - total * 1f) / GeneratingClient.this.numLookups) * 100;
+          float hits = ((GeneratingClient.this.numHits.get()*1f)/total)*100;
           log.info(String.format(
-              "Total: %,d  |  Success: %,.2f%%  |  Loss: %,.2f%%)",
-              Integer.valueOf(total), Float.valueOf(success),
+              "Total: %,d  |  Success: %,.2f%%  |  Hits: %,.2f%%  |  Loss: %,.2f%%)",
+              Integer.valueOf(total), Float.valueOf(success), Float.valueOf(hits),
               Float.valueOf(loss)));
           future.getSession().close(true);
           GeneratingClient.this.connector.dispose(true);
@@ -303,8 +309,12 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
    *          the response message.
    */
   public void handleResponse(final LookupResponseMessage msg) {
+    
     if (ResponseCode.SUCCESS.equals(msg.getResponseCode())) {
       this.numSuccess.incrementAndGet();
+      if(msg.getBindings() != null && msg.getBindings().length> 0){
+        this.numHits.incrementAndGet();
+      }
     } else {
       this.numFailures.incrementAndGet();
     }

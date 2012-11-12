@@ -46,6 +46,16 @@ public class Configuration {
    * networkType.
    */
   private String mappingConfiguration = "map-ipv4.xml";
+  
+  /**
+   * Type of GUID storage to use.
+   */
+  private String storeType = "berkeleydb";
+  
+  /**
+   * Configuration filename for the GUID storage object.
+   */
+  private String storeConfiguration = "berkeleydb.xml";
 
   /**
    * Gets the current number of worker threads used.
@@ -173,6 +183,22 @@ public class Configuration {
    */
   public void setMappingConfiguration(String mappingConfiguration) {
     this.mappingConfiguration = mappingConfiguration;
+  }
+
+  public String getStoreType() {
+    return storeType;
+  }
+
+  public void setStoreType(String storeType) {
+    this.storeType = storeType;
+  }
+
+  public String getStoreConfiguration() {
+    return storeConfiguration;
+  }
+
+  public void setStoreConfiguration(String storeConfiguration) {
+    this.storeConfiguration = storeConfiguration;
   }
 
 }

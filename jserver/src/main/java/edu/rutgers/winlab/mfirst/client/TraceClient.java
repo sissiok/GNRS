@@ -199,7 +199,7 @@ public class TraceClient extends IoHandlerAdapter {
 
         message.setOriginAddress(fromAddress);
 
-        log.debug("Writing {} to {}", message, session);
+        log.info("Writing {} to {}", message, session);
         session.write(message);
         try {
           Thread.sleep(this.delay);

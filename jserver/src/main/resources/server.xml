@@ -14,7 +14,7 @@
   
   <!-- 
        The type of networking to be used by the server. Changes to this value
-       mean that the networkConfiguration parameter be reference the correct
+       mean that the networkConfiguration parameter must reference the correct
        configuration file.  
        Possible values are:
          * "ipv4udp" - IPv4 with UDP
@@ -26,4 +26,15 @@
   
   <!-- Configuration file name for the GUID mapping object. -->
   <mappingConfiguration>src/main/resources/map-ipv4.xml</mappingConfiguration>
+
+  <!-- The type of GUID storage object to use.  Changes to this value mean that
+       the config storeConfiguration parameter must reference the correct
+       configuration file.
+       Possible values are:
+         * "simple" - Basic in-memory map. Configuration file value is ignored. 
+         * "berkeleydb" - Persistent BerkeleyDB with in-memory cache.-->
+  <storeType>berkeleydb</storeType>
+  
+  <!-- Configuration file name for the GUID storage object. -->
+  <storeConfiguration>src/main/resources/berkeleydb.xml</storeConfiguration>
 </edu.rutgers.winlab.mfirst.Configuration>

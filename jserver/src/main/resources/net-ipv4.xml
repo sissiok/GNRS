@@ -7,7 +7,4 @@
 
   <!-- Flag to indicate if writes should be asynchronous (non-blocking) -->
   <ascynchronousWrite>false</ascynchronousWrite>
-
-  
-  
 </edu.rutgers.winlab.mfirst.net.ipv4udp.Configuration>

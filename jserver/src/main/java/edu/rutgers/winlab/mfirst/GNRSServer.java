@@ -31,9 +31,10 @@ import edu.rutgers.winlab.mfirst.net.NetworkAccessObject;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.SessionParameters;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPNAO;
+import edu.rutgers.winlab.mfirst.storage.GNRSRecord;
 import edu.rutgers.winlab.mfirst.storage.GUIDStore;
 import edu.rutgers.winlab.mfirst.storage.SimpleGUIDStore;
-import edu.rutgers.winlab.mfirst.structures.GNRSRecord;
+import edu.rutgers.winlab.mfirst.storage.bdb.BerkeleyDBStore;
 import edu.rutgers.winlab.mfirst.structures.GUID;
 import edu.rutgers.winlab.mfirst.structures.GUIDBinding;
 
@@ -161,7 +162,7 @@ public class GNRSServer implements MessageListener {
   /**
    * GUID binding storage object.
    */
-  private final GUIDStore store = new SimpleGUIDStore();
+  private final GUIDStore guidStore;
 
   /**
    * Creates a new GNRS server with the specified configuration. The server will
@@ -207,6 +208,13 @@ public class GNRSServer implements MessageListener {
       throw new IllegalArgumentException(
           "Unable to create network access object.");
     }
+
+    this.guidStore = this.createStore(this.config);
+    if(this.guidStore == null){
+      log.error("Unable to create GUID store of type {}", this.config.getStoreType());
+      throw new IllegalArgumentException("Unable to create GUID store object.");
+    }
+
     this.networkAccess.addMessageListener(this);
 
   }
@@ -218,9 +226,13 @@ public class GNRSServer implements MessageListener {
    */
   public boolean startup() {
 
+    
+    
     if (this.collectStatistics) {
       this.statsTimer.scheduleAtFixedRate(new StatsTask(), 1000, 1000);
     }
+    
+    this.guidStore.doInit();
     return true;
   }
 
@@ -273,11 +285,23 @@ public class GNRSServer implements MessageListener {
 
   }
 
+  private GUIDStore createStore(final Configuration config) {
+    if ("berkeleydb".equalsIgnoreCase(config.getStoreType())) {
+      return new BerkeleyDBStore(config.getStoreConfiguration(), this);
+    } else if ("simple".equalsIgnoreCase(config.getStoreType())) {
+      return new SimpleGUIDStore();
+    }
+    log.error("Unrecognized store type: {}", config.getStoreType());
+    return null;
+  }
+
   /**
    * Terminates the server in a graceful way.
    */
   public void shutdown() {
 
+    this.guidStore.doShutdown();
+    
     if (this.collectStatistics) {
       this.statsTimer.cancel();
     }
@@ -293,7 +317,7 @@ public class GNRSServer implements MessageListener {
    */
   public NetworkAddress[] getBindings(final GUID guid) {
 
-    GNRSRecord record = this.store.getBinding(guid);
+    GNRSRecord record = this.guidStore.getBindings(guid);
     if (record == null) {
       return null;
     }
@@ -310,14 +334,14 @@ public class GNRSServer implements MessageListener {
    *          the new bindings for the GUID
    * @return {@code true} if the insert succeeds, else {@code false}.
    */
-  public boolean insertBindings(final GUID guid, final NetworkAddress[] bindings) {
+  public boolean appendBindings(final GUID guid, final NetworkAddress... bindings) {
     for (NetworkAddress a : bindings) {
       // TODO: Handle the future.
       GUIDBinding b = new GUIDBinding();
       b.setAddress(a);
       b.setTtl(0);
       b.setWeight(0);
-      this.store.insertBinding(guid, b);
+      this.guidStore.appendBindings(guid, b);
     }
     return true;
   }
@@ -446,6 +470,10 @@ public class GNRSServer implements MessageListener {
           Float.valueOf(lookupsPerSecond), Float.valueOf(numSeconds),
           Float.valueOf(averageLifetimeUsec)));
     }
+  }
+
+  public Timer getStatsTimer() {
+    return this.statsTimer;
   }
 
 }

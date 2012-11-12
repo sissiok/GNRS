@@ -66,7 +66,7 @@ public class InsertTask implements Callable<Object> {
   @Override
   public Object call() throws Exception {
 
-    boolean success = this.server.insertBindings(this.message.getGuid(),
+    boolean success = this.server.appendBindings(this.message.getGuid(),
         this.message.getBindings());
 
     InsertResponseMessage response = new InsertResponseMessage();
