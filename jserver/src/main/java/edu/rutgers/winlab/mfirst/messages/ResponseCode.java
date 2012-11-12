@@ -6,6 +6,8 @@
 package edu.rutgers.winlab.mfirst.messages;
 
 /**
+ * Response codes for response message.
+ * 
  * @author Robert Moore
  * 
  */

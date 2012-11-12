@@ -21,13 +21,28 @@ import edu.rutgers.winlab.mfirst.structures.GUID;
 @Persistent
 public class BDBGUID {
 
+  /**
+   * String-encoded form of the GUID value. Encoded as a UTF-16 (Big Endian)
+   * String.
+   */
   @KeyField(1)
   public String guid;
 
+  /**
+   * Creates a new, empty GUID.
+   */
   public BDBGUID() {
     super();
   }
 
+  /**
+   * Creates a BDB GUID value from a GUID.
+   * 
+   * @param guid
+   *          the GUID to construct the new BDBGUID from.
+   * @return a new BDBGUID representing the GUID, or {@code null} if UTF-16 is
+   *         not supported.
+   */
   public static BDBGUID fromGUID(final GUID guid) {
     BDBGUID newBDB = new BDBGUID();
     try {
@@ -38,6 +53,12 @@ public class BDBGUID {
     return newBDB;
   }
 
+  /**
+   * Returns a GUID with the same value as this BDBGUID.
+   * 
+   * @return the GUID with the same value, or {@code null} if UTF-16 is not
+   *         supported.
+   */
   public GUID toGUID() {
     GUID newGuid = new GUID();
     try {

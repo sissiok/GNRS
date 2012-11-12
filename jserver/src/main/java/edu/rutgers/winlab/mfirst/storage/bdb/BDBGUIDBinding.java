@@ -34,10 +34,20 @@ public class BDBGUIDBinding {
    */
   public int weight;
 
+  /**
+   * Creates a new, empty binding.
+   */
   public BDBGUIDBinding() {
     super();
   }
 
+  /**
+   * Creates a BDB GUID binding from a GUIDBinding object.
+   * 
+   * @param binding
+   *          the source GUID binding.
+   * @return a new BDB GUID binding.
+   */
   public static BDBGUIDBinding fromGUIDBinding(final GUIDBinding binding) {
 
     BDBGUIDBinding returnBind = new BDBGUIDBinding();
@@ -50,6 +60,11 @@ public class BDBGUIDBinding {
     return returnBind;
   }
 
+  /**
+   * Converts this BDBGUIDBinding to a GUIDBinding object.
+   * 
+   * @return a new GUIDBinding object with the same information as this binding.
+   */
   public GUIDBinding toGUIDBinding() {
     GUIDBinding binding = new GUIDBinding();
     binding.setAddress(this.address.toNetworkAddress());

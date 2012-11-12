@@ -19,6 +19,8 @@ import edu.rutgers.winlab.mfirst.net.AddressType;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 
 /**
+ * NetworkAddress convenience class for IPv4+UDP networking.
+ * 
  * @author Robert Moore
  * 
  */
@@ -166,7 +168,7 @@ public class IPv4UDPAddress extends NetworkAddress {
     if (this.value.length > 4) {
       sb.append(':');
       sb.append(Integer
-          .toString((((int) this.value[4] << 8) | (this.value[5] & 0xFF)) & 0xFFFF));
+          .toString(((this.value[4] << 8) | (this.value[5] & 0xFF)) & 0xFFFF));
     }
     return sb.toString();
   }

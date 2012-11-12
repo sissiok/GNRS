@@ -6,7 +6,6 @@
 package edu.rutgers.winlab.mfirst.storage.bdb;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.TimerTask;
 
 import org.slf4j.Logger;
@@ -35,13 +34,35 @@ import edu.rutgers.winlab.mfirst.structures.GUIDBinding;
  */
 public class BerkeleyDBStore implements GUIDStore {
 
+  /**
+   * TimerTask for reporting BerkeleyDB-related statistics.
+   * 
+   * @author Robert Moore
+   * 
+   */
   private static final class StatsTask extends TimerTask {
+    /**
+     * Logging for reporting statistics.
+     */
+    @SuppressWarnings("hiding")
     private static final Logger log = LoggerFactory.getLogger(StatsTask.class);
 
+    /**
+     * BerkeleyDB environment.
+     */
     private final Environment env;
 
+    /**
+     * Previous cache miss value.
+     */
     private long lastCacheMiss = 0l;
 
+    /**
+     * Creates a new task for the provided BerkeleyDB environment.
+     * 
+     * @param dbEnv
+     *          the BDB environment.
+     */
     public StatsTask(final Environment dbEnv) {
       super();
       this.env = dbEnv;
@@ -50,7 +71,8 @@ public class BerkeleyDBStore implements GUIDStore {
     @Override
     public void run() {
       long newCacheMiss = this.env.getStats(null).getNCacheMiss();
-      log.info("BDB Cache Misses: {}", (newCacheMiss - this.lastCacheMiss));
+      log.info("BDB Cache Misses: {}",
+          (Long.valueOf(newCacheMiss - this.lastCacheMiss)));
       this.lastCacheMiss = newCacheMiss;
     }
   }
@@ -150,7 +172,7 @@ public class BerkeleyDBStore implements GUIDStore {
           String
               .format(
                   "Unable to allocate cache of size %,d. Using 10% of available memory instead.",
-                  this.config.getCacheSizeMiB()), iae);
+                  Integer.valueOf(this.config.getCacheSizeMiB())), iae);
     }
     // Open/create the DB environment
     this.bdbEnvironment = new Environment(
@@ -211,12 +233,12 @@ public class BerkeleyDBStore implements GUIDStore {
     }
 
     int offset = newBindings.length - bindings.length;
-    
-    for(int i = 0; i < bindings.length; ++i, ++offset){
+
+    for (int i = 0; i < bindings.length; ++i, ++offset) {
       newBindings[offset] = BDBGUIDBinding.fromGUIDBinding(bindings[i]);
     }
-    
-//    System.arraycopy(bindings, 0, newBindings, offset, bindings.length);
+
+    // System.arraycopy(bindings, 0, newBindings, offset, bindings.length);
 
     // Wasn't even a record before, so make one.
     if (record == null) {

@@ -8,6 +8,9 @@ package edu.rutgers.winlab.mfirst.net;
 import edu.rutgers.winlab.mfirst.messages.AbstractMessage;
 
 /**
+ * Interface for classes that wish to respond to GNRS messages as they arrive on
+ * a network interface.
+ * 
  * @author Robert Moore
  * 
  */

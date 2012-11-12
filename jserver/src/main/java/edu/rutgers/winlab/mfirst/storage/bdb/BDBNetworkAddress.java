@@ -5,11 +5,6 @@
  */
 package edu.rutgers.winlab.mfirst.storage.bdb;
 
-import java.util.Arrays;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sleepycat.persist.model.Persistent;
 
 import edu.rutgers.winlab.mfirst.net.AddressType;
@@ -24,18 +19,36 @@ import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 @Persistent
 public class BDBNetworkAddress {
 
+  /**
+   * Network address type value
+   */
   public int type;
-  
+
+  /**
+   * Binary value of the address
+   */
   public byte[] value;
 
-  public static BDBNetworkAddress fromNetworkAddress(final NetworkAddress na){
+  /**
+   * Converts the provided NetworkAddress to a BDBNetworkAddress.
+   * 
+   * @param na
+   *          the source NetworkAddress.
+   * @return a new BDBNetworkAddress representing the NetworkAddress.
+   */
+  public static BDBNetworkAddress fromNetworkAddress(final NetworkAddress na) {
     BDBNetworkAddress newAddr = new BDBNetworkAddress();
     newAddr.type = na.getType().value();
     newAddr.value = na.getValue();
     return newAddr;
   }
-  
-  public NetworkAddress toNetworkAddress(){
+
+  /**
+   * Converts this BDBNetworkAddress to a NetworkAddress.
+   * 
+   * @return a NetworkAddress with the same value as this BDBNetworkAddress.
+   */
+  public NetworkAddress toNetworkAddress() {
     return new NetworkAddress(AddressType.valueOf(this.type), this.value);
   }
 }

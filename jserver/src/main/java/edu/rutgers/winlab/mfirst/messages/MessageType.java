@@ -6,6 +6,9 @@
 package edu.rutgers.winlab.mfirst.messages;
 
 /**
+ * Message type identifier enumeration. Used to distinguish different network
+ * message types.
+ * 
  * @author Robert Moore
  * 
  */
