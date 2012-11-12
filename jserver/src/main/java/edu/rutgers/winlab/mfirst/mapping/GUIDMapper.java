@@ -1,3 +1,8 @@
+/*
+ * Mobility First GNRS Server
+ * Copyright (C) 2012 Robert Moore and Rutgers University
+ * All rights reserved.
+ */
 package edu.rutgers.winlab.mfirst.mapping;
 
 import java.util.Collection;
@@ -6,12 +11,6 @@ import java.util.EnumSet;
 import edu.rutgers.winlab.mfirst.net.AddressType;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.structures.GUID;
-
-/*
- * Mobility First GNRS Server
- * Copyright (C) 2012 Robert Moore and Rutgers University
- * All rights reserved.
- */
 
 /**
  * 
@@ -42,7 +41,19 @@ public interface GUIDMapper {
   public Collection<NetworkAddress> getMapping(GUID guid, int numAddresses,
       AddressType... types);
 
+  /**
+   * The set of AddressType values supported by this mapper.
+   * 
+   * @return the supported AddressTypes for this GUID mapper.
+   */
   public EnumSet<AddressType> getTypes();
 
+  /**
+   * The default AddressType for the mapper. When no AddressType is provided to
+   * {@link #getMapping(GUID, int, AddressType...)}, then this type will be
+   * generated.
+   * 
+   * @return the default AddressType for this mapper.
+   */
   public AddressType getDefaultAddressType();
 }

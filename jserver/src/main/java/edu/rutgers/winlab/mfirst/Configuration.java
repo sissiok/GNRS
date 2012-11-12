@@ -185,18 +185,34 @@ public class Configuration {
     this.mappingConfiguration = mappingConfiguration;
   }
 
+  /**
+   * Gets the GUID store type value.
+   * @return the type of GUID store to use.
+   */
   public String getStoreType() {
-    return storeType;
+    return this.storeType;
   }
 
+  /**
+   * Sets the GUID store type value.
+   * @param storeType the new type of GUID store to use.
+   */
   public void setStoreType(String storeType) {
     this.storeType = storeType;
   }
 
+  /**
+   * Gets the filename of the GUID store configuration.
+   * @return the GUID store configuration filename.
+   */
   public String getStoreConfiguration() {
-    return storeConfiguration;
+    return this.storeConfiguration;
   }
 
+  /**
+   * Sets the GUID store configuration filename.
+   * @param storeConfiguration the GUID store configuration filename.
+   */
   public void setStoreConfiguration(String storeConfiguration) {
     this.storeConfiguration = storeConfiguration;
   }

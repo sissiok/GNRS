@@ -27,14 +27,14 @@ import com.thoughtworks.xstream.XStream;
 
 import edu.rutgers.winlab.mfirst.mapping.GUIDMapper;
 import edu.rutgers.winlab.mfirst.net.AddressType;
-import edu.rutgers.winlab.mfirst.net.NetworkAccessObject;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
-import edu.rutgers.winlab.mfirst.mapping.ipv4udp.Configuration;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPAddress;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.NetworkAddressMapper;
 import edu.rutgers.winlab.mfirst.structures.GUID;
 
 /**
+ * GUID Mapper for IPv4/UDP networking.
+ * 
  * @author Robert Moore
  * 
  */
@@ -46,6 +46,9 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
   private static final Logger log = LoggerFactory
       .getLogger(IPv4UDPGUIDMapper.class);
 
+  /**
+   * Hashing object to compute a random network address.
+   */
   private final GUIDHasher hasher;
 
   /**
@@ -59,6 +62,16 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
    */
   public final ConcurrentHashMap<Integer, InetSocketAddress> asAddresses = new ConcurrentHashMap<Integer, InetSocketAddress>();
 
+  /**
+   * Creates a new IPv4+UDP GUID mapper from the specified configuration
+   * filename. The configuration file is opened, parsed, and this mapper is
+   * configured.
+   * 
+   * @param configFile
+   *          the name of the configuration file for this mapper.
+   * @throws IOException
+   *           if an IOException is thrown while reading the configuration file.
+   */
   public IPv4UDPGUIDMapper(final String configFile) throws IOException {
     Configuration config = this.loadConfiguration(configFile);
 
@@ -124,32 +137,28 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
       String[] prefixParts = generalComponents[0].split("/");
       InetAddress addx = InetAddress.getByName(prefixParts[0]);
       byte[] addxBytes = addx.getAddress();
-      int addxAsInt = ((addxBytes[0] << 24)&0xFF000000) | ((addxBytes[1] << 16)&0xFF0000)
-          | ((addxBytes[2] << 8)&0xFF00) | ((addxBytes[3])&0xFF);
-      
-    
+      int addxAsInt = ((addxBytes[0] << 24) & 0xFF000000)
+          | ((addxBytes[1] << 16) & 0xFF0000) | ((addxBytes[2] << 8) & 0xFF00)
+          | ((addxBytes[3]) & 0xFF);
+
       // Extract prefix length
       int prefixLength = Integer.parseInt(prefixParts[1]);
       // Apply the prefix
       addxAsInt = addxAsInt & (0x80000000 >> prefixLength);
 
-      
-      
       NetworkAddress na = IPv4UDPAddress.fromInteger(addxAsInt);
-      byte[] naBytes= na.getValue();
+      byte[] naBytes = na.getValue();
       int realLength = 0;
-      for(byte b : naBytes){
-        if(b == 0){
+      for (byte b : naBytes) {
+        if (b == 0) {
           break;
         }
         ++realLength;
       }
-      if(realLength < naBytes.length){
-        na.setValue(Arrays.copyOf(naBytes,realLength));
+      if (realLength < naBytes.length) {
+        na.setValue(Arrays.copyOf(naBytes, realLength));
       }
-      
-     
-      
+
       this.networkAddressMap.put(na, generalComponents[1]);
 
       line = lineReader.readLine();
@@ -159,6 +168,14 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
 
   }
 
+  /**
+   * Loads the Autonomous System (AS) network bindings file.
+   * 
+   * @param asBindingFilename
+   *          the name of the AS bindings file.
+   * @throws IOException
+   *           if an IOException is thrown while reading the bindings file.
+   */
   private void loadAsNetworkBindings(final String asBindingFilename)
       throws IOException {
     File asBindingFile = new File(asBindingFilename);
@@ -240,23 +257,25 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
             type, numAddresses);
 
         // Map them to an AS
-        for(NetworkAddress na : randomAddresses){
+        for (NetworkAddress na : randomAddresses) {
           String autonomousSystem = this.networkAddressMap.get(na);
-          if(autonomousSystem == null){
+          if (autonomousSystem == null) {
             // FIXME: Rehash?
-            log.error("Found mapping hole for {}",na);
+            log.error("Found mapping hole for {}", na);
             continue;
           }
-          InetSocketAddress asGNRSAddr = this.asAddresses.get(Integer.decode(autonomousSystem));
-          NetworkAddress finalAddr = IPv4UDPAddress.fromInetSocketAddress(asGNRSAddr);
-          if(finalAddr != null){
+          InetSocketAddress asGNRSAddr = this.asAddresses.get(Integer
+              .decode(autonomousSystem));
+          NetworkAddress finalAddr = IPv4UDPAddress
+              .fromInetSocketAddress(asGNRSAddr);
+          if (finalAddr != null) {
             returnedAddresses.add(finalAddr);
-          }else{
+          } else {
             log.error("Unable to create NetworkAddress from {}", asGNRSAddr);
             continue;
           }
         }
-        
+
       } catch (NoSuchAlgorithmException e) {
         log.error("Unable to hash GUID for type " + type, e);
         continue;

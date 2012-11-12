@@ -210,8 +210,9 @@ public class GNRSServer implements MessageListener {
     }
 
     this.guidStore = this.createStore(this.config);
-    if(this.guidStore == null){
-      log.error("Unable to create GUID store of type {}", this.config.getStoreType());
+    if (this.guidStore == null) {
+      log.error("Unable to create GUID store of type {}",
+          this.config.getStoreType());
       throw new IllegalArgumentException("Unable to create GUID store object.");
     }
 
@@ -226,12 +227,10 @@ public class GNRSServer implements MessageListener {
    */
   public boolean startup() {
 
-    
-    
     if (this.collectStatistics) {
       this.statsTimer.scheduleAtFixedRate(new StatsTask(), 1000, 1000);
     }
-    
+
     this.guidStore.doInit();
     return true;
   }
@@ -285,6 +284,13 @@ public class GNRSServer implements MessageListener {
 
   }
 
+  /**
+   * Creates the GUID data store based on the configuration parameters.
+   * 
+   * @param config
+   *          the server configuration.
+   * @return a new GUID data store, or {@code null} if an error occurred.
+   */
   private GUIDStore createStore(final Configuration config) {
     if ("berkeleydb".equalsIgnoreCase(config.getStoreType())) {
       return new BerkeleyDBStore(config.getStoreConfiguration(), this);
@@ -301,7 +307,7 @@ public class GNRSServer implements MessageListener {
   public void shutdown() {
 
     this.guidStore.doShutdown();
-    
+
     if (this.collectStatistics) {
       this.statsTimer.cancel();
     }
@@ -334,7 +340,8 @@ public class GNRSServer implements MessageListener {
    *          the new bindings for the GUID
    * @return {@code true} if the insert succeeds, else {@code false}.
    */
-  public boolean appendBindings(final GUID guid, final NetworkAddress... bindings) {
+  public boolean appendBindings(final GUID guid,
+      final NetworkAddress... bindings) {
     for (NetworkAddress a : bindings) {
       // TODO: Handle the future.
       GUIDBinding b = new GUIDBinding();
@@ -472,6 +479,12 @@ public class GNRSServer implements MessageListener {
     }
   }
 
+  /**
+   * Returns a reference to this server's statistics Timer object. If statistics
+   * are not enabled, then the timer will be {@code null}.
+   * 
+   * @return this server's Timer object for statistics reporting.
+   */
   public Timer getStatsTimer() {
     return this.statsTimer;
   }
