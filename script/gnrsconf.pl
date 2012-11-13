@@ -20,7 +20,8 @@ my $inFile = FileHandle->new;
 $inFile->open("<" . $ARGV[0])
   || die "Could not open \"$ARGV[0]\" for reading.";
 
-my $outFile;
+my $outFile1;  #to generate server.xml
+my $outFile2;  #to generate net-ipv4.xml
 
 my $count = 1;
 # Read the input file, line-by-line
@@ -31,28 +32,28 @@ while (my $line = $inFile->getline) {
 	}
 	$count++;
 	chomp $line;
-	open($outFile, ">", "gnrsd_".$line.".conf");
+	open($outFile1, ">", "server_".$line.".xml");
 
-	printf $outFile "#daemon config\n";
-	printf $outFile "DAEMON_LISTEN_PORT=5000;\n";
-	printf $outFile "SERVER_ADDR=\"192.168.1.$count\";\n";
-	printf $outFile "#for HASH_FUNC: 0 is hash128, 1 is BGP_hash\n";
-	printf $outFile "HASH_FUNC=0;\n";
-	printf $outFile "THREAD_POOL_SIZE=1;\n";
-	printf $outFile "#FOR SERVICE_REQ_NUM: If it's a negative number, it will keep running. If positive, it will shutdown after receiving SERVICE_REQ_NUM requests.\n";
-	printf $outFile "SERVICE_REQ_NUM=-1;\n\n";
-	printf $outFile "#static partipation set of gnrs servers\n";
-	printf $outFile "SERVERS_LIST_FILE=\"./servers.lst\";\n\n";
-	printf $outFile "#database details for persistence engine\n";
-	printf $outFile "DB_HOSTNAME=\"127.0.0.1\";\n";
-	printf $outFile "DB_PORT=3306;\n";
-	printf $outFile "DB_NAME=\"mf_gnrs\";\n";
-	printf $outFile "DB_USER=\"mf-user\";\n";
-	printf $outFile "DB_PASSWD=\"mf-user\";\n\n";
-	printf $outFile "#client config\n";
-	printf $outFile "CLIENT_LISTEN_PORT=9000;\n";
-	printf $outFile "CLIENT_ADDR=\"\";\n";
+	printf $outFile1 "<edu.rutgers.winlab.mfirst.Configuration>\n";
+	printf $outFile1 "  <numWorkerThreads>1</numWorkerThreads>\n";
+	printf $outFile1 "  <numReplicas>5</numReplicas>\n";
+	printf $outFile1 "  <collectStatistics>true</collectStatistics>\n";
+	printf $outFile1 "  <networkType>ipv4udp</networkType>\n";
+	printf $outFile1 "  <networkConfiguration>src/main/resources/net-ipv4_".$line.".xml</networkConfiguration>\n";
+	printf $outFile1 "  <mappingConfiguration>src/main/resources/map-ipv4.xml</mappingConfiguration>\n";
+	printf $outFile1 "  <storeType>berkeleydb</storeType>\n";
+	printf $outFile1 "  <storeConfiguration>src/main/resources/berkeleydb.xml</storeConfiguration>\n";
+	printf $outFile1 "</edu.rutgers.winlab.mfirst.Configuration>";
 
-	close $outFile;
+	open($outFile2, ">", "net-ipv4_".$line.".xml");
+
+	printf $outFile2 "<edu.rutgers.winlab.mfirst.net.ipv4udp.Configuration>\n";
+	printf $outFile2 "  <bindPort>5001</bindPort>\n";
+	printf $outFile2 "  <bindAddress>192.168.1.".$count."</bindAddress>\n";
+	printf $outFile2 "  <ascynchronousWrite>false</ascynchronousWrite>\n";
+	printf $outFile2 "</edu.rutgers.winlab.mfirst.net.ipv4udp.Configuration>";
+
+	close $outFile1;
+	close $outFile2;
 }
-	
+
