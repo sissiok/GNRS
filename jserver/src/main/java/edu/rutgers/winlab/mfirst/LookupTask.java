@@ -33,16 +33,16 @@ public class LookupTask implements Callable<Object> {
   /**
    * The received lookup message.
    */
-  private final LookupMessage message;
+  private final transient LookupMessage message;
 
   /**
    * Session parameters received with the message.
    */
-  private final SessionParameters params;
+  private final transient SessionParameters params;
   /**
    * The server processing the message.
    */
-  private final GNRSServer server;
+  private final transient GNRSServer server;
 
   /**
    * Creates a new lookup task for the specified server and lookup message
@@ -64,17 +64,17 @@ public class LookupTask implements Callable<Object> {
   }
 
   @Override
-  public Object call() throws Exception {
+  public Object call() {
 
-    long t10 = System.nanoTime();
+    final long t10 = System.nanoTime();
     GNRSServer.NUM_LOOKUPS.incrementAndGet();
 
-    Collection<NetworkAddress> serverAddxes = this.server.getMappings(
+    final Collection<NetworkAddress> serverAddxes = this.server.getMappings(
         this.message.getGuid(), this.message.getOriginAddress().getType());
 
-    long t20 = System.nanoTime();
+    final long t20 = System.nanoTime();
 
-    LookupResponseMessage response = new LookupResponseMessage();
+    final LookupResponseMessage response = new LookupResponseMessage();
     response.setRequestId(this.message.getRequestId());
 
     if (serverAddxes == null) {
@@ -104,11 +104,11 @@ public class LookupTask implements Callable<Object> {
       response.setResponseCode(ResponseCode.FAILED);
     }
     response.setOriginAddress(this.server.getOriginAddress());
-    long t30 = System.nanoTime();
+    final long t30 = System.nanoTime();
     // log.debug("[{}] Writing {}", this.container.session, response);
     this.server.sendMessage(this.params, response);
 
-    long t40 = System.nanoTime();
+    final long t40 = System.nanoTime();
     if (this.server.getConfig().isCollectStatistics()) {
       GNRSServer.MSG_LIFETIME.addAndGet(System.nanoTime()
           - this.message.createdNanos);

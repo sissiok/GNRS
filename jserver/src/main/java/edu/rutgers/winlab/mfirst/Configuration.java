@@ -70,7 +70,7 @@ public class Configuration {
    * @param minWorkerThreads
    *          the new number of worker threads.
    */
-  public void setNumWorkerThreads(int minWorkerThreads) {
+  public void setNumWorkerThreads(final int minWorkerThreads) {
     this.numWorkerThreads = minWorkerThreads;
   }
 
@@ -89,7 +89,7 @@ public class Configuration {
    * @param collectStatistics
    *          {@code true} to collect statistics.
    */
-  public void setCollectStatistics(boolean collectStatistics) {
+  public void setCollectStatistics(final boolean collectStatistics) {
     this.collectStatistics = collectStatistics;
   }
 
@@ -108,7 +108,7 @@ public class Configuration {
    * @param numReplicas
    *          the new number of replicas.
    */
-  public void setNumReplicas(int numReplicas) {
+  public void setNumReplicas(final int numReplicas) {
     this.numReplicas = numReplicas;
   }
 
@@ -139,7 +139,7 @@ public class Configuration {
    * @param networkType
    *          the new network type value.
    */
-  public void setNetworkType(String networkType) {
+  public void setNetworkType(final String networkType) {
     this.networkType = networkType;
   }
 
@@ -155,11 +155,11 @@ public class Configuration {
   /**
    * Sets the network configuration filename.
    * 
-   * @param networkConfiguration
+   * @param netConfig
    *          the new network configuration filename.
    */
-  public void setNetworkConfiguration(String networkConfiguration) {
-    this.networkConfiguration = networkConfiguration;
+  public void setNetworkConfiguration(final String netConfig) {
+    this.networkConfiguration = netConfig;
   }
 
   /**
@@ -174,11 +174,11 @@ public class Configuration {
   /**
    * Sets the GUID mapping configuration filename.
    * 
-   * @param mappingConfiguration
+   * @param mapConfig
    *          the new filename.
    */
-  public void setMappingConfiguration(String mappingConfiguration) {
-    this.mappingConfiguration = mappingConfiguration;
+  public void setMappingConfiguration(final String mapConfig) {
+    this.mappingConfiguration = mapConfig;
   }
 
   /**
@@ -196,7 +196,7 @@ public class Configuration {
    * @param storeType
    *          the new type of GUID store to use.
    */
-  public void setStoreType(String storeType) {
+  public void setStoreType(final String storeType) {
     this.storeType = storeType;
   }
 
@@ -212,11 +212,11 @@ public class Configuration {
   /**
    * Sets the GUID store configuration filename.
    * 
-   * @param storeConfiguration
+   * @param storeConfig
    *          the GUID store configuration filename.
    */
-  public void setStoreConfiguration(String storeConfiguration) {
-    this.storeConfiguration = storeConfiguration;
+  public void setStoreConfiguration(final String storeConfig) {
+    this.storeConfiguration = storeConfig;
   }
 
 }

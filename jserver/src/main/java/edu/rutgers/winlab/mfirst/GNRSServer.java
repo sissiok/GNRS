@@ -1,7 +1,6 @@
 /*
- * Mobility First GNRS Server
- * Copyright (C) 2012 Robert Moore and Rutgers University.
- * All rights reserved.
+ * Mobility First GNRS Server Copyright (C) 2012 Robert Moore and Rutgers
+ * University. All rights reserved.
  */
 package edu.rutgers.winlab.mfirst;
 
@@ -40,9 +39,7 @@ import edu.rutgers.winlab.mfirst.storage.bdb.BerkeleyDBStore;
 /**
  * Java implementation of a GNRS server.
  * 
- * 
  * @author Robert Moore
- * 
  */
 public class GNRSServer implements MessageListener {
 
@@ -68,35 +65,37 @@ public class GNRSServer implements MessageListener {
     if (args.length < 1) {
       LOG.error("Missing 1 or more command-line arguments.");
       printUsageInfo();
-      return;
-    }
-    final XStream x = new XStream();
-    LOG.trace("Loading configuration file \"{}\".", args[0]);
-    final Configuration config = (Configuration) x.fromXML(new File(args[0]));
-    LOG.debug("Finished parsing configuration file.");
-    try {
 
-      // Create the server
-      final GNRSServer server = new GNRSServer(config);
-      /*
-       * The server bound its port and is listening, but isn't yet started.
-       * Messages can arrive, but will just be queued until start() is called.
-       */
+    } else {
+      final XStream xStream = new XStream();
+      LOG.trace("Loading configuration file \"{}\".", args[0]);
+      final Configuration config = (Configuration) xStream.fromXML(new File(
+          args[0]));
+      LOG.debug("Finished parsing configuration file.");
+      try {
 
-      // Add a hook to capture interrupts and shut down gracefully
-      Runtime.getRuntime().addShutdownHook(new Thread() {
-        @Override
-        public void run() {
-          server.shutdown();
-        }
-      });
+        // Create the server
+        final GNRSServer server = new GNRSServer(config);
+        /*
+         * The server bound its port and is listening, but isn't yet started.
+         * Messages can arrive, but will just be queued until start() is called.
+         */
 
-      LOG.debug("GNRS server object successfully created.");
-      server.startup();
-      LOG.trace("GNRS server thread started.");
-    } catch (IOException ioe) {
-      LOG.error("Unable to start server.", ioe);
-      return;
+        // Add a hook to capture interrupts and shut down gracefully
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+          @Override
+          public void run() {
+            server.shutdown();
+          }
+        });
+
+        LOG.debug("GNRS server object successfully created.");
+        server.startup();
+        LOG.trace("GNRS server thread started.");
+      } catch (final IOException ioe) {
+        LOG.error("Unable to start server.", ioe);
+
+      }
     }
   }
 
@@ -115,22 +114,17 @@ public class GNRSServer implements MessageListener {
   /**
    * Configuration file for the server.
    */
-  private final Configuration config;
-
-  /**
-   * Object for the server to wait/notify on.
-   */
-  private final Object messageLock = new Object();
+  private final transient Configuration config;
 
   /**
    * Whether or not to collect statistics about performance.
    */
-  private final boolean collectStatistics;
+  private final transient boolean collectStatistics;
 
   /**
    * Timer for printing statistics.
    */
-  private final Timer statsTimer;
+  private final transient Timer statsTimer;
 
   /**
    * Number of lookups performed since last stats output.
@@ -146,22 +140,22 @@ public class GNRSServer implements MessageListener {
   /**
    * Thread pool for distributing tasks.
    */
-  private final ExecutorService workers;
+  private final transient ExecutorService workers;
 
   /**
    * Networking interface for the server.
    */
-  private final NetworkAccessObject networkAccess;
+  private final transient NetworkAccessObject networkAccess;
 
   /**
    * Mapping provider for converting a GUID to a set of Network Address values.
    */
-  private final GUIDMapper guidMapper;
+  private final transient GUIDMapper guidMapper;
 
   /**
    * GUID binding storage object.
    */
-  private final GUIDStore guidStore;
+  private final transient GUIDStore guidStore;
 
   /**
    * Creates a new GNRS server with the specified configuration. The server will
@@ -224,6 +218,7 @@ public class GNRSServer implements MessageListener {
    * 
    * @return {@code true} if everything starts correctly.
    */
+  
   public boolean startup() {
 
     if (this.collectStatistics) {
@@ -239,24 +234,21 @@ public class GNRSServer implements MessageListener {
    * 
    * @param config
    *          the server configuration.
-   * 
    * @return {@code true} if configuration succeeds, else {@code false}.
    */
   // TODO: Add new network types here.
   private static NetworkAccessObject createNAO(final Configuration config) {
+    NetworkAccessObject netAccess = null;
     // IPv4 + UDP
     if ("ipv4udp".equalsIgnoreCase(config.getNetworkType())) {
       try {
-        return new IPv4UDPNAO(config.getNetworkConfiguration());
-      } catch (IOException ioe) {
+        netAccess = new IPv4UDPNAO(config.getNetworkConfiguration());
+      } catch (final IOException ioe) {
         LOG.error("Unable to create IPv4/UDP network access.", ioe);
-        return null;
       }
-
     }
     LOG.error("Unrecognized networking type: {}", config.getNetworkType());
-    return null;
-
+    return netAccess;
   }
 
   /**
@@ -265,21 +257,20 @@ public class GNRSServer implements MessageListener {
    * 
    * @param config
    *          the server configuration.
-   * 
    * @return {@code true} if the binding was successful, else {@code false}.
    */
   private static GUIDMapper createMapper(final Configuration config) {
+    GUIDMapper mapper = null;
     // IPv4 + UDP
     if ("ipv4udp".equalsIgnoreCase(config.getNetworkType())) {
       try {
-        return new IPv4UDPGUIDMapper(config.getMappingConfiguration());
-      } catch (IOException ioe) {
+        mapper = new IPv4UDPGUIDMapper(config.getMappingConfiguration());
+      } catch (final IOException ioe) {
         LOG.error("Unable to create IPv4/UDP GUID mapper.", ioe);
-        return null;
       }
     }
     LOG.error("Unrecognized networking type: {}", config.getNetworkType());
-    return null;
+    return mapper;
 
   }
 
@@ -291,13 +282,14 @@ public class GNRSServer implements MessageListener {
    * @return a new GUID data store, or {@code null} if an error occurred.
    */
   private GUIDStore createStore(final Configuration config) {
+    GUIDStore store = null;
     if ("berkeleydb".equalsIgnoreCase(config.getStoreType())) {
-      return new BerkeleyDBStore(config.getStoreConfiguration(), this);
+      store = new BerkeleyDBStore(config.getStoreConfiguration(), this);
     } else if ("simple".equalsIgnoreCase(config.getStoreType())) {
-      return new SimpleGUIDStore();
+      store = new SimpleGUIDStore();
     }
     LOG.error("Unrecognized store type: {}", config.getStoreType());
-    return null;
+    return store;
   }
 
   /**
@@ -321,13 +313,13 @@ public class GNRSServer implements MessageListener {
    * @return the current binding values.
    */
   public NetworkAddress[] getBindings(final GUID guid) {
-
-    GNRSRecord record = this.guidStore.getBindings(guid);
-    if (record == null) {
-      return null;
+    NetworkAddress[] addresses = null;
+    final GNRSRecord record = this.guidStore.getBindings(guid);
+    if (record != null) {
+      addresses = record.getBindings();
     }
 
-    return record.getBindings();
+    return addresses;
   }
 
   /**
@@ -335,19 +327,19 @@ public class GNRSServer implements MessageListener {
    * 
    * @param guid
    *          the GUID to bind.
-   * @param bindings
+   * @param addresses
    *          the new bindings for the GUID
    * @return {@code true} if the insert succeeds, else {@code false}.
    */
   public boolean appendBindings(final GUID guid,
-      final NetworkAddress... bindings) {
-    for (NetworkAddress a : bindings) {
-      // TODO: Handle the future.
-      GUIDBinding b = new GUIDBinding();
-      b.setAddress(a);
-      b.setTtl(0);
-      b.setWeight(0);
-      this.guidStore.appendBindings(guid, b);
+      final NetworkAddress... addresses) {
+    GUIDBinding binding = null;
+    for (final NetworkAddress a : addresses) {
+      binding = new GUIDBinding();
+      binding.setAddress(a);
+      binding.setTtl(0);
+      binding.setWeight(0);
+      this.guidStore.appendBindings(guid, binding);
     }
     return true;
   }
@@ -409,7 +401,8 @@ public class GNRSServer implements MessageListener {
   }
 
   @Override
-  public void messageReceived(SessionParameters parameters, AbstractMessage msg) {
+  public void messageReceived(final SessionParameters parameters,
+      final AbstractMessage msg) {
 
     if (msg instanceof InsertMessage) {
       this.workers
@@ -424,10 +417,6 @@ public class GNRSServer implements MessageListener {
       LOG.warn("Unrecognized message: {}", msg);
       this.networkAccess.endSession(parameters);
     }
-    // Notify the main thread that work can be done.
-    synchronized (this.messageLock) {
-      this.messageLock.notifyAll();
-    }
 
   }
 
@@ -435,19 +424,19 @@ public class GNRSServer implements MessageListener {
    * Timer task that reports server-related statistics when called.
    * 
    * @author Robert Moore
-   * 
    */
-  private static final class StatsTask extends TimerTask {
+  public static final class StatsTask extends TimerTask {
 
     /**
      * Logging for the statistics class.
      */
-    private static final Logger LOG_STATS = LoggerFactory.getLogger(StatsTask.class);
+    private static final Logger LOG_STATS = LoggerFactory
+        .getLogger(StatsTask.class);
 
     /**
      * The last time statistics were generated.
      */
-    private long lastTimestamp = System.currentTimeMillis();
+    private transient long lastTimestamp = System.currentTimeMillis();
 
     @Override
     public void run() {
@@ -480,6 +469,7 @@ public class GNRSServer implements MessageListener {
 
   /**
    * Gets this server's configuration.
+   * 
    * @return this server's configuration.
    */
   public Configuration getConfig() {

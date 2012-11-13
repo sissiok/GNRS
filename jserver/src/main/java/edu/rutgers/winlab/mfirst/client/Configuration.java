@@ -51,7 +51,7 @@ public class Configuration {
    * @param serverHost
    *          the new server hostname.
    */
-  public void setServerHost(String serverHost) {
+  public void setServerHost(final String serverHost) {
     this.serverHost = serverHost;
   }
 
@@ -70,7 +70,7 @@ public class Configuration {
    * @param serverPort
    *          the new server port number.
    */
-  public void setServerPort(int serverPort) {
+  public void setServerPort(final int serverPort) {
     this.serverPort = serverPort;
   }
 
@@ -89,7 +89,7 @@ public class Configuration {
    * @param clientPort
    *          the new sending port.
    */
-  public void setClientPort(int clientPort) {
+  public void setClientPort(final int clientPort) {
     this.clientPort = clientPort;
   }
 
@@ -108,7 +108,7 @@ public class Configuration {
    * @param clientHost
    *          the new client hostname.
    */
-  public void setClientHost(String clientHost) {
+  public void setClientHost(final String clientHost) {
     this.clientHost = clientHost;
   }
 

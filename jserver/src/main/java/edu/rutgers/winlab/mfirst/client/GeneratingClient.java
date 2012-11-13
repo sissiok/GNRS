@@ -65,14 +65,14 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
       return;
     }
 
-    XStream x = new XStream();
+    final XStream xStream = new XStream();
 
-    Configuration config = (Configuration) x.fromXML(new File(args[0]));
+    final Configuration config = (Configuration) xStream.fromXML(new File(args[0]));
     LOG.debug("Loaded configuration file \"{}\".", args[0]);
 
-    int delay = Integer.parseInt(args[2]);
-    int numClients = Integer.parseInt(args[3]);
-    int numLookups = Integer.parseInt(args[1]);
+    final int delay = Integer.parseInt(args[2]);
+    final int numClients = Integer.parseInt(args[3]);
+    final int numLookups = Integer.parseInt(args[1]);
 
     GeneratingClient[] clients = new GeneratingClient[numClients];
     for (int i = 0; i < clients.length; ++i) {
