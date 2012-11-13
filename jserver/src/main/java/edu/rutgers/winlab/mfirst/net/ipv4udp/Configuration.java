@@ -53,7 +53,7 @@ public class Configuration {
    * @param bindAddress
    *          the new binding address.
    */
-  public void setBindAddress(String bindAddress) {
+  public void setBindAddress(final String bindAddress) {
     this.bindAddress = bindAddress;
   }
 
@@ -72,7 +72,7 @@ public class Configuration {
    * @param bindPort
    *          the new binding port.
    */
-  public void setBindPort(int bindPort) {
+  public void setBindPort(final int bindPort) {
     this.bindPort = bindPort;
   }
 
@@ -93,7 +93,7 @@ public class Configuration {
    *          (non-blocking), or {@code false} for synchronous (blocking)
    *          writes.
    */
-  public void setAscynchronousWrite(boolean ascynchronousWrite) {
+  public void setAscynchronousWrite(final boolean ascynchronousWrite) {
     this.ascynchronousWrite = ascynchronousWrite;
   }
 }

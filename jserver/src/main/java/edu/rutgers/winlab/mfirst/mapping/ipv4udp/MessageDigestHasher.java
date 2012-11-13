@@ -69,7 +69,7 @@ public class MessageDigestHasher implements GUIDHasher {
         try {
           return MessageDigest
               .getInstance(MessageDigestHasher.this.algorithmName);
-        } catch (NoSuchAlgorithmException nsae) {
+        } catch (final NoSuchAlgorithmException nsae) {
           return null;
         }
       }
@@ -80,19 +80,19 @@ public class MessageDigestHasher implements GUIDHasher {
   public Collection<NetworkAddress> hash(final GUID guid,
       final AddressType type, final int numAddresses)
       throws NoSuchAlgorithmException {
-    ArrayList<NetworkAddress> addresses = new ArrayList<NetworkAddress>(
+    final ArrayList<NetworkAddress> addresses = new ArrayList<NetworkAddress>(
         numAddresses);
-    MessageDigest digest = this.localDigest.get();
+    final MessageDigest digest = this.localDigest.get();
     if (digest == null) {
       LOG.error("Unable to hash because \"{}\" is not supported.",
           this.algorithmName);
       return null;
     }
-    int digestBytes = digest.getDigestLength();
+    final int digestBytes = digest.getDigestLength();
     // Figure out how many bytes we need to buffer for our network addresses
-    int numberDigests = (int) Math
+    final int numberDigests = (int) Math
         .ceil((type.getMaxLength() * numAddresses * 1f) / digestBytes);
-    ByteBuffer buffer = ByteBuffer.allocate(numberDigests * digestBytes);
+    final ByteBuffer buffer = ByteBuffer.allocate(numberDigests * digestBytes);
 
     // Initializes values to 0
     byte[] previousDigest = new byte[digestBytes];
@@ -111,9 +111,9 @@ public class MessageDigestHasher implements GUIDHasher {
     // Generate the addresses and put them in the collection
     for (int i = 0; i < numAddresses; ++i) {
       
-      byte[] bytes = new byte[type.getMaxLength()];
+      final byte[] bytes = new byte[type.getMaxLength()];
       buffer.get(bytes);
-      NetworkAddress na = new NetworkAddress(type,bytes);
+      final NetworkAddress na = new NetworkAddress(type,bytes);
       addresses.add(na);
     }
 

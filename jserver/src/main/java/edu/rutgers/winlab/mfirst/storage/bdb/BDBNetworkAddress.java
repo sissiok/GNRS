@@ -37,7 +37,7 @@ public class BDBNetworkAddress {
    * @return a new BDBNetworkAddress representing the NetworkAddress.
    */
   public static BDBNetworkAddress fromNetworkAddress(final NetworkAddress na) {
-    BDBNetworkAddress newAddr = new BDBNetworkAddress();
+    final BDBNetworkAddress newAddr = new BDBNetworkAddress();
     newAddr.type = na.getType().value();
     newAddr.value = na.getValue();
     return newAddr;

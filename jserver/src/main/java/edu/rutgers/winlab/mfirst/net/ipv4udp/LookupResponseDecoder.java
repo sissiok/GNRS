@@ -26,7 +26,7 @@ import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 public class LookupResponseDecoder implements MessageDecoder {
 
   @Override
-  public MessageDecoderResult decodable(IoSession session, IoBuffer buffer) {
+  public MessageDecoderResult decodable(final IoSession session, final IoBuffer buffer) {
     // Store the current cursor position in the buffer
     buffer.mark();
     // Need 2 bytes to check version and type
@@ -37,7 +37,7 @@ public class LookupResponseDecoder implements MessageDecoder {
     // Skip the version field
     // TODO: What to do with versions?
     buffer.get();
-    byte type = buffer.get();
+    final byte type = buffer.get();
     // Reset the cursor so we don't modify the buffer data.
     buffer.reset();
     if (type == MessageType.LOOKUP_RESPONSE.value()) {
@@ -47,8 +47,8 @@ public class LookupResponseDecoder implements MessageDecoder {
   }
 
   @Override
-  public MessageDecoderResult decode(IoSession session, IoBuffer buffer,
-      ProtocolDecoderOutput out) throws Exception {
+  public MessageDecoderResult decode(final IoSession session, final IoBuffer buffer,
+      final ProtocolDecoderOutput out) throws Exception {
     /*
      * Common message header stuff
      */
@@ -60,22 +60,22 @@ public class LookupResponseDecoder implements MessageDecoder {
 
     // Don't need message length
     buffer.getUnsignedShort();
-    long requestId = buffer.getUnsignedInt();
+    final long requestId = buffer.getUnsignedInt();
 
     // Origin Address
-    AddressType addrType = AddressType.valueOf(buffer.getUnsignedShort());
+    final AddressType addrType = AddressType.valueOf(buffer.getUnsignedShort());
 
-    int originAddrLength = buffer.getUnsignedShort();
-    byte[] originAddr = new byte[originAddrLength];
+    final int originAddrLength = buffer.getUnsignedShort();
+    final byte[] originAddr = new byte[originAddrLength];
     buffer.get(originAddr);
-    NetworkAddress originAddress = new NetworkAddress(addrType, originAddr);
+    final NetworkAddress originAddress = new NetworkAddress(addrType, originAddr);
 
     // Response code
-    ResponseCode responseCode = ResponseCode.valueOf(buffer.getUnsignedShort());
+    final ResponseCode responseCode = ResponseCode.valueOf(buffer.getUnsignedShort());
     // Padding
     buffer.getShort();
 
-    LookupResponseMessage msg = new LookupResponseMessage();
+    final LookupResponseMessage msg = new LookupResponseMessage();
     msg.setOriginAddress(originAddress);
     msg.setRequestId(requestId);
     msg.setResponseCode(responseCode);
@@ -83,16 +83,16 @@ public class LookupResponseDecoder implements MessageDecoder {
     // Lookup response-specific
 
     // Lookup response-specific stuff
-    long numBindings = buffer.getUnsignedInt();
-    NetworkAddress[] bindings = new NetworkAddress[(int) numBindings];
+    final long numBindings = buffer.getUnsignedInt();
+    final NetworkAddress[] bindings = new NetworkAddress[(int) numBindings];
 
     for (int i = 0; i < numBindings; ++i) {
-      int addxType = buffer.getUnsignedShort();
-      int addxLength = buffer.getUnsignedShort();
-      byte[] addxBytes = new byte[addxLength];
+      final int addxType = buffer.getUnsignedShort();
+      final int addxLength = buffer.getUnsignedShort();
+      final byte[] addxBytes = new byte[addxLength];
       buffer.get(addxBytes);
 
-      NetworkAddress na = new NetworkAddress(AddressType.valueOf(addxType),
+      final NetworkAddress na = new NetworkAddress(AddressType.valueOf(addxType),
           addxBytes);
       bindings[i] = na;
     }
@@ -114,7 +114,7 @@ public class LookupResponseDecoder implements MessageDecoder {
    * org.apache.mina.filter.codec.ProtocolDecoderOutput)
    */
   @Override
-  public void finishDecode(IoSession arg0, ProtocolDecoderOutput arg1)
+  public void finishDecode(final IoSession arg0, final ProtocolDecoderOutput arg1)
       throws Exception {
     // Nothing to see here.
   }

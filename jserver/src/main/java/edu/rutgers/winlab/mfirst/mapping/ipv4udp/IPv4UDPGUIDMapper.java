@@ -73,7 +73,7 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
    *           if an IOException is thrown while reading the configuration file.
    */
   public IPv4UDPGUIDMapper(final String configFile) throws IOException {
-    Configuration config = this.loadConfiguration(configFile);
+    final Configuration config = this.loadConfiguration(configFile);
 
     // Load the network prefix announcements
     this.loadPrefixes(config.getPrefixFile());
@@ -98,7 +98,7 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
    * @return the configuration object
    */
   private Configuration loadConfiguration(final String filename) {
-    XStream x = new XStream();
+    final XStream x = new XStream();
     return (Configuration) x.fromXML(new File(filename));
   }
 
@@ -111,8 +111,8 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
    *           if an exception occurs while reading the file.
    */
   private void loadPrefixes(final String prefixFilename) throws IOException {
-    File prefixFile = new File(prefixFilename);
-    BufferedReader lineReader = new BufferedReader(new FileReader(prefixFile));
+    final File prefixFile = new File(prefixFilename);
+    final BufferedReader lineReader = new BufferedReader(new FileReader(prefixFile));
 
     String line = lineReader.readLine();
     while (line != null) {
@@ -126,30 +126,30 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
 
       // log.debug("Parsing \"{}\"", line);
       // Extract any comments and discard
-      String content = line.split("#")[0];
+      final String content = line.split("#")[0];
 
-      String[] generalComponents = content.split("\\s+");
+      final String[] generalComponents = content.split("\\s+");
       if (generalComponents.length < 2) {
         LOG.warn("Not enough components to parse the line \"{}\".", line);
         continue;
       }
       // Extract the base address and prefix length
-      String[] prefixParts = generalComponents[0].split("/");
-      InetAddress addx = InetAddress.getByName(prefixParts[0]);
-      byte[] addxBytes = addx.getAddress();
+      final String[] prefixParts = generalComponents[0].split("/");
+      final InetAddress addx = InetAddress.getByName(prefixParts[0]);
+      final byte[] addxBytes = addx.getAddress();
       int addxAsInt = ((addxBytes[0] << 24) & 0xFF000000)
           | ((addxBytes[1] << 16) & 0xFF0000) | ((addxBytes[2] << 8) & 0xFF00)
           | ((addxBytes[3]) & 0xFF);
 
       // Extract prefix length
-      int prefixLength = Integer.parseInt(prefixParts[1]);
+      final int prefixLength = Integer.parseInt(prefixParts[1]);
       // Apply the prefix
       addxAsInt = addxAsInt & (0x80000000 >> prefixLength);
 
-      NetworkAddress na = IPv4UDPAddress.fromInteger(addxAsInt);
-      byte[] naBytes = na.getValue();
+      final NetworkAddress na = IPv4UDPAddress.fromInteger(addxAsInt);
+      final byte[] naBytes = na.getValue();
       int realLength = 0;
-      for (byte b : naBytes) {
+      for (final byte b : naBytes) {
         if (b == 0) {
           break;
         }
@@ -178,8 +178,8 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
    */
   private void loadAsNetworkBindings(final String asBindingFilename)
       throws IOException {
-    File asBindingFile = new File(asBindingFilename);
-    BufferedReader lineReader = new BufferedReader(
+    final File asBindingFile = new File(asBindingFilename);
+    final BufferedReader lineReader = new BufferedReader(
         new FileReader(asBindingFile));
 
     String line = lineReader.readLine();
@@ -194,20 +194,20 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
 
       // log.debug("Parsing \"{}\"", line);
       // Extract any comments and discard
-      String content = line.split("#")[0];
+      final String content = line.split("#")[0];
 
       // Extract the 3 parts (AS #, IP address, port)
-      String[] generalComponents = content.split("\\s+");
+      final String[] generalComponents = content.split("\\s+");
       if (generalComponents.length < 3) {
         LOG.warn("Not enough components to parse the line \"{}\".", line);
         continue;
       }
 
-      Integer asNumber = Integer.valueOf(generalComponents[0]);
-      String ipAddrString = generalComponents[1];
-      int port = Integer.parseInt(generalComponents[2]);
+      final Integer asNumber = Integer.valueOf(generalComponents[0]);
+      final String ipAddrString = generalComponents[1];
+      final int port = Integer.parseInt(generalComponents[2]);
 
-      InetSocketAddress sockAddx = new InetSocketAddress(ipAddrString, port);
+      final InetSocketAddress sockAddx = new InetSocketAddress(ipAddrString, port);
       this.asAddresses.put(asNumber, sockAddx);
 
       line = lineReader.readLine();
@@ -236,8 +236,8 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
     // Match-up returned types with supported types.
     else {
       returnedTypes = new LinkedList<AddressType>();
-      EnumSet<AddressType> supportedTypes = this.getTypes();
-      for (AddressType t : types) {
+      final EnumSet<AddressType> supportedTypes = this.getTypes();
+      for (final AddressType t : types) {
         if (supportedTypes.contains(t)) {
           returnedTypes.add(t);
         }
@@ -248,25 +248,25 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
       }
     }
 
-    List<NetworkAddress> returnedAddresses = new LinkedList<NetworkAddress>();
+    final List<NetworkAddress> returnedAddresses = new LinkedList<NetworkAddress>();
 
-    for (AddressType type : returnedTypes) {
+    for (final AddressType type : returnedTypes) {
       try {
         // Generate some addresses from the GUID
-        Collection<NetworkAddress> randomAddresses = this.hasher.hash(guid,
+        final Collection<NetworkAddress> randomAddresses = this.hasher.hash(guid,
             type, numAddresses);
 
         // Map them to an AS
-        for (NetworkAddress na : randomAddresses) {
-          String autonomousSystem = this.networkAddressMap.get(na);
+        for (final NetworkAddress na : randomAddresses) {
+          final String autonomousSystem = this.networkAddressMap.get(na);
           if (autonomousSystem == null) {
             // FIXME: Rehash?
             LOG.error("Found mapping hole for {}", na);
             continue;
           }
-          InetSocketAddress asGNRSAddr = this.asAddresses.get(Integer
+          final InetSocketAddress asGNRSAddr = this.asAddresses.get(Integer
               .decode(autonomousSystem));
-          NetworkAddress finalAddr = IPv4UDPAddress
+          final NetworkAddress finalAddr = IPv4UDPAddress
               .fromInetSocketAddress(asGNRSAddr);
           if (finalAddr != null) {
             returnedAddresses.add(finalAddr);
@@ -276,7 +276,7 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
           }
         }
 
-      } catch (NoSuchAlgorithmException e) {
+      } catch (final NoSuchAlgorithmException e) {
         LOG.error("Unable to hash GUID for type " + type, e);
         continue;
       }

@@ -23,10 +23,10 @@ public class InsertEncoder implements MessageEncoder<InsertMessage> {
 
 
   @Override
-  public void encode(IoSession session, InsertMessage message,
-      ProtocolEncoderOutput out) throws Exception {
+  public void encode(final IoSession session, final InsertMessage message,
+      final ProtocolEncoderOutput out) throws Exception {
 
-    IoBuffer buff = IoBuffer.allocate(message.getMessageLength());
+    final IoBuffer buff = IoBuffer.allocate(message.getMessageLength());
     
     // Generic request stuff
     buff.put(message.getVersion());
@@ -44,7 +44,7 @@ public class InsertEncoder implements MessageEncoder<InsertMessage> {
     buff.putUnsignedInt(message.getOptions());
     buff.putUnsignedInt(message.getNumBindings());
     if(message.getNumBindings() > 0){
-      for(NetworkAddress addx : message.getBindings()){
+      for(final NetworkAddress addx : message.getBindings()){
         buff.putUnsignedShort(addx.getType().value());
         buff.putUnsignedShort(addx.getLength());
         buff.put(addx.getValue());

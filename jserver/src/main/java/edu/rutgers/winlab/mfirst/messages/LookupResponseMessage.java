@@ -43,13 +43,13 @@ public class LookupResponseMessage extends AbstractResponseMessage {
    * @param bindings
    *          the new bindings for this message.
    */
-  public void setBindings(NetworkAddress[] bindings) {
+  public void setBindings(final NetworkAddress[] bindings) {
     this.bindings = bindings;
   }
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder("LKR #").append(this.getRequestId())
+    final StringBuilder sb = new StringBuilder("LKR #").append(this.getRequestId())
         .append("/").append(this.responseCode).append(" {");
     if (this.bindings != null) {
       for (int i = 0; i < this.bindings.length; ++i) {
@@ -79,7 +79,7 @@ public class LookupResponseMessage extends AbstractResponseMessage {
   protected int getBindingsLength() {
     int length = 0;
     if (this.bindings != null) {
-      for (NetworkAddress addx : this.bindings) {
+      for (final NetworkAddress addx : this.bindings) {
         // Type, length, value
         length += (addx.getLength() + 4);
       }

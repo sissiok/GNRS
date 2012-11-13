@@ -71,7 +71,7 @@ public class NetworkAddress {
    * @param bytes
    *          the new value of this network address.
    */
-  public final void setValue(byte[] bytes) {
+  public final void setValue(final byte[] bytes) {
     if (bytes != null && bytes.length > 0xFFFF) {
       throw new IllegalArgumentException(
           "NetworkAddress value exceeds maximum length of 65535 bytes.");
@@ -81,10 +81,10 @@ public class NetworkAddress {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(this.getLength() * 2 + 4);
+    final StringBuilder sb = new StringBuilder(this.getLength() * 2 + 4);
     sb.append("NA(");
 
-    for (byte b : this.value) {
+    for (final byte b : this.value) {
       sb.append(String.format("%02x", Byte.valueOf(b)));
     }
     sb.append(')');
@@ -97,7 +97,7 @@ public class NetworkAddress {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(final Object o) {
     if (o instanceof NetworkAddress) {
       return this.equalsNA((NetworkAddress) o);
     }
@@ -131,7 +131,7 @@ public class NetworkAddress {
    * @param type
    *          the new type.
    */
-  public final void setType(AddressType type) {
+  public final void setType(final AddressType type) {
     this.type = type;
   }
 

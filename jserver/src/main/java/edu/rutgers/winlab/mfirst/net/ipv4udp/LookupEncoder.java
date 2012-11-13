@@ -20,9 +20,9 @@ import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 public class LookupEncoder implements MessageEncoder<LookupMessage> {
 
   @Override
-  public void encode(IoSession session, LookupMessage message,
-      ProtocolEncoderOutput out) throws Exception {
-    IoBuffer buff = IoBuffer.allocate(message.getMessageLength());
+  public void encode(final IoSession session, final LookupMessage message,
+      final ProtocolEncoderOutput out) throws Exception {
+    final IoBuffer buff = IoBuffer.allocate(message.getMessageLength());
 
     // Generic request stuff
     buff.put(message.getVersion());

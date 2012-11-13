@@ -83,12 +83,12 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject 
     this.acceptor = new NioDatagramAcceptor();
     this.acceptor.setHandler(this);
 
-    DefaultIoFilterChainBuilder chain = this.acceptor.getFilterChain();
+    final DefaultIoFilterChainBuilder chain = this.acceptor.getFilterChain();
     // For encoding/decoding our messages
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
         new GNRSProtocolCodecFactory(true)));
 
-    DatagramSessionConfig sessionConfig = this.acceptor.getSessionConfig();
+    final DatagramSessionConfig sessionConfig = this.acceptor.getSessionConfig();
     sessionConfig.setReuseAddress(true);
     sessionConfig.setCloseOnPortUnreachable(false);
 
@@ -112,25 +112,25 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject 
    * @return {@code true} if loading succeeds.
    */
   private boolean loadConfiguration(final String filename) {
-    XStream x = new XStream();
+    final XStream x = new XStream();
     this.config = (Configuration) x.fromXML(new File(filename));
     return true;
   }
 
   @Override
-  public void addMessageListener(MessageListener listener) {
+  public void addMessageListener(final MessageListener listener) {
     this.listeners.add(listener);
   }
 
   @Override
-  public void sendMessage(SessionParameters parameters, AbstractMessage message) {
+  public void sendMessage(final SessionParameters parameters, final AbstractMessage message) {
     if (!(parameters instanceof IPv4UDPParameters)) {
       throw new IllegalArgumentException(
           "Not an instance of IPv4UDP networking parameters: " + parameters);
     }
 
-    IPv4UDPParameters p = (IPv4UDPParameters) parameters;
-    WriteFuture f = p.session.write(message);
+    final IPv4UDPParameters p = (IPv4UDPParameters) parameters;
+    final WriteFuture f = p.session.write(message);
     if (!this.config.isAscynchronousWrite()) {
       f.awaitUninterruptibly();
     }
@@ -142,7 +142,7 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject 
       throw new IllegalArgumentException(
           "Not an instance of IPv4UDP networking parameters: " + parameters);
     }
-    IPv4UDPParameters p = (IPv4UDPParameters) parameters;
+    final IPv4UDPParameters p = (IPv4UDPParameters) parameters;
     p.session.close(true);
   }
 
@@ -162,7 +162,7 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject 
     try {
       return IPv4UDPAddress.fromASCII(this.config.getBindAddress() + ":"
           + this.config.getBindPort());
-    } catch (UnsupportedEncodingException e) {
+    } catch (final UnsupportedEncodingException e) {
       LOG.error("Unable to create origin address due to encoding problems.", e);
       return null;
     }
@@ -181,14 +181,14 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject 
       params.session = session;
       this.sessionMap.put(session, params);
     }
-    for (MessageListener listener : this.listeners) {
+    for (final MessageListener listener : this.listeners) {
       listener.messageReceived(params, (AbstractMessage) message);
     }
   }
 
   @Override
   public void sessionOpened(final IoSession session) {
-    IPv4UDPParameters params = new IPv4UDPParameters();
+    final IPv4UDPParameters params = new IPv4UDPParameters();
     params.session = session;
     this.sessionMap.put(session, params);
   }

@@ -26,7 +26,7 @@ import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 public class InsertDecoder implements MessageDecoder {
 
   @Override
-  public MessageDecoderResult decodable(IoSession session, IoBuffer buffer) {
+  public MessageDecoderResult decodable(final IoSession session, final IoBuffer buffer) {
     // Store the current cursor position in the buffer
     buffer.mark();
     // Need 2 bytes to check version and type
@@ -38,7 +38,7 @@ public class InsertDecoder implements MessageDecoder {
     // Skip the version number
     // TODO: What to do with the version?
     buffer.get();
-    byte type = buffer.get();
+    final byte type = buffer.get();
     // Reset the cursor so we don't modify the buffer data.
     buffer.reset();
     if (type == MessageType.INSERT.value()) {
@@ -56,52 +56,52 @@ public class InsertDecoder implements MessageDecoder {
    * org.apache.mina.filter.codec.ProtocolDecoderOutput)
    */
   @Override
-  public MessageDecoderResult decode(IoSession session, IoBuffer buffer,
-      ProtocolDecoderOutput out) throws Exception {
+  public MessageDecoderResult decode(final IoSession session, final IoBuffer buffer,
+      final ProtocolDecoderOutput out) throws Exception {
 
     /*
      * Common message header stuff
      */
-    byte version = buffer.get();
+    final byte version = buffer.get();
     // Ignore type, since this is checked in decodable(IoSession, IoBuffer)
     buffer.get();
     // Ignore message length (not used)
     buffer.getUnsignedShort();
-    long requestId = buffer.getUnsignedInt();
+    final long requestId = buffer.getUnsignedInt();
 
     // Origin address
-    AddressType addrType = AddressType.valueOf(buffer.getUnsignedShort());
+    final AddressType addrType = AddressType.valueOf(buffer.getUnsignedShort());
 
-    int originAddrLength = buffer.getUnsignedShort();
-    byte[] originAddr = new byte[originAddrLength];
+    final int originAddrLength = buffer.getUnsignedShort();
+    final byte[] originAddr = new byte[originAddrLength];
     buffer.get(originAddr);
-    NetworkAddress originAddress = new NetworkAddress(addrType, originAddr);
+    final NetworkAddress originAddress = new NetworkAddress(addrType, originAddr);
 
-    InsertMessage msg = new InsertMessage();
+    final InsertMessage msg = new InsertMessage();
     msg.setVersion(version);
     msg.setRequestId(requestId);
     msg.setOriginAddress(originAddress);
 
     // Insert-specific stuff
-    GUID guid = new GUID();
-    byte[] guidBytes = new byte[GUID.SIZE_OF_GUID];
+    final GUID guid = new GUID();
+    final byte[] guidBytes = new byte[GUID.SIZE_OF_GUID];
     buffer.get(guidBytes);
     guid.setBinaryForm(guidBytes);
     msg.setGuid(guid);
 
-    long options = buffer.getUnsignedInt();
+    final long options = buffer.getUnsignedInt();
     msg.setOptions(options);
 
-    long numBindings = buffer.getUnsignedInt();
-    NetworkAddress[] bindings = new NetworkAddress[(int) numBindings];
+    final long numBindings = buffer.getUnsignedInt();
+    final NetworkAddress[] bindings = new NetworkAddress[(int) numBindings];
 
     for (int i = 0; i < numBindings; ++i) {
-      int addxType = buffer.getUnsignedShort();
-      int addxLength = buffer.getUnsignedShort();
-      byte[] addxBytes = new byte[addxLength];
+      final int addxType = buffer.getUnsignedShort();
+      final int addxLength = buffer.getUnsignedShort();
+      final byte[] addxBytes = new byte[addxLength];
       buffer.get(addxBytes);
 
-      NetworkAddress na = new NetworkAddress(AddressType.valueOf(addxType),
+      final NetworkAddress na = new NetworkAddress(AddressType.valueOf(addxType),
           addxBytes);
       bindings[i] = na;
     }
@@ -115,7 +115,7 @@ public class InsertDecoder implements MessageDecoder {
   }
 
   @Override
-  public void finishDecode(IoSession arg0, ProtocolDecoderOutput arg1)
+  public void finishDecode(final IoSession arg0, final ProtocolDecoderOutput arg1)
       throws Exception {
     // Nothing to do
   }

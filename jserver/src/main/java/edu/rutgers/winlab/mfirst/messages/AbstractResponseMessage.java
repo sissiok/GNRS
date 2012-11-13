@@ -49,7 +49,7 @@ public abstract class AbstractResponseMessage extends AbstractMessage {
    *          the new response code.
    * @see ResponseCode
    */
-  public void setResponseCode(ResponseCode responseCode) {
+  public void setResponseCode(final ResponseCode responseCode) {
     this.responseCode = responseCode;
   }
 

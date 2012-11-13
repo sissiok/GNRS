@@ -55,7 +55,7 @@ public enum ResponseCode {
    * @param b a byte value from the GNRS network protocol.
    * @return a ResponseCode appropriate for the value.
    */
-  public static ResponseCode valueOf(int b){
+  public static ResponseCode valueOf(final int b){
     return b == SUCCESS.value ? SUCCESS : FAILED;
   }
   

@@ -53,7 +53,7 @@ public class InsertMessage extends AbstractMessage {
    * @param guid
    *          the new GUID for this message.
    */
-  public void setGuid(GUID guid) {
+  public void setGuid(final GUID guid) {
     this.guid = guid;
   }
 
@@ -80,13 +80,13 @@ public class InsertMessage extends AbstractMessage {
    * @param bindings
    *          the new Network Address bindings for this message.
    */
-  public void setBindings(NetworkAddress[] bindings) {
+  public void setBindings(final NetworkAddress[] bindings) {
     this.bindings = bindings;
   }
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder("INS #");
+    final StringBuilder sb = new StringBuilder("INS #");
     sb.append(this.getRequestId()).append(' ').append(this.guid)
         .append(" -> {");
     if (this.bindings != null) {
@@ -117,7 +117,7 @@ public class InsertMessage extends AbstractMessage {
   protected int getBindingsLength() {
     int length = 0;
     if (this.bindings != null) {
-      for (NetworkAddress addr : this.bindings) {
+      for (final NetworkAddress addr : this.bindings) {
         length += (4 + addr.getLength());
       }
     }
@@ -139,7 +139,7 @@ public class InsertMessage extends AbstractMessage {
    * @param options
    *          the new message options value.
    */
-  public void setOptions(long options) {
+  public void setOptions(final long options) {
     this.options = options & 0xFFFFFFFF;
   }
 

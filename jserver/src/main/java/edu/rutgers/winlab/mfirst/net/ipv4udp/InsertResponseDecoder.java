@@ -26,7 +26,7 @@ import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 public class InsertResponseDecoder implements MessageDecoder {
 
   @Override
-  public MessageDecoderResult decodable(IoSession session, IoBuffer buffer) {
+  public MessageDecoderResult decodable(final IoSession session, final IoBuffer buffer) {
     // Store the current cursor position in the buffer
     buffer.mark();
     // Need 5 bytes to check request ID and type
@@ -37,7 +37,7 @@ public class InsertResponseDecoder implements MessageDecoder {
     // Skip the version number
     // TODO: What happens with version number?
     buffer.get();
-    byte type = buffer.get();
+    final byte type = buffer.get();
     // Reset the cursor so we don't modify the buffer data.
     buffer.reset();
     if (type == MessageType.INSERT_RESPONSE.value()) {
@@ -49,37 +49,37 @@ public class InsertResponseDecoder implements MessageDecoder {
 
  
   @Override
-  public MessageDecoderResult decode(IoSession session, IoBuffer buffer,
-      ProtocolDecoderOutput out) throws Exception {
+  public MessageDecoderResult decode(final IoSession session, final IoBuffer buffer,
+      final ProtocolDecoderOutput out) throws Exception {
     /*
      * Common message header stuff
      */
     // TODO: What to do with version?
-    byte version = buffer.get();
-    byte type = buffer.get();
+    final byte version = buffer.get();
+    final byte type = buffer.get();
 
     if (type != MessageType.INSERT_RESPONSE.value()) {
       return MessageDecoderResult.NOT_OK;
     }
     // Don't really care about message length
     buffer.getUnsignedShort();
-    long requestId = buffer.getUnsignedInt();
+    final long requestId = buffer.getUnsignedInt();
     
-    AddressType addrType = AddressType.valueOf(buffer.getUnsignedShort());
+    final AddressType addrType = AddressType.valueOf(buffer.getUnsignedShort());
     
-    int originAddrLength = buffer.getUnsignedShort();
-    byte[] originAddr = new byte[originAddrLength];
+    final int originAddrLength = buffer.getUnsignedShort();
+    final byte[] originAddr = new byte[originAddrLength];
     buffer.get(originAddr);
-    NetworkAddress originAddress = new NetworkAddress(addrType, originAddr);
+    final NetworkAddress originAddress = new NetworkAddress(addrType, originAddr);
     
-    InsertResponseMessage msg = new InsertResponseMessage();
+    final InsertResponseMessage msg = new InsertResponseMessage();
     msg.setVersion(version);
     msg.setOriginAddress(originAddress);
     msg.setRequestId(requestId);
 
     // Response-specific stuff
     
-    int responseCode = buffer.getUnsignedShort();
+    final int responseCode = buffer.getUnsignedShort();
 
     msg.setResponseCode(ResponseCode.valueOf(responseCode));
     
@@ -102,7 +102,7 @@ public class InsertResponseDecoder implements MessageDecoder {
    * org.apache.mina.filter.codec.ProtocolDecoderOutput)
    */
   @Override
-  public void finishDecode(IoSession arg0, ProtocolDecoderOutput arg1)
+  public void finishDecode(final IoSession arg0, final ProtocolDecoderOutput arg1)
       throws Exception {
     // Nothing to do
   }

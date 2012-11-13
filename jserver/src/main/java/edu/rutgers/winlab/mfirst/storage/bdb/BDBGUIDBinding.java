@@ -50,7 +50,7 @@ public class BDBGUIDBinding {
    */
   public static BDBGUIDBinding fromGUIDBinding(final GUIDBinding binding) {
 
-    BDBGUIDBinding returnBind = new BDBGUIDBinding();
+    final BDBGUIDBinding returnBind = new BDBGUIDBinding();
 
     returnBind.address = BDBNetworkAddress.fromNetworkAddress(binding
         .getAddress());
@@ -66,7 +66,7 @@ public class BDBGUIDBinding {
    * @return a new GUIDBinding object with the same information as this binding.
    */
   public GUIDBinding toGUIDBinding() {
-    GUIDBinding binding = new GUIDBinding();
+    final GUIDBinding binding = new GUIDBinding();
     binding.setAddress(this.address.toNetworkAddress());
     binding.setTtl(this.ttl);
     binding.setWeight(this.weight);

@@ -44,10 +44,10 @@ public class BDBGUID {
    *         not supported.
    */
   public static BDBGUID fromGUID(final GUID guid) {
-    BDBGUID newBDB = new BDBGUID();
+    final BDBGUID newBDB = new BDBGUID();
     try {
       newBDB.guid = new String(guid.getBinaryForm(), "UTF-16BE");
-    } catch (UnsupportedEncodingException e) {
+    } catch (final UnsupportedEncodingException e) {
       return null;
     }
     return newBDB;
@@ -60,10 +60,10 @@ public class BDBGUID {
    *         supported.
    */
   public GUID toGUID() {
-    GUID newGuid = new GUID();
+    final GUID newGuid = new GUID();
     try {
       newGuid.setBinaryForm(this.guid.getBytes("UTF-16BE"));
-    } catch (UnsupportedEncodingException e) {
+    } catch (final UnsupportedEncodingException e) {
       return null;
     }
     return newGuid;

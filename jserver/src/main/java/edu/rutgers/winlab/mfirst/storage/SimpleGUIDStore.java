@@ -31,12 +31,12 @@ public class SimpleGUIDStore implements GUIDStore {
   private final ConcurrentHashMap<GUID, GNRSRecord> storageMap = new ConcurrentHashMap<GUID, GNRSRecord>();
 
   @Override
-  public GNRSRecord getBindings(GUID guid) {
+  public GNRSRecord getBindings(final GUID guid) {
     return this.storageMap.get(guid);
   }
 
   @Override
-  public boolean appendBindings(GUID guid, GUIDBinding... bindings) {
+  public boolean appendBindings(final GUID guid, final GUIDBinding... bindings) {
     GNRSRecord currRecord = this.storageMap.get(guid);
     if (currRecord == null) {
       currRecord = new GNRSRecord(guid);
@@ -44,7 +44,7 @@ public class SimpleGUIDStore implements GUIDStore {
     }
 
     if (bindings != null) {
-      for (GUIDBinding b : bindings) {
+      for (final GUIDBinding b : bindings) {
         currRecord.addBinding(b);
       }
     }
@@ -63,7 +63,7 @@ public class SimpleGUIDStore implements GUIDStore {
   }
 
   @Override
-  public boolean replaceBindings(GUID guid, GUIDBinding... bindings) {
+  public boolean replaceBindings(final GUID guid, final GUIDBinding... bindings) {
     GNRSRecord currRecord = this.storageMap.get(guid);
     if (currRecord == null) {
       currRecord = new GNRSRecord(guid);
@@ -72,7 +72,7 @@ public class SimpleGUIDStore implements GUIDStore {
     currRecord.removeAll();
 
     if (bindings != null) {
-      for (GUIDBinding b : bindings) {
+      for (final GUIDBinding b : bindings) {
         currRecord.addBinding(b);
       }
     }

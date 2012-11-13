@@ -27,7 +27,7 @@ public class LookupDecoder implements MessageDecoder {
 
   
   @Override
-  public MessageDecoderResult decodable(IoSession session, IoBuffer buffer) {
+  public MessageDecoderResult decodable(final IoSession session, final IoBuffer buffer) {
     // Store the current cursor position in the buffer
     buffer.mark();
     // Need 5 bytes to check request ID and type
@@ -38,7 +38,7 @@ public class LookupDecoder implements MessageDecoder {
     // Skip the version
     // TODO: What to do with version?
     buffer.get();
-    byte type = buffer.get();
+    final byte type = buffer.get();
     // Reset the cursor so we don't modify the buffer data.
     buffer.reset();
     if (type == MessageType.LOOKUP.value()) {
@@ -48,37 +48,37 @@ public class LookupDecoder implements MessageDecoder {
   }
 
   @Override
-  public MessageDecoderResult decode(IoSession session, IoBuffer buffer,
-      ProtocolDecoderOutput out) throws Exception {
+  public MessageDecoderResult decode(final IoSession session, final IoBuffer buffer,
+      final ProtocolDecoderOutput out) throws Exception {
     /*
      * Common message header stuff
      */
-    byte version = buffer.get();
+    final byte version = buffer.get();
     // Ignoring message type, checked in decodable(IoSession, IoBuffer)
     buffer.get();
     // Don't need message length
     buffer.getUnsignedShort();
-    long requestId = buffer.getUnsignedInt();
+    final long requestId = buffer.getUnsignedInt();
 
     // Origin address
-    AddressType addrType = AddressType.valueOf(buffer.getUnsignedShort());
+    final AddressType addrType = AddressType.valueOf(buffer.getUnsignedShort());
 
-    int originAddrLength = buffer.getUnsignedShort();
-    byte[] originAddr = new byte[originAddrLength];
+    final int originAddrLength = buffer.getUnsignedShort();
+    final byte[] originAddr = new byte[originAddrLength];
     buffer.get(originAddr);
-    NetworkAddress originAddress = new NetworkAddress(addrType, originAddr);
+    final NetworkAddress originAddress = new NetworkAddress(addrType, originAddr);
 
-    LookupMessage msg = new LookupMessage();
+    final LookupMessage msg = new LookupMessage();
     msg.setVersion(version);
     msg.setRequestId(requestId);
     msg.setOriginAddress(originAddress);
     
     // Lookup-specific stuff
-    byte[] guidBytes = new byte[GUID.SIZE_OF_GUID];
+    final byte[] guidBytes = new byte[GUID.SIZE_OF_GUID];
     buffer.get(guidBytes);
-    GUID queryGUID = new GUID();
+    final GUID queryGUID = new GUID();
     queryGUID.setBinaryForm(guidBytes);
-    long options = buffer.getUnsignedInt();
+    final long options = buffer.getUnsignedInt();
     msg.setGuid(queryGUID);
     msg.setOptions(options);
 
@@ -91,7 +91,7 @@ public class LookupDecoder implements MessageDecoder {
   }
 
   @Override
-  public void finishDecode(IoSession arg0, ProtocolDecoderOutput arg1)
+  public void finishDecode(final IoSession arg0, final ProtocolDecoderOutput arg1)
       throws Exception {
     // Nothing to do. No state kept.
   }

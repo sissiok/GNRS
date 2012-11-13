@@ -52,24 +52,24 @@ public class TraceClient extends IoHandlerAdapter {
    * 
    * @param args
    */
-  public static void main(String[] args) {
+  public static void main(final String[] args) {
     if (args.length < 3) {
       printUsageInfo();
       return;
     }
 
-    XStream x = new XStream();
+    final XStream x = new XStream();
 
-    Configuration config = (Configuration) x.fromXML(new File(args[0]));
+    final Configuration config = (Configuration) x.fromXML(new File(args[0]));
     LOG.debug("Loaded configuration file \"{}\".", args[0]);
 
-    File traceFile = new File(args[1]);
+    final File traceFile = new File(args[1]);
 
     LOG.debug("Loaded trace file \"{}\".", traceFile);
 
-    int delay = Integer.parseInt(args[2]);
+    final int delay = Integer.parseInt(args[2]);
 
-    TraceClient client = new TraceClient(config, traceFile, delay);
+    final TraceClient client = new TraceClient(config, traceFile, delay);
 
     LOG.debug("Configured trace client.");
     client.connect();
@@ -121,10 +121,10 @@ public class TraceClient extends IoHandlerAdapter {
 
     this.connector = new NioDatagramConnector();
     this.connector.setHandler(this);
-    DatagramSessionConfig sessionConfig = this.connector.getSessionConfig();
+    final DatagramSessionConfig sessionConfig = this.connector.getSessionConfig();
     sessionConfig.setReuseAddress(true);
     sessionConfig.setCloseOnPortUnreachable(false);
-    DefaultIoFilterChainBuilder chain = this.connector.getFilterChain();
+    final DefaultIoFilterChainBuilder chain = this.connector.getFilterChain();
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
         new GNRSProtocolCodecFactory(false)));
 
@@ -138,14 +138,14 @@ public class TraceClient extends IoHandlerAdapter {
    */
   public boolean connect() {
     LOG.debug("Creating connect future.");
-    ConnectFuture connectFuture = this.connector.connect(new InetSocketAddress(
+    final ConnectFuture connectFuture = this.connector.connect(new InetSocketAddress(
         this.config.getServerHost(), this.config.getServerPort()));
 
     connectFuture.awaitUninterruptibly();
 
     connectFuture.addListener(new IoFutureListener<ConnectFuture>() {
       @Override
-      public void operationComplete(ConnectFuture future) {
+      public void operationComplete(final ConnectFuture future) {
         if (future.isConnected()) {
           TraceClient.LOG.info("Connected to {}", future.getSession());
           TraceClient.this.runTrace(future.getSession());
@@ -169,7 +169,7 @@ public class TraceClient extends IoHandlerAdapter {
    */
   void runTrace(final IoSession session) {
     LOG.info("Starting trace from {}.", this.traceFile);
-    BufferedReader reader = loadFile(this.traceFile);
+    final BufferedReader reader = loadFile(this.traceFile);
     if (reader == null) {
       LOG.warn("Unable to open file reader. Aborting trace.");
       return;
@@ -179,7 +179,7 @@ public class TraceClient extends IoHandlerAdapter {
     try {
       fromAddress = IPv4UDPAddress.fromASCII(this.config.getClientHost() + ":"
           + this.config.getClientPort());
-    } catch (UnsupportedEncodingException uee) {
+    } catch (final UnsupportedEncodingException uee) {
       LOG.error(
           "Unable to parse local host name from configuration parameter.", uee);
       return;
@@ -193,7 +193,7 @@ public class TraceClient extends IoHandlerAdapter {
         }
 
         LOG.debug("FILE: {}", line);
-        AbstractMessage message = TraceClient.parseMessage(line);
+        final AbstractMessage message = TraceClient.parseMessage(line);
         if (message == null) {
           LOG.warn("Unable to parse message from \"" + line + "\".");
           continue;
@@ -205,7 +205,7 @@ public class TraceClient extends IoHandlerAdapter {
         session.write(message);
         try {
           Thread.sleep(this.delay);
-        } catch (InterruptedException ie) {
+        } catch (final InterruptedException ie) {
           // Ignored
         }
 
@@ -213,11 +213,11 @@ public class TraceClient extends IoHandlerAdapter {
       LOG.info("Finished reading trace file. Waiting 5 seconds.");
       try {
         Thread.sleep(5000);
-      } catch (InterruptedException ie) {
+      } catch (final InterruptedException ie) {
         // Ignored?
       }
       reader.close();
-    } catch (IOException ioe) {
+    } catch (final IOException ioe) {
       LOG.error("Exception occurred while reading trace file.", ioe);
     }
   }
@@ -232,9 +232,9 @@ public class TraceClient extends IoHandlerAdapter {
   public static AbstractMessage parseMessage(final String s) {
     LOG.debug("Parsing \"{}\"", s);
     // Extract any comments and discard
-    String line = s.split("#")[0];
+    final String line = s.split("#")[0];
 
-    String[] generalComponents = line.split("\\s+");
+    final String[] generalComponents = line.split("\\s+");
     if (generalComponents.length < 3) {
       LOG.error("Not enough components to parse from the line {}.",
           Integer.valueOf(generalComponents.length));
@@ -242,14 +242,14 @@ public class TraceClient extends IoHandlerAdapter {
     }
 
     // Sequence number
-    int sequenceNumber = Integer.parseInt(generalComponents[0]);
+    final int sequenceNumber = Integer.parseInt(generalComponents[0]);
     // Type
-    MessageType type = MessageType.parseType(generalComponents[1]);
+    final MessageType type = MessageType.parseType(generalComponents[1]);
     // GUID
     GUID guid = null;
     try {
       guid = GUID.fromASCII(generalComponents[2]);
-    } catch (UnsupportedEncodingException uee) {
+    } catch (final UnsupportedEncodingException uee) {
       LOG.error("Unable to parse GUID value from string.", uee);
       return null;
     }
@@ -262,18 +262,18 @@ public class TraceClient extends IoHandlerAdapter {
         break;
       }
 
-      String[] bindingValues = generalComponents[3].split(",");
+      final String[] bindingValues = generalComponents[3].split(",");
       if (bindingValues.length % 3 != 0) {
         LOG.error("Binding values are not a multiple of 3: {}",
             Integer.valueOf(bindingValues.length));
         break;
       }
-      NetworkAddress[] bindings = new NetworkAddress[bindingValues.length / 3];
+      final NetworkAddress[] bindings = new NetworkAddress[bindingValues.length / 3];
       for (int i = 0; i < bindings.length; ++i) {
         NetworkAddress na = null;
         try {
           na = IPv4UDPAddress.fromASCII(bindingValues[0]);
-        } catch (UnsupportedEncodingException uee) {
+        } catch (final UnsupportedEncodingException uee) {
           LOG.error("Unable to parse network address from ASCII string.", uee);
           break;
         }
@@ -282,7 +282,7 @@ public class TraceClient extends IoHandlerAdapter {
 
       }
 
-      InsertMessage insMsg = new InsertMessage();
+      final InsertMessage insMsg = new InsertMessage();
       msg = insMsg;
       insMsg.setBindings(bindings);
       insMsg.setGuid(guid);
@@ -290,7 +290,7 @@ public class TraceClient extends IoHandlerAdapter {
       break;
     }
     case LOOKUP: {
-      LookupMessage lookMsg = new LookupMessage();
+      final LookupMessage lookMsg = new LookupMessage();
       msg = lookMsg;
       lookMsg.setGuid(guid);
       lookMsg.setRequestId(sequenceNumber);
@@ -312,26 +312,26 @@ public class TraceClient extends IoHandlerAdapter {
    */
   private BufferedReader loadFile(final File file) {
     try {
-      BufferedReader reader = new BufferedReader(new FileReader(file));
+      final BufferedReader reader = new BufferedReader(new FileReader(file));
       return reader;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       LOG.error("Unable to load file for reading.", e);
       return null;
     }
   }
 
   @Override
-  public void exceptionCaught(IoSession session, Throwable cause) {
+  public void exceptionCaught(final IoSession session, final Throwable cause) {
     LOG.error("Caught unhandled exception.", cause);
   }
 
   @Override
-  public void messageReceived(IoSession session, Object message) {
+  public void messageReceived(final IoSession session, final Object message) {
     LOG.debug("[{}] Received {}", session, message);
   }
 
   @Override
-  public void messageSent(IoSession session, Object message) {
+  public void messageSent(final IoSession session, final Object message) {
     LOG.debug("[{}] Sent {}", session, message);
   }
 }

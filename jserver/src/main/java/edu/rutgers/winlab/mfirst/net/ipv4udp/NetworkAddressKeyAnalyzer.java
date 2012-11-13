@@ -47,27 +47,27 @@ public final class NetworkAddressKeyAnalyzer implements
   }
 
   @Override
-  public int compare(NetworkAddress arg0, NetworkAddress arg1) {
+  public int compare(final NetworkAddress arg0, final NetworkAddress arg1) {
     return this.byteAnalyzer.compare(arg0.getValue(), arg1.getValue());
   }
 
   @Override
-  public int bitIndex(NetworkAddress arg0, NetworkAddress arg1) {
+  public int bitIndex(final NetworkAddress arg0, final NetworkAddress arg1) {
     return this.byteAnalyzer.bitIndex(arg0.getValue(), arg1.getValue());
   }
 
   @Override
-  public boolean isBitSet(NetworkAddress arg0, int arg1) {
+  public boolean isBitSet(final NetworkAddress arg0, final int arg1) {
     return this.byteAnalyzer.isBitSet(arg0.getValue(), arg1);
   }
 
   @Override
-  public boolean isPrefix(NetworkAddress arg0, NetworkAddress arg1) {
+  public boolean isPrefix(final NetworkAddress arg0, final NetworkAddress arg1) {
     return this.byteAnalyzer.isPrefix(arg0.getValue(), arg1.getValue());
   }
 
   @Override
-  public int lengthInBits(NetworkAddress arg0) {
+  public int lengthInBits(final NetworkAddress arg0) {
     if (arg0.getValue() == null) {
       return 0;
     }

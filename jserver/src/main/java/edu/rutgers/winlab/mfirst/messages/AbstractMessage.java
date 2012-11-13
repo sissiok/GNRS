@@ -84,7 +84,7 @@ public abstract class AbstractMessage {
    * 
    * @param requestId
    */
-  public void setRequestId(long requestId) {
+  public void setRequestId(final long requestId) {
     this.requestId = requestId;
   }
 
@@ -95,7 +95,7 @@ public abstract class AbstractMessage {
    *          the type of this message.
    * @see MessageType
    */
-  protected void setType(MessageType type) {
+  protected void setType(final MessageType type) {
     this.type = type;
   }
 
@@ -105,7 +105,7 @@ public abstract class AbstractMessage {
    * @param address
    *          the originator address for this message.
    */
-  public void setOriginAddress(NetworkAddress address) {
+  public void setOriginAddress(final NetworkAddress address) {
     this.originAddress = address;
   }
 
@@ -142,7 +142,7 @@ public abstract class AbstractMessage {
    * @param version
    *          the new version value.
    */
-  public void setVersion(byte version) {
+  public void setVersion(final byte version) {
     this.version = version;
   }
 }

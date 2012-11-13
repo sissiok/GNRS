@@ -22,10 +22,10 @@ public class InsertResponseEncoder implements MessageEncoder<InsertResponseMessa
 
  
   @Override
-  public void encode(IoSession session, InsertResponseMessage message,
-      ProtocolEncoderOutput out) throws Exception {
+  public void encode(final IoSession session, final InsertResponseMessage message,
+      final ProtocolEncoderOutput out) throws Exception {
     // Common Response stuff
-    IoBuffer buffer = IoBuffer.allocate(message.getMessageLength());
+    final IoBuffer buffer = IoBuffer.allocate(message.getMessageLength());
     buffer.put(message.getVersion());
     buffer.put(message.getType().value());
     buffer.putUnsignedShort(message.getMessageLength());

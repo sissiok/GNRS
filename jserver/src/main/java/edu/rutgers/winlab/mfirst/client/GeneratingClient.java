@@ -74,12 +74,12 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     final int numClients = Integer.parseInt(args[3]);
     final int numLookups = Integer.parseInt(args[1]);
 
-    GeneratingClient[] clients = new GeneratingClient[numClients];
+    final GeneratingClient[] clients = new GeneratingClient[numClients];
     for (int i = 0; i < clients.length; ++i) {
       clients[i] = new GeneratingClient(config, delay, numLookups);
     }
 
-    Thread[] threads = new Thread[numClients];
+    final Thread[] threads = new Thread[numClients];
 
     for (int i = 0; i < clients.length; ++i) {
       threads[i] = new Thread(clients[i]);
@@ -159,10 +159,10 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
 
     this.connector = new NioDatagramConnector();
     this.connector.setHandler(this);
-    DatagramSessionConfig sessionConfig = this.connector.getSessionConfig();
+    final DatagramSessionConfig sessionConfig = this.connector.getSessionConfig();
     sessionConfig.setReuseAddress(true);
     sessionConfig.setCloseOnPortUnreachable(false);
-    DefaultIoFilterChainBuilder chain = this.connector.getFilterChain();
+    final DefaultIoFilterChainBuilder chain = this.connector.getFilterChain();
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
         new GNRSProtocolCodecFactory(false)));
 
@@ -183,7 +183,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
    */
   public boolean connect() {
     LOG.debug("Creating connect future.");
-    ConnectFuture connectFuture = this.connector.connect(new InetSocketAddress(
+    final ConnectFuture connectFuture = this.connector.connect(new InetSocketAddress(
         this.config.getServerHost(), this.config.getServerPort()));
 
     // FIXME: Must call awaitUninterruptably. This is a known issue in MINA
@@ -192,20 +192,20 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
 
     connectFuture.addListener(new IoFutureListener<ConnectFuture>() {
       @Override
-      public void operationComplete(ConnectFuture future) {
+      public void operationComplete(final ConnectFuture future) {
         if (future.isConnected()) {
           GeneratingClient.LOG.info("Connected to {}", future.getSession());
           GeneratingClient.this.generateLookups(future.getSession());
           try {
             Thread.sleep(5000);
-          } catch (InterruptedException ie) {
+          } catch (final InterruptedException ie) {
             // Ignored
           }
-          int succ = GeneratingClient.this.numSuccess.get();
-          int total = succ + GeneratingClient.this.numFailures.get();
-          float success = ((succ * 1f) / total) * 100;
-          float loss = ((GeneratingClient.this.numLookups - total * 1f) / GeneratingClient.this.numLookups) * 100;
-          float hits = ((GeneratingClient.this.numHits.get()*1f)/total)*100;
+          final int succ = GeneratingClient.this.numSuccess.get();
+          final int total = succ + GeneratingClient.this.numFailures.get();
+          final float success = ((succ * 1f) / total) * 100;
+          final float loss = ((GeneratingClient.this.numLookups - total * 1f) / GeneratingClient.this.numLookups) * 100;
+          final float hits = ((GeneratingClient.this.numHits.get()*1f)/total)*100;
           LOG.info(String.format(
               "Total: %,d  |  Success: %,.2f%%  |  Hits: %,.2f%%  |  Loss: %,.2f%%)",
               Integer.valueOf(total), Float.valueOf(success), Float.valueOf(hits),
@@ -233,7 +233,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
 
     try {
       IPv4UDPAddress.fromASCII(this.config.getClientHost());
-    } catch (UnsupportedEncodingException uee) {
+    } catch (final UnsupportedEncodingException uee) {
       LOG.error(
           "Unable to parse local host name from configuration parameter.", uee);
       return;
@@ -245,7 +245,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
       clientAddress = IPv4UDPAddress.fromASCII(this.config.getClientHost()
           + ":" + this.config.getClientPort());
 
-    } catch (UnsupportedEncodingException uee) {
+    } catch (final UnsupportedEncodingException uee) {
       LOG.error("Unable to parse client hostname from configuration file.", uee);
       return;
     }
@@ -262,12 +262,12 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
       message.setRequestId(i);
       message.setOriginAddress(clientAddress);
       lastSend = System.nanoTime();
-      WriteFuture future = session.write(message);
+      final WriteFuture future = session.write(message);
 
       future.awaitUninterruptibly();
 
       nextSend = lastSend + (this.delay * 1000);
-      long waitTime = getNanoSleep(nextSend - System.nanoTime());
+      final long waitTime = getNanoSleep(nextSend - System.nanoTime());
 
       if (waitTime > 0) {
         LockSupport.parkNanos(waitTime);
@@ -285,18 +285,18 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
    * @return the actual sleep time to use.
    */
   public static long getNanoSleep(final long desiredSleep) {
-    long halfPrecision = SLEEP_PRECISION / 4;
-    long roundHalf = desiredSleep / (halfPrecision);
+    final long halfPrecision = SLEEP_PRECISION / 4;
+    final long roundHalf = desiredSleep / (halfPrecision);
     return roundHalf * (halfPrecision) - SLEEP_PRECISION;
   }
 
   @Override
-  public void exceptionCaught(IoSession session, Throwable cause) {
+  public void exceptionCaught(final IoSession session, final Throwable cause) {
     LOG.error("Caught unhandled exception.", cause);
   }
 
   @Override
-  public void messageReceived(IoSession session, Object message) {
+  public void messageReceived(final IoSession session, final Object message) {
     if (message instanceof LookupResponseMessage) {
       this.handleResponse((LookupResponseMessage) message);
     }
@@ -321,7 +321,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
   }
 
   @Override
-  public void sessionCreated(IoSession session) {
+  public void sessionCreated(final IoSession session) {
     LOG.info("[{}] Session created.", session);
   }
 }

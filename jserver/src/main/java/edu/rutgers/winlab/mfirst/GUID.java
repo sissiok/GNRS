@@ -96,7 +96,7 @@ public class GUID {
   public String toString() {
     final StringBuilder sBuff = new StringBuilder(SIZE_OF_GUID * 2 + 6);
     sBuff.append("GUID(");
-    for (byte b : this.bytes) {
+    for (final byte b : this.bytes) {
       sBuff.append(String.format("%02x", Byte.valueOf(b)));
     }
     sBuff.append(')');

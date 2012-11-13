@@ -22,7 +22,7 @@ public class InsertResponseMessage extends AbstractResponseMessage {
 
   @Override
   public String toString(){
-    StringBuilder sb = new StringBuilder("INR #");
+    final StringBuilder sb = new StringBuilder("INR #");
     sb.append(this.getRequestId()).append("/").append(super.responseCode);
     return sb.toString();
   }

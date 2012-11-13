@@ -46,7 +46,7 @@ public class GUIDBinding {
    * @param address
    *          the new network address for this binding.
    */
-  public void setAddress(NetworkAddress address) {
+  public void setAddress(final NetworkAddress address) {
     this.address = address;
   }
 
@@ -68,7 +68,7 @@ public class GUIDBinding {
    * @param ttl
    *          the new TTL value.
    */
-  public void setTtl(long ttl) {
+  public void setTtl(final long ttl) {
     this.ttl = ttl;
   }
 
@@ -91,7 +91,7 @@ public class GUIDBinding {
    * @param weight
    *          the new weight value.
    */
-  public void setWeight(int weight) {
+  public void setWeight(final int weight) {
     this.weight = weight;
   }
   
@@ -101,7 +101,7 @@ public class GUIDBinding {
   }
   
   @Override
-  public boolean equals(Object o){
+  public boolean equals(final Object o){
     if(o instanceof GUIDBinding){
       return this.equalsBinding((GUIDBinding)o);
     }
@@ -120,7 +120,7 @@ public class GUIDBinding {
   
   @Override
   public String toString(){
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("Bind (").append(this.address).append(", ").append(this.ttl).append(", ").append(this.weight).append(")");
     return sb.toString();
     

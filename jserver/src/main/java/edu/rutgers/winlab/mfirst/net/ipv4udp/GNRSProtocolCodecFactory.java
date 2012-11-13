@@ -29,7 +29,7 @@ public class GNRSProtocolCodecFactory extends DemuxingProtocolCodecFactory {
    * @param isServer
    *          {@code true} if the factory should be for a server
    */
-  public GNRSProtocolCodecFactory(boolean isServer) {
+  public GNRSProtocolCodecFactory(final boolean isServer) {
     super();
     if (isServer) {
       super.addMessageDecoder(InsertDecoder.class);

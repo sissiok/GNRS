@@ -32,7 +32,7 @@ public class IPv4UDPAddress extends NetworkAddress {
    *          contains the binary form of the IPv4+UDP address (4-byte IP
    *          address, 2-byte UDP port)
    */
-  public IPv4UDPAddress(byte[] value) {
+  public IPv4UDPAddress(final byte[] value) {
     super(AddressType.INET_4_UDP, value);
   }
 
@@ -60,12 +60,12 @@ public class IPv4UDPAddress extends NetworkAddress {
       return null;
     }
 
-    String[] components = s.split(":");
+    final String[] components = s.split(":");
 
     InetAddress inet;
     try {
       inet = InetAddress.getByName(components[0]);
-    } catch (UnknownHostException e) {
+    } catch (final UnknownHostException e) {
       LOG.error("Unable to parse IPv4 address.", e);
       return null;
     }
@@ -75,7 +75,7 @@ public class IPv4UDPAddress extends NetworkAddress {
       port = Short.parseShort(components[1]);
     }
 
-    byte[] newValue = new byte[AddressType.INET_4_UDP.getMaxLength()];
+    final byte[] newValue = new byte[AddressType.INET_4_UDP.getMaxLength()];
     System.arraycopy(inet.getAddress(), 0, newValue, 0, 4);
     newValue[newValue.length - 2] = (byte) (port >> 8);
     newValue[newValue.length - 1] = (byte) port;
@@ -94,7 +94,7 @@ public class IPv4UDPAddress extends NetworkAddress {
    */
   public static IPv4UDPAddress fromInteger(final int i) {
 
-    byte[] newValue = new byte[AddressType.INET_4_UDP.getMaxLength()];
+    final byte[] newValue = new byte[AddressType.INET_4_UDP.getMaxLength()];
     newValue[0] = (byte) (i >> 24);
     newValue[1] = (byte) (i >> 16);
     newValue[2] = (byte) (i >> 8);
@@ -114,19 +114,19 @@ public class IPv4UDPAddress extends NetworkAddress {
    *         conversion.
    */
   public static InetSocketAddress toSocketAddr(final NetworkAddress addr) {
-    byte[] value = addr.getValue();
+    final byte[] value = addr.getValue();
     if (value == null) {
       LOG.error("Unable to create InetSocketAddress from null bytes.");
       return null;
     }
     try {
       // Last two bytes are the port
-      int port = ((value[value.length - 2] << 8) | value[value.length - 1]) & 0xFFFF;
+      final int port = ((value[value.length - 2] << 8) | value[value.length - 1]) & 0xFFFF;
       // First 4 bytes are the IP address
       return new InetSocketAddress(InetAddress.getByAddress(Arrays.copyOf(
           value, 4)), port);
 
-    } catch (UnknownHostException e) {
+    } catch (final UnknownHostException e) {
       LOG.error("Could not create InetSocketAddress from NetworkAddress.", e);
       return null;
     }
@@ -143,9 +143,9 @@ public class IPv4UDPAddress extends NetworkAddress {
    */
   public static IPv4UDPAddress fromInetSocketAddress(
       final InetSocketAddress addx) {
-    byte[] fullAddx = new byte[6];
+    final byte[] fullAddx = new byte[6];
     System.arraycopy(addx.getAddress().getAddress(), 0, fullAddx, 0, 4);
-    int port = addx.getPort();
+    final int port = addx.getPort();
     fullAddx[4] = (byte) (port >> 8);
     fullAddx[5] = (byte) port;
     return new IPv4UDPAddress(fullAddx);
@@ -154,7 +154,7 @@ public class IPv4UDPAddress extends NetworkAddress {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(Integer.toString(this.value[0] & 0xFF));
     sb.append('.');
     sb.append(Integer

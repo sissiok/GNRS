@@ -44,7 +44,7 @@ public class Configuration {
    *          filesystem path to where the DB files should be stored.
    * 
    */
-  public void setPathToFiles(String pathToFiles) {
+  public void setPathToFiles(final String pathToFiles) {
     this.pathToFiles = pathToFiles;
   }
 
@@ -60,7 +60,7 @@ public class Configuration {
    * Sets the size of the DB cache.
    * @param cacheSizeMB the new size of the cache, in mebibytes.
    */
-  public void setCacheSizeMiB(int cacheSizeMB) {
+  public void setCacheSizeMiB(final int cacheSizeMB) {
     this.cacheSizeMiB = cacheSizeMB;
   }
 }

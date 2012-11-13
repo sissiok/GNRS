@@ -24,11 +24,11 @@ public class LookupResponseEncoder implements
 
   
   @Override
-  public void encode(IoSession session, LookupResponseMessage message,
-      ProtocolEncoderOutput out) throws Exception {
+  public void encode(final IoSession session, final LookupResponseMessage message,
+      final ProtocolEncoderOutput out) throws Exception {
     
     // Common Response stuff
-    IoBuffer buffer = IoBuffer.allocate(message.getMessageLength());
+    final IoBuffer buffer = IoBuffer.allocate(message.getMessageLength());
     buffer.put(message.getVersion());
     buffer.put(message.getType().value());
     buffer.putUnsignedShort(message.getMessageLength());
@@ -46,7 +46,7 @@ public class LookupResponseEncoder implements
     // Lookup response-specific
     buffer.putUnsignedInt(message.getNumBindings());
     if(message.getNumBindings() > 0){
-      for(NetworkAddress addx : message.getBindings()){
+      for(final NetworkAddress addx : message.getBindings()){
         buffer.putUnsignedShort(addx.getType().value());
         buffer.putUnsignedShort(addx.getLength());
         buffer.put(addx.getValue());

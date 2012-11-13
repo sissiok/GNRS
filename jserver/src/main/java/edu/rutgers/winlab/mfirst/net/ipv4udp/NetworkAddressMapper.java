@@ -55,7 +55,7 @@ public class NetworkAddressMapper {
    * @return the previous mapped value, or {@code null} if there was none.
    */
   public String put(final NetworkAddress na, final String hostname) {
-    String previous = this.storageTrie.remove(na);
+    final String previous = this.storageTrie.remove(na);
     this.storageTrie.put(na, hostname);
     return previous;
   }

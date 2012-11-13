@@ -45,7 +45,7 @@ public class Configuration {
    * @param hashAlgorithm
    *          the new algorithm name.
    */
-  public void setHashAlgorithm(String hashAlgorithm) {
+  public void setHashAlgorithm(final String hashAlgorithm) {
     this.hashAlgorithm = hashAlgorithm;
   }
 
@@ -64,7 +64,7 @@ public class Configuration {
    * @param prefixFile
    *          the new IP prefix filename.
    */
-  public void setPrefixFile(String prefixFile) {
+  public void setPrefixFile(final String prefixFile) {
     this.prefixFile = prefixFile;
   }
 
@@ -87,7 +87,7 @@ public class Configuration {
    * @param asBindingFile
    *          the name of the AS bindings file.
    */
-  public void setAsBindingFile(String asBindingFile) {
+  public void setAsBindingFile(final String asBindingFile) {
     this.asBindingFile = asBindingFile;
   }
 }

@@ -83,7 +83,7 @@ public class LookupTask implements Callable<Object> {
 
     boolean resolvedLocally = false;
     if (serverAddxes != null) {
-      for (NetworkAddress addx : serverAddxes) {
+      for (final NetworkAddress addx : serverAddxes) {
         // Loopback? Then the local server should handle it.
         if (this.server.isLocalAddress(addx)) {
           resolvedLocally = true;
