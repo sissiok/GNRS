@@ -7,6 +7,9 @@ package edu.rutgers.winlab.mfirst.storage.bdb;
 
 import java.io.UnsupportedEncodingException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sleepycat.persist.model.KeyField;
 import com.sleepycat.persist.model.Persistent;
 
@@ -20,6 +23,11 @@ import edu.rutgers.winlab.mfirst.GUID;
  */
 @Persistent
 public class BDBGUID {
+  
+  /**
+   * Error logger.
+   */
+  private static final transient Logger LOG = LoggerFactory.getLogger(BDBGUID.class);
 
   /**
    * String-encoded form of the GUID value. Encoded as a UTF-16 (Big Endian)
@@ -28,12 +36,12 @@ public class BDBGUID {
   @KeyField(1)
   public String guid;
 
-  /**
-   * Creates a new, empty GUID.
-   */
-  public BDBGUID() {
-    super();
-  }
+//  /**
+//   * Creates a new, empty GUID.
+//   */
+//  public BDBGUID() {
+//    super();
+//  }
 
   /**
    * Creates a BDB GUID value from a GUID.
@@ -44,11 +52,13 @@ public class BDBGUID {
    *         not supported.
    */
   public static BDBGUID fromGUID(final GUID guid) {
-    final BDBGUID newBDB = new BDBGUID();
+    BDBGUID newBDB = null;
     try {
-      newBDB.guid = new String(guid.getBinaryForm(), "UTF-16BE");
+      final String asString = new String(guid.getBinaryForm(), "UTF-16BE");
+      newBDB = new BDBGUID();
+      newBDB.guid = asString;
     } catch (final UnsupportedEncodingException e) {
-      return null;
+      LOG.error("Unable to create string from GUID bytes.", e);
     }
     return newBDB;
   }
@@ -60,13 +70,30 @@ public class BDBGUID {
    *         supported.
    */
   public GUID toGUID() {
-    final GUID newGuid = new GUID();
+    GUID newGuid = null;
     try {
-      newGuid.setBinaryForm(this.guid.getBytes("UTF-16BE"));
+      final byte[] bytes = this.guid.getBytes("UTF-16BE");
+      newGuid = new GUID();
+      newGuid.setBinaryForm(bytes);
     } catch (final UnsupportedEncodingException e) {
-      return null;
+      LOG.error("Unable to create GUID from String form.",e);
     }
     return newGuid;
   }
 
+  /**
+   * Returns the String form of this GUID.
+   * @return this GUID as a String.
+   */
+  public String getGuid() {
+    return this.guid;
+  }
+
+  /**
+   * Sets the String form of this GUID.
+   * @param guid the new GUID.
+   */
+  public void setGuid(final String guid) {
+    this.guid = guid;
+  }
 }

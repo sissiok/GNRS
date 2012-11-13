@@ -52,11 +52,11 @@ public enum ResponseCode {
   
   /**
    * Returns a Responsecode based on the byte value.
-   * @param b a byte value from the GNRS network protocol.
+   * @param byteValue a byte value from the GNRS network protocol.
    * @return a ResponseCode appropriate for the value.
    */
-  public static ResponseCode valueOf(final int b){
-    return b == SUCCESS.value ? SUCCESS : FAILED;
+  public static ResponseCode valueOf(final int byteValue){
+    return byteValue == SUCCESS.value ? SUCCESS : FAILED;
   }
   
   /**

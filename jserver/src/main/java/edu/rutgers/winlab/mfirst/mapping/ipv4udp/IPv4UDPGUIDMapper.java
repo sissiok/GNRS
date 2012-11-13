@@ -1,7 +1,6 @@
 /*
- * Mobility First GNRS Server
- * Copyright (C) 2012 Robert Moore and Rutgers University
- * All rights reserved.
+ * Mobility First GNRS Server Copyright (C) 2012 Robert Moore and Rutgers
+ * University All rights reserved.
  */
 package edu.rutgers.winlab.mfirst.mapping.ipv4udp;
 
@@ -36,7 +35,6 @@ import edu.rutgers.winlab.mfirst.net.ipv4udp.NetworkAddressMapper;
  * GUID Mapper for IPv4/UDP networking.
  * 
  * @author Robert Moore
- * 
  */
 public class IPv4UDPGUIDMapper implements GUIDMapper {
 
@@ -49,18 +47,18 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
   /**
    * Hashing object to compute a random network address.
    */
-  private final GUIDHasher hasher;
+  private final transient GUIDHasher hasher;
 
   /**
    * Mapping network address prefixes to AS/addresses.
    */
-  public final NetworkAddressMapper networkAddressMap = new NetworkAddressMapper(
+  public final transient NetworkAddressMapper networkAddressMap = new NetworkAddressMapper(
       AddressType.INET_4_UDP);
 
   /**
    * Mapping of Autonomous System numbers to their network locations.
    */
-  public final ConcurrentHashMap<Integer, InetSocketAddress> asAddresses = new ConcurrentHashMap<Integer, InetSocketAddress>();
+  public final transient ConcurrentHashMap<Integer, InetSocketAddress> asAddresses = new ConcurrentHashMap<Integer, InetSocketAddress>();
 
   /**
    * Creates a new IPv4+UDP GUID mapper from the specified configuration
@@ -98,8 +96,8 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
    * @return the configuration object
    */
   private Configuration loadConfiguration(final String filename) {
-    final XStream x = new XStream();
-    return (Configuration) x.fromXML(new File(filename));
+    final XStream xStream = new XStream();
+    return (Configuration) xStream.fromXML(new File(filename));
   }
 
   /**
@@ -112,14 +110,15 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
    */
   private void loadPrefixes(final String prefixFilename) throws IOException {
     final File prefixFile = new File(prefixFilename);
-    final BufferedReader lineReader = new BufferedReader(new FileReader(prefixFile));
+    final BufferedReader lineReader = new BufferedReader(new FileReader(
+        prefixFile));
 
     String line = lineReader.readLine();
     while (line != null) {
       // Eliminate leading/trailing whitespace
       line = line.trim();
       // Skip comments
-      if (line.length() == 0 || line.startsWith("#")) {
+      if (line.length() == 0 || line.charAt(0) == '#') {
         line = lineReader.readLine();
         continue;
       }
@@ -137,17 +136,16 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
       final String[] prefixParts = generalComponents[0].split("/");
       final InetAddress addx = InetAddress.getByName(prefixParts[0]);
       final byte[] addxBytes = addx.getAddress();
-      int addxAsInt = ((addxBytes[0] << 24) & 0xFF000000)
-          | ((addxBytes[1] << 16) & 0xFF0000) | ((addxBytes[2] << 8) & 0xFF00)
-          | ((addxBytes[3]) & 0xFF);
 
       // Extract prefix length
       final int prefixLength = Integer.parseInt(prefixParts[1]);
-      // Apply the prefix
-      addxAsInt = addxAsInt & (0x80000000 >> prefixLength);
 
-      final NetworkAddress na = IPv4UDPAddress.fromInteger(addxAsInt);
-      final byte[] naBytes = na.getValue();
+      final int addxAsInt = (((addxBytes[0] << 24) & 0xFF000000)
+          | ((addxBytes[1] << 16) & 0xFF0000) | ((addxBytes[2] << 8) & 0xFF00) | ((addxBytes[3]) & 0xFF)
+          & (0x80000000 >> prefixLength));
+
+      final NetworkAddress netAddr = IPv4UDPAddress.fromInteger(addxAsInt);
+      final byte[] naBytes = netAddr.getValue();
       int realLength = 0;
       for (final byte b : naBytes) {
         if (b == 0) {
@@ -156,10 +154,10 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
         ++realLength;
       }
       if (realLength < naBytes.length) {
-        na.setValue(Arrays.copyOf(naBytes, realLength));
+        netAddr.setValue(Arrays.copyOf(naBytes, realLength));
       }
 
-      this.networkAddressMap.put(na, generalComponents[1]);
+      this.networkAddressMap.put(netAddr, generalComponents[1]);
 
       line = lineReader.readLine();
     }
@@ -179,15 +177,15 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
   private void loadAsNetworkBindings(final String asBindingFilename)
       throws IOException {
     final File asBindingFile = new File(asBindingFilename);
-    final BufferedReader lineReader = new BufferedReader(
-        new FileReader(asBindingFile));
+    final BufferedReader lineReader = new BufferedReader(new FileReader(
+        asBindingFile));
 
     String line = lineReader.readLine();
     while (line != null) {
       // Eliminate leading/trailing whitespace
       line = line.trim();
       // Skip comments
-      if (line.length() == 0 || line.startsWith("#")) {
+      if (line.length() == 0 || line.charAt(0) == '#') {
         line = lineReader.readLine();
         continue;
       }
@@ -207,7 +205,8 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
       final String ipAddrString = generalComponents[1];
       final int port = Integer.parseInt(generalComponents[2]);
 
-      final InetSocketAddress sockAddx = new InetSocketAddress(ipAddrString, port);
+      final InetSocketAddress sockAddx = new InetSocketAddress(ipAddrString,
+          port);
       this.asAddresses.put(asNumber, sockAddx);
 
       line = lineReader.readLine();
@@ -243,43 +242,16 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
         }
       }
       // No matching types found, so no mapping possible.
-      if (returnedTypes.isEmpty()) {
-        return null;
-      }
+      // if (returnedTypes.isEmpty()) {
+      // return null;
+      // }
     }
 
     final List<NetworkAddress> returnedAddresses = new LinkedList<NetworkAddress>();
 
     for (final AddressType type : returnedTypes) {
-      try {
-        // Generate some addresses from the GUID
-        final Collection<NetworkAddress> randomAddresses = this.hasher.hash(guid,
-            type, numAddresses);
-
-        // Map them to an AS
-        for (final NetworkAddress na : randomAddresses) {
-          final String autonomousSystem = this.networkAddressMap.get(na);
-          if (autonomousSystem == null) {
-            // FIXME: Rehash?
-            LOG.error("Found mapping hole for {}", na);
-            continue;
-          }
-          final InetSocketAddress asGNRSAddr = this.asAddresses.get(Integer
-              .decode(autonomousSystem));
-          final NetworkAddress finalAddr = IPv4UDPAddress
-              .fromInetSocketAddress(asGNRSAddr);
-          if (finalAddr != null) {
-            returnedAddresses.add(finalAddr);
-          } else {
-            LOG.error("Unable to create NetworkAddress from {}", asGNRSAddr);
-            continue;
-          }
-        }
-
-      } catch (final NoSuchAlgorithmException e) {
-        LOG.error("Unable to hash GUID for type " + type, e);
-        continue;
-      }
+      returnedAddresses
+          .addAll(this.getAddressForType(type, guid, numAddresses));
 
     }
 
@@ -287,6 +259,67 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
       return null;
     }
     return returnedAddresses;
+  }
+
+  /**
+   * Returns a collection of mapped NetworkAddresses, randomly generated from
+   * {@code guid} of the specified type.
+   * 
+   * @param type
+   *          the type of address to create.
+   * @param guid
+   *          the GUID to use to generate the addresses.
+   * @param numAddresses
+   *          the number of addresses to create.
+   * @return a collection containing the addresses, if they were able to be
+   *         generated.
+   */
+  private Collection<NetworkAddress> getAddressForType(final AddressType type,
+      final GUID guid, final int numAddresses) {
+    final LinkedList<NetworkAddress> returnedAddresses = new LinkedList<NetworkAddress>();
+    try {
+      // Generate some addresses from the GUID
+      final Collection<NetworkAddress> randomAddresses = this.hasher.hash(guid,
+          type, numAddresses);
+
+      // Map them to an AS
+      for (final NetworkAddress netAddr : randomAddresses) {
+        final NetworkAddress finalAddr = this.performMapping(netAddr);
+        if (finalAddr == null) {
+          LOG.error("Unable to map NetworkAddress for {}", netAddr);
+        } else {
+          returnedAddresses.add(finalAddr);
+        }
+      }
+
+    } catch (final NoSuchAlgorithmException e) {
+      LOG.error("Unable to hash GUID for type " + type, e);
+    }
+    return returnedAddresses;
+  }
+
+  /**
+   * Maps a network address to an AS based on the announced prefix table.
+   * 
+   * @param netAddr
+   *          a random network address.
+   * @return the NetworkAddress of the GNRS server of the AS "responsible" for
+   *         {@code netAddr}
+   */
+  private NetworkAddress performMapping(final NetworkAddress netAddr) {
+    final String autonomousSystem = this.networkAddressMap.get(netAddr);
+    NetworkAddress finalAddr;
+    if (autonomousSystem == null) {
+      // FIXME: Rehash?
+      LOG.error("Found mapping hole for {}", netAddr);
+      finalAddr = null;
+    } else {
+      final InetSocketAddress asGNRSAddr = this.asAddresses.get(Integer
+          .decode(autonomousSystem));
+      finalAddr = IPv4UDPAddress.fromInetSocketAddress(asGNRSAddr);
+    }
+    return finalAddr;
+
   }
 
   @Override

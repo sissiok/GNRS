@@ -1,7 +1,6 @@
 /*
- * Mobility First GNRS Server
- * Copyright (C) 2012 Robert Moore and Rutgers University
- * All rights reserved.
+ * Mobility First GNRS Server Copyright (C) 2012 Robert Moore and Rutgers
+ * University All rights reserved.
  */
 package edu.rutgers.winlab.mfirst.net.ipv4udp;
 
@@ -21,36 +20,40 @@ import edu.rutgers.winlab.mfirst.net.NetworkAddress;
  * Apache MINA message decoder for Insert Response messages.
  * 
  * @author Robert Moore
- * 
  */
 public class InsertResponseDecoder implements MessageDecoder {
 
   @Override
-  public MessageDecoderResult decodable(final IoSession session, final IoBuffer buffer) {
+  public MessageDecoderResult decodable(final IoSession session,
+      final IoBuffer buffer) {
+    MessageDecoderResult result;
     // Store the current cursor position in the buffer
     buffer.mark();
     // Need 5 bytes to check request ID and type
     if (buffer.remaining() < 2) {
-      return MessageDecoderResult.NEED_DATA;
-    }
+      result = MessageDecoderResult.NEED_DATA;
+    } else {
 
-    // Skip the version number
-    // TODO: What happens with version number?
-    buffer.get();
-    final byte type = buffer.get();
-    // Reset the cursor so we don't modify the buffer data.
-    buffer.reset();
-    if (type == MessageType.INSERT_RESPONSE.value()) {
-      return MessageDecoderResult.OK;
+      // Skip the version number
+      // TODO: What happens with version number?
+      buffer.get();
+      final byte type = buffer.get();
+      // Reset the cursor so we don't modify the buffer data.
+      buffer.reset();
+      if (type == MessageType.INSERT_RESPONSE.value()) {
+        result = MessageDecoderResult.OK;
+      } else {
+        result = MessageDecoderResult.NOT_OK;
+      }
     }
-    return MessageDecoderResult.NOT_OK;
+    return result;
 
   }
 
- 
   @Override
-  public MessageDecoderResult decode(final IoSession session, final IoBuffer buffer,
-      final ProtocolDecoderOutput out) throws Exception {
+  public MessageDecoderResult decode(final IoSession session,
+      final IoBuffer buffer, final ProtocolDecoderOutput out) {
+    MessageDecoderResult result;
     /*
      * Common message header stuff
      */
@@ -58,52 +61,48 @@ public class InsertResponseDecoder implements MessageDecoder {
     final byte version = buffer.get();
     final byte type = buffer.get();
 
-    if (type != MessageType.INSERT_RESPONSE.value()) {
-      return MessageDecoderResult.NOT_OK;
+    if (type == MessageType.INSERT_RESPONSE.value()) {
+      // Don't really care about message length
+      buffer.getUnsignedShort();
+      final long requestId = buffer.getUnsignedInt();
+
+      final AddressType addrType = AddressType.valueOf(buffer
+          .getUnsignedShort());
+
+      final int originAddrLength = buffer.getUnsignedShort();
+      final byte[] originAddr = new byte[originAddrLength];
+      buffer.get(originAddr);
+      final NetworkAddress originAddress = new NetworkAddress(addrType,
+          originAddr);
+
+      final InsertResponseMessage msg = new InsertResponseMessage();
+      msg.setVersion(version);
+      msg.setOriginAddress(originAddress);
+      msg.setRequestId(requestId);
+
+      // Response-specific stuff
+
+      final int responseCode = buffer.getUnsignedShort();
+
+      msg.setResponseCode(ResponseCode.valueOf(responseCode));
+
+      // Remove unused padding
+      buffer.getUnsignedShort();
+
+      // Write the decoded object to the next filter
+      out.write(msg);
+
+      // Everything OK!
+      result = MessageDecoderResult.OK;
+    } else {
+      result = MessageDecoderResult.NOT_OK;
     }
-    // Don't really care about message length
-    buffer.getUnsignedShort();
-    final long requestId = buffer.getUnsignedInt();
-    
-    final AddressType addrType = AddressType.valueOf(buffer.getUnsignedShort());
-    
-    final int originAddrLength = buffer.getUnsignedShort();
-    final byte[] originAddr = new byte[originAddrLength];
-    buffer.get(originAddr);
-    final NetworkAddress originAddress = new NetworkAddress(addrType, originAddr);
-    
-    final InsertResponseMessage msg = new InsertResponseMessage();
-    msg.setVersion(version);
-    msg.setOriginAddress(originAddress);
-    msg.setRequestId(requestId);
-
-    // Response-specific stuff
-    
-    final int responseCode = buffer.getUnsignedShort();
-
-    msg.setResponseCode(ResponseCode.valueOf(responseCode));
-    
-    // Remove unused padding
-    buffer.getUnsignedShort();
-
-    // Write the decoded object to the next filter
-    out.write(msg);
-
-    // Everything OK!
-    return MessageDecoderResult.OK;
+    return result;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.mina.filter.codec.demux.MessageDecoder#finishDecode(org.apache
-   * .mina.core.session.IoSession,
-   * org.apache.mina.filter.codec.ProtocolDecoderOutput)
-   */
   @Override
-  public void finishDecode(final IoSession arg0, final ProtocolDecoderOutput arg1)
-      throws Exception {
+  public void finishDecode(final IoSession arg0,
+      final ProtocolDecoderOutput arg1) {
     // Nothing to do
   }
 

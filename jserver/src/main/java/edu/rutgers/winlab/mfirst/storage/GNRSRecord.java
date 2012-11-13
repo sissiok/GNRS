@@ -22,11 +22,11 @@ public class GNRSRecord {
   /**
    * The GUID of this record.
    */
-  private final GUID guid;
+  private final transient GUID guid;
   /**
    * The set of bindings for the GUID.
    */
-  private final Collection<GUIDBinding> bindings = new ConcurrentHashSet<GUIDBinding>();
+  private final transient Collection<GUIDBinding> bindings = new ConcurrentHashSet<GUIDBinding>();
 
   /**
    * Creates a new empty record for the specified GUID value.
@@ -70,10 +70,10 @@ public class GNRSRecord {
    */
   public NetworkAddress[] getBindings() {
     final NetworkAddress[] addresses = new NetworkAddress[this.bindings.size()];
-    int i = 0;
+    int index = 0;
     for (final GUIDBinding b : this.bindings) {
-      addresses[i] = b.getAddress();
-      ++i;
+      addresses[index] = b.getAddress();
+      ++index;
     }
     return addresses;
   }

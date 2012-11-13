@@ -31,7 +31,7 @@ public class NetworkAddressMapper {
   /**
    * Prefix trie used to find the closest match of a network address.
    */
-  private final Trie<NetworkAddress, String> storageTrie;
+  private final transient Trie<NetworkAddress, String> storageTrie;
 
   /**
    * Creates a new mapper for the specified NetworkAddress type.
@@ -48,15 +48,15 @@ public class NetworkAddressMapper {
   /**
    * Inserts a binding into this mapper for the specified network address.
    * 
-   * @param na
+   * @param netAddr
    *          the network address to map.
    * @param hostname
    *          the mapping for the address.
    * @return the previous mapped value, or {@code null} if there was none.
    */
-  public String put(final NetworkAddress na, final String hostname) {
-    final String previous = this.storageTrie.remove(na);
-    this.storageTrie.put(na, hostname);
+  public String put(final NetworkAddress netAddr, final String hostname) {
+    final String previous = this.storageTrie.remove(netAddr);
+    this.storageTrie.put(netAddr, hostname);
     return previous;
   }
 
@@ -65,19 +65,20 @@ public class NetworkAddressMapper {
    * "distance" is based on the XOR value of the binary form of the network
    * address.
    * 
-   * @param na
+   * @param netAddr
    *          the address to retrieve the binding for.
    * @return the closest mapped value for the network address or {@code null} if
    *         none exists.
    */
-  public String get(final NetworkAddress na) {
-    if (this.storageTrie.isEmpty()) {
-      return null;
-    }
+  public String get(final NetworkAddress netAddr) {
+//    String retValue;
+//    if (this.storageTrie.isEmpty()) {
+//      retValue = null;
+//    }
 
     // FIXME: Issue #9
     // <https://bitbucket.org/romoore/gnrs/issue/9/ipv4-guid-mapping-should-rehash-then-find>
 
-    return this.storageTrie.selectValue(na);
+    return this.storageTrie.selectValue(netAddr);
   }
 }

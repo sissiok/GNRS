@@ -24,7 +24,7 @@ public class InsertEncoder implements MessageEncoder<InsertMessage> {
 
   @Override
   public void encode(final IoSession session, final InsertMessage message,
-      final ProtocolEncoderOutput out) throws Exception {
+      final ProtocolEncoderOutput out) {
 
     final IoBuffer buff = IoBuffer.allocate(message.getMessageLength());
     

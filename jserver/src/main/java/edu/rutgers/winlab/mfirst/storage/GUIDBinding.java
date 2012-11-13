@@ -1,7 +1,6 @@
 /*
- * Mobility First GNRS Server
- * Copyright (C) 2012 Robert Moore and Rutgers University
- * All rights reserved.
+ * Mobility First GNRS Server Copyright (C) 2012 Robert Moore and Rutgers
+ * University All rights reserved.
  */
 package edu.rutgers.winlab.mfirst.storage;
 
@@ -11,7 +10,6 @@ import edu.rutgers.winlab.mfirst.net.NetworkAddress;
  * A GNRS record entry for a single Network Address binding value.
  * 
  * @author Robert Moore
- * 
  */
 public class GUIDBinding {
 
@@ -94,36 +92,42 @@ public class GUIDBinding {
   public void setWeight(final int weight) {
     this.weight = weight;
   }
-  
+
   @Override
-  public int hashCode(){
+  public int hashCode() {
     return this.address.hashCode();
   }
-  
+
   @Override
-  public boolean equals(final Object o){
-    if(o instanceof GUIDBinding){
-      return this.equalsBinding((GUIDBinding)o);
+  public boolean equals(final Object other) {
+    boolean equal;
+    if (other instanceof GUIDBinding) {
+      equal = this.equalsBinding((GUIDBinding) other);
+    } else {
+      equal = super.equals(other);
     }
-    return super.equals(o);
+    return equal;
   }
-  
+
   /**
-   * Determines equality of this GUIDBinding and another based on the values of 
+   * Determines equality of this GUIDBinding and another based on the values of
    * their NetworkAddresses.
-   * @param binding the other GUIDBinding.
+   * 
+   * @param binding
+   *          the other GUIDBinding.
    * @return {@code true} if and only if {@code this.address.equals(b.address)}
    */
-  public boolean equalsBinding(final GUIDBinding binding){
+  public boolean equalsBinding(final GUIDBinding binding) {
     return this.address.equalsNA(binding.address);
   }
-  
+
   @Override
-  public String toString(){
-    final StringBuilder sb = new StringBuilder();
-    sb.append("Bind (").append(this.address).append(", ").append(this.ttl).append(", ").append(this.weight).append(")");
-    return sb.toString();
-    
+  public String toString() {
+    final StringBuilder sBuff = new StringBuilder();
+    sBuff.append("Bind (").append(this.address).append(", ").append(this.ttl)
+        .append(", ").append(this.weight).append(")");
+    return sBuff.toString();
+
   }
-  
+
 }

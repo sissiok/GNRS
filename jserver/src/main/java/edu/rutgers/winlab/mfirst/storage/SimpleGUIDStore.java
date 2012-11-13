@@ -1,7 +1,6 @@
 /*
- * Mobility First GNRS Server
- * Copyright (C) 2012 Robert Moore and Rutgers University
- * All rights reserved.
+ * Mobility First GNRS Server Copyright (C) 2012 Robert Moore and Rutgers
+ * University All rights reserved.
  */
 package edu.rutgers.winlab.mfirst.storage;
 
@@ -12,7 +11,6 @@ import edu.rutgers.winlab.mfirst.GUID;
 /**
  * A simple in-memory GUID storage engine with no persistence after the
  * application terminates.
- * 
  * <p>
  * The implementation is completely threadsafe in the sense that it will not
  * throw a {@code ConcurrentModificationException} if it is access
@@ -21,7 +19,6 @@ import edu.rutgers.winlab.mfirst.GUID;
  * </p>
  * 
  * @author Robert Moore
- * 
  */
 public class SimpleGUIDStore implements GUIDStore {
 
@@ -39,8 +36,15 @@ public class SimpleGUIDStore implements GUIDStore {
   public boolean appendBindings(final GUID guid, final GUIDBinding... bindings) {
     GNRSRecord currRecord = this.storageMap.get(guid);
     if (currRecord == null) {
-      currRecord = new GNRSRecord(guid);
-      this.storageMap.put(guid, currRecord);
+   // First-time insert, so synch
+      synchronized (this.storageMap) {
+        // Extra work, but only once per record
+        currRecord = this.storageMap.get(guid);
+        if (currRecord == null) {
+          currRecord = new GNRSRecord(guid);
+          this.storageMap.put(guid, currRecord);
+        }
+      }
     }
 
     if (bindings != null) {
@@ -66,8 +70,15 @@ public class SimpleGUIDStore implements GUIDStore {
   public boolean replaceBindings(final GUID guid, final GUIDBinding... bindings) {
     GNRSRecord currRecord = this.storageMap.get(guid);
     if (currRecord == null) {
-      currRecord = new GNRSRecord(guid);
-      this.storageMap.put(guid, currRecord);
+      // First-time insert, so synch
+      synchronized (this.storageMap) {
+        // Extra work, but only once per record
+        currRecord = this.storageMap.get(guid);
+        if (currRecord == null) {
+          currRecord = new GNRSRecord(guid);
+          this.storageMap.put(guid, currRecord);
+        }
+      }
     }
     currRecord.removeAll();
 

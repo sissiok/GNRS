@@ -1,7 +1,6 @@
 /*
- * Mobility First GNRS Server
- * Copyright (C) 2012 Robert Moore and Rutgers University
- * All rights reserved.
+ * Mobility First GNRS Server Copyright (C) 2012 Robert Moore and Rutgers
+ * University All rights reserved.
  */
 package edu.rutgers.winlab.mfirst.net.ipv4udp;
 
@@ -21,34 +20,38 @@ import edu.rutgers.winlab.mfirst.net.NetworkAddress;
  * Apache MINA message decoder for Lookup Response messages.
  * 
  * @author Robert Moore
- * 
  */
 public class LookupResponseDecoder implements MessageDecoder {
 
   @Override
-  public MessageDecoderResult decodable(final IoSession session, final IoBuffer buffer) {
+  public MessageDecoderResult decodable(final IoSession session,
+      final IoBuffer buffer) {
+    MessageDecoderResult result;
     // Store the current cursor position in the buffer
     buffer.mark();
     // Need 2 bytes to check version and type
     if (buffer.remaining() < 2) {
-      return MessageDecoderResult.NEED_DATA;
-    }
+      result = MessageDecoderResult.NEED_DATA;
+    } else {
 
-    // Skip the version field
-    // TODO: What to do with versions?
-    buffer.get();
-    final byte type = buffer.get();
-    // Reset the cursor so we don't modify the buffer data.
-    buffer.reset();
-    if (type == MessageType.LOOKUP_RESPONSE.value()) {
-      return MessageDecoderResult.OK;
+      // Skip the version field
+      // TODO: What to do with versions?
+      buffer.get();
+      final byte type = buffer.get();
+      // Reset the cursor so we don't modify the buffer data.
+      buffer.reset();
+      if (type == MessageType.LOOKUP_RESPONSE.value()) {
+        result = MessageDecoderResult.OK;
+      } else {
+        result = MessageDecoderResult.NOT_OK;
+      }
     }
-    return MessageDecoderResult.NOT_OK;
+    return result;
   }
 
   @Override
-  public MessageDecoderResult decode(final IoSession session, final IoBuffer buffer,
-      final ProtocolDecoderOutput out) throws Exception {
+  public MessageDecoderResult decode(final IoSession session,
+      final IoBuffer buffer, final ProtocolDecoderOutput out) {
     /*
      * Common message header stuff
      */
@@ -68,10 +71,12 @@ public class LookupResponseDecoder implements MessageDecoder {
     final int originAddrLength = buffer.getUnsignedShort();
     final byte[] originAddr = new byte[originAddrLength];
     buffer.get(originAddr);
-    final NetworkAddress originAddress = new NetworkAddress(addrType, originAddr);
+    final NetworkAddress originAddress = new NetworkAddress(addrType,
+        originAddr);
 
     // Response code
-    final ResponseCode responseCode = ResponseCode.valueOf(buffer.getUnsignedShort());
+    final ResponseCode responseCode = ResponseCode.valueOf(buffer
+        .getUnsignedShort());
     // Padding
     buffer.getShort();
 
@@ -92,9 +97,9 @@ public class LookupResponseDecoder implements MessageDecoder {
       final byte[] addxBytes = new byte[addxLength];
       buffer.get(addxBytes);
 
-      final NetworkAddress na = new NetworkAddress(AddressType.valueOf(addxType),
-          addxBytes);
-      bindings[i] = na;
+      final NetworkAddress netAddr = new NetworkAddress(
+          AddressType.valueOf(addxType), addxBytes);
+      bindings[i] = netAddr;
     }
     msg.setBindings(bindings);
 
@@ -105,17 +110,9 @@ public class LookupResponseDecoder implements MessageDecoder {
     return MessageDecoderResult.OK;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.mina.filter.codec.demux.MessageDecoder#finishDecode(org.apache
-   * .mina.core.session.IoSession,
-   * org.apache.mina.filter.codec.ProtocolDecoderOutput)
-   */
   @Override
-  public void finishDecode(final IoSession arg0, final ProtocolDecoderOutput arg1)
-      throws Exception {
+  public void finishDecode(final IoSession arg0,
+      final ProtocolDecoderOutput arg1){
     // Nothing to see here.
   }
 

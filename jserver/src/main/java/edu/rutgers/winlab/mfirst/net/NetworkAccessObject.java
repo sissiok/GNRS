@@ -1,7 +1,6 @@
 /*
- * Mobility First GNRS Server
- * Copyright (C) 2012 Robert Moore and Rutgers University
- * All rights reserved.
+ * Mobility First GNRS Server Copyright (C) 2012 Robert Moore and Rutgers
+ * University All rights reserved.
  */
 package edu.rutgers.winlab.mfirst.net;
 
@@ -11,7 +10,6 @@ import edu.rutgers.winlab.mfirst.messages.AbstractMessage;
  * Interface that provides network communication for the GNRS server.
  * 
  * @author Robert Moore
- * 
  */
 public interface NetworkAccessObject {
   /**
@@ -71,5 +69,11 @@ public interface NetworkAccessObject {
    *         this server.
    */
   public NetworkAddress getOriginAddress();
+
+  /**
+   * Called before the server exits so the network access can clean-up any
+   * resources.
+   */
+  public void doShutdown();
 
 }

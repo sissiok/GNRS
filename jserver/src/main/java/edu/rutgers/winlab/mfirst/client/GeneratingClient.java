@@ -1,7 +1,6 @@
 /*
- * Mobility First GNRS Server
- * Copyright (C) 2012 Robert Moore and Rutgers University
- * All rights reserved.
+ * Mobility First GNRS Server Copyright (C) 2012 Robert Moore and Rutgers
+ * University All rights reserved.
  */
 package edu.rutgers.winlab.mfirst.client;
 
@@ -38,14 +37,14 @@ import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPAddress;
  * A simple GNRS client that generates lots of lookup messages.
  * 
  * @author Robert Moore
- * 
  */
 public class GeneratingClient extends IoHandlerAdapter implements Runnable {
 
   /**
    * Logging facility for this class.
    */
-  private static final Logger LOG = LoggerFactory.getLogger(GeneratingClient.class);
+  private static final Logger LOG = LoggerFactory
+      .getLogger(GeneratingClient.class);
 
   /**
    * Rough estimate of how precise the system nanosecond timer is.
@@ -67,7 +66,8 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
 
     final XStream xStream = new XStream();
 
-    final Configuration config = (Configuration) xStream.fromXML(new File(args[0]));
+    final Configuration config = (Configuration) xStream.fromXML(new File(
+        args[0]));
     LOG.debug("Loaded configuration file \"{}\".", args[0]);
 
     final int delay = Integer.parseInt(args[2]);
@@ -107,36 +107,36 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
   /**
    * Connector to communicate with the server.
    */
-  NioDatagramConnector connector;
+  private final transient NioDatagramConnector connector;
 
   /**
    * Configuration for this client.
    */
-  private final Configuration config;
+  private final transient Configuration config;
 
   /**
    * How long to wait between messages, in microseconds.
    */
-  private final int delay;
+  private final transient int delay;
   /**
    * Total number of lookup messages to generate.
    */
-  final int numLookups;
+  private final transient int numLookups;
 
   /**
    * Total number of successes.
    */
-  final AtomicInteger numSuccess = new AtomicInteger(0);
-  
+  private final transient AtomicInteger numSuccess = new AtomicInteger(0);
+
   /**
    * Total number of responses with bindings.
    */
-  final AtomicInteger numHits = new AtomicInteger(0);
+  private final transient AtomicInteger numHits = new AtomicInteger(0);
 
   /**
    * Total number of failures.
    */
-  final AtomicInteger numFailures = new AtomicInteger(0);
+  private final transient AtomicInteger numFailures = new AtomicInteger(0);
 
   /**
    * Creates a new GeneratingClient with the configuration and delay values
@@ -159,7 +159,8 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
 
     this.connector = new NioDatagramConnector();
     this.connector.setHandler(this);
-    final DatagramSessionConfig sessionConfig = this.connector.getSessionConfig();
+    final DatagramSessionConfig sessionConfig = this.connector
+        .getSessionConfig();
     sessionConfig.setReuseAddress(true);
     sessionConfig.setCloseOnPortUnreachable(false);
     final DefaultIoFilterChainBuilder chain = this.connector.getFilterChain();
@@ -183,8 +184,9 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
    */
   public boolean connect() {
     LOG.debug("Creating connect future.");
-    final ConnectFuture connectFuture = this.connector.connect(new InetSocketAddress(
-        this.config.getServerHost(), this.config.getServerPort()));
+    final ConnectFuture connectFuture = this.connector
+        .connect(new InetSocketAddress(this.config.getServerHost(), this.config
+            .getServerPort()));
 
     // FIXME: Must call awaitUninterruptably. This is a known issue in MINA
     // <https://issues.apache.org/jira/browse/DIRMINA-911>
@@ -194,24 +196,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
       @Override
       public void operationComplete(final ConnectFuture future) {
         if (future.isConnected()) {
-          GeneratingClient.LOG.info("Connected to {}", future.getSession());
-          GeneratingClient.this.generateLookups(future.getSession());
-          try {
-            Thread.sleep(5000);
-          } catch (final InterruptedException ie) {
-            // Ignored
-          }
-          final int succ = GeneratingClient.this.numSuccess.get();
-          final int total = succ + GeneratingClient.this.numFailures.get();
-          final float success = ((succ * 1f) / total) * 100;
-          final float loss = ((GeneratingClient.this.numLookups - total * 1f) / GeneratingClient.this.numLookups) * 100;
-          final float hits = ((GeneratingClient.this.numHits.get()*1f)/total)*100;
-          LOG.info(String.format(
-              "Total: %,d  |  Success: %,.2f%%  |  Hits: %,.2f%%  |  Loss: %,.2f%%)",
-              Integer.valueOf(total), Float.valueOf(success), Float.valueOf(hits),
-              Float.valueOf(loss)));
-          future.getSession().close(true);
-          GeneratingClient.this.connector.dispose(true);
+          GeneratingClient.this.perform(future.getSession());
         }
       }
 
@@ -223,55 +208,72 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
   }
 
   /**
+   * Sends the requests to the server.
+   * 
+   * @param session
+   *          the session on which to send the messages.
+   */
+  public void perform(final IoSession session) {
+    LOG.info("Connected to {}", session);
+    this.generateLookups(session);
+    try {
+      Thread.sleep(5000);
+    } catch (final InterruptedException ie) {
+      // Ignored
+    }
+    final int succ = GeneratingClient.this.numSuccess.get();
+    final int total = succ + GeneratingClient.this.numFailures.get();
+    final float success = ((succ * 1f) / total) * 100;
+    final float loss = ((GeneratingClient.this.numLookups - total * 1f) / GeneratingClient.this.numLookups) * 100;
+    final float hits = ((GeneratingClient.this.numHits.get() * 1f) / total) * 100;
+    LOG.info(String.format(
+        "Total: %,d  |  Success: %,.2f%%  |  Hits: %,.2f%%  |  Loss: %,.2f%%)",
+        Integer.valueOf(total), Float.valueOf(success), Float.valueOf(hits),
+        Float.valueOf(loss)));
+    session.close(true);
+    this.connector.dispose(true);
+  }
+
+  /**
    * Creates a stream of lookup messages to send to the server.
    * 
    * @param session
    *          the session on which to send the messages.
    */
-  void generateLookups(final IoSession session) {
+  private void generateLookups(final IoSession session) {
     LOG.info("Generating {} lookups.", Integer.valueOf(this.numLookups));
 
     try {
-      IPv4UDPAddress.fromASCII(this.config.getClientHost());
+      final NetworkAddress clientAddress = IPv4UDPAddress.fromASCII(this.config
+          .getClientHost() + ":" + this.config.getClientPort());
+
+      LookupMessage message;
+      long nextSend = System.nanoTime();
+      long lastSend = 0l;
+      final Random rand = new Random(System.currentTimeMillis());
+
+      for (int i = 0; i < this.numLookups; ++i) {
+
+        message = new LookupMessage();
+
+        message.setGuid(GUID.fromInt(('0' + rand.nextInt(10)) << 24));
+        message.setRequestId(i);
+        message.setOriginAddress(clientAddress);
+        lastSend = System.nanoTime();
+        final WriteFuture future = session.write(message);
+
+        future.awaitUninterruptibly();
+
+        nextSend = lastSend + (this.delay * 1000);
+        final long waitTime = getNanoSleep(nextSend - System.nanoTime());
+
+        if (waitTime > 0) {
+          LockSupport.parkNanos(waitTime);
+        }
+      }
     } catch (final UnsupportedEncodingException uee) {
       LOG.error(
           "Unable to parse local host name from configuration parameter.", uee);
-      return;
-    }
-
-    this.config.getClientPort();
-    NetworkAddress clientAddress = null;
-    try {
-      clientAddress = IPv4UDPAddress.fromASCII(this.config.getClientHost()
-          + ":" + this.config.getClientPort());
-
-    } catch (final UnsupportedEncodingException uee) {
-      LOG.error("Unable to parse client hostname from configuration file.", uee);
-      return;
-    }
-    LookupMessage message = null;
-    long nextSend = System.nanoTime();
-    long lastSend = 0l;
-    final Random r = new Random(System.currentTimeMillis());
-
-    for (int i = 0; i < this.numLookups; ++i) {
-
-      message = new LookupMessage();
-
-      message.setGuid(GUID.fromInt(('0' + r.nextInt(10)) << 24));
-      message.setRequestId(i);
-      message.setOriginAddress(clientAddress);
-      lastSend = System.nanoTime();
-      final WriteFuture future = session.write(message);
-
-      future.awaitUninterruptibly();
-
-      nextSend = lastSend + (this.delay * 1000);
-      final long waitTime = getNanoSleep(nextSend - System.nanoTime());
-
-      if (waitTime > 0) {
-        LockSupport.parkNanos(waitTime);
-      }
     }
 
   }
@@ -309,10 +311,10 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
    *          the response message.
    */
   public void handleResponse(final LookupResponseMessage msg) {
-    
+
     if (ResponseCode.SUCCESS.equals(msg.getResponseCode())) {
       this.numSuccess.incrementAndGet();
-      if(msg.getBindings() != null && msg.getBindings().length> 0){
+      if (msg.getBindings() != null && msg.getBindings().length > 0) {
         this.numHits.incrementAndGet();
       }
     } else {
