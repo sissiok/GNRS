@@ -5,8 +5,7 @@
  */
 package edu.rutgers.winlab.mfirst.storage;
 
-import edu.rutgers.winlab.mfirst.structures.GUID;
-import edu.rutgers.winlab.mfirst.structures.GUIDBinding;
+import edu.rutgers.winlab.mfirst.GUID;
 
 /**
  * Basic interface for storing and retrieving GUID bindings.

@@ -1,7 +1,6 @@
 /*
- * Mobility First GNRS Server
- * Copyright (C) 2012 Robert Moore and Rutgers University
- * All rights reserved.
+ * Mobility First GNRS Server Copyright (C) 2012 Robert Moore and Rutgers
+ * University All rights reserved.
  */
 package edu.rutgers.winlab.mfirst.net.ipv4udp;
 
@@ -15,19 +14,20 @@ import edu.rutgers.winlab.mfirst.net.NetworkAddress;
  * Patricia Trie key analyzer for NetworkAddress objects.
  * 
  * @author Robert Moore
- * 
  */
-public class NetworkAddressKeyAnalyzer implements KeyAnalyzer<NetworkAddress> {
+public final class NetworkAddressKeyAnalyzer implements
+    KeyAnalyzer<NetworkAddress> {
 
   /**
    * Analyzer that does the actual work.
    */
-  private final ByteArrayKeyAnalyzer byteAnalyzer;
+  private final transient ByteArrayKeyAnalyzer byteAnalyzer;
 
   /**
    * Constructor kept private.
-   * @param type the type of address this analyzer will process.
    * 
+   * @param type
+   *          the type of address this analyzer will process.
    */
   private NetworkAddressKeyAnalyzer(final AddressType type) {
     super();
@@ -37,8 +37,9 @@ public class NetworkAddressKeyAnalyzer implements KeyAnalyzer<NetworkAddress> {
   /**
    * Creates a new NetworkAddressKeyAnalyzer for addresses of the specified
    * length.
-   * @param type the type of address to create an analyzer for.
    * 
+   * @param type
+   *          the type of address to create an analyzer for.
    * @return some analyzer for addresses of the specified length.
    */
   public static NetworkAddressKeyAnalyzer create(final AddressType type) {

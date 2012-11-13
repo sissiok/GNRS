@@ -3,11 +3,13 @@
  * Copyright (C) 2012 Robert Moore and Rutgers University
  * All rights reserved.
  */
-package edu.rutgers.winlab.mfirst.structures;
+package edu.rutgers.winlab.mfirst.storage;
 
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 
 /**
+ * A GNRS record entry for a single Network Address binding value.
+ * 
  * @author Robert Moore
  * 
  */
@@ -101,7 +103,7 @@ public class GUIDBinding {
   @Override
   public boolean equals(Object o){
     if(o instanceof GUIDBinding){
-      return this.equals((GUIDBinding)o);
+      return this.equalsBinding((GUIDBinding)o);
     }
     return super.equals(o);
   }
@@ -109,11 +111,11 @@ public class GUIDBinding {
   /**
    * Determines equality of this GUIDBinding and another based on the values of 
    * their NetworkAddresses.
-   * @param b the other GUIDBinding.
+   * @param binding the other GUIDBinding.
    * @return {@code true} if and only if {@code this.address.equals(b.address)}
    */
-  public boolean equals(final GUIDBinding b){
-    return this.address.equals(b.address);
+  public boolean equalsBinding(final GUIDBinding binding){
+    return this.address.equalsNA(binding.address);
   }
   
   @Override

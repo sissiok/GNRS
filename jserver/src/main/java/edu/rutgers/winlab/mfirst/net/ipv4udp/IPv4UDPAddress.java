@@ -39,7 +39,7 @@ public class IPv4UDPAddress extends NetworkAddress {
   /**
    * Extension of NetworkAddress that provides IPv4/UDP-specific functionality.
    */
-  private static final Logger log = LoggerFactory
+  private static final Logger LOG = LoggerFactory
       .getLogger(IPv4UDPAddress.class);
 
   /**
@@ -66,11 +66,11 @@ public class IPv4UDPAddress extends NetworkAddress {
     try {
       inet = InetAddress.getByName(components[0]);
     } catch (UnknownHostException e) {
-      log.error("Unable to parse IPv4 address.", e);
+      LOG.error("Unable to parse IPv4 address.", e);
       return null;
     }
 
-    short port = GNRSServer.DEFAULT_PORT;
+    int port = GNRSServer.DEFAULT_PORT;
     if (components.length > 1) {
       port = Short.parseShort(components[1]);
     }
@@ -116,7 +116,7 @@ public class IPv4UDPAddress extends NetworkAddress {
   public static InetSocketAddress toSocketAddr(final NetworkAddress addr) {
     byte[] value = addr.getValue();
     if (value == null) {
-      log.error("Unable to create InetSocketAddress from null bytes.");
+      LOG.error("Unable to create InetSocketAddress from null bytes.");
       return null;
     }
     try {
@@ -127,7 +127,7 @@ public class IPv4UDPAddress extends NetworkAddress {
           value, 4)), port);
 
     } catch (UnknownHostException e) {
-      log.error("Could not create InetSocketAddress from NetworkAddress.", e);
+      LOG.error("Could not create InetSocketAddress from NetworkAddress.", e);
       return null;
     }
   }

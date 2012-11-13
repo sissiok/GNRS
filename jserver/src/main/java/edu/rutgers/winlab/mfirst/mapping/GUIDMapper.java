@@ -8,11 +8,13 @@ package edu.rutgers.winlab.mfirst.mapping;
 import java.util.Collection;
 import java.util.EnumSet;
 
+import edu.rutgers.winlab.mfirst.GUID;
 import edu.rutgers.winlab.mfirst.net.AddressType;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
-import edu.rutgers.winlab.mfirst.structures.GUID;
 
 /**
+ * Simple interface for classes that map GUID values to the Network Addresses of the
+ * authoritative replicas.
  * 
  * @author Robert Moore
  * 

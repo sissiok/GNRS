@@ -10,7 +10,7 @@ import java.io.UnsupportedEncodingException;
 import com.sleepycat.persist.model.KeyField;
 import com.sleepycat.persist.model.Persistent;
 
-import edu.rutgers.winlab.mfirst.structures.GUID;
+import edu.rutgers.winlab.mfirst.GUID;
 
 /**
  * BerkeleyDB-compatible version of a GUID.

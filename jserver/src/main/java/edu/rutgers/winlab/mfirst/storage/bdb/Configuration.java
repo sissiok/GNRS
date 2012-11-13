@@ -7,6 +7,9 @@ package edu.rutgers.winlab.mfirst.storage.bdb;
 
 
 /**
+ * Configuration settings for the Berkeley DB implementation of the GUID
+ * storage engine.
+ * 
  * @author Robert Moore
  * 
  */

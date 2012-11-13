@@ -1,7 +1,6 @@
 /*
- * Mobility First GNRS Server
- * Copyright (C) 2012 Robert Moore and Rutgers University
- * All rights reserved.
+ * Mobility First GNRS Server Copyright (C) 2012 Robert Moore and Rutgers
+ * University All rights reserved.
  */
 package edu.rutgers.winlab.mfirst;
 
@@ -9,7 +8,6 @@ package edu.rutgers.winlab.mfirst;
  * Configuration class for GNRS Server.
  * 
  * @author Robert Moore
- * 
  */
 public class Configuration {
 
@@ -46,12 +44,12 @@ public class Configuration {
    * networkType.
    */
   private String mappingConfiguration = "map-ipv4.xml";
-  
+
   /**
    * Type of GUID storage to use.
    */
   private String storeType = "berkeleydb";
-  
+
   /**
    * Configuration filename for the GUID storage object.
    */
@@ -117,7 +115,6 @@ public class Configuration {
   /**
    * Gets the network type for the server.
    * 
-   * 
    * @return the network type value.
    */
   public String getNetworkType() {
@@ -132,8 +129,7 @@ public class Configuration {
    * <table>
    * <thead>
    * <th style="text-align: left">Value</th>
-   * <th style="text-align: left">Description</th>
-   * </thead>
+   * <th style="text-align: left">Description</th> </thead>
    * <tr>
    * <td><code>ipv4udp</code></td>
    * <td>Internet Protocol version 4 with UDP.</td>
@@ -187,6 +183,7 @@ public class Configuration {
 
   /**
    * Gets the GUID store type value.
+   * 
    * @return the type of GUID store to use.
    */
   public String getStoreType() {
@@ -195,7 +192,9 @@ public class Configuration {
 
   /**
    * Sets the GUID store type value.
-   * @param storeType the new type of GUID store to use.
+   * 
+   * @param storeType
+   *          the new type of GUID store to use.
    */
   public void setStoreType(String storeType) {
     this.storeType = storeType;
@@ -203,6 +202,7 @@ public class Configuration {
 
   /**
    * Gets the filename of the GUID store configuration.
+   * 
    * @return the GUID store configuration filename.
    */
   public String getStoreConfiguration() {
@@ -211,7 +211,9 @@ public class Configuration {
 
   /**
    * Sets the GUID store configuration filename.
-   * @param storeConfiguration the GUID store configuration filename.
+   * 
+   * @param storeConfiguration
+   *          the GUID store configuration filename.
    */
   public void setStoreConfiguration(String storeConfiguration) {
     this.storeConfiguration = storeConfiguration;

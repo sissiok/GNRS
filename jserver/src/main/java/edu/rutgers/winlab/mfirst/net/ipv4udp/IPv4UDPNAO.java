@@ -33,6 +33,9 @@ import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.SessionParameters;
 
 /**
+ * Network Access Object (NAO) implementation for IPv4/UDP GNRS networking
+ * implementations.
+ * 
  * @author Robert Moore
  * 
  */
@@ -41,7 +44,7 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject 
   /**
    * Logging for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(IPv4UDPNAO.class);
+  private static final Logger LOG = LoggerFactory.getLogger(IPv4UDPNAO.class);
   
   /**
    * Set of listeners for this NAO.
@@ -160,7 +163,7 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject 
       return IPv4UDPAddress.fromASCII(this.config.getBindAddress() + ":"
           + this.config.getBindPort());
     } catch (UnsupportedEncodingException e) {
-      log.error("Unable to create origin address due to encoding problems.", e);
+      LOG.error("Unable to create origin address due to encoding problems.", e);
       return null;
     }
 
@@ -197,7 +200,7 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject 
   
   @Override
   public void exceptionCaught(final IoSession session, final Throwable cause){
-    log.error("Exception caught.",cause);
+    LOG.error("Exception caught.",cause);
   }
  
 }

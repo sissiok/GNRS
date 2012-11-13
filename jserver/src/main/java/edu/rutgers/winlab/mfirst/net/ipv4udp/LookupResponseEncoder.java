@@ -14,6 +14,8 @@ import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 
 /**
+ * Apache MINA message encoder for {@link LookupResponseMessage} objects.
+ * 
  * @author Robert Moore
  * 
  */

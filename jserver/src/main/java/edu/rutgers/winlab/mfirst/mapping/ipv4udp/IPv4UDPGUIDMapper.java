@@ -25,12 +25,12 @@ import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.XStream;
 
+import edu.rutgers.winlab.mfirst.GUID;
 import edu.rutgers.winlab.mfirst.mapping.GUIDMapper;
 import edu.rutgers.winlab.mfirst.net.AddressType;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPAddress;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.NetworkAddressMapper;
-import edu.rutgers.winlab.mfirst.structures.GUID;
 
 /**
  * GUID Mapper for IPv4/UDP networking.
@@ -43,7 +43,7 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
   /**
    * Logging for this class.
    */
-  private static final Logger log = LoggerFactory
+  private static final Logger LOG = LoggerFactory
       .getLogger(IPv4UDPGUIDMapper.class);
 
   /**
@@ -130,7 +130,7 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
 
       String[] generalComponents = content.split("\\s+");
       if (generalComponents.length < 2) {
-        log.warn("Not enough components to parse the line \"{}\".", line);
+        LOG.warn("Not enough components to parse the line \"{}\".", line);
         continue;
       }
       // Extract the base address and prefix length
@@ -164,7 +164,7 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
       line = lineReader.readLine();
     }
     lineReader.close();
-    log.info("Finished loading prefix map.");
+    LOG.info("Finished loading prefix map.");
 
   }
 
@@ -199,7 +199,7 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
       // Extract the 3 parts (AS #, IP address, port)
       String[] generalComponents = content.split("\\s+");
       if (generalComponents.length < 3) {
-        log.warn("Not enough components to parse the line \"{}\".", line);
+        LOG.warn("Not enough components to parse the line \"{}\".", line);
         continue;
       }
 
@@ -213,7 +213,7 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
       line = lineReader.readLine();
     }
     lineReader.close();
-    log.info("Finished loading AS network binding values.");
+    LOG.info("Finished loading AS network binding values.");
 
   }
 
@@ -261,7 +261,7 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
           String autonomousSystem = this.networkAddressMap.get(na);
           if (autonomousSystem == null) {
             // FIXME: Rehash?
-            log.error("Found mapping hole for {}", na);
+            LOG.error("Found mapping hole for {}", na);
             continue;
           }
           InetSocketAddress asGNRSAddr = this.asAddresses.get(Integer
@@ -271,13 +271,13 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
           if (finalAddr != null) {
             returnedAddresses.add(finalAddr);
           } else {
-            log.error("Unable to create NetworkAddress from {}", asGNRSAddr);
+            LOG.error("Unable to create NetworkAddress from {}", asGNRSAddr);
             continue;
           }
         }
 
       } catch (NoSuchAlgorithmException e) {
-        log.error("Unable to hash GUID for type " + type, e);
+        LOG.error("Unable to hash GUID for type " + type, e);
         continue;
       }
 

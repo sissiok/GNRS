@@ -13,6 +13,11 @@ import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
 
 /**
+ * Protocol codec factory class for Apache MINA.
+ * 
+ * <p>Creates a protocol codec for GNRS server/client applications using the Apache
+ * MINA networking library.</p>
+ * 
  * @author Robert Moore
  * 
  */

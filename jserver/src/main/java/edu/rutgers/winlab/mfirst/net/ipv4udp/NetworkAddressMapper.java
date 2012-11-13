@@ -25,7 +25,7 @@ public class NetworkAddressMapper {
    * Logging for this class.
    */
   @SuppressWarnings("unused")
-  private static final Logger log = LoggerFactory
+  private static final Logger LOG = LoggerFactory
       .getLogger(NetworkAddressMapper.class);
 
   /**

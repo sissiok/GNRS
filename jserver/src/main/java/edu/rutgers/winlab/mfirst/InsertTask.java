@@ -28,22 +28,22 @@ public class InsertTask implements Callable<Object> {
    * Logging for this class.
    */
   @SuppressWarnings("unused")
-  private static final Logger log = LoggerFactory.getLogger(InsertTask.class);
+  private static final Logger LOG = LoggerFactory.getLogger(InsertTask.class);
 
   /**
    * The message and some metadata for this task.
    */
-  private final SessionParameters params;
+  private final transient SessionParameters params;
 
   /**
    * The received insert message.
    */
-  private final InsertMessage message;
+  private final transient InsertMessage message;
 
   /**
    * The server that is handling the message.
    */
-  private final GNRSServer server;
+  private final transient GNRSServer server;
 
   /**
    * Creates a new InsertTask for the specified server and message container.
@@ -64,12 +64,12 @@ public class InsertTask implements Callable<Object> {
   }
 
   @Override
-  public Object call() throws Exception {
+  public Object call() {
 
-    boolean success = this.server.appendBindings(this.message.getGuid(),
+    final boolean success = this.server.appendBindings(this.message.getGuid(),
         this.message.getBindings());
 
-    InsertResponseMessage response = new InsertResponseMessage();
+    final InsertResponseMessage response = new InsertResponseMessage();
     response.setRequestId(this.message.getRequestId());
     response.setResponseCode(success ? ResponseCode.SUCCESS
         : ResponseCode.FAILED);

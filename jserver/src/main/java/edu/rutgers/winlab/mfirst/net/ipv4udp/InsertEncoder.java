@@ -14,6 +14,8 @@ import edu.rutgers.winlab.mfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 
 /**
+ * Apache MINA message encoder for {@link InsertMessage} objects.
+ * 
  * @author Robert Moore
  * 
  */

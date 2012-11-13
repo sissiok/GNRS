@@ -9,9 +9,8 @@ import java.util.Collection;
 
 import org.apache.mina.util.ConcurrentHashSet;
 
+import edu.rutgers.winlab.mfirst.GUID;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
-import edu.rutgers.winlab.mfirst.structures.GUID;
-import edu.rutgers.winlab.mfirst.structures.GUIDBinding;
 
 /**
  * Representation of a set of GUID bindings for GNRS servers.

@@ -11,11 +11,11 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.apache.mina.filter.codec.demux.MessageDecoder;
 import org.apache.mina.filter.codec.demux.MessageDecoderResult;
 
+import edu.rutgers.winlab.mfirst.GUID;
 import edu.rutgers.winlab.mfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mfirst.messages.MessageType;
 import edu.rutgers.winlab.mfirst.net.AddressType;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
-import edu.rutgers.winlab.mfirst.structures.GUID;
 
 /**
  * Apache MINA message decoder for InsertMessage objects.

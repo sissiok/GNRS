@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.XStream;
 
+import edu.rutgers.winlab.mfirst.GUID;
 import edu.rutgers.winlab.mfirst.messages.AbstractMessage;
 import edu.rutgers.winlab.mfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
@@ -32,9 +33,10 @@ import edu.rutgers.winlab.mfirst.messages.MessageType;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.GNRSProtocolCodecFactory;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPAddress;
-import edu.rutgers.winlab.mfirst.structures.GUID;
 
 /**
+ * A simple GNRS client that sends GNRS messages based on a trace file.
+ * 
  * @author Robert Moore
  * 
  */
@@ -43,7 +45,7 @@ public class TraceClient extends IoHandlerAdapter {
   /**
    * Logging for this class.
    */
-  static final Logger log = LoggerFactory.getLogger(TraceClient.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TraceClient.class);
 
   /**
    * Sends messages to a server based on a trace file.
@@ -59,19 +61,19 @@ public class TraceClient extends IoHandlerAdapter {
     XStream x = new XStream();
 
     Configuration config = (Configuration) x.fromXML(new File(args[0]));
-    log.debug("Loaded configuration file \"{}\".", args[0]);
+    LOG.debug("Loaded configuration file \"{}\".", args[0]);
 
     File traceFile = new File(args[1]);
 
-    log.debug("Loaded trace file \"{}\".", traceFile);
+    LOG.debug("Loaded trace file \"{}\".", traceFile);
 
     int delay = Integer.parseInt(args[2]);
 
     TraceClient client = new TraceClient(config, traceFile, delay);
 
-    log.debug("Configured trace client.");
+    LOG.debug("Configured trace client.");
     client.connect();
-    log.debug("Finished main thread.");
+    LOG.debug("Finished main thread.");
   }
 
   /**
@@ -135,7 +137,7 @@ public class TraceClient extends IoHandlerAdapter {
    * @return {@code true} if everything goes well, else {@code false}.
    */
   public boolean connect() {
-    log.debug("Creating connect future.");
+    LOG.debug("Creating connect future.");
     ConnectFuture connectFuture = this.connector.connect(new InetSocketAddress(
         this.config.getServerHost(), this.config.getServerPort()));
 
@@ -145,7 +147,7 @@ public class TraceClient extends IoHandlerAdapter {
       @Override
       public void operationComplete(ConnectFuture future) {
         if (future.isConnected()) {
-          TraceClient.log.info("Connected to {}", future.getSession());
+          TraceClient.LOG.info("Connected to {}", future.getSession());
           TraceClient.this.runTrace(future.getSession());
           future.getSession().close(true);
           TraceClient.this.connector.dispose(true);
@@ -154,7 +156,7 @@ public class TraceClient extends IoHandlerAdapter {
 
     });
 
-    log.debug("Future listener will handle connection event and start trace.");
+    LOG.debug("Future listener will handle connection event and start trace.");
 
     return true;
   }
@@ -166,10 +168,10 @@ public class TraceClient extends IoHandlerAdapter {
    *          the connection to the server.
    */
   void runTrace(final IoSession session) {
-    log.info("Starting trace from {}.", this.traceFile);
+    LOG.info("Starting trace from {}.", this.traceFile);
     BufferedReader reader = loadFile(this.traceFile);
     if (reader == null) {
-      log.warn("Unable to open file reader. Aborting trace.");
+      LOG.warn("Unable to open file reader. Aborting trace.");
       return;
     }
     String line = null;
@@ -178,7 +180,7 @@ public class TraceClient extends IoHandlerAdapter {
       fromAddress = IPv4UDPAddress.fromASCII(this.config.getClientHost() + ":"
           + this.config.getClientPort());
     } catch (UnsupportedEncodingException uee) {
-      log.error(
+      LOG.error(
           "Unable to parse local host name from configuration parameter.", uee);
       return;
     }
@@ -190,16 +192,16 @@ public class TraceClient extends IoHandlerAdapter {
           continue;
         }
 
-        log.debug("FILE: {}", line);
+        LOG.debug("FILE: {}", line);
         AbstractMessage message = TraceClient.parseMessage(line);
         if (message == null) {
-          log.warn("Unable to parse message from \"" + line + "\".");
+          LOG.warn("Unable to parse message from \"" + line + "\".");
           continue;
         }
 
         message.setOriginAddress(fromAddress);
 
-        log.info("Writing {} to {}", message, session);
+        LOG.info("Writing {} to {}", message, session);
         session.write(message);
         try {
           Thread.sleep(this.delay);
@@ -208,7 +210,7 @@ public class TraceClient extends IoHandlerAdapter {
         }
 
       }
-      log.info("Finished reading trace file. Waiting 5 seconds.");
+      LOG.info("Finished reading trace file. Waiting 5 seconds.");
       try {
         Thread.sleep(5000);
       } catch (InterruptedException ie) {
@@ -216,7 +218,7 @@ public class TraceClient extends IoHandlerAdapter {
       }
       reader.close();
     } catch (IOException ioe) {
-      log.error("Exception occurred while reading trace file.", ioe);
+      LOG.error("Exception occurred while reading trace file.", ioe);
     }
   }
 
@@ -228,13 +230,13 @@ public class TraceClient extends IoHandlerAdapter {
    * @return the parsed message, or {@code null} if none was parsed.
    */
   public static AbstractMessage parseMessage(final String s) {
-    log.debug("Parsing \"{}\"", s);
+    LOG.debug("Parsing \"{}\"", s);
     // Extract any comments and discard
     String line = s.split("#")[0];
 
     String[] generalComponents = line.split("\\s+");
     if (generalComponents.length < 3) {
-      log.error("Not enough components to parse from the line {}.",
+      LOG.error("Not enough components to parse from the line {}.",
           Integer.valueOf(generalComponents.length));
       return null;
     }
@@ -248,7 +250,7 @@ public class TraceClient extends IoHandlerAdapter {
     try {
       guid = GUID.fromASCII(generalComponents[2]);
     } catch (UnsupportedEncodingException uee) {
-      log.error("Unable to parse GUID value from string.", uee);
+      LOG.error("Unable to parse GUID value from string.", uee);
       return null;
     }
     AbstractMessage msg = null;
@@ -256,13 +258,13 @@ public class TraceClient extends IoHandlerAdapter {
     case INSERT: {
       // Make sure there is something to split
       if (generalComponents.length < 4) {
-        log.error("Missing GUID binding value.");
+        LOG.error("Missing GUID binding value.");
         break;
       }
 
       String[] bindingValues = generalComponents[3].split(",");
       if (bindingValues.length % 3 != 0) {
-        log.error("Binding values are not a multiple of 3: {}",
+        LOG.error("Binding values are not a multiple of 3: {}",
             Integer.valueOf(bindingValues.length));
         break;
       }
@@ -272,7 +274,7 @@ public class TraceClient extends IoHandlerAdapter {
         try {
           na = IPv4UDPAddress.fromASCII(bindingValues[0]);
         } catch (UnsupportedEncodingException uee) {
-          log.error("Unable to parse network address from ASCII string.", uee);
+          LOG.error("Unable to parse network address from ASCII string.", uee);
           break;
         }
 
@@ -295,7 +297,7 @@ public class TraceClient extends IoHandlerAdapter {
       break;
     }
     default:
-      log.error("Unknown message type {}", type);
+      LOG.error("Unknown message type {}", type);
     }
     return msg;
   }
@@ -313,23 +315,23 @@ public class TraceClient extends IoHandlerAdapter {
       BufferedReader reader = new BufferedReader(new FileReader(file));
       return reader;
     } catch (Exception e) {
-      log.error("Unable to load file for reading.", e);
+      LOG.error("Unable to load file for reading.", e);
       return null;
     }
   }
 
   @Override
   public void exceptionCaught(IoSession session, Throwable cause) {
-    log.error("Caught unhandled exception.", cause);
+    LOG.error("Caught unhandled exception.", cause);
   }
 
   @Override
   public void messageReceived(IoSession session, Object message) {
-    log.debug("[{}] Received {}", session, message);
+    LOG.debug("[{}] Received {}", session, message);
   }
 
   @Override
   public void messageSent(IoSession session, Object message) {
-    log.debug("[{}] Sent {}", session, message);
+    LOG.debug("[{}] Sent {}", session, message);
   }
 }

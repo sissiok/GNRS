@@ -13,6 +13,8 @@ import org.apache.mina.filter.codec.demux.MessageEncoder;
 import edu.rutgers.winlab.mfirst.messages.InsertResponseMessage;
 
 /**
+ * Apache MINA message encoder for {@link InsertResponseMessage} objects.
+ * 
  * @author Robert Moore
  * 
  */

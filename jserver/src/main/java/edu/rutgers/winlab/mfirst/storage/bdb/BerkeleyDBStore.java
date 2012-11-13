@@ -20,10 +20,10 @@ import com.sleepycat.persist.StoreConfig;
 import com.thoughtworks.xstream.XStream;
 
 import edu.rutgers.winlab.mfirst.GNRSServer;
+import edu.rutgers.winlab.mfirst.GUID;
 import edu.rutgers.winlab.mfirst.storage.GNRSRecord;
+import edu.rutgers.winlab.mfirst.storage.GUIDBinding;
 import edu.rutgers.winlab.mfirst.storage.GUIDStore;
-import edu.rutgers.winlab.mfirst.structures.GUID;
-import edu.rutgers.winlab.mfirst.structures.GUIDBinding;
 
 /**
  * Implementation of a GUID store using BerkeleyDB for both in-memory caching
@@ -44,8 +44,7 @@ public class BerkeleyDBStore implements GUIDStore {
     /**
      * Logging for reporting statistics.
      */
-    @SuppressWarnings("hiding")
-    private static final Logger log = LoggerFactory.getLogger(StatsTask.class);
+    private static final Logger LOG_STATS = LoggerFactory.getLogger(StatsTask.class);
 
     /**
      * BerkeleyDB environment.
@@ -71,7 +70,7 @@ public class BerkeleyDBStore implements GUIDStore {
     @Override
     public void run() {
       long newCacheMiss = this.env.getStats(null).getNCacheMiss();
-      log.info("BDB Cache Misses: {}",
+      LOG_STATS.info("BDB Cache Misses: {}",
           (Long.valueOf(newCacheMiss - this.lastCacheMiss)));
       this.lastCacheMiss = newCacheMiss;
     }
@@ -80,7 +79,7 @@ public class BerkeleyDBStore implements GUIDStore {
   /**
    * Logging for this class.
    */
-  private static final Logger log = LoggerFactory
+  private static final Logger LOG = LoggerFactory
       .getLogger(BerkeleyDBStore.class);
 
   /**
@@ -141,7 +140,7 @@ public class BerkeleyDBStore implements GUIDStore {
     File bdbEnvDir = new File(this.config.getPathToFiles());
     if (!bdbEnvDir.exists()) {
       if (bdbEnvDir.isFile()) {
-        log.error(
+        LOG.error(
             "Unable to create BerkeleyDB environment directory. File exists with same name: {}",
             configFileName);
         throw new IllegalArgumentException(
@@ -151,7 +150,7 @@ public class BerkeleyDBStore implements GUIDStore {
                     configFileName));
       }
       if (!bdbEnvDir.mkdirs()) {
-        log.error("Unable to create some directories for BerkeleyDB environment.");
+        LOG.error("Unable to create some directories for BerkeleyDB environment.");
         throw new IllegalArgumentException(
             "Unable to create some directories for BerkeleyDB environment.");
       }
@@ -168,7 +167,7 @@ public class BerkeleyDBStore implements GUIDStore {
     try {
       this.bdbEnvConfig.setCacheSize(this.config.getCacheSizeMiB() * 1048576);
     } catch (IllegalArgumentException iae) {
-      log.error(
+      LOG.error(
           String
               .format(
                   "Unable to allocate cache of size %,d. Using 10% of available memory instead.",
@@ -249,7 +248,7 @@ public class BerkeleyDBStore implements GUIDStore {
     try {
       this.primaryIndex.put(record);
     } catch (DatabaseException dbe) {
-      log.error("Unable to append binding in Berkeley DB store.", dbe);
+      LOG.error("Unable to append binding in Berkeley DB store.", dbe);
       return false;
     }
     return true;
@@ -280,7 +279,7 @@ public class BerkeleyDBStore implements GUIDStore {
       }
 
     } catch (DatabaseException dbe) {
-      log.error("Unable to cleanly close Berkeley DB store.", dbe);
+      LOG.error("Unable to cleanly close Berkeley DB store.", dbe);
     }
 
     // Clean-up and close the environment
@@ -290,7 +289,7 @@ public class BerkeleyDBStore implements GUIDStore {
         this.bdbEnvironment.close();
       }
     } catch (DatabaseException dbe) {
-      log.error("Unable to cleanly close Berkeley DB environment.", dbe);
+      LOG.error("Unable to cleanly close Berkeley DB environment.", dbe);
 
     }
   }
@@ -316,7 +315,7 @@ public class BerkeleyDBStore implements GUIDStore {
     try {
       this.primaryIndex.put(record);
     } catch (DatabaseException dbe) {
-      log.error("Unable to append binding in Berkeley DB store.", dbe);
+      LOG.error("Unable to append binding in Berkeley DB store.", dbe);
       return false;
     }
     return true;

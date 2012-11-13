@@ -6,6 +6,10 @@
 package edu.rutgers.winlab.mfirst.client;
 
 /**
+ * Configuration settings for GNRS clients.
+ * 
+ * <p>Contains common settings for simulation/testing clients.</p>
+ * 
  * @author Robert Moore
  * 
  */

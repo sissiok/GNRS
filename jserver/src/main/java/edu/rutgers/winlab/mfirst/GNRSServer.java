@@ -32,11 +32,10 @@ import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.SessionParameters;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPNAO;
 import edu.rutgers.winlab.mfirst.storage.GNRSRecord;
+import edu.rutgers.winlab.mfirst.storage.GUIDBinding;
 import edu.rutgers.winlab.mfirst.storage.GUIDStore;
 import edu.rutgers.winlab.mfirst.storage.SimpleGUIDStore;
 import edu.rutgers.winlab.mfirst.storage.bdb.BerkeleyDBStore;
-import edu.rutgers.winlab.mfirst.structures.GUID;
-import edu.rutgers.winlab.mfirst.structures.GUIDBinding;
 
 /**
  * Java implementation of a GNRS server.
@@ -50,31 +49,31 @@ public class GNRSServer implements MessageListener {
   /**
    * Default port value for GNRS servers.
    */
-  public static final short DEFAULT_PORT = 5001;
+  public static final int DEFAULT_PORT = 5001;
 
   /**
    * Logging facility for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(GNRSServer.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GNRSServer.class);
 
   /**
    * @param args
    *          <Configuration File>
    */
-  public static void main(String[] args) {
-    log.debug("------------------------");
-    log.debug("GNRS Server starting up.");
-    log.debug("------------------------");
+  public static void main(final String[] args) {
+    LOG.debug("------------------------");
+    LOG.debug("GNRS Server starting up.");
+    LOG.debug("------------------------");
 
     if (args.length < 1) {
-      log.error("Missing 1 or more command-line arguments.");
+      LOG.error("Missing 1 or more command-line arguments.");
       printUsageInfo();
       return;
     }
-    XStream x = new XStream();
-    log.trace("Loading configuration file \"{}\".", args[0]);
-    Configuration config = (Configuration) x.fromXML(new File(args[0]));
-    log.debug("Finished parsing configuration file.");
+    final XStream x = new XStream();
+    LOG.trace("Loading configuration file \"{}\".", args[0]);
+    final Configuration config = (Configuration) x.fromXML(new File(args[0]));
+    LOG.debug("Finished parsing configuration file.");
     try {
 
       // Create the server
@@ -92,11 +91,11 @@ public class GNRSServer implements MessageListener {
         }
       });
 
-      log.debug("GNRS server object successfully created.");
+      LOG.debug("GNRS server object successfully created.");
       server.startup();
-      log.trace("GNRS server thread started.");
+      LOG.trace("GNRS server thread started.");
     } catch (IOException ioe) {
-      log.error("Unable to start server.", ioe);
+      LOG.error("Unable to start server.", ioe);
       return;
     }
   }
@@ -106,7 +105,7 @@ public class GNRSServer implements MessageListener {
    * invoke.
    */
   public static void printUsageInfo() {
-    System.out.println("Parameters: <Config file>");
+    System.err.println("Parameters: <Config file>");
   }
 
   /*
@@ -116,7 +115,7 @@ public class GNRSServer implements MessageListener {
   /**
    * Configuration file for the server.
    */
-  final Configuration config;
+  private final Configuration config;
 
   /**
    * Object for the server to wait/notify on.
@@ -136,13 +135,13 @@ public class GNRSServer implements MessageListener {
   /**
    * Number of lookups performed since last stats output.
    */
-  static final AtomicInteger numLookups = new AtomicInteger(0);
+  static final AtomicInteger NUM_LOOKUPS = new AtomicInteger(0);
 
   /**
    * Total number of nanoseconds spent processing messages since last stats
    * report.
    */
-  static final AtomicLong messageLifetime = new AtomicLong(0);
+  static final AtomicLong MSG_LIFETIME = new AtomicLong(0);
 
   /**
    * Thread pool for distributing tasks.
@@ -187,7 +186,7 @@ public class GNRSServer implements MessageListener {
     this.guidMapper = createMapper(this.config);
     if (this.guidMapper == null) {
 
-      log.error("Unable to create GUID mapper of type {}",
+      LOG.error("Unable to create GUID mapper of type {}",
           this.config.getNetworkType());
       throw new IllegalArgumentException("Unable to create GUID mapper object.");
     }
@@ -198,12 +197,12 @@ public class GNRSServer implements MessageListener {
       numThreads = 1;
     }
 
-    log.info("Using threadpool of {} threads.", Integer.valueOf(numThreads));
+    LOG.info("Using threadpool of {} threads.", Integer.valueOf(numThreads));
     this.workers = Executors.newFixedThreadPool(numThreads);
 
     this.networkAccess = createNAO(this.config);
     if (this.networkAccess == null) {
-      log.error("Unable to create network access of type {}",
+      LOG.error("Unable to create network access of type {}",
           this.config.getNetworkType());
       throw new IllegalArgumentException(
           "Unable to create network access object.");
@@ -211,7 +210,7 @@ public class GNRSServer implements MessageListener {
 
     this.guidStore = this.createStore(this.config);
     if (this.guidStore == null) {
-      log.error("Unable to create GUID store of type {}",
+      LOG.error("Unable to create GUID store of type {}",
           this.config.getStoreType());
       throw new IllegalArgumentException("Unable to create GUID store object.");
     }
@@ -250,12 +249,12 @@ public class GNRSServer implements MessageListener {
       try {
         return new IPv4UDPNAO(config.getNetworkConfiguration());
       } catch (IOException ioe) {
-        log.error("Unable to create IPv4/UDP network access.", ioe);
+        LOG.error("Unable to create IPv4/UDP network access.", ioe);
         return null;
       }
 
     }
-    log.error("Unrecognized networking type: {}", config.getNetworkType());
+    LOG.error("Unrecognized networking type: {}", config.getNetworkType());
     return null;
 
   }
@@ -275,11 +274,11 @@ public class GNRSServer implements MessageListener {
       try {
         return new IPv4UDPGUIDMapper(config.getMappingConfiguration());
       } catch (IOException ioe) {
-        log.error("Unable to create IPv4/UDP GUID mapper.", ioe);
+        LOG.error("Unable to create IPv4/UDP GUID mapper.", ioe);
         return null;
       }
     }
-    log.error("Unrecognized networking type: {}", config.getNetworkType());
+    LOG.error("Unrecognized networking type: {}", config.getNetworkType());
     return null;
 
   }
@@ -297,7 +296,7 @@ public class GNRSServer implements MessageListener {
     } else if ("simple".equalsIgnoreCase(config.getStoreType())) {
       return new SimpleGUIDStore();
     }
-    log.error("Unrecognized store type: {}", config.getStoreType());
+    LOG.error("Unrecognized store type: {}", config.getStoreType());
     return null;
   }
 
@@ -389,14 +388,14 @@ public class GNRSServer implements MessageListener {
    * Convenience method for tasks to check if a NetworkAddress references the
    * local server or not.
    * 
-   * @param na
+   * @param address
    *          the address to check
    * @return {@code true} if the address identifies this server, else
    *         {@code false}.
    * @see NetworkAccessObject#isLocal(NetworkAddress)
    */
-  public boolean isLocalAddress(final NetworkAddress na) {
-    return this.networkAccess.isLocal(na);
+  public boolean isLocalAddress(final NetworkAddress address) {
+    return this.networkAccess.isLocal(address);
   }
 
   /**
@@ -422,7 +421,7 @@ public class GNRSServer implements MessageListener {
     }
     // Unrecognized or invalid message received
     else {
-      log.warn("Unrecognized message: {}", msg);
+      LOG.warn("Unrecognized message: {}", msg);
       this.networkAccess.endSession(parameters);
     }
     // Notify the main thread that work can be done.
@@ -443,39 +442,29 @@ public class GNRSServer implements MessageListener {
     /**
      * Logging for the statistics class.
      */
-    @SuppressWarnings("hiding")
-    private static final Logger log = LoggerFactory.getLogger(StatsTask.class);
+    private static final Logger LOG_STATS = LoggerFactory.getLogger(StatsTask.class);
 
     /**
      * The last time statistics were generated.
      */
     private long lastTimestamp = System.currentTimeMillis();
 
-    /**
-     * Creates a new task for the specified server.
-     * 
-     */
-    public StatsTask() {
-      super();
-
-    }
-
     @Override
     public void run() {
-      long totalNanos = GNRSServer.messageLifetime.getAndSet(0l);
-      int numLookups = GNRSServer.numLookups.getAndSet(0);
-      long now = System.currentTimeMillis();
+      final long totalNanos = GNRSServer.MSG_LIFETIME.getAndSet(0l);
+      final int numLookups = GNRSServer.NUM_LOOKUPS.getAndSet(0);
+      final long now = System.currentTimeMillis();
 
-      long timeDiff = now - this.lastTimestamp;
+      final long timeDiff = now - this.lastTimestamp;
       this.lastTimestamp = now;
-      float numSeconds = timeDiff / 1000f;
-      float lookupsPerSecond = numLookups / numSeconds;
-      float averageLifetimeUsec = numLookups == 0 ? 0
+      final float numSeconds = timeDiff / 1000f;
+      final float lookupsPerSecond = numLookups / numSeconds;
+      final float avgLifetimeUsec = numLookups == 0 ? 0
           : ((totalNanos / (float) numLookups) / 1000);
-      log.info(String.format(
+      LOG_STATS.info(String.format(
           "\nLookups: %.3f per second (%.2f s)\nAverage Lifetime: %,.0fus",
           Float.valueOf(lookupsPerSecond), Float.valueOf(numSeconds),
-          Float.valueOf(averageLifetimeUsec)));
+          Float.valueOf(avgLifetimeUsec)));
     }
   }
 
@@ -487,6 +476,14 @@ public class GNRSServer implements MessageListener {
    */
   public Timer getStatsTimer() {
     return this.statsTimer;
+  }
+
+  /**
+   * Gets this server's configuration.
+   * @return this server's configuration.
+   */
+  public Configuration getConfig() {
+    return this.config;
   }
 
 }

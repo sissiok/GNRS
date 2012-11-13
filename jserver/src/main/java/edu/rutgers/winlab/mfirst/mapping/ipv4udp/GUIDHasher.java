@@ -8,9 +8,9 @@ package edu.rutgers.winlab.mfirst.mapping.ipv4udp;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 
+import edu.rutgers.winlab.mfirst.GUID;
 import edu.rutgers.winlab.mfirst.net.AddressType;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
-import edu.rutgers.winlab.mfirst.structures.GUID;
 
 /**
  * Simple interface to be implemented by classes that can hash a GUID value to a

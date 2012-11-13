@@ -5,9 +5,15 @@
  */
 package edu.rutgers.winlab.mfirst.messages;
 
-import edu.rutgers.winlab.mfirst.structures.GUID;
+import edu.rutgers.winlab.mfirst.GUID;
 
 /**
+ * A Lookup/Retrieval for a GUID value from the GNRS system.
+ * 
+ * <p>Lookup/Retrieval messages specify a query GUID value to a GNRS server.
+ * The response message, a {@link LookupResponseMessage}, is sent with the current
+ * binding values (if present) back to the requester.</p>
+ * 
  * @author Robert Moore
  * 
  */
@@ -44,7 +50,7 @@ public class LookupMessage extends AbstractResponseMessage {
    * @param guid
    *          the new GUID for this message.
    */
-  public void setGuid(GUID guid) {
+  public void setGuid(final GUID guid) {
     this.guid = guid;
   }
   
@@ -52,9 +58,9 @@ public class LookupMessage extends AbstractResponseMessage {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder("LKP #").append(this.getRequestId()).append(" (");
-    sb.append(this.guid).append(")");
-    return sb.toString();
+    final StringBuilder buffer = new StringBuilder("LKP #").append(this.getRequestId()).append(" (");
+    buffer.append(this.guid).append(")");
+    return buffer.toString();
   }
 
   /**
@@ -69,7 +75,7 @@ public class LookupMessage extends AbstractResponseMessage {
    * Sets the options flags for this message.
    * @param options the new options flags.
    */
-  public void setOptions(long options) {
+  public void setOptions(final long options) {
     this.options = options & 0xFFFFFFFF;
   }
 

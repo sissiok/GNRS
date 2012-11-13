@@ -5,8 +5,8 @@
  */
 package edu.rutgers.winlab.mfirst.messages;
 
+import edu.rutgers.winlab.mfirst.GUID;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
-import edu.rutgers.winlab.mfirst.structures.GUID;
 
 /**
  * A message for inserting a GUID->NetworkAddress binding into the GNRS server.

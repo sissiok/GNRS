@@ -26,13 +26,13 @@ import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.XStream;
 
+import edu.rutgers.winlab.mfirst.GUID;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.ResponseCode;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.GNRSProtocolCodecFactory;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPAddress;
-import edu.rutgers.winlab.mfirst.structures.GUID;
 
 /**
  * A simple GNRS client that generates lots of lookup messages.
@@ -45,13 +45,13 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
   /**
    * Logging facility for this class.
    */
-  static final Logger log = LoggerFactory.getLogger(GeneratingClient.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GeneratingClient.class);
 
   /**
    * Rough estimate of how precise the system nanosecond timer is.
    */
   // Linux supports a 50 microsecond precision
-  static final long SYSTEM_SLEEP_PRECISION = System.getProperty("os.name")
+  private static final long SLEEP_PRECISION = System.getProperty("os.name")
       .equalsIgnoreCase("linux") ? 50000 : 1000000;
 
   /**
@@ -59,7 +59,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
    * @throws InterruptedException
    *           if interrupted while waiting for the clients to finish.
    */
-  public static void main(String[] args) throws InterruptedException {
+  public static void main(final String[] args) throws InterruptedException {
     if (args.length < 4) {
       printUsageInfo();
       return;
@@ -68,7 +68,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     XStream x = new XStream();
 
     Configuration config = (Configuration) x.fromXML(new File(args[0]));
-    log.debug("Loaded configuration file \"{}\".", args[0]);
+    LOG.debug("Loaded configuration file \"{}\".", args[0]);
 
     int delay = Integer.parseInt(args[2]);
     int numClients = Integer.parseInt(args[3]);
@@ -85,7 +85,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
       threads[i] = new Thread(clients[i]);
     }
 
-    log.info("Created {} clients.", Integer.valueOf(numClients));
+    LOG.info("Created {} clients.", Integer.valueOf(numClients));
 
     for (int i = 0; i < clients.length; ++i) {
       threads[i].start();
@@ -166,8 +166,8 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
         new GNRSProtocolCodecFactory(false)));
 
-    log.info(String.format("Assuming timer precision of %,dns.",
-        Long.valueOf(SYSTEM_SLEEP_PRECISION)));
+    LOG.info(String.format("Assuming timer precision of %,dns.",
+        Long.valueOf(SLEEP_PRECISION)));
 
   }
 
@@ -182,7 +182,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
    * @return {@code true} if everything goes well, else {@code false}.
    */
   public boolean connect() {
-    log.debug("Creating connect future.");
+    LOG.debug("Creating connect future.");
     ConnectFuture connectFuture = this.connector.connect(new InetSocketAddress(
         this.config.getServerHost(), this.config.getServerPort()));
 
@@ -194,7 +194,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
       @Override
       public void operationComplete(ConnectFuture future) {
         if (future.isConnected()) {
-          GeneratingClient.log.info("Connected to {}", future.getSession());
+          GeneratingClient.LOG.info("Connected to {}", future.getSession());
           GeneratingClient.this.generateLookups(future.getSession());
           try {
             Thread.sleep(5000);
@@ -206,7 +206,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
           float success = ((succ * 1f) / total) * 100;
           float loss = ((GeneratingClient.this.numLookups - total * 1f) / GeneratingClient.this.numLookups) * 100;
           float hits = ((GeneratingClient.this.numHits.get()*1f)/total)*100;
-          log.info(String.format(
+          LOG.info(String.format(
               "Total: %,d  |  Success: %,.2f%%  |  Hits: %,.2f%%  |  Loss: %,.2f%%)",
               Integer.valueOf(total), Float.valueOf(success), Float.valueOf(hits),
               Float.valueOf(loss)));
@@ -217,7 +217,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
 
     });
 
-    log.debug("Future listener will handle connection event and start trace.");
+    LOG.debug("Future listener will handle connection event and start trace.");
 
     return true;
   }
@@ -229,12 +229,12 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
    *          the session on which to send the messages.
    */
   void generateLookups(final IoSession session) {
-    log.info("Generating {} lookups.", Integer.valueOf(this.numLookups));
+    LOG.info("Generating {} lookups.", Integer.valueOf(this.numLookups));
 
     try {
       IPv4UDPAddress.fromASCII(this.config.getClientHost());
     } catch (UnsupportedEncodingException uee) {
-      log.error(
+      LOG.error(
           "Unable to parse local host name from configuration parameter.", uee);
       return;
     }
@@ -246,7 +246,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
           + ":" + this.config.getClientPort());
 
     } catch (UnsupportedEncodingException uee) {
-      log.error("Unable to parse client hostname from configuration file.", uee);
+      LOG.error("Unable to parse client hostname from configuration file.", uee);
       return;
     }
     LookupMessage message = null;
@@ -285,14 +285,14 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
    * @return the actual sleep time to use.
    */
   public static long getNanoSleep(final long desiredSleep) {
-    long halfPrecision = SYSTEM_SLEEP_PRECISION / 4;
+    long halfPrecision = SLEEP_PRECISION / 4;
     long roundHalf = desiredSleep / (halfPrecision);
-    return roundHalf * (halfPrecision) - SYSTEM_SLEEP_PRECISION;
+    return roundHalf * (halfPrecision) - SLEEP_PRECISION;
   }
 
   @Override
   public void exceptionCaught(IoSession session, Throwable cause) {
-    log.error("Caught unhandled exception.", cause);
+    LOG.error("Caught unhandled exception.", cause);
   }
 
   @Override
@@ -322,6 +322,6 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
 
   @Override
   public void sessionCreated(IoSession session) {
-    log.info("[{}] Session created.", session);
+    LOG.info("[{}] Session created.", session);
   }
 }

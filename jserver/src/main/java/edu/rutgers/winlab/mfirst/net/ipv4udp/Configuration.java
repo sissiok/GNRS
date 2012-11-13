@@ -6,6 +6,16 @@
 package edu.rutgers.winlab.mfirst.net.ipv4udp;
 
 /**
+ * Conifguration settings for the IPv4/UDP networking implementation.
+ * 
+ * <p>
+ * Specific network configuration settings for a GNRS networking interface that
+ * utilizes IPv4 and UDP for network communication. The major components are the
+ * IP prefixes file (for BGP-like route announcements) and the AS bindings file,
+ * which provides routable addresses for the GNRS servers within each Autonomous
+ * System (AS).
+ * </p>
+ * 
  * @author Robert Moore
  * 
  */
@@ -26,8 +36,6 @@ public class Configuration {
    * (non-blocking).
    */
   private boolean ascynchronousWrite = false;
-
-  
 
   /**
    * The address to which the server should bind.

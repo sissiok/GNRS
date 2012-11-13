@@ -7,7 +7,7 @@ package edu.rutgers.winlab.mfirst.storage.bdb;
 
 import com.sleepycat.persist.model.Persistent;
 
-import edu.rutgers.winlab.mfirst.structures.GUIDBinding;
+import edu.rutgers.winlab.mfirst.storage.GUIDBinding;
 
 /**
  * BerkeleyDB-compatible version of GUID binding.

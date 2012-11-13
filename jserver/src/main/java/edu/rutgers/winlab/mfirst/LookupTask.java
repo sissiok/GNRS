@@ -28,7 +28,7 @@ public class LookupTask implements Callable<Object> {
   /**
    * Logging facility for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(LookupTask.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LookupTask.class);
 
   /**
    * The received lookup message.
@@ -67,7 +67,7 @@ public class LookupTask implements Callable<Object> {
   public Object call() throws Exception {
 
     long t10 = System.nanoTime();
-    GNRSServer.numLookups.incrementAndGet();
+    GNRSServer.NUM_LOOKUPS.incrementAndGet();
 
     Collection<NetworkAddress> serverAddxes = this.server.getMappings(
         this.message.getGuid(), this.message.getOriginAddress().getType());
@@ -109,12 +109,12 @@ public class LookupTask implements Callable<Object> {
     this.server.sendMessage(this.params, response);
 
     long t40 = System.nanoTime();
-    if (this.server.config.isCollectStatistics()) {
-      GNRSServer.messageLifetime.addAndGet(System.nanoTime()
+    if (this.server.getConfig().isCollectStatistics()) {
+      GNRSServer.MSG_LIFETIME.addAndGet(System.nanoTime()
           - this.message.createdNanos);
     }
-    if (log.isDebugEnabled()) {
-      log.debug(String.format(
+    if (LOG.isDebugEnabled()) {
+      LOG.debug(String.format(
           "Processing: %,dns [Map: %,dns, GetBind: %,dns, Write: %,dns] \n",
           Long.valueOf(t40 - t10), Long.valueOf(t20 - t10),
           Long.valueOf(t30 - t20), Long.valueOf(t40 - t30)));

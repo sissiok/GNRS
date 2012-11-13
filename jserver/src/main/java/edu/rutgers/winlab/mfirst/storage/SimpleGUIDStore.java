@@ -7,8 +7,7 @@ package edu.rutgers.winlab.mfirst.storage;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import edu.rutgers.winlab.mfirst.structures.GUID;
-import edu.rutgers.winlab.mfirst.structures.GUIDBinding;
+import edu.rutgers.winlab.mfirst.GUID;
 
 /**
  * A simple in-memory GUID storage engine with no persistence after the

@@ -14,9 +14,9 @@ import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.rutgers.winlab.mfirst.GUID;
 import edu.rutgers.winlab.mfirst.net.AddressType;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
-import edu.rutgers.winlab.mfirst.structures.GUID;
 
 /**
  * Hashes GUID values based on Java-supported hashing algorithms. Incorporates
@@ -40,7 +40,7 @@ public class MessageDigestHasher implements GUIDHasher {
   /**
    * Logging for this class.
    */
-  private static final Logger log = LoggerFactory
+  private static final Logger LOG = LoggerFactory
       .getLogger(MessageDigestHasher.class);
 
   /**
@@ -84,7 +84,7 @@ public class MessageDigestHasher implements GUIDHasher {
         numAddresses);
     MessageDigest digest = this.localDigest.get();
     if (digest == null) {
-      log.error("Unable to hash because \"{}\" is not supported.",
+      LOG.error("Unable to hash because \"{}\" is not supported.",
           this.algorithmName);
       return null;
     }

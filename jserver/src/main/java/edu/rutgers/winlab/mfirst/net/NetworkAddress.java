@@ -24,7 +24,7 @@ public class NetworkAddress {
    * Logging for this class.
    */
   @SuppressWarnings("unused")
-  private static final Logger log = LoggerFactory
+  private static final Logger LOG = LoggerFactory
       .getLogger(NetworkAddress.class);
 
   /**
@@ -71,7 +71,7 @@ public class NetworkAddress {
    * @param bytes
    *          the new value of this network address.
    */
-  public void setValue(byte[] bytes) {
+  public final void setValue(byte[] bytes) {
     if (bytes != null && bytes.length > 0xFFFF) {
       throw new IllegalArgumentException(
           "NetworkAddress value exceeds maximum length of 65535 bytes.");
@@ -99,7 +99,7 @@ public class NetworkAddress {
   @Override
   public boolean equals(Object o) {
     if (o instanceof NetworkAddress) {
-      return this.equals((NetworkAddress) o);
+      return this.equalsNA((NetworkAddress) o);
     }
     return super.equals(o);
   }
@@ -108,12 +108,12 @@ public class NetworkAddress {
    * Determines if this NetworkAddress equals another based on their type and
    * value.
    * 
-   * @param na
+   * @param address
    *          another NetworkAddress
    * @return {@code true} if they are equal.
    */
-  public boolean equals(final NetworkAddress na) {
-    return this.type.equals(na.type) && Arrays.equals(this.value, na.value);
+  public boolean equalsNA(final NetworkAddress address) {
+    return this.type.equals(address.type) && Arrays.equals(this.value, address.value);
   }
 
   /**
@@ -131,7 +131,7 @@ public class NetworkAddress {
    * @param type
    *          the new type.
    */
-  public void setType(AddressType type) {
+  public final void setType(AddressType type) {
     this.type = type;
   }
 

@@ -13,6 +13,7 @@ import org.apache.mina.filter.codec.demux.MessageEncoder;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 
 /**
+ * Apache MINA message encoder for {@link LookupMessage} objects.
  * @author Robert Moore
  * 
  */
