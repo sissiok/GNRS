@@ -19,11 +19,13 @@ $inFile->open("<" . $ARGV[0])
   || die "Could not open \"$ARGV[0]\" for reading.";
 
 my $outFile = FileHandle->new;
-$outFile->open("> AS_binding.data")
+$outFile->open("> as-binding.ipv4")
     || die "Could not create \"node_list_perline.data\" for writing.";
 
 #read the AS, and generate the corresponding IP mapping
 my $count = 1;
+#port number is hard coded as 5001
+my $port = 5001;
 while (my $line = $inFile->getline) {
 	# Skip comments at the start of the line
 	if($line =~ m/^#/) {
@@ -34,5 +36,5 @@ while (my $line = $inFile->getline) {
 	if($count != 2) {
 		printf $outFile "\n";
 	}
-	printf $outFile "$line"." 192.168.1.$count";
+	printf $outFile "$line"." 192.168.1.$count $port";
 }
