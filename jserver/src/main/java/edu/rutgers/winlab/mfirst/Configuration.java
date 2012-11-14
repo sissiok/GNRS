@@ -48,7 +48,7 @@ public class Configuration {
   /**
    * Type of GUID storage to use.
    */
-  private String storeType = "berkeleydb";
+  private String storeType = "simple";
 
   /**
    * Configuration filename for the GUID storage object.

@@ -11,10 +11,16 @@
   
   <properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <skipTests>true</skipTests>
+    <skipTests>false</skipTests>
 	</properties>
 
 	<build>
+    <testSourceDirectory>${project.basedir}/src/test/java</testSourceDirectory>
+    <testResources>
+      <testResource>
+        <directory>${project.basedir}/src/test/resources</directory>
+      </testResource>
+    </testResources>
 	  <pluginManagement>
       <plugins>
         <plugin>
@@ -93,9 +99,10 @@
           <instrumentation>
             <ignores>
               <ignore>edu.rutgers.winlab.mfirst.client.*</ignore>
+              <ignore>*Test</ignore> 
             </ignores>
             <excludes>
-              <exclude>edu/rutgers/winlab/mfirst/client/*.class</exclude>
+              <exclude>**/*Test.class</exclude>
             </excludes>
           </instrumentation>
           <check>
@@ -109,8 +116,8 @@
             <regexes>
               <regex>
                 <pattern>edu.rutgers.winlab.mfirst.client.*</pattern>
-                <branchRate>90</branchRate>
-                <lineRate>80</lineRate>
+                <branchRate>50</branchRate>
+                <lineRate>50</lineRate>
               </regex>
             </regexes>
           </check>

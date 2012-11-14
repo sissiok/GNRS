@@ -22,7 +22,7 @@
   <networkType>ipv4udp</networkType>
   
   <!-- Configuration file name for the network access object. -->
-  <networkConfiguration>src/main/resources/net-ipv4.xml</networkConfiguration>
+  <networkConfiguration>net-ipv4.xml</networkConfiguration>
   
   <!-- Configuration file name for the GUID mapping object. -->
   <mappingConfiguration>map-ipv4.xml</mappingConfiguration>

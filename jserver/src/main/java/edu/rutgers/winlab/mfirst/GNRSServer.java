@@ -159,7 +159,7 @@ public class GNRSServer implements MessageListener {
 
   /**
    * Creates a new GNRS server with the specified configuration. The server will
-   * not start running until the {@code #start()} method is invoked.
+   * not start running until the {@link #startup()} method is invoked.
    * 
    * @param config
    *          the configuration to use.
