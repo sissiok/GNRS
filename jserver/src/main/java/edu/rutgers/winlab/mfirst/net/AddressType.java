@@ -50,14 +50,14 @@ public enum AddressType {
    * Converts the provided unsigned short into an AddressType or {@code null} if
    * the type is not unrecognized.
    * 
-   * @param asString
+   * @param asInt
    *          the unsigned short representing the type.
    * @return an AddressType for the value, or {@code null} if none can be found
    *         that matches.
    */
-  public static AddressType valueOf(final int asString) {
+  public static AddressType valueOf(final int asInt) {
     AddressType type = null;
-    if (asString == INET_4_UDP.type) {
+    if (asInt == INET_4_UDP.type) {
       type = INET_4_UDP;
     }
     return type;
