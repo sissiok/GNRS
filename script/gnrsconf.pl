@@ -39,10 +39,10 @@ while (my $line = $inFile->getline) {
 	printf $outFile1 "  <numReplicas>5</numReplicas>\n";
 	printf $outFile1 "  <collectStatistics>true</collectStatistics>\n";
 	printf $outFile1 "  <networkType>ipv4udp</networkType>\n";
-	printf $outFile1 "  <networkConfiguration>src/main/resources/net-ipv4_".$line.".xml</networkConfiguration>\n";
-	printf $outFile1 "  <mappingConfiguration>src/main/resources/map-ipv4.xml</mappingConfiguration>\n";
+	printf $outFile1 "  <networkConfiguration>/usr/local/mobilityfirst/conf/net-ipv4_".$line.".xml</networkConfiguration>\n";
+	printf $outFile1 "  <mappingConfiguration>/usr/local/mobilityfirst/conf/map-ipv4.xml</mappingConfiguration>\n";
 	printf $outFile1 "  <storeType>berkeleydb</storeType>\n";
-	printf $outFile1 "  <storeConfiguration>src/main/resources/berkeleydb.xml</storeConfiguration>\n";
+	printf $outFile1 "  <storeConfiguration>/usr/local/mobilityfirst/conf/berkeleydb.xml</storeConfiguration>\n";
 	printf $outFile1 "</edu.rutgers.winlab.mfirst.Configuration>";
 
 	open($outFile2, ">", "net-ipv4_".$line.".xml");

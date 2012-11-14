@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# do experiment preparation 
+# do experiment preparation from the console 
 # it will generate config files, send config files to corresponding nodes, and config node IP address
 
 AS_topo_file=$1
