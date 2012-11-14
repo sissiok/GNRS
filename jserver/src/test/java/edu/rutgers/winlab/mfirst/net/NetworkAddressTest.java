@@ -107,7 +107,7 @@ public class NetworkAddressTest {
 
   /**
    * Test method for
-   * {@link edu.rutgers.winlab.mfirst.net.NetworkAddress#setValue()}.
+   * {@link edu.rutgers.winlab.mfirst.net.NetworkAddress}.
    */
   @Test(expected = IllegalArgumentException.class)
   public void testIllegalSetValueLength() {

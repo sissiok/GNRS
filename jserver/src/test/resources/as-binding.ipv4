@@ -7,3 +7,4 @@
 3 127.0.0.1 5001
 4 127.0.0.1 5001
 5 127.0.0.1 5001
+err # This line is an error and will be skipped

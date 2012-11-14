@@ -82,7 +82,7 @@ public class MessageDigestHasher implements GUIDHasher {
       try {
         digest = MessageDigest.getInstance(this.algorithmName);
       } catch (final NoSuchAlgorithmException nsae) {
-        ERROR_LOG.error("Unable to create message digest from algorithm {}.", nsae);
+        ERROR_LOG.error("Unable to create message digest from unsupported algorithm.", nsae);
       }
       return digest;
     }
@@ -104,7 +104,7 @@ public class MessageDigestHasher implements GUIDHasher {
   @Override
   public Collection<NetworkAddress> hash(final GUID guid,
       final AddressType type, final int numAddresses)
-      throws NoSuchAlgorithmException {
+     {
     final ArrayList<NetworkAddress> addresses = new ArrayList<NetworkAddress>(
         numAddresses);
     final MessageDigest digest = this.localDigest.get();

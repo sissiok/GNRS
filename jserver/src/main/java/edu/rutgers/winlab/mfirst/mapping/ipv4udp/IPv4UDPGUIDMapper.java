@@ -80,11 +80,6 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
     this.loadAsNetworkBindings(config.getAsBindingFile());
 
     this.hasher = new MessageDigestHasher(config.getHashAlgorithm());
-    if (this.hasher == null) {
-      throw new IllegalArgumentException(
-          "Unable to create hashing algorithm from \""
-              + config.getHashAlgorithm() + "\".");
-    }
 
   }
 
@@ -130,6 +125,7 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
       final String[] generalComponents = content.split("\\s+");
       if (generalComponents.length < 2) {
         LOG.warn("Not enough components to parse the line \"{}\".", line);
+        line = lineReader.readLine();
         continue;
       }
       // Extract the base address and prefix length
@@ -147,11 +143,10 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
       final NetworkAddress netAddr = IPv4UDPAddress.fromInteger(addxAsInt);
       final byte[] naBytes = netAddr.getValue();
       int realLength = 0;
-      for (final byte b : naBytes) {
-        if (b == 0) {
-          break;
+      for (int i = 0; i < naBytes.length;++i) {
+        if (naBytes[i] != 0) {
+          realLength = i;
         }
-        ++realLength;
       }
       if (realLength < naBytes.length) {
         netAddr.setValue(Arrays.copyOf(naBytes, realLength));
@@ -198,6 +193,7 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
       final String[] generalComponents = content.split("\\s+");
       if (generalComponents.length < 3) {
         LOG.warn("Not enough components to parse the line \"{}\".", line);
+        line = lineReader.readLine();
         continue;
       }
 

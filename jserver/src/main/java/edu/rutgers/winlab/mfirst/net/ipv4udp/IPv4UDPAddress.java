@@ -158,7 +158,8 @@ public class IPv4UDPAddress extends NetworkAddress {
   public String toString() {
     final StringBuilder sBuff = new StringBuilder();
     int index = 0;
-    for (; index < this.value.length; ++index) {
+    int addxLength = Math.min(this.value.length,4);
+    for (; index < addxLength; ++index) {
       if (index > 0) {
         sBuff.append('.');
       }
