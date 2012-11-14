@@ -1,7 +1,6 @@
 /*
- * Mobility First GNRS Server
- * Copyright (C) 2012 Robert Moore and Rutgers University
- * All rights reserved.
+ * Mobility First GNRS Server Copyright (C) 2012 Robert Moore and Rutgers
+ * University All rights reserved.
  */
 package edu.rutgers.winlab.mfirst.net.ipv4udp;
 
@@ -37,7 +36,6 @@ import edu.rutgers.winlab.mfirst.net.SessionParameters;
  * implementations.
  * 
  * @author Robert Moore
- * 
  */
 public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject {
 
@@ -45,26 +43,26 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject 
    * Logging for this class.
    */
   private static final Logger LOG = LoggerFactory.getLogger(IPv4UDPNAO.class);
-  
+
   /**
    * Set of listeners for this NAO.
    */
-  private final Set<MessageListener> listeners = new ConcurrentHashSet<MessageListener>();
+  private final transient Set<MessageListener> listeners = new ConcurrentHashSet<MessageListener>();
 
   /**
    * Configuration options for this NAO.
    */
-  private Configuration config;
+  private final transient Configuration config;
 
   /**
    * SessionParameter objects for each IoSession.
    */
-  private final Map<IoSession, IPv4UDPParameters> sessionMap = new ConcurrentHashMap<IoSession, IPv4UDPParameters>();
+  private final transient Map<IoSession, IPv4UDPParameters> sessionMap = new ConcurrentHashMap<IoSession, IPv4UDPParameters>();
 
   /**
    * Incoming datagram acceptor.
    */
-  private final NioDatagramAcceptor acceptor;
+  private final transient NioDatagramAcceptor acceptor;
 
   /**
    * Creates a new instance of network access object for IPv4/UDP networking.
@@ -76,7 +74,8 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject 
    */
   public IPv4UDPNAO(final String configFilename) throws IOException {
     super();
-    if (!this.loadConfiguration(configFilename)) {
+    this.config = this.loadConfiguration(configFilename);
+    if (this.config == null){
       throw new IllegalArgumentException("Unable to load configuration file \""
           + configFilename + "\".");
     }
@@ -109,12 +108,11 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject 
    * 
    * @param filename
    *          the name of the configuration file.
-   * @return {@code true} if loading succeeds.
+   * @return the loaded configuration.
    */
-  private boolean loadConfiguration(final String filename) {
-    final XStream x = new XStream();
-    this.config = (Configuration) x.fromXML(new File(filename));
-    return true;
+  private Configuration loadConfiguration(final String filename) {
+    final XStream xStream = new XStream();
+    return (Configuration) xStream.fromXML(new File(filename));
   }
 
   @Override
@@ -123,16 +121,17 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject 
   }
 
   @Override
-  public void sendMessage(final SessionParameters parameters, final AbstractMessage message) {
+  public void sendMessage(final SessionParameters parameters,
+      final AbstractMessage message) {
     if (!(parameters instanceof IPv4UDPParameters)) {
       throw new IllegalArgumentException(
           "Not an instance of IPv4UDP networking parameters: " + parameters);
     }
 
-    final IPv4UDPParameters p = (IPv4UDPParameters) parameters;
-    final WriteFuture f = p.session.write(message);
+    final IPv4UDPParameters params = (IPv4UDPParameters) parameters;
+    final WriteFuture future = params.session.write(message);
     if (!this.config.isAscynchronousWrite()) {
-      f.awaitUninterruptibly();
+      future.awaitUninterruptibly();
     }
   }
 
@@ -142,8 +141,8 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject 
       throw new IllegalArgumentException(
           "Not an instance of IPv4UDP networking parameters: " + parameters);
     }
-    final IPv4UDPParameters p = (IPv4UDPParameters) parameters;
-    p.session.close(true);
+    final IPv4UDPParameters params = (IPv4UDPParameters) parameters;
+    params.session.close(true);
   }
 
   @Override
@@ -152,7 +151,7 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject 
   }
 
   @Override
-  public boolean isLocal(final NetworkAddress na) {
+  public boolean isLocal(final NetworkAddress netAddr) {
     // FIXME: Remote servers
     return true;
   }
@@ -168,7 +167,7 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject 
     }
 
   }
-  
+
   /*
    * MINA stuff
    */
@@ -197,10 +196,15 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject 
   public void sessionClosed(final IoSession session) {
     this.sessionMap.remove(session);
   }
-  
+
   @Override
-  public void exceptionCaught(final IoSession session, final Throwable cause){
-    LOG.error("Exception caught.",cause);
+  public void exceptionCaught(final IoSession session, final Throwable cause) {
+    LOG.error("Exception caught.", cause);
   }
- 
+
+  @Override
+  public void doShutdown() {
+    this.acceptor.dispose(true);
+  }
+
 }

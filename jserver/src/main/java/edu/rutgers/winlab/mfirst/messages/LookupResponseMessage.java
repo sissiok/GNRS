@@ -49,18 +49,18 @@ public class LookupResponseMessage extends AbstractResponseMessage {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("LKR #").append(this.getRequestId())
+    final StringBuilder sBuff = new StringBuilder("LKR #").append(this.getRequestId())
         .append("/").append(this.responseCode).append(" {");
     if (this.bindings != null) {
       for (int i = 0; i < this.bindings.length; ++i) {
         if (i > 0) {
-          sb.append(", ");
+          sBuff.append(", ");
         }
-        sb.append(this.bindings[i]);
+        sBuff.append(this.bindings[i]);
       }
     }
-    sb.append("}");
-    return sb.toString();
+    sBuff.append("}");
+    return sBuff.toString();
   }
 
   @Override

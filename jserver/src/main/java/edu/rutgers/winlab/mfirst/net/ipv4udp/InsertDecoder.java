@@ -1,7 +1,6 @@
 /*
- * Mobility First GNRS Server
- * Copyright (C) 2012 Robert Moore and Rutgers University
- * All rights reserved.
+ * Mobility First GNRS Server Copyright (C) 2012 Robert Moore and Rutgers
+ * University All rights reserved.
  */
 package edu.rutgers.winlab.mfirst.net.ipv4udp;
 
@@ -21,30 +20,34 @@ import edu.rutgers.winlab.mfirst.net.NetworkAddress;
  * Apache MINA message decoder for InsertMessage objects.
  * 
  * @author Robert Moore
- * 
  */
 public class InsertDecoder implements MessageDecoder {
 
   @Override
-  public MessageDecoderResult decodable(final IoSession session, final IoBuffer buffer) {
+  public MessageDecoderResult decodable(final IoSession session,
+      final IoBuffer buffer) {
+    MessageDecoderResult result;
     // Store the current cursor position in the buffer
     buffer.mark();
     // Need 2 bytes to check version and type
     if (buffer.remaining() < 2) {
       buffer.reset();
-      return MessageDecoderResult.NEED_DATA;
-    }
+      result = MessageDecoderResult.NEED_DATA;
+    } else {
 
-    // Skip the version number
-    // TODO: What to do with the version?
-    buffer.get();
-    final byte type = buffer.get();
-    // Reset the cursor so we don't modify the buffer data.
-    buffer.reset();
-    if (type == MessageType.INSERT.value()) {
-      return MessageDecoderResult.OK;
+      // Skip the version number
+      // TODO: What to do with the version?
+      buffer.get();
+      final byte type = buffer.get();
+      // Reset the cursor so we don't modify the buffer data.
+      buffer.reset();
+      if (type == MessageType.INSERT.value()) {
+        result = MessageDecoderResult.OK;
+      } else {
+        result = MessageDecoderResult.NOT_OK;
+      }
     }
-    return MessageDecoderResult.NOT_OK;
+    return result;
   }
 
   /*
@@ -56,9 +59,8 @@ public class InsertDecoder implements MessageDecoder {
    * org.apache.mina.filter.codec.ProtocolDecoderOutput)
    */
   @Override
-  public MessageDecoderResult decode(final IoSession session, final IoBuffer buffer,
-      final ProtocolDecoderOutput out) throws Exception {
-
+  public MessageDecoderResult decode(final IoSession session,
+      final IoBuffer buffer, final ProtocolDecoderOutput out) {
     /*
      * Common message header stuff
      */
@@ -75,7 +77,8 @@ public class InsertDecoder implements MessageDecoder {
     final int originAddrLength = buffer.getUnsignedShort();
     final byte[] originAddr = new byte[originAddrLength];
     buffer.get(originAddr);
-    final NetworkAddress originAddress = new NetworkAddress(addrType, originAddr);
+    final NetworkAddress originAddress = new NetworkAddress(addrType,
+        originAddr);
 
     final InsertMessage msg = new InsertMessage();
     msg.setVersion(version);
@@ -101,9 +104,9 @@ public class InsertDecoder implements MessageDecoder {
       final byte[] addxBytes = new byte[addxLength];
       buffer.get(addxBytes);
 
-      final NetworkAddress na = new NetworkAddress(AddressType.valueOf(addxType),
-          addxBytes);
-      bindings[i] = na;
+      final NetworkAddress netAddr = new NetworkAddress(
+          AddressType.valueOf(addxType), addxBytes);
+      bindings[i] = netAddr;
     }
     msg.setBindings(bindings);
 
@@ -115,8 +118,8 @@ public class InsertDecoder implements MessageDecoder {
   }
 
   @Override
-  public void finishDecode(final IoSession arg0, final ProtocolDecoderOutput arg1)
-      throws Exception {
+  public void finishDecode(final IoSession arg0,
+      final ProtocolDecoderOutput arg1) {
     // Nothing to do
   }
 

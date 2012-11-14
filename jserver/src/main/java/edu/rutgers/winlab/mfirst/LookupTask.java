@@ -1,7 +1,6 @@
 /*
- * Mobility First GNRS Server
- * Copyright (C) 2012 Robert Moore and Rutgers University
- * All rights reserved.
+ * Mobility First GNRS Server Copyright (C) 2012 Robert Moore and Rutgers
+ * University All rights reserved.
  */
 package edu.rutgers.winlab.mfirst;
 
@@ -22,7 +21,6 @@ import edu.rutgers.winlab.mfirst.net.SessionParameters;
  * independently of any other messages.
  * 
  * @author Robert Moore
- * 
  */
 public class LookupTask implements Callable<Object> {
   /**
@@ -77,12 +75,12 @@ public class LookupTask implements Callable<Object> {
     final LookupResponseMessage response = new LookupResponseMessage();
     response.setRequestId(this.message.getRequestId());
 
-    if (serverAddxes == null) {
+    if (serverAddxes == null || serverAddxes.isEmpty()) {
       response.setResponseCode(ResponseCode.FAILED);
     }
 
     boolean resolvedLocally = false;
-    if (serverAddxes != null) {
+    if (serverAddxes != null && !serverAddxes.isEmpty()) {
       for (final NetworkAddress addx : serverAddxes) {
         // Loopback? Then the local server should handle it.
         if (this.server.isLocalAddress(addx)) {

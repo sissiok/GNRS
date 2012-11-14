@@ -15,7 +15,7 @@ package edu.rutgers.winlab.mfirst.net;
  */
 public enum AddressType {
   /**
-   * Repersents an Internet Protocol (IP) version 4 address plus a UDP port.
+   * Represents an Internet Protocol (IP) version 4 address plus a UDP port.
    */
   INET_4_UDP(0, 6);
 
@@ -50,16 +50,17 @@ public enum AddressType {
    * Converts the provided unsigned short into an AddressType or {@code null} if
    * the type is not unrecognized.
    * 
-   * @param s
+   * @param asString
    *          the unsigned short representing the type.
    * @return an AddressType for the value, or {@code null} if none can be found
    *         that matches.
    */
-  public static AddressType valueOf(final int s) {
-    if (s == INET_4_UDP.type) {
-      return INET_4_UDP;
+  public static AddressType valueOf(final int asString) {
+    AddressType type = null;
+    if (asString == INET_4_UDP.type) {
+      type = INET_4_UDP;
     }
-    return null;
+    return type;
   }
 
   @Override

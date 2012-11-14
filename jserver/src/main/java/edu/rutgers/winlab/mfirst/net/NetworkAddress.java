@@ -81,14 +81,14 @@ public class NetworkAddress {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(this.getLength() * 2 + 4);
-    sb.append("NA(");
+    final StringBuilder sBuff = new StringBuilder(this.getLength() * 2 + 4);
+    sBuff.append("NA(");
 
     for (final byte b : this.value) {
-      sb.append(String.format("%02x", Byte.valueOf(b)));
+      sBuff.append(String.format("%02x", Byte.valueOf(b)));
     }
-    sb.append(')');
-    return sb.toString();
+    sBuff.append(')');
+    return sBuff.toString();
   }
 
   @Override
@@ -97,11 +97,14 @@ public class NetworkAddress {
   }
 
   @Override
-  public boolean equals(final Object o) {
-    if (o instanceof NetworkAddress) {
-      return this.equalsNA((NetworkAddress) o);
+  public boolean equals(final Object other) {
+    boolean equals;
+    if (other instanceof NetworkAddress) {
+      equals = this.equalsNA((NetworkAddress) other);
+    }else{
+      equals = super.equals(other);
     }
-    return super.equals(o);
+    return equals;
   }
 
   /**

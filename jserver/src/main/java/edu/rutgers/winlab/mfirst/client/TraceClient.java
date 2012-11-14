@@ -1,7 +1,6 @@
 /*
- * Mobility First GNRS Server
- * Copyright (C) 2012 Robert Moore and Rutgers University
- * All rights reserved.
+ * Mobility First GNRS Server Copyright (C) 2012 Robert Moore and Rutgers
+ * University All rights reserved.
  */
 package edu.rutgers.winlab.mfirst.client;
 
@@ -38,7 +37,6 @@ import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPAddress;
  * A simple GNRS client that sends GNRS messages based on a trace file.
  * 
  * @author Robert Moore
- * 
  */
 public class TraceClient extends IoHandlerAdapter {
 
@@ -58,9 +56,10 @@ public class TraceClient extends IoHandlerAdapter {
       return;
     }
 
-    final XStream x = new XStream();
+    final XStream xStream = new XStream();
 
-    final Configuration config = (Configuration) x.fromXML(new File(args[0]));
+    final Configuration config = (Configuration) xStream.fromXML(new File(
+        args[0]));
     LOG.debug("Loaded configuration file \"{}\".", args[0]);
 
     final File traceFile = new File(args[1]);
@@ -86,19 +85,19 @@ public class TraceClient extends IoHandlerAdapter {
   /**
    * Connector to communicate with the server.
    */
-  NioDatagramConnector connector;
+  private final transient NioDatagramConnector connector;
   /**
    * Configuration for the client.
    */
-  private final Configuration config;
+  private final transient Configuration config;
   /**
    * Trace file containing the messages to send.
    */
-  private final File traceFile;
+  private final transient File traceFile;
   /**
    * How long to wait between messages (microseconds).
    */
-  private final int delay;
+  private final transient int delay;
 
   /**
    * Creates a new client with the specified configuration file, trace file, and
@@ -121,7 +120,8 @@ public class TraceClient extends IoHandlerAdapter {
 
     this.connector = new NioDatagramConnector();
     this.connector.setHandler(this);
-    final DatagramSessionConfig sessionConfig = this.connector.getSessionConfig();
+    final DatagramSessionConfig sessionConfig = this.connector
+        .getSessionConfig();
     sessionConfig.setReuseAddress(true);
     sessionConfig.setCloseOnPortUnreachable(false);
     final DefaultIoFilterChainBuilder chain = this.connector.getFilterChain();
@@ -138,8 +138,9 @@ public class TraceClient extends IoHandlerAdapter {
    */
   public boolean connect() {
     LOG.debug("Creating connect future.");
-    final ConnectFuture connectFuture = this.connector.connect(new InetSocketAddress(
-        this.config.getServerHost(), this.config.getServerPort()));
+    final ConnectFuture connectFuture = this.connector
+        .connect(new InetSocketAddress(this.config.getServerHost(), this.config
+            .getServerPort()));
 
     connectFuture.awaitUninterruptibly();
 
@@ -147,10 +148,9 @@ public class TraceClient extends IoHandlerAdapter {
       @Override
       public void operationComplete(final ConnectFuture future) {
         if (future.isConnected()) {
-          TraceClient.LOG.info("Connected to {}", future.getSession());
+
           TraceClient.this.runTrace(future.getSession());
-          future.getSession().close(true);
-          TraceClient.this.connector.dispose(true);
+
         }
       }
 
@@ -167,28 +167,21 @@ public class TraceClient extends IoHandlerAdapter {
    * @param session
    *          the connection to the server.
    */
-  void runTrace(final IoSession session) {
+  public void runTrace(final IoSession session) {
+    LOG.info("Connected to {}", session);
     LOG.info("Starting trace from {}.", this.traceFile);
-    final BufferedReader reader = loadFile(this.traceFile);
-    if (reader == null) {
-      LOG.warn("Unable to open file reader. Aborting trace.");
-      return;
-    }
+
     String line = null;
     NetworkAddress fromAddress = null;
     try {
+      final BufferedReader reader = new BufferedReader(new FileReader(
+          this.traceFile));
       fromAddress = IPv4UDPAddress.fromASCII(this.config.getClientHost() + ":"
           + this.config.getClientPort());
-    } catch (final UnsupportedEncodingException uee) {
-      LOG.error(
-          "Unable to parse local host name from configuration parameter.", uee);
-      return;
-    }
 
-    try {
       while ((line = reader.readLine()) != null) {
         line = line.trim();
-        if (line.length() == 0 || line.startsWith("#")) {
+        if (line.length() == 0 || line.charAt(0) == '#') {
           continue;
         }
 
@@ -217,68 +210,106 @@ public class TraceClient extends IoHandlerAdapter {
         // Ignored?
       }
       reader.close();
+    } catch (final UnsupportedEncodingException uee) {
+      LOG.error(
+          "Unable to parse local host name from configuration parameter.", uee);
+      return;
     } catch (final IOException ioe) {
       LOG.error("Exception occurred while reading trace file.", ioe);
+
     }
+    session.close(true);
+    this.connector.dispose(true);
   }
 
   /**
    * Parses a message from the trace file.
    * 
-   * @param s
+   * @param asString
    *          a line from the trace file.
    * @return the parsed message, or {@code null} if none was parsed.
    */
-  public static AbstractMessage parseMessage(final String s) {
-    LOG.debug("Parsing \"{}\"", s);
+  public static AbstractMessage parseMessage(final String asString) {
+    LOG.debug("Parsing \"{}\"", asString);
     // Extract any comments and discard
-    final String line = s.split("#")[0];
+    final String line = asString.split("#")[0];
+    AbstractMessage msg = null;
 
     final String[] generalComponents = line.split("\\s+");
-    if (generalComponents.length < 3) {
+    if (generalComponents.length >= 3) {
+
+      // Sequence number
+      final int sequenceNumber = Integer.parseInt(generalComponents[0]);
+      // Type
+      final MessageType type = MessageType.parseType(generalComponents[1]);
+      // GUID
+      GUID guid = null;
+      try {
+        guid = GUID.fromASCII(generalComponents[2]);
+
+        switch (type) {
+        case INSERT: {
+          msg = parseInsertMessage(guid, sequenceNumber, generalComponents);
+          break;
+        }
+        case LOOKUP: {
+          final LookupMessage lookMsg = new LookupMessage();
+          msg = lookMsg;
+          lookMsg.setGuid(guid);
+          lookMsg.setRequestId(sequenceNumber);
+          break;
+        }
+        default:
+          LOG.error("Unknown message type {}", type);
+          break;
+        }
+      } catch (final UnsupportedEncodingException uee) {
+        LOG.error("Unable to parse GUID value from string.", uee);
+      }
+    } else {
       LOG.error("Not enough components to parse from the line {}.",
           Integer.valueOf(generalComponents.length));
-      return null;
     }
+    return msg;
+  }
 
-    // Sequence number
-    final int sequenceNumber = Integer.parseInt(generalComponents[0]);
-    // Type
-    final MessageType type = MessageType.parseType(generalComponents[1]);
-    // GUID
-    GUID guid = null;
-    try {
-      guid = GUID.fromASCII(generalComponents[2]);
-    } catch (final UnsupportedEncodingException uee) {
-      LOG.error("Unable to parse GUID value from string.", uee);
-      return null;
-    }
-    AbstractMessage msg = null;
-    switch (type) {
-    case INSERT: {
-      // Make sure there is something to split
-      if (generalComponents.length < 4) {
-        LOG.error("Missing GUID binding value.");
-        break;
-      }
+  /**
+   * Parses an Insert message from a trace file line.
+   * 
+   * @param guid
+   *          the GUID for the message.
+   * @param sequenceNumber
+   *          the sequence number for the message
+   * @param generalComponents
+   *          the split line from the file.
+   * @return an Insert Message parsed from the line, or {@code null} if parsing
+   *         failed.
+   */
+  private static InsertMessage parseInsertMessage(final GUID guid,
+      final int sequenceNumber, final String[] generalComponents) {
+    InsertMessage msg = null;
+    // Make sure there is something to split
+    if (generalComponents.length < 4) {
+      LOG.error("Missing GUID binding value.");
+
+    } else {
 
       final String[] bindingValues = generalComponents[3].split(",");
       if (bindingValues.length % 3 != 0) {
         LOG.error("Binding values are not a multiple of 3: {}",
             Integer.valueOf(bindingValues.length));
-        break;
       }
       final NetworkAddress[] bindings = new NetworkAddress[bindingValues.length / 3];
       for (int i = 0; i < bindings.length; ++i) {
-        NetworkAddress na = null;
+        NetworkAddress netAddr = null;
         try {
-          na = IPv4UDPAddress.fromASCII(bindingValues[0]);
+          netAddr = IPv4UDPAddress.fromASCII(bindingValues[0]);
         } catch (final UnsupportedEncodingException uee) {
           LOG.error("Unable to parse network address from ASCII string.", uee);
           break;
         }
 
-        bindings[i] = na;
+        bindings[i] = netAddr;
 
       }
 
@@ -287,37 +318,8 @@ public class TraceClient extends IoHandlerAdapter {
       insMsg.setBindings(bindings);
       insMsg.setGuid(guid);
       insMsg.setRequestId(sequenceNumber);
-      break;
-    }
-    case LOOKUP: {
-      final LookupMessage lookMsg = new LookupMessage();
-      msg = lookMsg;
-      lookMsg.setGuid(guid);
-      lookMsg.setRequestId(sequenceNumber);
-      break;
-    }
-    default:
-      LOG.error("Unknown message type {}", type);
     }
     return msg;
-  }
-
-  /**
-   * Wrapper to load files without throwing an exception.
-   * 
-   * @param file
-   *          the file to load into a reader.
-   * @return the BufferedReader for the loaded file, or {@code null} if an
-   *         exception occurred.
-   */
-  private BufferedReader loadFile(final File file) {
-    try {
-      final BufferedReader reader = new BufferedReader(new FileReader(file));
-      return reader;
-    } catch (final Exception e) {
-      LOG.error("Unable to load file for reading.", e);
-      return null;
-    }
   }
 
   @Override

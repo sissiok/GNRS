@@ -1,7 +1,6 @@
 /*
- * Mobility First GNRS Server
- * Copyright (C) 2012 Robert Moore and Rutgers University
- * All rights reserved.
+ * Mobility First GNRS Server Copyright (C) 2012 Robert Moore and Rutgers
+ * University All rights reserved.
  */
 package edu.rutgers.winlab.mfirst.messages;
 
@@ -10,7 +9,6 @@ package edu.rutgers.winlab.mfirst.messages;
  * message types.
  * 
  * @author Robert Moore
- * 
  */
 public enum MessageType {
   /**
@@ -79,9 +77,8 @@ public enum MessageType {
 
   /**
    * Parses a string and converts it to an appropriate MessageType, or the
-   * UNKNOWN type if the String value is incompatible or invalid.
-   * 
-   * Valid type values are:
+   * UNKNOWN type if the String value is incompatible or invalid. Valid type
+   * values are:
    * <ul>
    * <li>"I" for insert</li>
    * <li>"Q" for query</li>
@@ -95,19 +92,18 @@ public enum MessageType {
    *         appropriate.
    */
   public static MessageType parseType(final String asString) {
-    if (asString == null) {
-      return UNKNOWN;
-    }
+    MessageType type;
     if ("I".equalsIgnoreCase(asString)) {
-      return INSERT;
+      type = INSERT;
     } else if ("Q".equalsIgnoreCase(asString)) {
-      return LOOKUP;
+      type = LOOKUP;
     } else if ("A".equalsIgnoreCase(asString)) {
-      return INSERT_RESPONSE;
+      type = INSERT_RESPONSE;
     } else if ("R".equalsIgnoreCase(asString)) {
-      return LOOKUP_RESPONSE;
+      type = LOOKUP_RESPONSE;
     } else {
-      return UNKNOWN;
+      type = UNKNOWN;
     }
+    return type;
   }
 }

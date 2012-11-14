@@ -1,7 +1,6 @@
 /*
- * Mobility First GNRS Server
- * Copyright (C) 2012 Robert Moore and Rutgers University
- * All rights reserved.
+ * Mobility First GNRS Server Copyright (C) 2012 Robert Moore and Rutgers
+ * University All rights reserved.
  */
 package edu.rutgers.winlab.mfirst.storage.bdb;
 
@@ -30,7 +29,6 @@ import edu.rutgers.winlab.mfirst.storage.GUIDStore;
  * and on-disk persistent storage.
  * 
  * @author Robert Moore
- * 
  */
 public class BerkeleyDBStore implements GUIDStore {
 
@@ -38,23 +36,23 @@ public class BerkeleyDBStore implements GUIDStore {
    * TimerTask for reporting BerkeleyDB-related statistics.
    * 
    * @author Robert Moore
-   * 
    */
   private static final class StatsTask extends TimerTask {
     /**
      * Logging for reporting statistics.
      */
-    private static final Logger LOG_STATS = LoggerFactory.getLogger(StatsTask.class);
+    private static final Logger LOG_STATS = LoggerFactory
+        .getLogger(StatsTask.class);
 
     /**
      * BerkeleyDB environment.
      */
-    private final Environment env;
+    private final transient Environment env;
 
     /**
      * Previous cache miss value.
      */
-    private long lastCacheMiss = 0l;
+    private transient long lastCacheMiss = 0l;
 
     /**
      * Creates a new task for the provided BerkeleyDB environment.
@@ -71,7 +69,7 @@ public class BerkeleyDBStore implements GUIDStore {
     public void run() {
       final long newCacheMiss = this.env.getStats(null).getNCacheMiss();
       LOG_STATS.info("BDB Cache Misses: {}",
-          (Long.valueOf(newCacheMiss - this.lastCacheMiss)));
+          Long.valueOf(newCacheMiss - this.lastCacheMiss));
       this.lastCacheMiss = newCacheMiss;
     }
   }
@@ -83,44 +81,29 @@ public class BerkeleyDBStore implements GUIDStore {
       .getLogger(BerkeleyDBStore.class);
 
   /**
-   * Configuration parameters for this GUID store.
-   */
-  private final Configuration config;
-
-  /**
-   * Berkeley DB environment configuration.
-   */
-  private final EnvironmentConfig bdbEnvConfig;
-
-  /**
    * Berkkeley DB environment for this instance.
    */
-  private final Environment bdbEnvironment;
-
-  /**
-   * Berkeley DB store configuration.
-   */
-  private final StoreConfig bdbStoreConfig;
+  private final transient Environment bdbEnvironment;
 
   /**
    * The Berkeley DB store object.
    */
-  private final EntityStore bdbStore;
+  private final transient EntityStore bdbStore;
 
   /**
    * Reference back to the server instance.
    */
-  private final GNRSServer server;
+  private final transient GNRSServer server;
 
   /**
    * Timer task for recording BerkeleyDB-related statistics.
    */
-  private StatsTask statsTask;
+  private transient StatsTask statsTask;
 
   /**
    * Primary index (GUID) for interacting with the BDB store.
    */
-  private final PrimaryIndex<BDBGUID, BDBRecord> primaryIndex;
+  private final transient PrimaryIndex<BDBGUID, BDBRecord> primaryIndex;
 
   /**
    * Creates a new GUID Store using a Berkeley DB to back it.
@@ -135,9 +118,10 @@ public class BerkeleyDBStore implements GUIDStore {
   public BerkeleyDBStore(final String configFileName, final GNRSServer server)
       throws DatabaseException {
     super();
-    final XStream x = new XStream();
-    this.config = (Configuration) x.fromXML(new File(configFileName));
-    final File bdbEnvDir = new File(this.config.getPathToFiles());
+    final XStream xStream = new XStream();
+    final Configuration config = (Configuration) xStream.fromXML(new File(
+        configFileName));
+    final File bdbEnvDir = new File(config.getPathToFiles());
     if (!bdbEnvDir.exists()) {
       if (bdbEnvDir.isFile()) {
         LOG.error(
@@ -162,27 +146,20 @@ public class BerkeleyDBStore implements GUIDStore {
 
     this.server = server;
 
-    this.bdbEnvConfig = new EnvironmentConfig();
-    this.bdbEnvConfig.setAllowCreate(true);
-    try {
-      this.bdbEnvConfig.setCacheSize(this.config.getCacheSizeMiB() * 1048576);
-    } catch (final IllegalArgumentException iae) {
-      LOG.error(
-          String
-              .format(
-                  "Unable to allocate cache of size %,d. Using 10% of available memory instead.",
-                  Integer.valueOf(this.config.getCacheSizeMiB())), iae);
-    }
-    // Open/create the DB environment
-    this.bdbEnvironment = new Environment(
-        new File(this.config.getPathToFiles()), this.bdbEnvConfig);
+    final EnvironmentConfig bdbEnvConfig = new EnvironmentConfig();
+    bdbEnvConfig.setAllowCreate(true);
+    bdbEnvConfig.setCacheSize(config.getCacheSizeMiB() * 1048576);
 
-    this.bdbStoreConfig = new StoreConfig();
-    this.bdbStoreConfig.setAllowCreate(true);
+    // Open/create the DB environment
+    this.bdbEnvironment = new Environment(new File(config.getPathToFiles()),
+        bdbEnvConfig);
+
+    final StoreConfig bdbStoreConfig = new StoreConfig();
+    bdbStoreConfig.setAllowCreate(true);
 
     // Open/create the actual data store
     this.bdbStore = new EntityStore(this.bdbEnvironment, "GNRS GUIDStore",
-        this.bdbStoreConfig);
+        bdbStoreConfig);
 
     // Retrieve the primary index
     this.primaryIndex = this.bdbStore.getPrimaryIndex(BDBGUID.class,
@@ -204,31 +181,19 @@ public class BerkeleyDBStore implements GUIDStore {
 
   @Override
   public boolean appendBindings(final GUID guid, final GUIDBinding... bindings) {
-    // Nothing to append, nothing to do
-    if (bindings == null) {
-      return true;
-    }
+    boolean success;
     final BDBGUID theGuid = BDBGUID.fromGUID(guid);
     // Retrieve the current value
     BDBRecord record = this.primaryIndex.get(theGuid);
     BDBGUIDBinding[] newBindings = null;
 
     // If the current value exists, extend it
-    if (record != null) {
-
-      // No bindings? This isn't good!
-      if (record.bindings != null) {
-        newBindings = new BDBGUIDBinding[record.bindings.length
-            + bindings.length];
-        System.arraycopy(record.bindings, 0, newBindings, 0,
-            record.bindings.length);
-      }
-
-    }
-
-    // If there wasn't a current binding, start fresh
-    if (newBindings == null) {
+    if (record == null || record.bindings == null) {
       newBindings = new BDBGUIDBinding[bindings.length];
+    } else {
+      newBindings = new BDBGUIDBinding[record.bindings.length + bindings.length];
+      System.arraycopy(record.bindings, 0, newBindings, 0,
+          record.bindings.length);
     }
 
     int offset = newBindings.length - bindings.length;
@@ -247,21 +212,21 @@ public class BerkeleyDBStore implements GUIDStore {
     record.bindings = newBindings;
     try {
       this.primaryIndex.put(record);
+      success = true;
     } catch (final DatabaseException dbe) {
       LOG.error("Unable to append binding in Berkeley DB store.", dbe);
-      return false;
+      success = false;
     }
-    return true;
+    return success;
   }
 
   @Override
   public void doInit() {
-    if (this.server != null) {
-      if (this.server.getStatsTimer() != null) {
-        this.statsTask = new StatsTask(this.bdbEnvironment);
-        this.server.getStatsTimer().scheduleAtFixedRate(this.statsTask, 10000l,
-            10000l);
-      }
+    if (this.server != null && this.server.getStatsTimer() != null) {
+      this.statsTask = new StatsTask(this.bdbEnvironment);
+      this.server.getStatsTimer().scheduleAtFixedRate(this.statsTask, 10000l,
+          10000l);
+
     }
 
   }
@@ -272,7 +237,6 @@ public class BerkeleyDBStore implements GUIDStore {
       this.statsTask.cancel();
     }
 
-    // TODO: Close database
     try {
       if (this.bdbStore != null) {
         this.bdbStore.close();
@@ -296,29 +260,31 @@ public class BerkeleyDBStore implements GUIDStore {
 
   @Override
   public boolean replaceBindings(final GUID guid, final GUIDBinding... bindings) {
-
+    boolean success;
     // Nothing to replace with, so just delete
     if (bindings == null) {
       this.primaryIndex.delete(BDBGUID.fromGUID(guid));
-      return true;
-    }
+      success = true;
+    } else {
 
-    final BDBGUIDBinding[] newBindings = new BDBGUIDBinding[bindings.length];
-    for (int i = 0; i < bindings.length; ++i) {
-      newBindings[i] = BDBGUIDBinding.fromGUIDBinding(bindings[i]);
-    }
+      final BDBGUIDBinding[] newBindings = new BDBGUIDBinding[bindings.length];
+      for (int i = 0; i < bindings.length; ++i) {
+        newBindings[i] = BDBGUIDBinding.fromGUIDBinding(bindings[i]);
+      }
 
-    final BDBRecord record = new BDBRecord();
-    record.guid = BDBGUID.fromGUID(guid);
-    record.bindings = newBindings;
+      final BDBRecord record = new BDBRecord();
+      record.guid = BDBGUID.fromGUID(guid);
+      record.bindings = newBindings;
 
-    try {
-      this.primaryIndex.put(record);
-    } catch (final DatabaseException dbe) {
-      LOG.error("Unable to append binding in Berkeley DB store.", dbe);
-      return false;
+      try {
+        this.primaryIndex.put(record);
+        success = true;
+      } catch (final DatabaseException dbe) {
+        LOG.error("Unable to append binding in Berkeley DB store.", dbe);
+        success = false;
+      }
     }
-    return true;
+    return success;
   }
 
 }

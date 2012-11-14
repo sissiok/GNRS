@@ -218,7 +218,7 @@ public class GNRSServer implements MessageListener {
    * 
    * @return {@code true} if everything starts correctly.
    */
-  
+
   public boolean startup() {
 
     if (this.collectStatistics) {
@@ -246,8 +246,9 @@ public class GNRSServer implements MessageListener {
       } catch (final IOException ioe) {
         LOG.error("Unable to create IPv4/UDP network access.", ioe);
       }
+    } else {
+      LOG.error("Unrecognized networking type: {}", config.getNetworkType());
     }
-    LOG.error("Unrecognized networking type: {}", config.getNetworkType());
     return netAccess;
   }
 
@@ -268,8 +269,9 @@ public class GNRSServer implements MessageListener {
       } catch (final IOException ioe) {
         LOG.error("Unable to create IPv4/UDP GUID mapper.", ioe);
       }
+    } else {
+      LOG.error("Unrecognized networking type: {}", config.getNetworkType());
     }
-    LOG.error("Unrecognized networking type: {}", config.getNetworkType());
     return mapper;
 
   }
@@ -287,8 +289,9 @@ public class GNRSServer implements MessageListener {
       store = new BerkeleyDBStore(config.getStoreConfiguration(), this);
     } else if ("simple".equalsIgnoreCase(config.getStoreType())) {
       store = new SimpleGUIDStore();
+    } else {
+      LOG.error("Unrecognized store type: {}", config.getStoreType());
     }
-    LOG.error("Unrecognized store type: {}", config.getStoreType());
     return store;
   }
 
@@ -333,6 +336,7 @@ public class GNRSServer implements MessageListener {
    */
   public boolean appendBindings(final GUID guid,
       final NetworkAddress... addresses) {
+
     GUIDBinding binding = null;
     for (final NetworkAddress a : addresses) {
       binding = new GUIDBinding();

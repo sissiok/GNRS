@@ -21,7 +21,7 @@ public class LookupEncoder implements MessageEncoder<LookupMessage> {
 
   @Override
   public void encode(final IoSession session, final LookupMessage message,
-      final ProtocolEncoderOutput out) throws Exception {
+      final ProtocolEncoderOutput out)  {
     final IoBuffer buff = IoBuffer.allocate(message.getMessageLength());
 
     // Generic request stuff

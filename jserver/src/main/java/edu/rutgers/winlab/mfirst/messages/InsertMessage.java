@@ -86,19 +86,19 @@ public class InsertMessage extends AbstractMessage {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("INS #");
-    sb.append(this.getRequestId()).append(' ').append(this.guid)
+    final StringBuilder sBuff = new StringBuilder("INS #");
+    sBuff.append(this.getRequestId()).append(' ').append(this.guid)
         .append(" -> {");
     if (this.bindings != null) {
       for (int i = 0; i < this.bindings.length; ++i) {
         if (i > 0) {
-          sb.append(", ");
+          sBuff.append(", ");
         }
-        sb.append(this.bindings[i]);
+        sBuff.append(this.bindings[i]);
       }
     }
-    sb.append("}");
-    return sb.toString();
+    sBuff.append("}");
+    return sBuff.toString();
   }
 
   @Override

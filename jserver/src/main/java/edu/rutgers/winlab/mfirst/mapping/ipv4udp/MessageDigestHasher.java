@@ -1,7 +1,6 @@
 /*
- * Mobility First GNRS Server
- * Copyright (C) 2012 Robert Moore and Rutgers University
- * All rights reserved.
+ * Mobility First GNRS Server Copyright (C) 2012 Robert Moore and Rutgers
+ * University All rights reserved.
  */
 package edu.rutgers.winlab.mfirst.mapping.ipv4udp;
 
@@ -10,6 +9,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,15 +25,12 @@ import edu.rutgers.winlab.mfirst.net.NetworkAddress;
  * bytes of that digest have been consumed, then the GUID value is fed back into
  * the algorithm along with the MD5 output of the first hash. That digest is
  * then used, and so on until enough network addresses have been generated.
- * 
  * Please refer to the Java documentation for a <a href=
  * "http://docs.oracle.com/javase/6/docs/technotes/guides/security/StandardNames.html#MessageDigest"
  * >list of standard algorithms</a> available. Note that not all algorithms are
  * available on all JVM implementations.
  * 
  * @author Robert Moore
- * 
- * 
  */
 public class MessageDigestHasher implements GUIDHasher {
 
@@ -46,12 +43,50 @@ public class MessageDigestHasher implements GUIDHasher {
   /**
    * Name of the algorithm to use.
    */
-  final String algorithmName;
+  private final transient String algorithmName;
 
   /**
    * Thread-specific set of message digest objects.
    */
-  private ThreadLocal<MessageDigest> localDigest;
+  private final transient ThreadLocal<MessageDigest> localDigest;
+
+  /**
+   * Thread-specific message digest for hashing.
+   * @author Robert Moore
+   *
+   */
+  private static final class MessageDigestThreadLocal extends
+      ThreadLocal<MessageDigest> {
+    
+    /**
+     * Error logger.
+     */
+    private static final Logger ERROR_LOG = LoggerFactory.getLogger(MessageDigestThreadLocal.class);
+    /**
+     * Message digest algorithm name.
+     */
+    private final transient String algorithmName;
+
+    /**
+     * The name of the message digest algorithm to use.
+     * @param algorithmName
+     */
+    public MessageDigestThreadLocal(final String algorithmName) {
+      super();
+      this.algorithmName = algorithmName;
+    }
+
+    @Override
+    public MessageDigest initialValue() {
+      MessageDigest digest = null;
+      try {
+        digest = MessageDigest.getInstance(this.algorithmName);
+      } catch (final NoSuchAlgorithmException nsae) {
+        ERROR_LOG.error("Unable to create message digest from algorithm {}.", nsae);
+      }
+      return digest;
+    }
+  }
 
   /**
    * Creates a new message digest-based hashing object.
@@ -61,19 +96,9 @@ public class MessageDigestHasher implements GUIDHasher {
    */
   public MessageDigestHasher(final String algorithmName) {
     super();
-    this.algorithmName = algorithmName.toUpperCase();
+    this.algorithmName = algorithmName.toUpperCase(Locale.getDefault());
     // Create a new MessageDigest for each thread.
-    this.localDigest = new ThreadLocal<MessageDigest>() {
-      @Override
-      public MessageDigest initialValue() {
-        try {
-          return MessageDigest
-              .getInstance(MessageDigestHasher.this.algorithmName);
-        } catch (final NoSuchAlgorithmException nsae) {
-          return null;
-        }
-      }
-    };
+    this.localDigest = new MessageDigestThreadLocal(this.algorithmName);
   }
 
   @Override
@@ -86,37 +111,38 @@ public class MessageDigestHasher implements GUIDHasher {
     if (digest == null) {
       LOG.error("Unable to hash because \"{}\" is not supported.",
           this.algorithmName);
-      return null;
+    } else {
+      final int digestBytes = digest.getDigestLength();
+      // Figure out how many bytes we need to buffer for our network addresses
+      final int numberDigests = (int) Math.ceil((type.getMaxLength()
+          * numAddresses * 1f)
+          / digestBytes);
+      final ByteBuffer buffer = ByteBuffer
+          .allocate(numberDigests * digestBytes);
+
+      // Initializes values to 0
+      byte[] previousDigest = new byte[digestBytes];
+
+      // Generate some bytes!
+      for (int i = 0; i < numberDigests; ++i) {
+        digest.update(guid.getBinaryForm());
+        digest.update(previousDigest);
+        previousDigest = digest.digest();
+        buffer.put(previousDigest);
+      }
+
+      // Prepare the buffer for reading
+      buffer.flip();
+
+      // Generate the addresses and put them in the collection
+      for (int i = 0; i < numAddresses; ++i) {
+
+        final byte[] bytes = new byte[type.getMaxLength()];
+        buffer.get(bytes);
+        final NetworkAddress netAddr = new NetworkAddress(type, bytes);
+        addresses.add(netAddr);
+      }
     }
-    final int digestBytes = digest.getDigestLength();
-    // Figure out how many bytes we need to buffer for our network addresses
-    final int numberDigests = (int) Math
-        .ceil((type.getMaxLength() * numAddresses * 1f) / digestBytes);
-    final ByteBuffer buffer = ByteBuffer.allocate(numberDigests * digestBytes);
-
-    // Initializes values to 0
-    byte[] previousDigest = new byte[digestBytes];
-
-    // Generate some bytes!
-    for (int i = 0; i < numberDigests; ++i) {
-      digest.update(guid.getBinaryForm());
-      digest.update(previousDigest);
-      previousDigest = digest.digest();
-      buffer.put(previousDigest);
-    }
-
-    // Prepare the buffer for reading
-    buffer.flip();
-
-    // Generate the addresses and put them in the collection
-    for (int i = 0; i < numAddresses; ++i) {
-      
-      final byte[] bytes = new byte[type.getMaxLength()];
-      buffer.get(bytes);
-      final NetworkAddress na = new NetworkAddress(type,bytes);
-      addresses.add(na);
-    }
-
     return addresses;
   }
 

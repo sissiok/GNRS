@@ -1,7 +1,6 @@
 /*
- * Mobility First GNRS Server
- * Copyright (C) 2012 Robert Moore and Rutgers University
- * All rights reserved.
+ * Mobility First GNRS Server Copyright (C) 2012 Robert Moore and Rutgers
+ * University All rights reserved.
  */
 package edu.rutgers.winlab.mfirst.net.ipv4udp;
 
@@ -21,35 +20,38 @@ import edu.rutgers.winlab.mfirst.net.NetworkAddress;
  * Apache MINA message decoder for Lookup messages.
  * 
  * @author Robert Moore
- * 
  */
 public class LookupDecoder implements MessageDecoder {
 
-  
   @Override
-  public MessageDecoderResult decodable(final IoSession session, final IoBuffer buffer) {
+  public MessageDecoderResult decodable(final IoSession session,
+      final IoBuffer buffer) {
+    MessageDecoderResult result;
     // Store the current cursor position in the buffer
     buffer.mark();
     // Need 5 bytes to check request ID and type
     if (buffer.remaining() < 2) {
-      return MessageDecoderResult.NEED_DATA;
-    }
+      result = MessageDecoderResult.NEED_DATA;
+    } else {
 
-    // Skip the version
-    // TODO: What to do with version?
-    buffer.get();
-    final byte type = buffer.get();
-    // Reset the cursor so we don't modify the buffer data.
-    buffer.reset();
-    if (type == MessageType.LOOKUP.value()) {
-      return MessageDecoderResult.OK;
+      // Skip the version
+      // TODO: What to do with version?
+      buffer.get();
+      final byte type = buffer.get();
+      // Reset the cursor so we don't modify the buffer data.
+      buffer.reset();
+      if (type == MessageType.LOOKUP.value()) {
+        result = MessageDecoderResult.OK;
+      } else {
+        result = MessageDecoderResult.NOT_OK;
+      }
     }
-    return MessageDecoderResult.NOT_OK;
+    return result;
   }
 
   @Override
-  public MessageDecoderResult decode(final IoSession session, final IoBuffer buffer,
-      final ProtocolDecoderOutput out) throws Exception {
+  public MessageDecoderResult decode(final IoSession session,
+      final IoBuffer buffer, final ProtocolDecoderOutput out)  {
     /*
      * Common message header stuff
      */
@@ -66,13 +68,14 @@ public class LookupDecoder implements MessageDecoder {
     final int originAddrLength = buffer.getUnsignedShort();
     final byte[] originAddr = new byte[originAddrLength];
     buffer.get(originAddr);
-    final NetworkAddress originAddress = new NetworkAddress(addrType, originAddr);
+    final NetworkAddress originAddress = new NetworkAddress(addrType,
+        originAddr);
 
     final LookupMessage msg = new LookupMessage();
     msg.setVersion(version);
     msg.setRequestId(requestId);
     msg.setOriginAddress(originAddress);
-    
+
     // Lookup-specific stuff
     final byte[] guidBytes = new byte[GUID.SIZE_OF_GUID];
     buffer.get(guidBytes);
@@ -91,8 +94,8 @@ public class LookupDecoder implements MessageDecoder {
   }
 
   @Override
-  public void finishDecode(final IoSession arg0, final ProtocolDecoderOutput arg1)
-      throws Exception {
+  public void finishDecode(final IoSession arg0,
+      final ProtocolDecoderOutput arg1) {
     // Nothing to do. No state kept.
   }
 

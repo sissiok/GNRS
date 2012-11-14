@@ -1,7 +1,6 @@
 /*
- * Mobility First GNRS Server
- * Copyright (C) 2012 Robert Moore and Rutgers University
- * All rights reserved.
+ * Mobility First GNRS Server Copyright (C) 2012 Robert Moore and Rutgers
+ * University All rights reserved.
  */
 package edu.rutgers.winlab.mfirst.net.ipv4udp;
 
@@ -22,7 +21,6 @@ import edu.rutgers.winlab.mfirst.net.NetworkAddress;
  * NetworkAddress convenience class for IPv4+UDP networking.
  * 
  * @author Robert Moore
- * 
  */
 public class IPv4UDPAddress extends NetworkAddress {
   /**
@@ -48,39 +46,41 @@ public class IPv4UDPAddress extends NetworkAddress {
    * stored in the bytes field. The resulting Network Address will be truncated
    * or padded with zeros as necessary.
    * 
-   * @param s
+   * @param asString
    *          the String to convert.
    * @return a Network Address with the value of the String
    * @throws UnsupportedEncodingException
    *           if the String cannot be decoded to ASCII characters
    */
-  public static IPv4UDPAddress fromASCII(final String s)
+  public static IPv4UDPAddress fromASCII(final String asString)
       throws UnsupportedEncodingException {
-    if (s == null || s.length() == 0) {
-      return null;
+    IPv4UDPAddress address = null;
+    if (asString == null || asString.length() == 0) {
+      LOG.warn("Trying to create an IPv4/UDP address from an empty/null String.");
+    } else {
+      try {
+        final String[] components = asString.split(":");
+
+        InetAddress inet;
+
+        inet = InetAddress.getByName(components[0]);
+
+        int port = GNRSServer.DEFAULT_PORT;
+        if (components.length > 1) {
+          port = Short.parseShort(components[1]);
+        }
+
+        final byte[] newValue = new byte[AddressType.INET_4_UDP.getMaxLength()];
+        System.arraycopy(inet.getAddress(), 0, newValue, 0, 4);
+        newValue[newValue.length - 2] = (byte) (port >> 8);
+        newValue[newValue.length - 1] = (byte) port;
+
+        address = new IPv4UDPAddress(newValue);
+      } catch (final UnknownHostException e) {
+        LOG.error("Unable to parse IPv4 address.", e);
+      }
     }
-
-    final String[] components = s.split(":");
-
-    InetAddress inet;
-    try {
-      inet = InetAddress.getByName(components[0]);
-    } catch (final UnknownHostException e) {
-      LOG.error("Unable to parse IPv4 address.", e);
-      return null;
-    }
-
-    int port = GNRSServer.DEFAULT_PORT;
-    if (components.length > 1) {
-      port = Short.parseShort(components[1]);
-    }
-
-    final byte[] newValue = new byte[AddressType.INET_4_UDP.getMaxLength()];
-    System.arraycopy(inet.getAddress(), 0, newValue, 0, 4);
-    newValue[newValue.length - 2] = (byte) (port >> 8);
-    newValue[newValue.length - 1] = (byte) port;
-
-    return new IPv4UDPAddress(newValue);
+    return address;
   }
 
   /**
@@ -88,17 +88,17 @@ public class IPv4UDPAddress extends NetworkAddress {
    * bytes of the integer value are copied into the high bytes (index 0-3) of
    * the network address.
    * 
-   * @param i
+   * @param intValue
    *          the integer to create an address from.
    * @return the created network address.
    */
-  public static IPv4UDPAddress fromInteger(final int i) {
+  public static IPv4UDPAddress fromInteger(final int intValue) {
 
     final byte[] newValue = new byte[AddressType.INET_4_UDP.getMaxLength()];
-    newValue[0] = (byte) (i >> 24);
-    newValue[1] = (byte) (i >> 16);
-    newValue[2] = (byte) (i >> 8);
-    newValue[3] = (byte) (i);
+    newValue[0] = (byte) (intValue >> 24);
+    newValue[1] = (byte) (intValue >> 16);
+    newValue[2] = (byte) (intValue >> 8);
+    newValue[3] = (byte) (intValue);
 
     return new IPv4UDPAddress(newValue);
   }
@@ -108,28 +108,30 @@ public class IPv4UDPAddress extends NetworkAddress {
    * 
    * @param addr
    *          the network to convert
-   * 
    * @return an InetSocketAddress representing the same IP and port combination
    *         as the NetworkAddress, or {@code null} if an error occurs during
    *         conversion.
    */
   public static InetSocketAddress toSocketAddr(final NetworkAddress addr) {
+    InetSocketAddress retAddr = null;
     final byte[] value = addr.getValue();
     if (value == null) {
       LOG.error("Unable to create InetSocketAddress from null bytes.");
-      return null;
-    }
-    try {
-      // Last two bytes are the port
-      final int port = ((value[value.length - 2] << 8) | value[value.length - 1]) & 0xFFFF;
-      // First 4 bytes are the IP address
-      return new InetSocketAddress(InetAddress.getByAddress(Arrays.copyOf(
-          value, 4)), port);
+    } else {
+      try {
+        // Last two bytes are the port
 
-    } catch (final UnknownHostException e) {
-      LOG.error("Could not create InetSocketAddress from NetworkAddress.", e);
-      return null;
+        final int port = ((value[value.length - 2] << 8) | value[value.length - 1]) & 0xFFFF;
+        // First 4 bytes are the IP address
+        retAddr = new InetSocketAddress(InetAddress.getByAddress(Arrays.copyOf(
+            value, 4)), port);
+
+      } catch (final UnknownHostException e) {
+        LOG.error("Could not create InetSocketAddress from NetworkAddress.", e);
+
+      }
     }
+    return retAddr;
   }
 
   /**
@@ -154,22 +156,22 @@ public class IPv4UDPAddress extends NetworkAddress {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(Integer.toString(this.value[0] & 0xFF));
-    sb.append('.');
-    sb.append(Integer
-        .toString(this.value.length > 1 ? this.value[1] & 0xFF : 0));
-    sb.append('.');
-    sb.append(Integer
-        .toString(this.value.length > 2 ? this.value[2] & 0xFF : 0));
-    sb.append('.');
-    sb.append(Integer
-        .toString(this.value.length > 3 ? this.value[3] & 0xFF : 0));
+    final StringBuilder sBuff = new StringBuilder();
+    int index = 0;
+    for (; index < this.value.length; ++index) {
+      if (index > 0) {
+        sBuff.append('.');
+      }
+      sBuff.append(Integer.toString(this.value[index] & 0xFF));
+    }
+    for (; index < 4; ++index) {
+      sBuff.append('.').append('0');
+    }
     if (this.value.length > 4) {
-      sb.append(':');
-      sb.append(Integer
+      sBuff.append(':');
+      sBuff.append(Integer
           .toString(((this.value[4] << 8) | (this.value[5] & 0xFF)) & 0xFFFF));
     }
-    return sb.toString();
+    return sBuff.toString();
   }
 }

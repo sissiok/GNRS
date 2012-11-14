@@ -25,7 +25,7 @@ public class LookupResponseEncoder implements
   
   @Override
   public void encode(final IoSession session, final LookupResponseMessage message,
-      final ProtocolEncoderOutput out) throws Exception {
+      final ProtocolEncoderOutput out) {
     
     // Common Response stuff
     final IoBuffer buffer = IoBuffer.allocate(message.getMessageLength());
