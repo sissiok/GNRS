@@ -33,7 +33,7 @@ public class InsertMessageTest {
       0x13 };
 
   public static final String STRING_INIT = "INS #0 null -> {}";
-  public static final String STRING_TEST = "INS #1234 GUID(000102030405060708090a0b0c0d0e0f10111213) -> {127.0.0.1.0.55:55, 127.0.0.1.0.56:56, 127.0.0.1.0.57:57}";
+  public static final String STRING_TEST = "INS #1234 GUID(000102030405060708090a0b0c0d0e0f10111213) -> {127.0.0.1:55, 127.0.0.1:56, 127.0.0.1:57}";
 
   @Before
   public void prepTest() {

@@ -36,7 +36,7 @@ public class LookupResponseMessageTest {
       0x13 };
 
   public static final String STRING_INIT = "LKR #0/null {}";
-  public static final String STRING_TEST = "LKR #4294967295/SUCCESS {127.0.0.1.0.55:55, 127.0.0.1.0.56:56, 127.0.0.1.0.57:57}";
+  public static final String STRING_TEST = "LKR #4294967295/SUCCESS {127.0.0.1:55, 127.0.0.1:56, 127.0.0.1:57}";
 
   @Before
   public void prepTest() {

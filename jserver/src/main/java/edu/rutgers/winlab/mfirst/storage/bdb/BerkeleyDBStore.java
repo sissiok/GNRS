@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sleepycat.je.DatabaseException;
+import com.sleepycat.je.DatabaseNotFoundException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
 import com.sleepycat.persist.EntityStore;
@@ -31,6 +32,8 @@ import edu.rutgers.winlab.mfirst.storage.GUIDStore;
  * @author Robert Moore
  */
 public class BerkeleyDBStore implements GUIDStore {
+  
+  private static final String STORE_NAME = "GNRS GUIDStore";
 
   /**
    * TimerTask for reporting BerkeleyDB-related statistics.
@@ -104,6 +107,11 @@ public class BerkeleyDBStore implements GUIDStore {
    * Primary index (GUID) for interacting with the BDB store.
    */
   private final transient PrimaryIndex<BDBGUID, BDBRecord> primaryIndex;
+  
+  /**
+   * Flag to prevent accidental data destruction.
+   */
+  private boolean allowClear = false;
 
   /**
    * Creates a new GUID Store using a Berkeley DB to back it.
@@ -158,7 +166,7 @@ public class BerkeleyDBStore implements GUIDStore {
     bdbStoreConfig.setAllowCreate(true);
 
     // Open/create the actual data store
-    this.bdbStore = new EntityStore(this.bdbEnvironment, "GNRS GUIDStore",
+    this.bdbStore = new EntityStore(this.bdbEnvironment, STORE_NAME ,
         bdbStoreConfig);
 
     // Retrieve the primary index
@@ -285,6 +293,34 @@ public class BerkeleyDBStore implements GUIDStore {
       }
     }
     return success;
+  }
+  
+  /**
+   * Drops all data from persistent storage. DO NOT call this method unless you want unrecoverable data loss.
+   * 
+   * <p>Before calling this method, be sure to call {@link #enableClear()} first.  If {@code enableClear()} is not first
+   * invoked, then this method has no effect.</p>
+   * @return {@code true} if the clear succeeded, else {@code false}.
+   */
+  public boolean clearStore(){
+    boolean cleared = false;
+    if(this.allowClear){
+      try {
+      this.bdbEnvironment.truncateDatabase(null, STORE_NAME,false);
+      }catch(DatabaseNotFoundException dnfe){
+        // Ignored, since this can occur if no write has taken place
+      }
+      cleared = true;
+    }
+    this.allowClear = false;
+    return cleared;
+  }
+  
+  /**
+   * Permits the peristent store to be called by a subsequent call to {@link #clearStore()}.
+   */
+  public void enableClear(){
+    this.allowClear = true;
   }
 
 }

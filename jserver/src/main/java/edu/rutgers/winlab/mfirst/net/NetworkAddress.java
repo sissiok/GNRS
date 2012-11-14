@@ -1,7 +1,6 @@
 /*
- * Mobility First GNRS Server
- * Copyright (C) 2012 Robert Moore and Rutgers University
- * All rights reserved.
+ * Mobility First GNRS Server Copyright (C) 2012 Robert Moore and Rutgers
+ * University All rights reserved.
  */
 package edu.rutgers.winlab.mfirst.net;
 
@@ -16,7 +15,6 @@ import org.slf4j.LoggerFactory;
  * network.
  * 
  * @author Robert Moore
- * 
  */
 public class NetworkAddress {
 
@@ -101,7 +99,7 @@ public class NetworkAddress {
     boolean equals;
     if (other instanceof NetworkAddress) {
       equals = this.equalsNA((NetworkAddress) other);
-    }else{
+    } else {
       equals = super.equals(other);
     }
     return equals;
@@ -116,7 +114,24 @@ public class NetworkAddress {
    * @return {@code true} if they are equal.
    */
   public boolean equalsNA(final NetworkAddress address) {
-    return this.type.equals(address.type) && Arrays.equals(this.value, address.value);
+    boolean isEqual;
+    if (address == null) {
+      isEqual = false;
+    } else {
+      if (this.type == null) {
+        if (address.type == null) {
+          isEqual = true;
+        } else {
+          isEqual = false;
+        }
+      } else {
+        isEqual = this.type.equals(address.type);
+      }
+      if (isEqual) {
+        isEqual = Arrays.equals(this.value, address.value);
+      }
+    }
+    return isEqual;
   }
 
   /**

@@ -67,7 +67,7 @@ public class GUIDBinding {
    *          the new TTL value.
    */
   public void setTtl(final long ttl) {
-    this.ttl = ttl;
+    this.ttl = ttl & 0xFFFFFFFFl;
   }
 
   /**
@@ -90,7 +90,7 @@ public class GUIDBinding {
    *          the new weight value.
    */
   public void setWeight(final int weight) {
-    this.weight = weight;
+    this.weight = weight & 0xFFFF;
   }
 
   @Override
@@ -118,7 +118,19 @@ public class GUIDBinding {
    * @return {@code true} if and only if {@code this.address.equals(b.address)}
    */
   public boolean equalsBinding(final GUIDBinding binding) {
-    return this.address.equalsNA(binding.address);
+    boolean isEqual;
+
+    if (this.address == null) {
+      if (binding.address == null) {
+        isEqual = true;
+      } else {
+        isEqual = false;
+      }
+
+    } else {
+      isEqual = this.address.equalsNA(binding.address);
+    }
+    return isEqual;
   }
 
   @Override

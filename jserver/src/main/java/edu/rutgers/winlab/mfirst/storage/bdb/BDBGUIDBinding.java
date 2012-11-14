@@ -1,19 +1,18 @@
 /*
- * Mobility First GNRS Server
- * Copyright (C) 2012 Robert Moore and Rutgers University
- * All rights reserved.
+ * Mobility First GNRS Server Copyright (C) 2012 Robert Moore and Rutgers
+ * University All rights reserved.
  */
 package edu.rutgers.winlab.mfirst.storage.bdb;
 
 import com.sleepycat.persist.model.Persistent;
 
+import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.storage.GUIDBinding;
 
 /**
  * BerkeleyDB-compatible version of GUID binding.
  * 
  * @author Robert Moore
- * 
  */
 @Persistent
 public class BDBGUIDBinding {
@@ -67,7 +66,11 @@ public class BDBGUIDBinding {
    */
   public GUIDBinding toGUIDBinding() {
     final GUIDBinding binding = new GUIDBinding();
-    binding.setAddress(this.address.toNetworkAddress());
+    if (this.address == null) {
+//      binding.setAddress(new NetworkAddress(null,null));
+    }else{
+      binding.setAddress(this.address.toNetworkAddress());
+    }
     binding.setTtl(this.ttl);
     binding.setWeight(this.weight);
     return binding;

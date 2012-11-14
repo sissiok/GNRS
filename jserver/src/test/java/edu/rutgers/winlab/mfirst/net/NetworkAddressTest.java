@@ -122,5 +122,16 @@ public class NetworkAddressTest {
     Assert.assertEquals(NA2_STRING, this.netAddr2.toString());
     Assert.assertFalse(NA2_STRING.equals(this.netAddr1.toString()));
   }
+  
+  @Test
+  public void testNullHandling(){
+    NetworkAddress null1 = new NetworkAddress(null,null);
+    NetworkAddress null2 = new NetworkAddress(null,null);
+    
+    Assert.assertTrue(null1.equals(null2));
+    null2.setType(AddressType.GUID);
+    Assert.assertFalse(null1.equals(null2));
+    Assert.assertFalse(null2.equals(null1));
+  }
 
 }

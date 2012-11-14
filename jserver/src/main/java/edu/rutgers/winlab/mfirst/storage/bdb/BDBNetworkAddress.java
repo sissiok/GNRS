@@ -20,7 +20,7 @@ public class BDBNetworkAddress {
   /**
    * Network address type value
    */
-  private int type;
+  private int type = -1;
 
   /**
    * Binary value of the address
@@ -36,9 +36,15 @@ public class BDBNetworkAddress {
    */
   public static BDBNetworkAddress fromNetworkAddress(
       final NetworkAddress netAddr) {
-    final BDBNetworkAddress newAddr = new BDBNetworkAddress();
-    newAddr.type = netAddr.getType().value();
-    newAddr.value = netAddr.getValue();
+    BDBNetworkAddress newAddr = null;
+    if (netAddr != null) {
+      newAddr = new BDBNetworkAddress();
+      if (netAddr.getType() != null) {
+        newAddr.type = netAddr.getType().value();
+      }
+      newAddr.value = netAddr.getValue();
+    }
+
     return newAddr;
   }
 
