@@ -17,7 +17,7 @@ import edu.rutgers.winlab.mfirst.GUID;
  * @author Robert Moore
  * 
  */
-public class LookupMessage extends AbstractResponseMessage {
+public class LookupMessage extends AbstractMessage {
   /**
    * The GUID to look up.
    */
@@ -81,8 +81,12 @@ public class LookupMessage extends AbstractResponseMessage {
 
   
   @Override
-  protected int getResponsePayloadLength() {
+  protected int getPayloadLength() {
     // GUID, options
-   return this.guid.getBinaryForm().length + 4;
+    int length = 4;
+    if(this.guid != null && this.guid.getBinaryForm() != null){
+      length += this.guid.getBinaryForm().length;
+    }
+   return length;
   }
 }

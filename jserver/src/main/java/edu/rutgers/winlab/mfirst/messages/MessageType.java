@@ -50,7 +50,7 @@ public enum MessageType {
   /**
    * An unknown message type value.
    */
-  UNKNOWN((byte) 255);
+  UNKNOWN((byte) 0xFF);
 
   /**
    * The protocol-compatible value of this message type.
@@ -84,6 +84,8 @@ public enum MessageType {
    * <li>"Q" for query</li>
    * <li>"A" for insert ack</li>
    * <li>"R" for query response</li>
+   * <li>"U" for update</li>
+   * <li>"V" for update ack</li>
    * </ul>
    * 
    * @param asString
@@ -101,6 +103,10 @@ public enum MessageType {
       type = INSERT_RESPONSE;
     } else if ("R".equalsIgnoreCase(asString)) {
       type = LOOKUP_RESPONSE;
+    } else if ("U".equalsIgnoreCase(asString)) {
+      type = UPDATE;
+    } else if ("V".equalsIgnoreCase(asString)) {
+      type = UPDATE_RESPONSE;
     } else {
       type = UNKNOWN;
     }

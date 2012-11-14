@@ -17,21 +17,26 @@ public enum AddressType {
   /**
    * Represents an Internet Protocol (IP) version 4 address plus a UDP port.
    */
-  INET_4_UDP(0, 6);
+  INET_4_UDP(0, 6),
+  
+  /**
+   * Represents a GUID value.
+   */
+  GUID(1,20);
 
   /**
    * Strings for toString() method.
    */
-  private static final String[] STRINGS = { "IPv4+UDP" };
+  private static final String[] STRINGS = { "IPv4+UDP", "GUID" };
 
   /**
    * Unsigned short representing the type.
    */
-  private int type;
+  private final int type;
   /**
    * Maximum length of the value, specific to each type.
    */
-  private int maxLength;
+  private final  int maxLength;
 
   /**
    * Private constructor.
@@ -57,8 +62,11 @@ public enum AddressType {
    */
   public static AddressType valueOf(final int asInt) {
     AddressType type = null;
+   
     if (asInt == INET_4_UDP.type) {
       type = INET_4_UDP;
+    }else if(asInt == GUID.type){
+      type = GUID;
     }
     return type;
   }

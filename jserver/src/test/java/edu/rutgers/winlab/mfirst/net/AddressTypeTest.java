@@ -20,6 +20,10 @@ public class AddressTypeTest {
    * String for IPv4/UDP network address type.
    */
   public static final String IPV4_UDP_STRING = "IPv4+UDP";
+  /**
+   * String for GUID type.
+   */
+  public static final String GUID_STRING = "GUID";
   
   /**
    * Test method for {@link edu.rutgers.winlab.mfirst.net.AddressType}.
@@ -36,6 +40,24 @@ public class AddressTypeTest {
     Assert.assertEquals(t2.value(), 0);
     Assert.assertEquals(t2.getMaxLength(),6);
     Assert.assertEquals(IPV4_UDP_STRING,t2.toString());
+    
+    AddressType t3 = AddressType.GUID;
+    Assert.assertEquals(t3.value(), 1);
+    Assert.assertEquals(t3.getMaxLength(),20);
+    Assert.assertEquals(GUID_STRING,t3.toString());
+    
+    AddressType t4 = AddressType.valueOf(1);
+    Assert.assertEquals(t4.value(), 1);
+    Assert.assertEquals(t4.getMaxLength(),20);
+    Assert.assertEquals(GUID_STRING,t4.toString());
+    
+    Assert.assertTrue(t1.equals(t2));
+    Assert.assertTrue(t2.equals(t1));
+    Assert.assertTrue(t3.equals(t4));
+    Assert.assertTrue(t4.equals(t3));
+    Assert.assertFalse(t1.equals(t4));
+    Assert.assertFalse(t3.equals(t2));
+    
     
     AddressType nullType = AddressType.valueOf(-1);
     Assert.assertNull(nullType);

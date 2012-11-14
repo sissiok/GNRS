@@ -85,7 +85,7 @@ public abstract class AbstractMessage {
    * @param requestId
    */
   public void setRequestId(final long requestId) {
-    this.requestId = requestId;
+    this.requestId = (requestId & 0xFFFFFFFFl);
   }
 
   /**
@@ -117,7 +117,11 @@ public abstract class AbstractMessage {
    */
   public int getMessageLength() {
     // Version, type, length, request id, requestor address
-    return 8 + 4 + this.originAddress.getLength() + this.getPayloadLength();
+    int length = 12 + this.getPayloadLength();
+    if(this.originAddress != null){
+      length += this.originAddress.getLength();
+    }
+    return length;
   }
 
   /**
