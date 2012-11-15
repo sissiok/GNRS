@@ -6,5 +6,5 @@
   <bindAddress>127.0.0.1</bindAddress>
 
   <!-- Flag to indicate if writes should be asynchronous (non-blocking) -->
-  <ascynchronousWrite>false</ascynchronousWrite>
+  <asynchronousWrite>false</asynchronousWrite>
 </edu.rutgers.winlab.mfirst.net.ipv4udp.Configuration>
