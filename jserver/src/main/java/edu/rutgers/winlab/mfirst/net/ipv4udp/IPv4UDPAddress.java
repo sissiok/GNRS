@@ -124,7 +124,7 @@ public class IPv4UDPAddress extends NetworkAddress {
         try {
           // Last two bytes are the port
 
-          final int port = ((value[value.length - 2] << 8) | value[value.length - 1]) & 0xFFFF;
+          final int port = ((value[value.length - 2] << 8) | (value[value.length - 1]&0xFF)) & 0xFFFF;
           // First 4 bytes are the IP address
           retAddr = new InetSocketAddress(InetAddress.getByAddress(Arrays
               .copyOf(value, 4)), port);

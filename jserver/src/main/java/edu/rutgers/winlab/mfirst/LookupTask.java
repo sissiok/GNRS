@@ -84,39 +84,53 @@ public class LookupTask implements Callable<Object> {
       for (final NetworkAddress addx : serverAddxes) {
         // Loopback? Then the local server should handle it.
         if (this.server.isLocalAddress(addx)) {
+          LOG.info("{} is a local address.", addx);
           resolvedLocally = true;
           break;
+        } else {
+          LOG.info("REMOTE: {}", addx);
         }
 
       }
     }
 
     // At least one IP prefix binding was for the local server
-    if (resolvedLocally) {
-      // log.debug("Resolving {} locally.", message);
-
-      response.setBindings(this.server.getBindings(this.message.getGuid()));
-      response.setResponseCode(ResponseCode.SUCCESS);
-
+    if (message.isRecursive() & !resolvedLocally) {
+      message.setRecursive(false);
+      LOG.info("Forwarding {} to {}", message, serverAddxes);
+      // FIXME: Need to control relay behavior in the server, not NAO.
+      // This is the end.  Send out requests and the NAO will
+      // Handle sending back to the client.
+      this.server.sendMessage(message,
+          serverAddxes.toArray(new NetworkAddress[] {}));
     } else {
-      response.setResponseCode(ResponseCode.FAILED);
-    }
-    response.setOriginAddress(this.server.getOriginAddress());
-    final long t30 = System.nanoTime();
-    // log.debug("[{}] Writing {}", this.container.session, response);
-    this.server.sendMessage(this.params, response);
+      if (resolvedLocally) {
+        LOG.info("Resolving {} locally.", message);
 
-    final long t40 = System.nanoTime();
-    if (this.server.getConfig().isCollectStatistics()) {
-      GNRSServer.MSG_LIFETIME.addAndGet(System.nanoTime()
-          - this.message.createdNanos);
+        response.setBindings(this.server.getBindings(this.message.getGuid()));
+        response.setResponseCode(ResponseCode.SUCCESS);
+
+      } else {
+        response.setResponseCode(ResponseCode.FAILED);
+      }
+      response.setOriginAddress(this.server.getOriginAddress());
+      final long t30 = System.nanoTime();
+      // log.debug("[{}] Writing {}", this.container.session, response);
+      this.server.sendMessage(this.params, response);
+
+      final long t40 = System.nanoTime();
+      if (this.server.getConfig().isCollectStatistics()) {
+        GNRSServer.MSG_LIFETIME.addAndGet(System.nanoTime()
+            - this.message.createdNanos);
+      }
+      if (LOG.isDebugEnabled()) {
+        LOG.debug(String.format(
+            "Processing: %,dns [Map: %,dns, GetBind: %,dns, Write: %,dns] \n",
+            Long.valueOf(t40 - t10), Long.valueOf(t20 - t10),
+            Long.valueOf(t30 - t20), Long.valueOf(t40 - t30)));
+      }
     }
-    if (LOG.isDebugEnabled()) {
-      LOG.debug(String.format(
-          "Processing: %,dns [Map: %,dns, GetBind: %,dns, Write: %,dns] \n",
-          Long.valueOf(t40 - t10), Long.valueOf(t20 - t10),
-          Long.valueOf(t30 - t20), Long.valueOf(t40 - t30)));
-    }
+
     return null;
   }
 

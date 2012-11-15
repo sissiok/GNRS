@@ -42,6 +42,17 @@ public interface NetworkAccessObject {
       final AbstractMessage message);
 
   /**
+   * Sends a message to the network.
+   * 
+   * @param destAddrs
+   *          the destination addresses
+   * @param message
+   *          the message to send
+   */
+  public void sendMessage(
+      final AbstractMessage message, final NetworkAddress... destAddrs);
+
+  /**
    * Invoked when a session terminates and the NAO should clean-up any stored
    * state.
    * 

@@ -254,6 +254,7 @@ public class TraceClient extends IoHandlerAdapter {
         }
         case LOOKUP: {
           final LookupMessage lookMsg = new LookupMessage();
+          lookMsg.setRecursive(true);
           msg = lookMsg;
           lookMsg.setGuid(guid);
           lookMsg.setRequestId(sequenceNumber);

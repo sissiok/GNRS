@@ -186,7 +186,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     LOG.debug("Creating connect future.");
     final ConnectFuture connectFuture = this.connector
         .connect(new InetSocketAddress(this.config.getServerHost(), this.config
-            .getServerPort()));
+            .getServerPort()), new InetSocketAddress(this.config.getClientHost(), this.config.getClientPort()));
 
     // FIXME: Must call awaitUninterruptably. This is a known issue in MINA
     // <https://issues.apache.org/jira/browse/DIRMINA-911>
@@ -255,6 +255,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
       for (int i = 0; i < this.numLookups; ++i) {
 
         message = new LookupMessage();
+        message.setRecursive(true);
 
         message.setGuid(GUID.fromInt(('0' + rand.nextInt(10)) << 24));
         message.setRequestId(i);

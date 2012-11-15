@@ -380,6 +380,11 @@ public class GNRSServer implements MessageListener {
     this.networkAccess.sendMessage(params, message);
   }
 
+  public void sendMessage(final AbstractMessage message,
+      final NetworkAddress... destAddrs) {
+    this.networkAccess.sendMessage(message, destAddrs);
+  }
+
   /**
    * Convenience method for tasks to check if a NetworkAddress references the
    * local server or not.

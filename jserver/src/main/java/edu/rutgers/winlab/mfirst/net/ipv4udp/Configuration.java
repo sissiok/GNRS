@@ -30,6 +30,12 @@ public class Configuration {
    * UDP port on which to listen for incoming connections.
    */
   private int bindPort = 5001;
+  
+  /**
+   * UDP port from which to send messages.
+   */
+  private int sendPort = 5001;
+  
 
   /**
    * Flag to indicate whether or not writes should be asynchronous
@@ -95,5 +101,21 @@ public class Configuration {
    */
   public void setAsynchronousWrite(final boolean asynchronousWrite) {
     this.asynchronousWrite = asynchronousWrite;
+  }
+
+  /**
+   * Get the port from which to send messages.
+   * @return the sending port.
+   */
+  public int getSendPort() {
+    return this.sendPort;
+  }
+
+  /**
+   * Sets the port from which to send message.
+   * @param sendPort the new sending port value.
+   */
+  public void setSendPort(int sendPort) {
+    this.sendPort = sendPort;
   }
 }
