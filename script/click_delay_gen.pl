@@ -95,7 +95,8 @@ my $outFile;
 # Skip the first line of the delay matrix file
 readFileLine($delayFile);
 
-#port number is hardcoded as 5001
+my Count = 1;
+#port number is hardcoded as 5001 amd 4001
 my $severPort = 5001;
 my $clientPort = 4001;
 my $intraDelay = 5;  #assume intradomain delay is 5ms
@@ -103,7 +104,7 @@ my $intraDelay = 5;  #assume intradomain delay is 5ms
 GEN_OUTPUT: {
   foreach $asNum (@asList) {
     # The output file, named by AS number
-    open($outFile, ">", "as_".$asNum."_delay.dat");
+    open($outFile, ">", "as_".$Count."_delay.dat");
     # Get the delays for each source AS from the delay matrix
     my $delayLine = readFileLine($delayFile);
 
@@ -132,6 +133,7 @@ GEN_OUTPUT: {
       close $outFile;
       last GEN_OUTPUT;
     }
+    $Count++;
   }
 }
 
