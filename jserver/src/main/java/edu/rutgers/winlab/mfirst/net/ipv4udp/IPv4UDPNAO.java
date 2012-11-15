@@ -130,7 +130,7 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject 
 
     final IPv4UDPParameters params = (IPv4UDPParameters) parameters;
     final WriteFuture future = params.session.write(message);
-    if (!this.config.isAscynchronousWrite()) {
+    if (!this.config.isAsynchronousWrite()) {
       future.awaitUninterruptibly();
     }
   }

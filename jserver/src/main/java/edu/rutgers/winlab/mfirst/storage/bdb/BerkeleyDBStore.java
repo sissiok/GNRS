@@ -32,7 +32,7 @@ import edu.rutgers.winlab.mfirst.storage.GUIDStore;
  * @author Robert Moore
  */
 public class BerkeleyDBStore implements GUIDStore {
-  
+
   private static final String STORE_NAME = "GNRS GUIDStore";
 
   /**
@@ -107,7 +107,7 @@ public class BerkeleyDBStore implements GUIDStore {
    * Primary index (GUID) for interacting with the BDB store.
    */
   private final transient PrimaryIndex<BDBGUID, BDBRecord> primaryIndex;
-  
+
   /**
    * Flag to prevent accidental data destruction.
    */
@@ -130,17 +130,8 @@ public class BerkeleyDBStore implements GUIDStore {
     final Configuration config = (Configuration) xStream.fromXML(new File(
         configFileName));
     final File bdbEnvDir = new File(config.getPathToFiles());
+
     if (!bdbEnvDir.exists()) {
-      if (bdbEnvDir.isFile()) {
-        LOG.error(
-            "Unable to create BerkeleyDB environment directory. File exists with same name: {}",
-            configFileName);
-        throw new IllegalArgumentException(
-            String
-                .format(
-                    "Unable to create BerkeleyDB environment directory. File exists with same name: %s",
-                    configFileName));
-      }
       if (!bdbEnvDir.mkdirs()) {
         LOG.error("Unable to create some directories for BerkeleyDB environment.");
         throw new IllegalArgumentException(
@@ -150,6 +141,16 @@ public class BerkeleyDBStore implements GUIDStore {
         throw new IllegalArgumentException(
             "Unable write to directory for BerkeleyDB environment.");
       }
+    } else if (bdbEnvDir.isFile()) {
+      LOG.error(
+          "Unable to create BerkeleyDB environment directory. File exists with same name: {}",
+          configFileName);
+      throw new IllegalArgumentException(
+          String
+              .format(
+                  "Unable to create BerkeleyDB environment directory. File exists with same name: %s",
+                  configFileName));
+
     }
 
     this.server = server;
@@ -166,7 +167,7 @@ public class BerkeleyDBStore implements GUIDStore {
     bdbStoreConfig.setAllowCreate(true);
 
     // Open/create the actual data store
-    this.bdbStore = new EntityStore(this.bdbEnvironment, STORE_NAME ,
+    this.bdbStore = new EntityStore(this.bdbEnvironment, STORE_NAME,
         bdbStoreConfig);
 
     // Retrieve the primary index
@@ -294,20 +295,24 @@ public class BerkeleyDBStore implements GUIDStore {
     }
     return success;
   }
-  
+
   /**
-   * Drops all data from persistent storage. DO NOT call this method unless you want unrecoverable data loss.
+   * Drops all data from persistent storage. DO NOT call this method unless you
+   * want unrecoverable data loss.
+   * <p>
+   * Before calling this method, be sure to call {@link #enableClear()} first.
+   * If {@code enableClear()} is not first invoked, then this method has no
+   * effect.
+   * </p>
    * 
-   * <p>Before calling this method, be sure to call {@link #enableClear()} first.  If {@code enableClear()} is not first
-   * invoked, then this method has no effect.</p>
    * @return {@code true} if the clear succeeded, else {@code false}.
    */
-  public boolean clearStore(){
+  public boolean clearStore() {
     boolean cleared = false;
-    if(this.allowClear){
+    if (this.allowClear) {
       try {
-      this.bdbEnvironment.truncateDatabase(null, STORE_NAME,false);
-      }catch(DatabaseNotFoundException dnfe){
+        this.bdbEnvironment.truncateDatabase(null, STORE_NAME, false);
+      } catch (DatabaseNotFoundException dnfe) {
         // Ignored, since this can occur if no write has taken place
       }
       cleared = true;
@@ -315,11 +320,12 @@ public class BerkeleyDBStore implements GUIDStore {
     this.allowClear = false;
     return cleared;
   }
-  
+
   /**
-   * Permits the peristent store to be called by a subsequent call to {@link #clearStore()}.
+   * Permits the peristent store to be called by a subsequent call to
+   * {@link #clearStore()}.
    */
-  public void enableClear(){
+  public void enableClear() {
     this.allowClear = true;
   }
 

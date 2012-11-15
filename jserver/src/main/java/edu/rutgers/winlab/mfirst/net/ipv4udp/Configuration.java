@@ -35,7 +35,7 @@ public class Configuration {
    * Flag to indicate whether or not writes should be asynchronous
    * (non-blocking).
    */
-  private boolean ascynchronousWrite = false;
+  private boolean asynchronousWrite = false;
 
   /**
    * The address to which the server should bind.
@@ -81,19 +81,19 @@ public class Configuration {
    * 
    * @return {@code true} if network writes are asynchronous (non-blocking).
    */
-  public boolean isAscynchronousWrite() {
-    return this.ascynchronousWrite;
+  public boolean isAsynchronousWrite() {
+    return this.asynchronousWrite;
   }
 
   /**
    * Sets the flag for (a)synchronous writes to the network.
    * 
-   * @param ascynchronousWrite
+   * @param asynchronousWrite
    *          {@code true} if network writes should be asynchronous
    *          (non-blocking), or {@code false} for synchronous (blocking)
    *          writes.
    */
-  public void setAscynchronousWrite(final boolean ascynchronousWrite) {
-    this.ascynchronousWrite = ascynchronousWrite;
+  public void setAsynchronousWrite(final boolean asynchronousWrite) {
+    this.asynchronousWrite = asynchronousWrite;
   }
 }

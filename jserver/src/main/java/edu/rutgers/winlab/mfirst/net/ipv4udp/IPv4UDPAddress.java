@@ -114,21 +114,26 @@ public class IPv4UDPAddress extends NetworkAddress {
    */
   public static InetSocketAddress toSocketAddr(final NetworkAddress addr) {
     InetSocketAddress retAddr = null;
-    final byte[] value = addr.getValue();
-    if (value == null) {
-      LOG.error("Unable to create InetSocketAddress from null bytes.");
+    if (addr == null) {
+      LOG.error("Unable to create InetSocketAddress from a null address.");
     } else {
-      try {
-        // Last two bytes are the port
+      final byte[] value = addr.getValue();
+      if (value == null) {
+        LOG.error("Unable to create InetSocketAddress from null bytes.");
+      } else {
+        try {
+          // Last two bytes are the port
 
-        final int port = ((value[value.length - 2] << 8) | value[value.length - 1]) & 0xFFFF;
-        // First 4 bytes are the IP address
-        retAddr = new InetSocketAddress(InetAddress.getByAddress(Arrays.copyOf(
-            value, 4)), port);
+          final int port = ((value[value.length - 2] << 8) | value[value.length - 1]) & 0xFFFF;
+          // First 4 bytes are the IP address
+          retAddr = new InetSocketAddress(InetAddress.getByAddress(Arrays
+              .copyOf(value, 4)), port);
 
-      } catch (final UnknownHostException e) {
-        LOG.error("Could not create InetSocketAddress from NetworkAddress.", e);
+        } catch (final UnknownHostException e) {
+          LOG.error("Could not create InetSocketAddress from NetworkAddress.",
+              e);
 
+        }
       }
     }
     return retAddr;
@@ -158,7 +163,7 @@ public class IPv4UDPAddress extends NetworkAddress {
   public String toString() {
     final StringBuilder sBuff = new StringBuilder();
     int index = 0;
-    int addxLength = Math.min(this.value.length,4);
+    int addxLength = Math.min(this.value.length, 4);
     for (; index < addxLength; ++index) {
       if (index > 0) {
         sBuff.append('.');
