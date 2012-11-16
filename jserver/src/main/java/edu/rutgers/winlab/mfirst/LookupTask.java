@@ -84,11 +84,11 @@ public class LookupTask implements Callable<Object> {
       for (final NetworkAddress addx : serverAddxes) {
         // Loopback? Then the local server should handle it.
         if (this.server.isLocalAddress(addx)) {
-          LOG.info("{} is a local address.", addx);
+//          LOG.info("{} is a local address.", addx);
           resolvedLocally = true;
           break;
         } else {
-          LOG.info("REMOTE: {}", addx);
+//          LOG.info("REMOTE: {}", addx);
         }
 
       }
@@ -97,7 +97,7 @@ public class LookupTask implements Callable<Object> {
     // At least one IP prefix binding was for the local server
     if (this.message.isRecursive() & !resolvedLocally) {
       this.message.setRecursive(false);
-      LOG.info("Forwarding {} to {}", this.message, serverAddxes);
+//      LOG.info("Forwarding {} to {}", this.message, serverAddxes);
       // FIXME: Need to control relay behavior in the server, not NAO.
       // This is the end.  Send out requests and the NAO will
       // Handle sending back to the client.
@@ -120,7 +120,7 @@ public class LookupTask implements Callable<Object> {
           serverAddxes.toArray(new NetworkAddress[] {}));
     } else {
       if (resolvedLocally) {
-        LOG.info("Resolving {} locally.", this.message);
+//        LOG.info("Resolving {} locally.", this.message);
 
         response.setBindings(this.server.getBindings(this.message.getGuid()));
         response.setResponseCode(ResponseCode.SUCCESS);

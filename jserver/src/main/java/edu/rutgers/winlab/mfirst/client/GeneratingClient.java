@@ -8,7 +8,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.LockSupport;
 
@@ -110,7 +118,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
    * Connector to communicate with the server.
    */
   private final transient NioDatagramConnector connector;
-  
+
   private final transient NioDatagramAcceptor acceptor;
 
   /**
@@ -142,6 +150,10 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
    */
   private final transient AtomicInteger numFailures = new AtomicInteger(0);
 
+  private final Map<Integer, Long> sendTimes = new ConcurrentHashMap<Integer, Long>();
+
+  private final Queue<Long> rtts = new ConcurrentLinkedQueue<Long>();
+
   /**
    * Creates a new GeneratingClient with the configuration and delay values
    * provided.
@@ -169,11 +181,10 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     DefaultIoFilterChainBuilder chain = this.acceptor.getFilterChain();
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
         new GNRSProtocolCodecFactory()));
-    
+
     this.connector = new NioDatagramConnector();
     this.connector.setHandler(this);
-    sessionConfig = this.connector
-        .getSessionConfig();
+    sessionConfig = this.connector.getSessionConfig();
     sessionConfig.setReuseAddress(true);
     sessionConfig.setCloseOnPortUnreachable(false);
     chain = this.connector.getFilterChain();
@@ -199,32 +210,31 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     boolean retValue = true;
     try {
       this.acceptor.bind(new InetSocketAddress(this.config.getClientPort()));
-    
-    
-    LOG.debug("Creating connect future.");
-    final ConnectFuture connectFuture = this.connector
-        .connect(new InetSocketAddress(this.config.getServerHost(), this.config
-            .getServerPort()));
 
-    // FIXME: Must call awaitUninterruptably. This is a known issue in MINA
-    // <https://issues.apache.org/jira/browse/DIRMINA-911>
-    connectFuture.awaitUninterruptibly();
+      LOG.debug("Creating connect future.");
+      final ConnectFuture connectFuture = this.connector
+          .connect(new InetSocketAddress(this.config.getServerHost(),
+              this.config.getServerPort()));
 
-    connectFuture.addListener(new IoFutureListener<ConnectFuture>() {
-      @Override
-      public void operationComplete(final ConnectFuture future) {
-        if (future.isConnected()) {
-          GeneratingClient.this.perform(future.getSession());
+      // FIXME: Must call awaitUninterruptably. This is a known issue in MINA
+      // <https://issues.apache.org/jira/browse/DIRMINA-911>
+      connectFuture.awaitUninterruptibly();
+
+      connectFuture.addListener(new IoFutureListener<ConnectFuture>() {
+        @Override
+        public void operationComplete(final ConnectFuture future) {
+          if (future.isConnected()) {
+            GeneratingClient.this.perform(future.getSession());
+          }
         }
-      }
 
-    });
+      });
 
-    LOG.debug("Future listener will handle connection event and start trace.");
+      LOG.debug("Future listener will handle connection event and start trace.");
 
     } catch (IOException e) {
-      LOG.error("Unable to bind to local port.",e);
-     retValue = false;
+      LOG.error("Unable to bind to local port.", e);
+      retValue = false;
     }
     return retValue;
   }
@@ -239,10 +249,21 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     LOG.info("Connected to {}", session);
     this.generateLookups(session);
     try {
-      Thread.sleep(5000);
+      Thread.sleep(1000);
     } catch (final InterruptedException ie) {
       // Ignored
     }
+    int length = this.rtts.size();
+    ArrayList<Long> rttList = new ArrayList<Long>(length);
+    rttList.addAll(this.rtts);
+
+    Collections.sort(rttList);
+
+    Long median = rttList.get(length / 2);
+
+    LOG.info(String.format("Min: %,dus | Med: %,dus | Max: %,dus", rttList.get(0)/1000,
+        median/1000, rttList.get(length - 1)/1000));
+
     final int succ = GeneratingClient.this.numSuccess.get();
     final int total = succ + GeneratingClient.this.numFailures.get();
     final float success = ((succ * 1f) / total) * 100;
@@ -285,6 +306,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
         message.setOriginAddress(clientAddress);
         lastSend = System.nanoTime();
         final WriteFuture future = session.write(message);
+        this.sendTimes.put(Integer.valueOf(i), Long.valueOf(lastSend));
 
         future.awaitUninterruptibly();
 
@@ -323,9 +345,10 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
 
   @Override
   public void messageReceived(final IoSession session, final Object message) {
-    LOG.info("Received {} on {}",message,session);
+    final long rcvTime = System.nanoTime();
+    LOG.info("Received {} on {}", message, session);
     if (message instanceof LookupResponseMessage) {
-      this.handleResponse((LookupResponseMessage) message);
+      this.handleResponse((LookupResponseMessage) message, rcvTime);
     }
   }
 
@@ -335,8 +358,11 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
    * @param msg
    *          the response message.
    */
-  public void handleResponse(final LookupResponseMessage msg) {
+  public void handleResponse(final LookupResponseMessage msg,final long recvNanos) {
 
+    Long startNanos = this.sendTimes.get(Integer.valueOf((int)msg.getRequestId()));
+    this.rtts.add(Long.valueOf(recvNanos - startNanos.longValue()));
+    
     if (ResponseCode.SUCCESS.equals(msg.getResponseCode())) {
       this.numSuccess.incrementAndGet();
       if (msg.getBindings() != null && msg.getBindings().length > 0) {

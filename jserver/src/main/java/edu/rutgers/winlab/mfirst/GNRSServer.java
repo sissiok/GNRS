@@ -201,7 +201,7 @@ public class GNRSServer implements MessageListener {
       numThreads = 1;
     }
 
-    LOG.info("Using threadpool of {} threads.", Integer.valueOf(numThreads));
+//    LOG.info("Using threadpool of {} threads.", Integer.valueOf(numThreads));
     this.workers = Executors.newFixedThreadPool(numThreads);
 
     this.networkAccess = createNAO(this.config);
@@ -429,27 +429,27 @@ public class GNRSServer implements MessageListener {
 
   private void handleResponse(final SessionParameters params,
       final AbstractResponseMessage respMsg) {
-    LOG.info("Using relay info for {}", respMsg);
+//    LOG.info("Using relay info for {}", respMsg);
     Integer reqId = Integer.valueOf((int) respMsg.getRequestId());
     RelayInfo info = this.awaitingResponse.get(reqId);
-    LOG.info("[{}]Using relay info for {}", respMsg, info.clientMessage);
+//    LOG.info("[{}]Using relay info for {}", respMsg, info.clientMessage);
     // We are actually expecting this response
     if (info != null) {
-      LOG.info("Retrieved relay info");
+//      LOG.info("Retrieved relay info");
       // This is a server we need a response from
       if (info.remainingServers.remove(respMsg.getOriginAddress())) {
-        LOG.info("Removed {} from servers", respMsg.getOriginAddress());
+//        LOG.info("Removed {} from servers", respMsg.getOriginAddress());
         // Add the bindings (if any)
         if (respMsg instanceof LookupResponseMessage) {
           LookupResponseMessage lrm = (LookupResponseMessage) respMsg;
           for (NetworkAddress netAddr : lrm.getBindings()) {
-            LOG.info("Adding {} to LKR bindings.", lrm.getBindings());
+//            LOG.info("Adding {} to LKR bindings.", lrm.getBindings());
             info.responseAddresses.add(netAddr);
           }
         }
         // If this was the last server, reply to the client
         if (info.remainingServers.isEmpty()) {
-          LOG.info("All servers have replied.");
+//          LOG.info("All servers have replied.");
           this.awaitingResponse.remove(reqId);
 
           if (info.clientMessage instanceof LookupMessage) {
@@ -460,7 +460,7 @@ public class GNRSServer implements MessageListener {
             lrm.setVersion((byte) 0x0);
             lrm.setBindings(info.responseAddresses
                 .toArray(new NetworkAddress[] {}));
-            LOG.info("Going to send reply back to client: {}", lrm);
+//            LOG.info("Going to send reply back to client: {}", lrm);
             this.networkAccess.sendMessage(lrm,info.clientMessage.getOriginAddress());
           } else if (info.clientMessage instanceof InsertMessage) {
             LOG.error("Insert not implemented");
@@ -468,7 +468,7 @@ public class GNRSServer implements MessageListener {
             LOG.error("Unsupported message received?");
           }
         } else {
-          LOG.info("Awaiting servers: {}", info.remainingServers);
+//          LOG.info("Awaiting servers: {}", info.remainingServers);
         }
       } else {
         LOG.warn("Unable to find relay info for {}", respMsg);

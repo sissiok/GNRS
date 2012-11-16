@@ -201,23 +201,23 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
 
     final IPv4UDPParameters params = (IPv4UDPParameters) parameters;
     final WriteFuture future = params.session.write(message);
-    LOG.info("Awaiting actual write of {} to {}", message, params.session);
+//    LOG.info("Awaiting actual write of {} to {}", message, params.session);
     // if (!this.config.isAsynchronousWrite()) {
     // future.awaitUninterruptibly();
     // }
-    LOG.info("Wrote {} to {}", message, params.session);
+//    LOG.info("Wrote {} to {}", message, params.session);
   }
 
   @Override
   public void sendMessage(final AbstractMessage message,
       final NetworkAddress... destAddrs) {
-    LOG.info("Sending {} to {}", message, destAddrs);
+//    LOG.info("Sending {} to {}", message, destAddrs);
     for (NetworkAddress destAddr : destAddrs) {
       IPv4UDPParameters params = this.connections.get(destAddr);
 
       if (params == null) {
-        LOG.info("Establishing connection to {}",
-            IPv4UDPAddress.toSocketAddr(destAddr));
+//        LOG.info("Establishing connection to {}",
+//            IPv4UDPAddress.toSocketAddr(destAddr));
         final ConnectFuture future = this.connector.connect(
             IPv4UDPAddress.toSocketAddr(destAddr), this.sendSockAddr);
         RelayInfo info = new RelayInfo();
@@ -278,7 +278,7 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
     if (message instanceof AbstractMessage) {
       AbstractMessage msg = (AbstractMessage) message;
       NetworkAddress origin = msg.getOriginAddress();
-      LOG.info("Received {} from {}", message, session);
+//      LOG.info("Received {} from {}", message, session);
       for (final MessageListener listener : this.listeners) {
         listener.messageReceived(null, (AbstractMessage) message);
       }
