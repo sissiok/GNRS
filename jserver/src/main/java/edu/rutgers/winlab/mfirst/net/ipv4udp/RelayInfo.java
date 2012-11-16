@@ -25,7 +25,7 @@ public class RelayInfo {
   
   public IPv4UDPParameters clientParams;
   
-  public NetworkAddress serverAddress;
+  public NetworkAddress remoteAddress;
   
   public IPv4UDPParameters serverParams;
 

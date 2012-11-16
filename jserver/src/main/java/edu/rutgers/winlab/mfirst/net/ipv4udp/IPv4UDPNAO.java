@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
+import java.net.PortUnreachableException;
 import java.net.SocketAddress;
 import java.util.Map;
 import java.util.Set;
@@ -19,6 +20,7 @@ import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.future.IoFutureListener;
 import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.service.IoHandlerAdapter;
+import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
@@ -69,25 +71,14 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
    */
   private final transient Configuration config;
 
-  /**
-   * SessionParameter objects for each IoSession.
-   */
-  // private final transient Map<IoSession, IPv4UDPParameters> inSessionMap =
-  // new ConcurrentHashMap<IoSession, IPv4UDPParameters>();
-
+  private final transient Map<IoSession,NetworkAddress> sessions = new ConcurrentHashMap<IoSession, NetworkAddress>();
+  
   private final transient Map<NetworkAddress, IPv4UDPParameters> connections = new ConcurrentHashMap<NetworkAddress, IPv4UDPParameters>();
 
   /**
    * Messages that are awaiting connections.
    */
   private final transient Map<ConnectFuture, RelayInfo> awaitingConnect = new ConcurrentHashMap<ConnectFuture, RelayInfo>();
-
-  /**
-   * Existing outbound connections for network addresses.
-   */
-  // private final transient Map<NetworkAddress, IPv4UDPParameters>
-  // outgoingConnections = new ConcurrentHashMap<NetworkAddress,
-  // IPv4UDPParameters>();
 
   /**
    * Incoming datagram acceptor.
@@ -148,7 +139,9 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
     final DatagramSessionConfig sessionConfig = this.acceptor
         .getSessionConfig();
     sessionConfig.setReuseAddress(true);
-    sessionConfig.setCloseOnPortUnreachable(false);
+    sessionConfig.setCloseOnPortUnreachable(true);
+    sessionConfig.setIdleTime(IdleStatus.BOTH_IDLE, 1);
+    sessionConfig.setIdleTime(IdleStatus.BOTH_IDLE, 1);
 
     // Bind to wildcard (all) interface
     if (this.config.getBindAddress() == null
@@ -173,6 +166,9 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
         .getSessionConfig();
     sessionConfig.setReuseAddress(true);
     sessionConfig.setCloseOnPortUnreachable(false);
+    sessionConfig.setIdleTime(IdleStatus.BOTH_IDLE, 1);
+    sessionConfig.setIdleTime(IdleStatus.BOTH_IDLE, 1);
+    
     final DefaultIoFilterChainBuilder chain = this.connector.getFilterChain();
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
         new GNRSProtocolCodecFactory()));
@@ -226,7 +222,7 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
             IPv4UDPAddress.toSocketAddr(destAddr), this.sendSockAddr);
         RelayInfo info = new RelayInfo();
         info.clientMessage = message;
-        info.serverAddress = destAddr;
+        info.remoteAddress = destAddr;
         this.awaitingConnect.put(future, info);
         future.addListener(this);
         // FIXME: Must call awaitUninterruptably. This is a known issue in MINA
@@ -283,24 +279,8 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
       AbstractMessage msg = (AbstractMessage) message;
       NetworkAddress origin = msg.getOriginAddress();
       LOG.info("Received {} from {}", message, session);
-      IPv4UDPParameters params = this.connections.get(origin);
-      if (params == null
-          && session.getRemoteAddress() instanceof InetSocketAddress) {
-        NetworkAddress remoteAddr = IPv4UDPAddress
-            .fromInetSocketAddress((InetSocketAddress) session
-                .getRemoteAddress());
-        params = new IPv4UDPParameters();
-        params.session = session;
-        this.connections.put(origin, params);
-      }
-      if (params != null) {
-        // this.inSessionMap.put(session, params);
-
-        // FIXME: This is poor separation of network and server
-        for (final MessageListener listener : this.listeners) {
-          listener.messageReceived(params, (AbstractMessage) message);
-        }
-
+      for (final MessageListener listener : this.listeners) {
+        listener.messageReceived(null, (AbstractMessage) message);
       }
 
     } else {
@@ -310,19 +290,30 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
 
   @Override
   public void sessionOpened(final IoSession session) {
-    final IPv4UDPParameters params = new IPv4UDPParameters();
-    params.session = session;
-    // this.inSessionMap.put(session, params);
+    
+  }
+  
+  @Override
+  public void sessionIdle(final IoSession session, final IdleStatus idleStatus){
+    session.close(true);
   }
 
   @Override
   public void sessionClosed(final IoSession session) {
-    // this.inSessionMap.remove(session);
+    NetworkAddress addr = this.sessions.get(session);
+    if(addr != null){
+      this.connections.remove(addr);
+    }
+   
   }
 
   @Override
   public void exceptionCaught(final IoSession session, final Throwable cause) {
-    LOG.error("Exception caught.", cause);
+   if(cause instanceof PortUnreachableException){
+     session.close(true);
+   }else{
+     LOG.error("Caught exception for " + session+".",cause);
+   }
   }
 
   @Override
@@ -339,8 +330,9 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
       IPv4UDPParameters params = new IPv4UDPParameters();
       params.session = future.getSession();
       info.serverParams = params;
-      this.connections.put(info.serverAddress, info.serverParams);
-      this.sendMessage(info.clientMessage, info.serverAddress);
+      this.connections.put(info.remoteAddress, info.serverParams);
+      this.sessions.put(params.session, info.remoteAddress);
+      this.sendMessage(info.clientMessage, info.remoteAddress);
     }
   }
 

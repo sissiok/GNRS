@@ -5,6 +5,7 @@
 package edu.rutgers.winlab.mfirst.client;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.util.Random;
@@ -19,6 +20,7 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
+import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
 import org.apache.mina.transport.socket.nio.NioDatagramConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,6 +110,8 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
    * Connector to communicate with the server.
    */
   private final transient NioDatagramConnector connector;
+  
+  private final transient NioDatagramAcceptor acceptor;
 
   /**
    * Configuration for this client.
@@ -157,13 +161,22 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     this.delay = delay;
     this.numLookups = numLookups;
 
+    this.acceptor = new NioDatagramAcceptor();
+    this.acceptor.setHandler(this);
+    DatagramSessionConfig sessionConfig = this.acceptor.getSessionConfig();
+    sessionConfig.setReuseAddress(true);
+    sessionConfig.setCloseOnPortUnreachable(false);
+    DefaultIoFilterChainBuilder chain = this.acceptor.getFilterChain();
+    chain.addLast("gnrs codec", new ProtocolCodecFilter(
+        new GNRSProtocolCodecFactory()));
+    
     this.connector = new NioDatagramConnector();
     this.connector.setHandler(this);
-    final DatagramSessionConfig sessionConfig = this.connector
+    sessionConfig = this.connector
         .getSessionConfig();
     sessionConfig.setReuseAddress(true);
     sessionConfig.setCloseOnPortUnreachable(false);
-    final DefaultIoFilterChainBuilder chain = this.connector.getFilterChain();
+    chain = this.connector.getFilterChain();
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
         new GNRSProtocolCodecFactory()));
 
@@ -183,10 +196,15 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
    * @return {@code true} if everything goes well, else {@code false}.
    */
   public boolean connect() {
+    boolean retValue = true;
+    try {
+      this.acceptor.bind(new InetSocketAddress(this.config.getClientPort()));
+    
+    
     LOG.debug("Creating connect future.");
     final ConnectFuture connectFuture = this.connector
         .connect(new InetSocketAddress(this.config.getServerHost(), this.config
-            .getServerPort()), new InetSocketAddress(this.config.getClientHost(), this.config.getClientPort()));
+            .getServerPort()));
 
     // FIXME: Must call awaitUninterruptably. This is a known issue in MINA
     // <https://issues.apache.org/jira/browse/DIRMINA-911>
@@ -204,7 +222,11 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
 
     LOG.debug("Future listener will handle connection event and start trace.");
 
-    return true;
+    } catch (IOException e) {
+      LOG.error("Unable to bind to local port.",e);
+     retValue = false;
+    }
+    return retValue;
   }
 
   /**
@@ -231,6 +253,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
         Integer.valueOf(total), Float.valueOf(success), Float.valueOf(hits),
         Float.valueOf(loss)));
     session.close(true);
+    this.acceptor.dispose(true);
     this.connector.dispose(true);
   }
 
@@ -300,6 +323,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
 
   @Override
   public void messageReceived(final IoSession session, final Object message) {
+    LOG.info("Received {} on {}",message,session);
     if (message instanceof LookupResponseMessage) {
       this.handleResponse((LookupResponseMessage) message);
     }
