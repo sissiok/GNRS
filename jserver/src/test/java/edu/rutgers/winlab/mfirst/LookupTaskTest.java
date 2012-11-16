@@ -7,6 +7,7 @@ package edu.rutgers.winlab.mfirst;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.net.PortUnreachableException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -64,7 +65,7 @@ public class LookupTaskTest {
   /**
    * Test method for {@link edu.rutgers.winlab.mfirst.LookupTask#call()}.
    */
-  @Test(expected = IllegalArgumentException.class)
+  @Test//(expected=PortUnreachableException.class)
   public void testCall() {
     try {
       LookupMessage msg = new LookupMessage();

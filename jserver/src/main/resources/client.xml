@@ -8,4 +8,7 @@
   <!-- The hostname the client will send to the server. Also used for binding
        sockets when necessary. -->
   <clientHost>localhost</clientHost>
+  <!-- Seed value for random number generation.  A negative value will use the current
+       millisecond timestamp. -->
+  <randomSeed>-1</randomSeed>
 </edu.rutgers.winlab.mfirst.client.Configuration>

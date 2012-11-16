@@ -38,8 +38,8 @@ public interface NetworkAccessObject {
    * @param message
    *          the message to send
    */
-  public void sendMessage(final SessionParameters parameters,
-      final AbstractMessage message);
+//  public void actualSend(final SessionParameters parameters,
+//      final AbstractMessage message);
 
   /**
    * Sends a message to the network.

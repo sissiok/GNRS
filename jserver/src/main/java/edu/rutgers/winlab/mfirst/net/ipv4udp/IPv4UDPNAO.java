@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,6 +27,8 @@ import org.apache.mina.transport.socket.nio.NioDatagramConnector;
 import org.apache.mina.util.ConcurrentHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import sun.reflect.generics.repository.AbstractRepository;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -69,9 +72,10 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
   /**
    * SessionParameter objects for each IoSession.
    */
-  private final transient Map<IoSession, IPv4UDPParameters> inSessionMap = new ConcurrentHashMap<IoSession, IPv4UDPParameters>();
+  // private final transient Map<IoSession, IPv4UDPParameters> inSessionMap =
+  // new ConcurrentHashMap<IoSession, IPv4UDPParameters>();
 
-  private final transient Map<NetworkAddress, IPv4UDPParameters> incomingConnections = new ConcurrentHashMap<NetworkAddress, IPv4UDPParameters>();
+  private final transient Map<NetworkAddress, IPv4UDPParameters> connections = new ConcurrentHashMap<NetworkAddress, IPv4UDPParameters>();
 
   /**
    * Messages that are awaiting connections.
@@ -81,9 +85,9 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
   /**
    * Existing outbound connections for network addresses.
    */
-  private final transient Map<NetworkAddress, IPv4UDPParameters> outgoingConnections = new ConcurrentHashMap<NetworkAddress, IPv4UDPParameters>();
-
-  private final transient Map<Integer, RelayInfo> awaitingResponse = new ConcurrentHashMap<Integer, RelayInfo>();
+  // private final transient Map<NetworkAddress, IPv4UDPParameters>
+  // outgoingConnections = new ConcurrentHashMap<NetworkAddress,
+  // IPv4UDPParameters>();
 
   /**
    * Incoming datagram acceptor.
@@ -100,9 +104,6 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
   private final transient IPv4UDPAddress sendAddress;
 
   private final transient InetSocketAddress sendSockAddr;
-
-  private final transient AtomicInteger nextRequestId = new AtomicInteger(
-      (int) System.currentTimeMillis());
 
   /**
    * Creates a new instance of network access object for IPv4/UDP networking.
@@ -142,7 +143,7 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
     final DefaultIoFilterChainBuilder chain = this.acceptor.getFilterChain();
     // For encoding/decoding our messages
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
-        new GNRSProtocolCodecFactory(true)));
+        new GNRSProtocolCodecFactory()));
 
     final DatagramSessionConfig sessionConfig = this.acceptor
         .getSessionConfig();
@@ -174,7 +175,7 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
     sessionConfig.setCloseOnPortUnreachable(false);
     final DefaultIoFilterChainBuilder chain = this.connector.getFilterChain();
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
-        new GNRSProtocolCodecFactory(false)));
+        new GNRSProtocolCodecFactory()));
   }
 
   /**
@@ -194,8 +195,7 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
     this.listeners.add(listener);
   }
 
-  @Override
-  public void sendMessage(final SessionParameters parameters,
+  protected void actualSend(final SessionParameters parameters,
       final AbstractMessage message) {
 
     if (!(parameters instanceof IPv4UDPParameters)) {
@@ -206,9 +206,9 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
     final IPv4UDPParameters params = (IPv4UDPParameters) parameters;
     final WriteFuture future = params.session.write(message);
     LOG.info("Awaiting actual write of {} to {}", message, params.session);
-    if (!this.config.isAsynchronousWrite()) {
-      future.awaitUninterruptibly();
-    }
+    // if (!this.config.isAsynchronousWrite()) {
+    // future.awaitUninterruptibly();
+    // }
     LOG.info("Wrote {} to {}", message, params.session);
   }
 
@@ -217,9 +217,11 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
       final NetworkAddress... destAddrs) {
     LOG.info("Sending {} to {}", message, destAddrs);
     for (NetworkAddress destAddr : destAddrs) {
-      IPv4UDPParameters params = this.outgoingConnections.get(destAddr);
+      IPv4UDPParameters params = this.connections.get(destAddr);
+
       if (params == null) {
-        LOG.info("Establishing connection to {}", IPv4UDPAddress.toSocketAddr(destAddr));
+        LOG.info("Establishing connection to {}",
+            IPv4UDPAddress.toSocketAddr(destAddr));
         final ConnectFuture future = this.connector.connect(
             IPv4UDPAddress.toSocketAddr(destAddr), this.sendSockAddr);
         RelayInfo info = new RelayInfo();
@@ -233,54 +235,13 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
       }
       // Have an existing connection
       else {
-        int requestId = this.nextRequestId.getAndIncrement();
-        LOG.info("Using requestID {}", requestId);
-        RelayInfo info = new RelayInfo();
-        info.clientMessage = message;
-        info.serverAddress = destAddr;
-        info.serverParams = params;
-        info.clientParams = this.outgoingConnections.get(message
-            .getOriginAddress());
+
         MessageType type = message.getType();
 
-        switch (type) {
-        case INSERT: {
-          InsertMessage clientMessage = (InsertMessage) message;
-          InsertMessage sentMessage = new InsertMessage();
-          sentMessage.setBindings(clientMessage.getBindings());
-          sentMessage.setGuid(clientMessage.getGuid());
-          sentMessage.setOptions(clientMessage.getOptions());
-          sentMessage.setOriginAddress(this.listenAddress);
-          sentMessage.setRequestId(requestId);
-          sentMessage.setVersion((byte) 0);
-          this.awaitingResponse.put(Integer.valueOf(requestId), info);
-          this.sendMessage(params, sentMessage);
-
+        if (message.getType() == MessageType.LOOKUP) {
+          ((LookupMessage) message).setRecursive(false);
         }
-          break;
-        case INSERT_RESPONSE:
-          break;
-        case LOOKUP: {
-          LookupMessage clientMessage = (LookupMessage) message;
-          LookupMessage sentMessage = new LookupMessage();
-          sentMessage.setRecursive(false);
-          sentMessage.setGuid(clientMessage.getGuid());
-          sentMessage.setOriginAddress(this.listenAddress);
-          sentMessage.setVersion((byte) 0);
-          sentMessage.setRequestId(requestId);
-          this.awaitingResponse.put(Integer.valueOf(requestId), info);
-          this.sendMessage(params, sentMessage);
-        }
-          break;
-        case LOOKUP_RESPONSE:
-          break;
-        case UPDATE:
-          break;
-        case UPDATE_RESPONSE:
-          break;
-        case UNKNOWN:
-          break;
-        }
+        this.actualSend(params, message);
       }
     }
 
@@ -318,63 +279,32 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
 
   @Override
   public void messageReceived(final IoSession session, final Object message) {
-    if (message instanceof AbstractResponseMessage) {
-      this.handleResponse(session, (AbstractResponseMessage) message);
-    } else {
+    if (message instanceof AbstractMessage) {
+      AbstractMessage msg = (AbstractMessage) message;
+      NetworkAddress origin = msg.getOriginAddress();
       LOG.info("Received {} from {}", message, session);
-      IPv4UDPParameters params = this.inSessionMap.get(session);
-      if (params == null) {
+      IPv4UDPParameters params = this.connections.get(origin);
+      if (params == null
+          && session.getRemoteAddress() instanceof InetSocketAddress) {
+        NetworkAddress remoteAddr = IPv4UDPAddress
+            .fromInetSocketAddress((InetSocketAddress) session
+                .getRemoteAddress());
         params = new IPv4UDPParameters();
         params.session = session;
-        this.inSessionMap.put(session, params);
-        if (message instanceof AbstractMessage) {
-          this.incomingConnections.put(
-              ((AbstractMessage) message).getOriginAddress(), params);
+        this.connections.put(origin, params);
+      }
+      if (params != null) {
+        // this.inSessionMap.put(session, params);
+
+        // FIXME: This is poor separation of network and server
+        for (final MessageListener listener : this.listeners) {
+          listener.messageReceived(params, (AbstractMessage) message);
         }
 
       }
 
-      for (final MessageListener listener : this.listeners) {
-        listener.messageReceived(params, (AbstractMessage) message);
-      }
-    }
-  }
-
-  private void handleResponse(final IoSession session,
-      final AbstractResponseMessage respMsg) {
-    Integer reqId = Integer.valueOf((int) respMsg.getRequestId());
-    RelayInfo info = this.awaitingResponse.get(reqId);
-    // We are actually expecting this response
-    if (info != null) {
-      // This is a server we need a response from
-      if (info.remainingServers.remove(respMsg.getOriginAddress())) {
-        // Add the bindings (if any)
-        if (respMsg instanceof LookupResponseMessage) {
-          LookupResponseMessage lrm = (LookupResponseMessage) respMsg;
-          for (NetworkAddress netAddr : lrm.getBindings()) {
-            info.responseAddresses.add(netAddr);
-          }
-        }
-        // If this was the last server, reply to the client
-        if (info.remainingServers.isEmpty()) {
-          this.awaitingResponse.remove(reqId);
-
-          if (info.clientMessage instanceof LookupMessage) {
-            LookupResponseMessage lrm = new LookupResponseMessage();
-            lrm.setRequestId(info.clientMessage.getRequestId());
-            lrm.setOriginAddress(this.listenAddress);
-            lrm.setResponseCode(ResponseCode.SUCCESS);
-            lrm.setVersion((byte) 0x0);
-            lrm.setBindings(info.responseAddresses
-                .toArray(new NetworkAddress[] {}));
-            this.sendMessage(info.clientParams, lrm);
-          } else if (info.clientMessage instanceof InsertMessage) {
-            LOG.error("Insert not implemented");
-          } else {
-            LOG.error("Unsupported message received?");
-          }
-        }
-      }
+    } else {
+      LOG.error("Received non-message object: {}", message);
     }
   }
 
@@ -382,12 +312,12 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
   public void sessionOpened(final IoSession session) {
     final IPv4UDPParameters params = new IPv4UDPParameters();
     params.session = session;
-    this.inSessionMap.put(session, params);
+    // this.inSessionMap.put(session, params);
   }
 
   @Override
   public void sessionClosed(final IoSession session) {
-    this.inSessionMap.remove(session);
+    // this.inSessionMap.remove(session);
   }
 
   @Override
@@ -409,7 +339,7 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
       IPv4UDPParameters params = new IPv4UDPParameters();
       params.session = future.getSession();
       info.serverParams = params;
-      this.outgoingConnections.put(info.serverAddress, info.serverParams);
+      this.connections.put(info.serverAddress, info.serverParams);
       this.sendMessage(info.clientMessage, info.serverAddress);
     }
   }

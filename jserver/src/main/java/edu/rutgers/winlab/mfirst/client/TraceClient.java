@@ -126,7 +126,7 @@ public class TraceClient extends IoHandlerAdapter {
     sessionConfig.setCloseOnPortUnreachable(false);
     final DefaultIoFilterChainBuilder chain = this.connector.getFilterChain();
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
-        new GNRSProtocolCodecFactory(false)));
+        new GNRSProtocolCodecFactory()));
 
   }
 

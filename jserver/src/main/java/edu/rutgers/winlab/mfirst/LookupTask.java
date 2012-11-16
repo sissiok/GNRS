@@ -95,17 +95,32 @@ public class LookupTask implements Callable<Object> {
     }
 
     // At least one IP prefix binding was for the local server
-    if (message.isRecursive() & !resolvedLocally) {
-      message.setRecursive(false);
-      LOG.info("Forwarding {} to {}", message, serverAddxes);
+    if (this.message.isRecursive() & !resolvedLocally) {
+      this.message.setRecursive(false);
+      LOG.info("Forwarding {} to {}", this.message, serverAddxes);
       // FIXME: Need to control relay behavior in the server, not NAO.
       // This is the end.  Send out requests and the NAO will
       // Handle sending back to the client.
-      this.server.sendMessage(message,
+      RelayInfo info = new RelayInfo();
+      info.clientMessage = this.message;
+      info.remainingServers.addAll(serverAddxes);
+      
+      int requestId = this.server.getNextRequestId();
+      
+      LookupMessage relayMessage = new LookupMessage();
+      relayMessage.setGuid(this.message.getGuid());
+      relayMessage.setOptions(this.message.getOptions());
+      relayMessage.setOriginAddress(this.server.getOriginAddress());
+      relayMessage.setVersion((byte)0);
+      relayMessage.setRequestId(requestId);
+      
+      this.server.addNeededServer(requestId, info);
+      
+      this.server.sendMessage(relayMessage,
           serverAddxes.toArray(new NetworkAddress[] {}));
     } else {
       if (resolvedLocally) {
-        LOG.info("Resolving {} locally.", message);
+        LOG.info("Resolving {} locally.", this.message);
 
         response.setBindings(this.server.getBindings(this.message.getGuid()));
         response.setResponseCode(ResponseCode.SUCCESS);
@@ -116,7 +131,7 @@ public class LookupTask implements Callable<Object> {
       response.setOriginAddress(this.server.getOriginAddress());
       final long t30 = System.nanoTime();
       // log.debug("[{}] Writing {}", this.container.session, response);
-      this.server.sendMessage(this.params, response);
+      this.server.sendMessage(response, this.message.getOriginAddress());
 
       final long t40 = System.nanoTime();
       if (this.server.getConfig().isCollectStatistics()) {

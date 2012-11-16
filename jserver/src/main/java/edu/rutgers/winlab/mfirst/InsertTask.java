@@ -75,7 +75,7 @@ public class InsertTask implements Callable<Object> {
         : ResponseCode.FAILED);
     response.setOriginAddress(this.server.getOriginAddress());
 
-    this.server.sendMessage(this.params, response);
+    this.server.sendMessage(response, this.message.getOriginAddress());
 
     return null;
   }

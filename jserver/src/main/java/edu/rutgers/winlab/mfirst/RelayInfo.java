@@ -3,7 +3,7 @@
  * Copyright (C) 2012 Robert Moore and Rutgers University
  * All rights reserved.
  */
-package edu.rutgers.winlab.mfirst.net.ipv4udp;
+package edu.rutgers.winlab.mfirst;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,11 +23,8 @@ public class RelayInfo {
 
   public AbstractMessage clientMessage;
   
-  public IPv4UDPParameters clientParams;
+  public Set<NetworkAddress> responseAddresses = new ConcurrentHashSet<NetworkAddress>();
   
-  public NetworkAddress serverAddress;
-  
-  public IPv4UDPParameters serverParams;
-
+  public final Set<NetworkAddress> remainingServers = new ConcurrentHashSet<NetworkAddress>();
   
 }

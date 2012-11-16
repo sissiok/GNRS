@@ -7,8 +7,10 @@ package edu.rutgers.winlab.mfirst;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,8 +24,11 @@ import com.thoughtworks.xstream.XStream;
 import edu.rutgers.winlab.mfirst.mapping.GUIDMapper;
 import edu.rutgers.winlab.mfirst.mapping.ipv4udp.IPv4UDPGUIDMapper;
 import edu.rutgers.winlab.mfirst.messages.AbstractMessage;
+import edu.rutgers.winlab.mfirst.messages.AbstractResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
+import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
+import edu.rutgers.winlab.mfirst.messages.ResponseCode;
 import edu.rutgers.winlab.mfirst.net.AddressType;
 import edu.rutgers.winlab.mfirst.net.MessageListener;
 import edu.rutgers.winlab.mfirst.net.NetworkAccessObject;
@@ -156,6 +161,11 @@ public class GNRSServer implements MessageListener {
    * GUID binding storage object.
    */
   private final transient GUIDStore guidStore;
+
+  private final transient Map<Integer, RelayInfo> awaitingResponse = new ConcurrentHashMap<Integer, RelayInfo>();
+  
+  private final transient AtomicInteger nextRequestId = new AtomicInteger(
+      (int) System.currentTimeMillis());
 
   /**
    * Creates a new GNRS server with the specified configuration. The server will
@@ -366,20 +376,6 @@ public class GNRSServer implements MessageListener {
         .getMapping(guid, this.config.getNumReplicas(), types);
   }
 
-  /**
-   * Convenience method for tasks to send a message.
-   * 
-   * @param params
-   *          network paramters for the NAO.
-   * @param message
-   *          the message to send.
-   * @see NetworkAccessObject#sendMessage(SessionParameters, AbstractMessage)
-   */
-  public void sendMessage(final SessionParameters params,
-      final AbstractMessage message) {
-    this.networkAccess.sendMessage(params, message);
-  }
-
   public void sendMessage(final AbstractMessage message,
       final NetworkAddress... destAddrs) {
     this.networkAccess.sendMessage(message, destAddrs);
@@ -420,6 +416,8 @@ public class GNRSServer implements MessageListener {
     } else if (msg instanceof LookupMessage) {
       this.workers
           .submit(new LookupTask(this, parameters, (LookupMessage) msg));
+    } else if (msg instanceof AbstractResponseMessage) {
+      this.handleResponse(parameters, (AbstractResponseMessage) msg);
     }
     // Unrecognized or invalid message received
     else {
@@ -427,6 +425,63 @@ public class GNRSServer implements MessageListener {
       this.networkAccess.endSession(parameters);
     }
 
+  }
+
+  private void handleResponse(final SessionParameters params,
+      final AbstractResponseMessage respMsg) {
+    LOG.info("Using relay info for {}", respMsg);
+    Integer reqId = Integer.valueOf((int) respMsg.getRequestId());
+    RelayInfo info = this.awaitingResponse.get(reqId);
+    LOG.info("[{}]Using relay info for {}", respMsg, info.clientMessage);
+    // We are actually expecting this response
+    if (info != null) {
+      LOG.info("Retrieved relay info");
+      // This is a server we need a response from
+      if (info.remainingServers.remove(respMsg.getOriginAddress())) {
+        LOG.info("Removed {} from servers", respMsg.getOriginAddress());
+        // Add the bindings (if any)
+        if (respMsg instanceof LookupResponseMessage) {
+          LookupResponseMessage lrm = (LookupResponseMessage) respMsg;
+          for (NetworkAddress netAddr : lrm.getBindings()) {
+            LOG.info("Adding {} to LKR bindings.", lrm.getBindings());
+            info.responseAddresses.add(netAddr);
+          }
+        }
+        // If this was the last server, reply to the client
+        if (info.remainingServers.isEmpty()) {
+          LOG.info("All servers have replied.");
+          this.awaitingResponse.remove(reqId);
+
+          if (info.clientMessage instanceof LookupMessage) {
+            LookupResponseMessage lrm = new LookupResponseMessage();
+            lrm.setRequestId(info.clientMessage.getRequestId());
+            lrm.setOriginAddress(this.networkAccess.getOriginAddress());
+            lrm.setResponseCode(ResponseCode.SUCCESS);
+            lrm.setVersion((byte) 0x0);
+            lrm.setBindings(info.responseAddresses
+                .toArray(new NetworkAddress[] {}));
+            LOG.info("Going to send reply back to client: {}", lrm);
+            this.networkAccess.sendMessage(lrm,info.clientMessage.getOriginAddress());
+          } else if (info.clientMessage instanceof InsertMessage) {
+            LOG.error("Insert not implemented");
+          } else {
+            LOG.error("Unsupported message received?");
+          }
+        } else {
+          LOG.info("Awaiting servers: {}", info.remainingServers);
+        }
+      } else {
+        LOG.warn("Unable to find relay info for {}", respMsg);
+      }
+    }
+  }
+  
+  public void addNeededServer(final Integer requestId, final RelayInfo info){
+    this.awaitingResponse.put(Integer.valueOf(requestId), info);
+  }
+  
+  public int getNextRequestId(){
+    return this.nextRequestId.getAndIncrement();
   }
 
   /**

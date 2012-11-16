@@ -8,6 +8,7 @@ package edu.rutgers.winlab.mfirst;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.net.PortUnreachableException;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -66,7 +67,7 @@ public class InsertTaskTest {
   /**
    * Test method for {@link edu.rutgers.winlab.mfirst.InsertTask#call()}.
    */
-  @Test(expected=IllegalArgumentException.class)
+  @Test//(expected=PortUnreachableException.class)
   public void testCall() {
     try {
       InsertMessage msg = new InsertMessage();

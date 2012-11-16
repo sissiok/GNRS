@@ -8,4 +8,6 @@
   <!-- The hostname the client will send to the server. Also used for binding
        sockets when necessary. -->
   <clientHost>localhost</clientHost>
+  <!-- The seed value for the random number generator. -->
+  <randomSeed>0</randomSeed>
 </edu.rutgers.winlab.mfirst.client.Configuration>

@@ -35,6 +35,11 @@ public class Configuration {
    */
   // FIXME: Make sure this is used
   private int clientPort = 4001;
+  
+  /**
+   * Seed value for random generation.
+   */
+  private long randomSeed = -1;
 
   /**
    * Returns the server hostname for this configuration.
@@ -110,6 +115,22 @@ public class Configuration {
    */
   public void setClientHost(final String clientHost) {
     this.clientHost = clientHost;
+  }
+
+  /**
+   * Get the random number generator seed value.
+   * @return the random seed value.
+   */
+  public long getRandomSeed() {
+    return this.randomSeed;
+  }
+
+  /**
+   * Sets the random number generator seed value.
+   * @param randomSeed the new seed value.
+   */
+  public void setRandomSeed(long randomSeed) {
+    this.randomSeed = randomSeed;
   }
 
 }

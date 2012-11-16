@@ -117,7 +117,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
   /**
    * How long to wait between messages, in microseconds.
    */
-  private final transient int delay;
+  private final transient long delay;
   /**
    * Total number of lookup messages to generate.
    */
@@ -165,7 +165,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     sessionConfig.setCloseOnPortUnreachable(false);
     final DefaultIoFilterChainBuilder chain = this.connector.getFilterChain();
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
-        new GNRSProtocolCodecFactory(false)));
+        new GNRSProtocolCodecFactory()));
 
     LOG.info(String.format("Assuming timer precision of %,dns.",
         Long.valueOf(SLEEP_PRECISION)));
@@ -250,7 +250,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
       LookupMessage message;
       long nextSend = System.nanoTime();
       long lastSend = 0l;
-      final Random rand = new Random(System.currentTimeMillis());
+      final Random rand = new Random(this.config.getRandomSeed());
 
       for (int i = 0; i < this.numLookups; ++i) {
 
