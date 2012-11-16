@@ -261,8 +261,8 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
 
     Long median = rttList.get(length / 2);
 
-    LOG.info(String.format("Min: %,dus | Med: %,dus | Max: %,dus", rttList.get(0)/1000,
-        median/1000, rttList.get(length - 1)/1000));
+    LOG.info(String.format("Min: %,dus | Med: %,dus | Max: %,dus",
+        rttList.get(0) / 1000, median / 1000, rttList.get(length - 1) / 1000));
 
     final int succ = GeneratingClient.this.numSuccess.get();
     final int total = succ + GeneratingClient.this.numFailures.get();
@@ -346,7 +346,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
   @Override
   public void messageReceived(final IoSession session, final Object message) {
     final long rcvTime = System.nanoTime();
-//    LOG.info("Received {} on {}", message, session);
+    // LOG.info("Received {} on {}", message, session);
     if (message instanceof LookupResponseMessage) {
       this.handleResponse((LookupResponseMessage) message, rcvTime);
     }
@@ -358,11 +358,14 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
    * @param msg
    *          the response message.
    */
-  public void handleResponse(final LookupResponseMessage msg,final long recvNanos) {
+  public void handleResponse(final LookupResponseMessage msg,
+      final long recvNanos) {
 
-    Long startNanos = this.sendTimes.get(Integer.valueOf((int)msg.getRequestId()));
-    this.rtts.add(Long.valueOf(recvNanos - startNanos.longValue()));
-    
+    Long startNanos = this.sendTimes.remove(Integer.valueOf((int) msg
+        .getRequestId()));
+    if (startNanos != null) {
+      this.rtts.add(Long.valueOf(recvNanos - startNanos.longValue()));
+    }
     if (ResponseCode.SUCCESS.equals(msg.getResponseCode())) {
       this.numSuccess.incrementAndGet();
       if (msg.getBindings() != null && msg.getBindings().length > 0) {
