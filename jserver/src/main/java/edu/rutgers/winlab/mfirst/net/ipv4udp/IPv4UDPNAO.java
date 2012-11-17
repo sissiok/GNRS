@@ -232,11 +232,7 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
       // Have an existing connection
       else {
 
-        MessageType type = message.getType();
-
-        if (message.getType() == MessageType.LOOKUP) {
-          ((LookupMessage) message).setRecursive(false);
-        }
+       
         this.actualSend(params, message);
       }
     }

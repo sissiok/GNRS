@@ -194,13 +194,13 @@ public class TraceClient extends IoHandlerAdapter {
 
         message.setOriginAddress(fromAddress);
 
-        LOG.info("Writing {} to {}", message, session);
         session.write(message);
-        try {
-          Thread.sleep(this.delay);
-        } catch (final InterruptedException ie) {
+//        try {
+          java.util.concurrent.locks.LockSupport.parkNanos(this.delay*1000l);
+//          Thread.sleep(this.delay);
+//        } catch (final InterruptedException ie) {
           // Ignored
-        }
+//        }
 
       }
       LOG.info("Finished reading trace file. Waiting 5 seconds.");
@@ -319,6 +319,7 @@ public class TraceClient extends IoHandlerAdapter {
       insMsg.setBindings(bindings);
       insMsg.setGuid(guid);
       insMsg.setRequestId(sequenceNumber);
+      insMsg.setRecursive(true);
     }
     return msg;
   }

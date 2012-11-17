@@ -26,6 +26,7 @@ import edu.rutgers.winlab.mfirst.mapping.ipv4udp.IPv4UDPGUIDMapper;
 import edu.rutgers.winlab.mfirst.messages.AbstractMessage;
 import edu.rutgers.winlab.mfirst.messages.AbstractResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.InsertMessage;
+import edu.rutgers.winlab.mfirst.messages.InsertResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.ResponseCode;
@@ -137,6 +138,13 @@ public class GNRSServer implements MessageListener {
   static final AtomicInteger NUM_LOOKUPS = new AtomicInteger(0);
 
   /**
+   * Number of inserts performed since last stats output.
+   */
+  static final AtomicInteger NUM_INSERTS = new AtomicInteger(0);
+  
+  static final AtomicInteger NUM_RESPONSES = new AtomicInteger(0);
+
+  /**
    * Total number of nanoseconds spent processing messages since last stats
    * report.
    */
@@ -162,8 +170,8 @@ public class GNRSServer implements MessageListener {
    */
   private final transient GUIDStore guidStore;
 
-  private final transient Map<Integer, RelayInfo> awaitingResponse = new ConcurrentHashMap<Integer, RelayInfo>();
-  
+  final transient Map<Integer, RelayInfo> awaitingResponse = new ConcurrentHashMap<Integer, RelayInfo>();
+
   private final transient AtomicInteger nextRequestId = new AtomicInteger(
       (int) System.currentTimeMillis());
 
@@ -201,7 +209,7 @@ public class GNRSServer implements MessageListener {
       numThreads = 1;
     }
 
-//    LOG.info("Using threadpool of {} threads.", Integer.valueOf(numThreads));
+    // LOG.info("Using threadpool of {} threads.", Integer.valueOf(numThreads));
     this.workers = Executors.newFixedThreadPool(numThreads);
 
     this.networkAccess = createNAO(this.config);
@@ -417,7 +425,7 @@ public class GNRSServer implements MessageListener {
       this.workers
           .submit(new LookupTask(this, parameters, (LookupMessage) msg));
     } else if (msg instanceof AbstractResponseMessage) {
-      this.handleResponse(parameters, (AbstractResponseMessage) msg);
+      this.workers.submit(new ResponseTask(this, parameters, (AbstractResponseMessage)msg));
     }
     // Unrecognized or invalid message received
     else {
@@ -427,60 +435,13 @@ public class GNRSServer implements MessageListener {
 
   }
 
-  private void handleResponse(final SessionParameters params,
-      final AbstractResponseMessage respMsg) {
-//    LOG.info("Using relay info for {}", respMsg);
-    Integer reqId = Integer.valueOf((int) respMsg.getRequestId());
-    RelayInfo info = this.awaitingResponse.get(reqId);
-//    LOG.info("[{}]Using relay info for {}", respMsg, info.clientMessage);
-    // We are actually expecting this response
-    if (info != null) {
-//      LOG.info("Retrieved relay info");
-      // This is a server we need a response from
-      if (info.remainingServers.remove(respMsg.getOriginAddress())) {
-//        LOG.info("Removed {} from servers", respMsg.getOriginAddress());
-        // Add the bindings (if any)
-        if (respMsg instanceof LookupResponseMessage) {
-          LookupResponseMessage lrm = (LookupResponseMessage) respMsg;
-          for (NetworkAddress netAddr : lrm.getBindings()) {
-//            LOG.info("Adding {} to LKR bindings.", lrm.getBindings());
-            info.responseAddresses.add(netAddr);
-          }
-        }
-        // If this was the last server, reply to the client
-        if (info.remainingServers.isEmpty()) {
-//          LOG.info("All servers have replied.");
-          this.awaitingResponse.remove(reqId);
+ 
 
-          if (info.clientMessage instanceof LookupMessage) {
-            LookupResponseMessage lrm = new LookupResponseMessage();
-            lrm.setRequestId(info.clientMessage.getRequestId());
-            lrm.setOriginAddress(this.networkAccess.getOriginAddress());
-            lrm.setResponseCode(ResponseCode.SUCCESS);
-            lrm.setVersion((byte) 0x0);
-            lrm.setBindings(info.responseAddresses
-                .toArray(new NetworkAddress[] {}));
-//            LOG.info("Going to send reply back to client: {}", lrm);
-            this.networkAccess.sendMessage(lrm,info.clientMessage.getOriginAddress());
-          } else if (info.clientMessage instanceof InsertMessage) {
-            LOG.error("Insert not implemented");
-          } else {
-            LOG.error("Unsupported message received?");
-          }
-        } else {
-//          LOG.info("Awaiting servers: {}", info.remainingServers);
-        }
-      } else {
-        LOG.warn("Unable to find relay info for {}", respMsg);
-      }
-    }
-  }
-  
-  public void addNeededServer(final Integer requestId, final RelayInfo info){
+  public void addNeededServer(final Integer requestId, final RelayInfo info) {
     this.awaitingResponse.put(Integer.valueOf(requestId), info);
   }
-  
-  public int getNextRequestId(){
+
+  public int getNextRequestId() {
     return this.nextRequestId.getAndIncrement();
   }
 
@@ -506,18 +467,26 @@ public class GNRSServer implements MessageListener {
     public void run() {
       final long totalNanos = GNRSServer.MSG_LIFETIME.getAndSet(0l);
       final int numLookups = GNRSServer.NUM_LOOKUPS.getAndSet(0);
+      final int numInserts = GNRSServer.NUM_INSERTS.getAndSet(0);
+      final int numResponse = GNRSServer.NUM_RESPONSES.getAndSet(0);
       final long now = System.currentTimeMillis();
 
       final long timeDiff = now - this.lastTimestamp;
       this.lastTimestamp = now;
       final float numSeconds = timeDiff / 1000f;
       final float lookupsPerSecond = numLookups / numSeconds;
-      final float avgLifetimeUsec = numLookups == 0 ? 0
-          : ((totalNanos / (float) numLookups) / 1000);
-      LOG_STATS.info(String.format(
-          "\nLookups: %.3f per second (%.2f s)\nAverage Lifetime: %,.0fus",
-          Float.valueOf(lookupsPerSecond), Float.valueOf(numSeconds),
-          Float.valueOf(avgLifetimeUsec)));
+      final float insertsPerSecond = numInserts / numSeconds;
+      final float responsesPerSecond = numResponse / numSeconds;
+      final int totalMessages = numLookups + numInserts + numResponse;
+      final float avgLifetimeUsec = totalMessages == 0 ? 0
+          : ((totalNanos / (float) totalMessages) / 1000);
+      LOG_STATS.info(String.format("\nLookups: %.3f per second (%.2f s)"
+          + "\nInserts: %.3f per second (%.2f s)"
+          + "\nResponses: %.3f per second (%.2f s)"
+          + "\nAverage Lifetime: %,.0fus", Float.valueOf(lookupsPerSecond),
+          Float.valueOf(numSeconds), Float.valueOf(insertsPerSecond),
+          Float.valueOf(numSeconds), Float.valueOf(responsesPerSecond),
+          Float.valueOf(numSeconds), Float.valueOf(avgLifetimeUsec)));
     }
   }
 

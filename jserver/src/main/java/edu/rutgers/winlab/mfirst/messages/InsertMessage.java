@@ -29,6 +29,21 @@ public class InsertMessage extends AbstractMessage {
    * Set of message options.
    */
   private long options;
+  
+  private static final long FLAG_RECURSIVE = 0x01l;
+  
+  
+  public void setRecursive(final boolean recursive) {
+    if (recursive) {
+      this.options |= FLAG_RECURSIVE;
+    } else {
+      this.options &= ~FLAG_RECURSIVE;
+    }
+  }
+
+  public boolean isRecursive() {
+    return (this.options & FLAG_RECURSIVE) != 0;
+  }
 
   /**
    * Creates a new Insert message.
