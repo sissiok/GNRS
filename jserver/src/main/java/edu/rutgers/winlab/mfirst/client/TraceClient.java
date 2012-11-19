@@ -18,6 +18,7 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
+import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
 import org.apache.mina.transport.socket.nio.NioDatagramConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,6 +87,8 @@ public class TraceClient extends IoHandlerAdapter {
    * Connector to communicate with the server.
    */
   private final transient NioDatagramConnector connector;
+  
+  private final transient NioDatagramAcceptor acceptor;
   /**
    * Configuration for the client.
    */
@@ -118,13 +121,23 @@ public class TraceClient extends IoHandlerAdapter {
     this.traceFile = traceFile;
     this.delay = delay;
 
+
+    this.acceptor = new NioDatagramAcceptor();
+    this.acceptor.setHandler(this);
+    DatagramSessionConfig sessionConfig = this.acceptor.getSessionConfig();
+    sessionConfig.setReuseAddress(true);
+    sessionConfig.setCloseOnPortUnreachable(false);
+    DefaultIoFilterChainBuilder chain = this.acceptor.getFilterChain();
+    chain.addLast("gnrs codec", new ProtocolCodecFilter(
+        new GNRSProtocolCodecFactory()));
+    
     this.connector = new NioDatagramConnector();
     this.connector.setHandler(this);
-    final DatagramSessionConfig sessionConfig = this.connector
+    sessionConfig = this.connector
         .getSessionConfig();
     sessionConfig.setReuseAddress(true);
     sessionConfig.setCloseOnPortUnreachable(false);
-    final DefaultIoFilterChainBuilder chain = this.connector.getFilterChain();
+    chain = this.connector.getFilterChain();
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
         new GNRSProtocolCodecFactory()));
 
@@ -137,6 +150,11 @@ public class TraceClient extends IoHandlerAdapter {
    * @return {@code true} if everything goes well, else {@code false}.
    */
   public boolean connect() {
+    boolean retValue = true;
+    try {
+  
+    this.acceptor.bind(new InetSocketAddress(this.config.getClientPort()));
+    
     LOG.debug("Creating connect future.");
     final ConnectFuture connectFuture = this.connector
         .connect(new InetSocketAddress(this.config.getServerHost(), this.config
@@ -157,8 +175,12 @@ public class TraceClient extends IoHandlerAdapter {
     });
 
     LOG.debug("Future listener will handle connection event and start trace.");
+    } catch (IOException e) {
+      LOG.error("Unable to bind to local port.", e);
+      retValue = false;
+    }
 
-    return true;
+    return retValue;
   }
 
   /**
@@ -220,6 +242,7 @@ public class TraceClient extends IoHandlerAdapter {
     }
     session.close(true);
     this.connector.dispose(true);
+    this.acceptor.dispose(true);
   }
 
   /**

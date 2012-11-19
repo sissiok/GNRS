@@ -37,4 +37,10 @@
   
   <!-- Configuration file name for the GUID storage object. -->
   <storeConfiguration>src/main/resources/berkeleydb.xml</storeConfiguration>
+  
+  <!-- Number of attempts to send timed-out messages to other servers. -->
+  <numAttempts>0</numAttempts>
+  
+  <!-- How long to wait for a response before declaring a message timed-out. -->
+  <timeoutMillis>1000</timeoutMillis>
 </edu.rutgers.winlab.mfirst.Configuration>

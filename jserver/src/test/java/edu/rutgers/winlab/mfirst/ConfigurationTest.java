@@ -4,7 +4,6 @@
  */
 package edu.rutgers.winlab.mfirst;
 
-import static org.junit.Assert.*;
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -19,9 +18,12 @@ public class ConfigurationTest {
    */
   public static final String TEST_STRING = "/path/to/file.xml";
 
+  /**
+   * General test case for getters/setters in the Configuration class.
+   */
   @Test
   public void test() {
-    Configuration config = new Configuration();
+    final Configuration config = new Configuration();
 
     config.setCollectStatistics(true);
     Assert.assertTrue(config.isCollectStatistics());
@@ -52,5 +54,12 @@ public class ConfigurationTest {
     
     config.setStoreType(TEST_STRING);
     Assert.assertEquals(TEST_STRING, config.getStoreType());
+    
+    config.setNumAttempts(5);
+    Assert.assertEquals(5,config.getNumAttempts());
+    
+    config.setTimeoutMillis(3210l);
+    Assert.assertEquals(3210l,config.getTimeoutMillis());
+    
   }
 }

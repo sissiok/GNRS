@@ -99,7 +99,6 @@ public class ResponseTask implements Callable<Object> {
 
     }
 
-    LOG.info("Outstanding requests: {}",this.server.awaitingResponse.size());
     
     return null;
   }

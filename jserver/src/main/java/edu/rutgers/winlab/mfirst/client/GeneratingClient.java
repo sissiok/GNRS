@@ -33,6 +33,8 @@ import org.apache.mina.transport.socket.nio.NioDatagramConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import sun.misc.GC;
+
 import com.thoughtworks.xstream.XStream;
 
 import edu.rutgers.winlab.mfirst.GUID;
@@ -62,6 +64,8 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
   // Linux supports a 50 microsecond precision
   private static final long SLEEP_PRECISION = System.getProperty("os.name")
       .equalsIgnoreCase("linux") ? 50000 : 1000000;
+
+  private transient long lastReceiveTime = System.currentTimeMillis();
 
   /**
    * @param args
@@ -248,10 +252,13 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
   public void perform(final IoSession session) {
     LOG.info("Connected to {}", session);
     this.generateLookups(session);
-    try {
-      Thread.sleep(1000);
-    } catch (final InterruptedException ie) {
-      // Ignored
+
+    while (this.lastReceiveTime > (System.currentTimeMillis() - 5000)) {
+      try {
+        Thread.sleep(500);
+      } catch (final InterruptedException ie) {
+        // Ignored
+      }
     }
     int length = this.rtts.size();
     ArrayList<Long> rttList = new ArrayList<Long>(length);
@@ -259,20 +266,19 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
 
     Collections.sort(rttList);
 
-    Long median = rttList.get(length / 2);
-
+    Long median = rttList.isEmpty() ? 0 : rttList.get(length / 2);
+    if(!rttList.isEmpty()){
     LOG.info(String.format("Min: %,dus | Med: %,dus | Max: %,dus",
         rttList.get(0) / 1000, median / 1000, rttList.get(length - 1) / 1000));
+    }
 
     final int succ = GeneratingClient.this.numSuccess.get();
     final int total = succ + GeneratingClient.this.numFailures.get();
-    final float success = ((succ * 1f) / total) * 100;
-    final float loss = ((GeneratingClient.this.numLookups - total * 1f) / GeneratingClient.this.numLookups) * 100;
-    final float hits = ((GeneratingClient.this.numHits.get() * 1f) / total) * 100;
+   
     LOG.info(String.format(
-        "Total: %,d  |  Success: %,.2f%%  |  Hits: %,.2f%%  |  Loss: %,.2f%%)",
-        Integer.valueOf(total), Float.valueOf(success), Float.valueOf(hits),
-        Float.valueOf(loss)));
+        "Total: %,d  |  Success: %,d  |  Bound: %,d  |  Loss: %,d)",
+        Integer.valueOf(total), Integer.valueOf(succ), Integer.valueOf(GeneratingClient.this.numHits.get()),
+        Integer.valueOf(GeneratingClient.this.numLookups-total)));
     session.close(true);
     this.acceptor.dispose(true);
     this.connector.dispose(true);
@@ -301,7 +307,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
         message = new LookupMessage();
         message.setRecursive(true);
 
-        message.setGuid(GUID.fromInt(('0' + rand.nextInt(10)) << 24));
+        message.setGuid(GUID.fromASCII("" + rand.nextInt(1000000)));
         message.setRequestId(i);
         message.setOriginAddress(clientAddress);
         lastSend = System.nanoTime();
@@ -346,6 +352,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
   @Override
   public void messageReceived(final IoSession session, final Object message) {
     final long rcvTime = System.nanoTime();
+    this.lastReceiveTime = System.currentTimeMillis();
     // LOG.info("Received {} on {}", message, session);
     if (message instanceof LookupResponseMessage) {
       this.handleResponse((LookupResponseMessage) message, rcvTime);

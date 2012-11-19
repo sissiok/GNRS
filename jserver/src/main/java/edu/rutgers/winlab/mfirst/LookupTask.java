@@ -64,13 +64,11 @@ public class LookupTask implements Callable<Object> {
   @Override
   public Object call() {
 
-    final long t10 = System.nanoTime();
     GNRSServer.NUM_LOOKUPS.incrementAndGet();
+    
 
     final Collection<NetworkAddress> serverAddxes = this.server.getMappings(
         this.message.getGuid(), this.message.getOriginAddress().getType());
-
-    final long t20 = System.nanoTime();
 
     final LookupResponseMessage response = new LookupResponseMessage();
     response.setRequestId(this.message.getRequestId());
@@ -90,11 +88,9 @@ public class LookupTask implements Callable<Object> {
 
       }
     }
-    
-    long t30 = System.nanoTime();
 
-    // At least one IP prefix binding was for the local server
-    if (this.message.isRecursive() & !resolvedLocally) {
+    // No bindings were for the local server
+    if (this.message.isRecursive() && !resolvedLocally) {
       this.message.setRecursive(false);
 
       RelayInfo info = new RelayInfo();
@@ -114,33 +110,32 @@ public class LookupTask implements Callable<Object> {
 
       this.server.sendMessage(relayMessage,
           serverAddxes.toArray(new NetworkAddress[] {}));
-    } else {
+      info.markAttempt();
+    }
+    // Either resolved at this server or non-recursive
+    else {
+      // Resolved at this server
       if (resolvedLocally) {
-        // LOG.info("Resolving {} locally.", this.message);
 
         response.setBindings(this.server.getBindings(this.message.getGuid()));
         response.setResponseCode(ResponseCode.SUCCESS);
 
-      } else {
+      }
+      // Non-local but not recursive, so a problem with the remote host
+      else {
         response.setResponseCode(ResponseCode.FAILED);
       }
       response.setOriginAddress(this.server.getOriginAddress());
-      
+
       // log.debug("[{}] Writing {}", this.container.session, response);
       this.server.sendMessage(response, this.message.getOriginAddress());
 
     }
-    final long t40 = System.nanoTime();
+
     if (this.server.getConfig().isCollectStatistics()) {
-      
+
       GNRSServer.MSG_LIFETIME.addAndGet(System.nanoTime()
           - this.message.createdNanos);
-    }
-    if (LOG.isDebugEnabled()) {
-      LOG.debug(String.format(
-          "Processing: %,dns [Map: %,dns, GetBind: %,dns, Write: %,dns] \n",
-          Long.valueOf(t40 - t10), Long.valueOf(t20 - t10),
-          Long.valueOf(t30 - t20), Long.valueOf(t40 - t30)));
     }
 
     return null;

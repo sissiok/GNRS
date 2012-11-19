@@ -22,6 +22,7 @@ import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.write.WriteToClosedSessionException;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
@@ -71,8 +72,8 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
    */
   private final transient Configuration config;
 
-  private final transient Map<IoSession,NetworkAddress> sessions = new ConcurrentHashMap<IoSession, NetworkAddress>();
-  
+  private final transient Map<IoSession, NetworkAddress> sessions = new ConcurrentHashMap<IoSession, NetworkAddress>();
+
   private final transient Map<NetworkAddress, IPv4UDPParameters> connections = new ConcurrentHashMap<NetworkAddress, IPv4UDPParameters>();
 
   /**
@@ -168,7 +169,7 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
     sessionConfig.setCloseOnPortUnreachable(false);
     sessionConfig.setIdleTime(IdleStatus.BOTH_IDLE, 1);
     sessionConfig.setIdleTime(IdleStatus.BOTH_IDLE, 1);
-    
+
     final DefaultIoFilterChainBuilder chain = this.connector.getFilterChain();
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
         new GNRSProtocolCodecFactory()));
@@ -201,23 +202,23 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
 
     final IPv4UDPParameters params = (IPv4UDPParameters) parameters;
     final WriteFuture future = params.session.write(message);
-//    LOG.info("Awaiting actual write of {} to {}", message, params.session);
+    // LOG.info("Awaiting actual write of {} to {}", message, params.session);
     // if (!this.config.isAsynchronousWrite()) {
     // future.awaitUninterruptibly();
     // }
-//    LOG.info("Wrote {} to {}", message, params.session);
+    // LOG.info("Wrote {} to {}", message, params.session);
   }
 
   @Override
   public void sendMessage(final AbstractMessage message,
       final NetworkAddress... destAddrs) {
-//    LOG.info("Sending {} to {}", message, destAddrs);
+    // LOG.info("Sending {} to {}", message, destAddrs);
     for (NetworkAddress destAddr : destAddrs) {
       IPv4UDPParameters params = this.connections.get(destAddr);
 
       if (params == null) {
-//        LOG.info("Establishing connection to {}",
-//            IPv4UDPAddress.toSocketAddr(destAddr));
+        // LOG.info("Establishing connection to {}",
+        // IPv4UDPAddress.toSocketAddr(destAddr));
         final ConnectFuture future = this.connector.connect(
             IPv4UDPAddress.toSocketAddr(destAddr), this.sendSockAddr);
         RelayInfo info = new RelayInfo();
@@ -232,7 +233,6 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
       // Have an existing connection
       else {
 
-       
         this.actualSend(params, message);
       }
     }
@@ -274,7 +274,7 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
     if (message instanceof AbstractMessage) {
       AbstractMessage msg = (AbstractMessage) message;
       NetworkAddress origin = msg.getOriginAddress();
-//      LOG.info("Received {} from {}", message, session);
+      // LOG.info("Received {} from {}", message, session);
       for (final MessageListener listener : this.listeners) {
         listener.messageReceived(null, (AbstractMessage) message);
       }
@@ -286,30 +286,37 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
 
   @Override
   public void sessionOpened(final IoSession session) {
-    
+
   }
-  
+
   @Override
-  public void sessionIdle(final IoSession session, final IdleStatus idleStatus){
+  public void sessionIdle(final IoSession session, final IdleStatus idleStatus) {
     session.close(true);
   }
 
   @Override
   public void sessionClosed(final IoSession session) {
-    NetworkAddress addr = this.sessions.get(session);
-    if(addr != null){
+    NetworkAddress addr = this.sessions.remove(session);
+    if (addr != null) {
       this.connections.remove(addr);
     }
-   
+
   }
 
   @Override
   public void exceptionCaught(final IoSession session, final Throwable cause) {
-   if(cause instanceof PortUnreachableException){
-     session.close(true);
-   }else{
-     LOG.error("Caught exception for " + session+".",cause);
-   }
+    if (!(cause instanceof PortUnreachableException || cause instanceof WriteToClosedSessionException)) {
+      LOG.error("Caught exception for " + session + ".", cause);
+      NetworkAddress addr = this.sessions.remove(session);
+      if (addr != null) {
+        this.connections.remove(addr);
+      }
+    }
+
+    NetworkAddress addr = this.sessions.remove(session);
+    if (addr != null) {
+      this.connections.remove(addr);
+    }
   }
 
   @Override

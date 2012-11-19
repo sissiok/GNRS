@@ -231,9 +231,9 @@ public class BerkeleyDBStore implements GUIDStore {
 
   @Override
   public void doInit() {
-    if (this.server != null && this.server.getStatsTimer() != null) {
+    if (this.server != null && this.server.isCollectStatistics()) {
       this.statsTask = new StatsTask(this.bdbEnvironment);
-      this.server.getStatsTimer().scheduleAtFixedRate(this.statsTask, 10000l,
+      this.server.getTimer().scheduleAtFixedRate(this.statsTask, 10000l,
           10000l);
 
     }

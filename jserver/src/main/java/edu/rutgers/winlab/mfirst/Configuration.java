@@ -56,6 +56,17 @@ public class Configuration {
   private String storeConfiguration = "berkeleydb.xml";
 
   /**
+   * Timeout period (in milliseconds) for messages sent to remote servers.
+   */
+  private long timeoutMillis = 500l;
+
+  /**
+   * Number of attempts to make to a remote server before returning a "FAILURE"
+   * response to clients.
+   */
+  private int numAttempts = 2;
+
+  /**
    * Gets the current number of worker threads used.
    * 
    * @return the number of worker threads in use.
@@ -217,6 +228,38 @@ public class Configuration {
    */
   public void setStoreConfiguration(final String storeConfig) {
     this.storeConfiguration = storeConfig;
+  }
+
+  /**
+   * Get the timeout value for messages sent to remote servers. 
+   * @return the timeout value in milliseconds.
+   */
+  public long getTimeoutMillis() {
+    return this.timeoutMillis;
+  }
+
+  /**
+   * Sets the timeout value for messages sent to remote servers.
+   * @param timeoutMillis the new timeout value in milliseconds.
+   */
+  public void setTimeoutMillis(final long timeoutMillis) {
+    this.timeoutMillis = timeoutMillis;
+  }
+
+  /**
+   * Gets the number of retries made for timed-out messages.
+   * @return the number of retries for each message.
+   */
+  public int getNumAttempts() {
+    return this.numAttempts;
+  }
+
+  /**
+   * Sets the number of retries made for each message.
+   * @param numRetries the new number of retries. A negative value is interpreted as 0.
+   */
+  public void setNumAttempts(final int numRetries) {
+    this.numAttempts = numRetries;
   }
 
 }

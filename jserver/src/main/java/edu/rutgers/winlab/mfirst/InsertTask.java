@@ -117,6 +117,7 @@ public class InsertTask implements Callable<Object> {
         this.server.addNeededServer(Integer.valueOf(requestId), info);
         this.server.sendMessage(relayMessage,
             serverAddxes.toArray(new NetworkAddress[] {}));
+        info.markAttempt();
       } else {
         LOG.error("Invalid server addresses.  Cannot forward.");
       }
@@ -131,6 +132,7 @@ public class InsertTask implements Callable<Object> {
       response.setVersion((byte)0);
       
       this.server.sendMessage(response, this.message.getOriginAddress());
+      
     }
 
     long t40 = System.nanoTime();

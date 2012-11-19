@@ -7,6 +7,7 @@ package edu.rutgers.winlab.mfirst;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -26,10 +27,7 @@ import edu.rutgers.winlab.mfirst.mapping.ipv4udp.IPv4UDPGUIDMapper;
 import edu.rutgers.winlab.mfirst.messages.AbstractMessage;
 import edu.rutgers.winlab.mfirst.messages.AbstractResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.InsertMessage;
-import edu.rutgers.winlab.mfirst.messages.InsertResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
-import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
-import edu.rutgers.winlab.mfirst.messages.ResponseCode;
 import edu.rutgers.winlab.mfirst.net.AddressType;
 import edu.rutgers.winlab.mfirst.net.MessageListener;
 import edu.rutgers.winlab.mfirst.net.NetworkAccessObject;
@@ -128,20 +126,23 @@ public class GNRSServer implements MessageListener {
   private final transient boolean collectStatistics;
 
   /**
-   * Timer for printing statistics.
+   * Timer for various tasks.
    */
-  private final transient Timer statsTimer;
+  private final transient Timer timer = new Timer();
 
   /**
-   * Number of lookups performed since last stats output.
+   * Number of Lookup messages processed since last stats output.
    */
   static final AtomicInteger NUM_LOOKUPS = new AtomicInteger(0);
 
   /**
-   * Number of inserts performed since last stats output.
+   * Number of Insert messages processed since last stats output.
    */
   static final AtomicInteger NUM_INSERTS = new AtomicInteger(0);
-  
+
+  /**
+   * Number of Response messages processed since last stats output.
+   */
   static final AtomicInteger NUM_RESPONSES = new AtomicInteger(0);
 
   /**
@@ -170,8 +171,15 @@ public class GNRSServer implements MessageListener {
    */
   private final transient GUIDStore guidStore;
 
+  /**
+   * Messages sent to other servers for processing. These messages are awaiting
+   * a response from a remote server.
+   */
   final transient Map<Integer, RelayInfo> awaitingResponse = new ConcurrentHashMap<Integer, RelayInfo>();
 
+  /**
+   * Unique message ID values for this server.
+   */
   private final transient AtomicInteger nextRequestId = new AtomicInteger(
       (int) System.currentTimeMillis());
 
@@ -188,12 +196,6 @@ public class GNRSServer implements MessageListener {
     super();
     this.config = config;
     this.collectStatistics = this.config.isCollectStatistics();
-
-    if (this.collectStatistics) {
-      this.statsTimer = new Timer();
-    } else {
-      this.statsTimer = null;
-    }
 
     this.guidMapper = createMapper(this.config);
     if (this.guidMapper == null) {
@@ -240,8 +242,19 @@ public class GNRSServer implements MessageListener {
   public boolean startup() {
 
     if (this.collectStatistics) {
-      this.statsTimer.scheduleAtFixedRate(new StatsTask(), 1000, 1000);
+      this.timer.scheduleAtFixedRate(new StatsTask(this), 1000, 1000);
     }
+
+    long sweepTime = this.config.getTimeoutMillis() / 4;
+    if (sweepTime < 250) {
+      sweepTime = 250;
+    }
+    else if(sweepTime > 5000){
+      sweepTime = 5000;
+    }
+    this.timer.scheduleAtFixedRate(
+        new ResponseSweepTask(this.config.getTimeoutMillis(),
+            this.awaitingResponse, this.workers,this), sweepTime, sweepTime);
 
     this.guidStore.doInit();
     return true;
@@ -251,7 +264,7 @@ public class GNRSServer implements MessageListener {
    * Configures the server to use a specific type of networking.
    * 
    * @param config
-   *          the server configuration.
+   *          * the server configuration.
    * @return {@code true} if configuration succeeds, else {@code false}.
    */
   // TODO: Add new network types here.
@@ -320,9 +333,7 @@ public class GNRSServer implements MessageListener {
 
     this.guidStore.doShutdown();
 
-    if (this.collectStatistics) {
-      this.statsTimer.cancel();
-    }
+    this.timer.cancel();
     this.workers.shutdown();
   }
 
@@ -425,7 +436,8 @@ public class GNRSServer implements MessageListener {
       this.workers
           .submit(new LookupTask(this, parameters, (LookupMessage) msg));
     } else if (msg instanceof AbstractResponseMessage) {
-      this.workers.submit(new ResponseTask(this, parameters, (AbstractResponseMessage)msg));
+      this.workers.submit(new ResponseTask(this, parameters,
+          (AbstractResponseMessage) msg));
     }
     // Unrecognized or invalid message received
     else {
@@ -435,12 +447,23 @@ public class GNRSServer implements MessageListener {
 
   }
 
- 
-
+  /**
+   * Marks a server as necessary for a specific request ID
+   * 
+   * @param requestId
+   *          the request ID of the message sent to the server
+   * @param info
+   *          the server/message information.
+   */
   public void addNeededServer(final Integer requestId, final RelayInfo info) {
     this.awaitingResponse.put(Integer.valueOf(requestId), info);
   }
 
+  /**
+   * Get the next available request ID.
+   * 
+   * @return
+   */
   public int getNextRequestId() {
     return this.nextRequestId.getAndIncrement();
   }
@@ -451,6 +474,13 @@ public class GNRSServer implements MessageListener {
    * @author Robert Moore
    */
   public static final class StatsTask extends TimerTask {
+
+    private final transient GNRSServer server;
+
+    public StatsTask(final GNRSServer server) {
+      super();
+      this.server = server;
+    }
 
     /**
      * Logging for the statistics class.
@@ -487,6 +517,66 @@ public class GNRSServer implements MessageListener {
           Float.valueOf(numSeconds), Float.valueOf(insertsPerSecond),
           Float.valueOf(numSeconds), Float.valueOf(responsesPerSecond),
           Float.valueOf(numSeconds), Float.valueOf(avgLifetimeUsec)));
+
+      LOG_STATS.info(String.format("Outstanding responses: %,d",
+          Integer.valueOf(this.server.awaitingResponse.size())));
+    }
+  }
+
+  /**
+   * Simple task for sweeping the responses and clearing-out those that have
+   * expired.
+   * 
+   * @author Robert Moore
+   */
+  private static final class ResponseSweepTask extends TimerTask {
+
+    private final transient Map<Integer, RelayInfo> infoCollection;
+    private final transient ExecutorService workers;
+    private final transient long maxAge;
+    private final transient GNRSServer server;
+
+    /**
+     * Creates a new task to monitor/sweep the specified collection. Any failed
+     * info will generate a new TimeoutTask which will be sent to the
+     * ExecutorService provided.
+     * 
+     * @param maxAge
+     *          the timeout period for a request.
+     * @param monitoredCollection
+     *          the objects to monitor
+     * @param workers
+     *          workers for handling the timeouts
+     */
+    public ResponseSweepTask(final long maxAge,
+        final Map<Integer, RelayInfo> monitoredCollection,
+        final ExecutorService workers, final GNRSServer server) {
+      super();
+      this.infoCollection = monitoredCollection;
+      this.workers = workers;
+      this.maxAge = maxAge;
+      this.server = server;
+    }
+
+    @Override
+    public void run() {
+      
+      final long cutoff = System.currentTimeMillis() - this.maxAge;
+      for (final Iterator<Integer> iter = this.infoCollection.keySet()
+          .iterator(); iter.hasNext();) {
+        Integer reqId = iter.next();
+        RelayInfo info = this.infoCollection.get(reqId);
+        if (info != null) {
+          if (info.getAttemptTs() < cutoff) {
+            info = this.infoCollection.remove(reqId);
+            // Sanity/concurrency check
+            if (info != null) {
+              this.workers.submit(new TimeoutTask(this.server,info));
+            }
+          }
+        }
+      }
+
     }
   }
 
@@ -496,8 +586,8 @@ public class GNRSServer implements MessageListener {
    * 
    * @return this server's Timer object for statistics reporting.
    */
-  public Timer getStatsTimer() {
-    return this.statsTimer;
+  public Timer getTimer() {
+    return this.timer;
   }
 
   /**
@@ -507,6 +597,10 @@ public class GNRSServer implements MessageListener {
    */
   public Configuration getConfig() {
     return this.config;
+  }
+
+  public boolean isCollectStatistics() {
+    return collectStatistics;
   }
 
 }
