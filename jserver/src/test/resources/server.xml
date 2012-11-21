@@ -43,4 +43,8 @@
   
   <!-- How long to wait for a response before declaring a message timed-out. -->
   <timeoutMillis>1000</timeoutMillis>
+  
+  <!-- Number of GUID entries to store in the local cache.  A non-positive value
+       disables caching. -->
+  <cacheEntries>0</cacheEntries>
 </edu.rutgers.winlab.mfirst.Configuration>

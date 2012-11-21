@@ -39,6 +39,7 @@ import edu.rutgers.winlab.mfirst.storage.GUIDBinding;
 import edu.rutgers.winlab.mfirst.storage.GUIDStore;
 import edu.rutgers.winlab.mfirst.storage.SimpleGUIDStore;
 import edu.rutgers.winlab.mfirst.storage.bdb.BerkeleyDBStore;
+import edu.rutgers.winlab.mfirst.storage.cache.SimpleCache;
 
 /**
  * Java implementation of a GNRS server.
@@ -184,6 +185,11 @@ public class GNRSServer implements MessageListener {
       (int) System.currentTimeMillis());
 
   /**
+   * Cache for storing values destined for other systems.
+   */
+  private final transient SimpleCache cache;
+
+  /**
    * Creates a new GNRS server with the specified configuration. The server will
    * not start running until the {@link #startup()} method is invoked.
    * 
@@ -229,6 +235,12 @@ public class GNRSServer implements MessageListener {
       throw new IllegalArgumentException("Unable to create GUID store object.");
     }
 
+    if (this.config.getCacheEntries() > 0) {
+      this.cache = new SimpleCache(this.config.getCacheEntries());
+    } else {
+      this.cache = null;
+    }
+
     this.networkAccess.addMessageListener(this);
 
   }
@@ -248,13 +260,12 @@ public class GNRSServer implements MessageListener {
     long sweepTime = this.config.getTimeoutMillis() / 4;
     if (sweepTime < 250) {
       sweepTime = 250;
-    }
-    else if(sweepTime > 5000){
+    } else if (sweepTime > 5000) {
       sweepTime = 5000;
     }
     this.timer.scheduleAtFixedRate(
         new ResponseSweepTask(this.config.getTimeoutMillis(),
-            this.awaitingResponse, this.workers,this), sweepTime, sweepTime);
+            this.awaitingResponse, this.workers, this), sweepTime, sweepTime);
 
     this.guidStore.doInit();
     return true;
@@ -469,6 +480,33 @@ public class GNRSServer implements MessageListener {
   }
 
   /**
+   * Accesses the server's cache to check for bindings for the specified GUID
+   * value.
+   * 
+   * @param guid
+   *          the GUID to retrieve
+   * @return the cached bindings, if any exist in the cache.
+   */
+  public Collection<GUIDBinding> getCached(final GUID guid) {
+
+    return this.cache == null ? null : this.cache.get(guid);
+  }
+
+  /**
+   * Inserts the specified NetworkAddress values into the server's local cache.
+   * 
+   * @param guid
+   *          the GUID for the bindings.
+   * @param addresses
+   *          the addresses to bind.
+   */
+  public void addToCache(final GUID guid, final NetworkAddress... addresses) {
+    if (this.cache != null) {
+      this.cache.put(guid, addresses);
+    }
+  }
+
+  /**
    * Timer task that reports server-related statistics when called.
    * 
    * @author Robert Moore
@@ -560,7 +598,7 @@ public class GNRSServer implements MessageListener {
 
     @Override
     public void run() {
-      
+
       final long cutoff = System.currentTimeMillis() - this.maxAge;
       for (final Iterator<Integer> iter = this.infoCollection.keySet()
           .iterator(); iter.hasNext();) {
@@ -571,7 +609,7 @@ public class GNRSServer implements MessageListener {
             info = this.infoCollection.remove(reqId);
             // Sanity/concurrency check
             if (info != null) {
-              this.workers.submit(new TimeoutTask(this.server,info));
+              this.workers.submit(new TimeoutTask(this.server, info));
             }
           }
         }

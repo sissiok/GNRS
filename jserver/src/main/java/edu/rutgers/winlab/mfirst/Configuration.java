@@ -65,6 +65,11 @@ public class Configuration {
    * response to clients.
    */
   private int numAttempts = 2;
+  
+  /**
+   * Number of GUID values in the local cache.
+   */
+  private int cacheEntries = 0;
 
   /**
    * Gets the current number of worker threads used.
@@ -260,6 +265,22 @@ public class Configuration {
    */
   public void setNumAttempts(final int numRetries) {
     this.numAttempts = numRetries;
+  }
+
+  /**
+   * Get the number of GUID values stored in the local cache.
+   * @return the size of the cache, as the number of GUID entries.
+   */
+  public int getCacheEntries() {
+    return this.cacheEntries;
+  }
+
+  /**
+   * Sets the size of the cache, as the number of GUID entries.
+   * @param cacheEntries the new size
+   */
+  public void setCacheEntries(final int cacheEntries) {
+    this.cacheEntries = cacheEntries;
   }
 
 }

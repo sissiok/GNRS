@@ -87,3 +87,11 @@ trace files into the current directory and use the shell script?
 
     ./gbench client.xml example.trace 1
 
+## Attributions and Licensing ##
+* LRUCache.java - Authored by Hank Gay on StackOverflow. 
+  http://stackoverflow.com/users/4203/hank-gay
+
+Unless otherwise noted in the application or in the source code, all 
+other resources, including but not limited to source code, artwork, 
+documentation, are copyright (C) 2012 Wireless Information Laboratory (WINLAB)
+and Rutgers University.  All rights reserved.

@@ -93,6 +93,9 @@ public class InsertTask implements Callable<Object> {
     if (resolvedLocally) {
       localSuccess = this.server.appendBindings(this.message.getGuid(),
           this.message.getBindings());
+    } else if (this.message.isRecursive() && this.message.getBindings() != null) {
+      this.server
+          .addToCache(this.message.getGuid(), this.message.getBindings());
     }
     long t30 = System.nanoTime();
     // At least one IP prefix binding was for the local server
@@ -122,17 +125,18 @@ public class InsertTask implements Callable<Object> {
         LOG.error("Invalid server addresses.  Cannot forward.");
       }
     }
-    
-    if(resolvedLocally && !this.message.isRecursive()){
-      
+
+    if (resolvedLocally && !this.message.isRecursive()) {
+
       InsertResponseMessage response = new InsertResponseMessage();
       response.setOriginAddress(this.server.getOriginAddress());
       response.setRequestId(this.message.getRequestId());
-      response.setResponseCode(localSuccess ? ResponseCode.SUCCESS : ResponseCode.FAILED);
-      response.setVersion((byte)0);
-      
+      response.setResponseCode(localSuccess ? ResponseCode.SUCCESS
+          : ResponseCode.FAILED);
+      response.setVersion((byte) 0);
+
       this.server.sendMessage(response, this.message.getOriginAddress());
-      
+
     }
 
     long t40 = System.nanoTime();
