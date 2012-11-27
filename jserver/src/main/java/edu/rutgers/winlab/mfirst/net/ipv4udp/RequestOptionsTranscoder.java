@@ -49,29 +49,30 @@ public class RequestOptionsTranscoder {
   public static List<Option> decode(IoBuffer optionsBuffer) {
     Option lastOption = null;
     List<Option> options = new LinkedList<Option>();
-    byte type = 0;
-    byte length = 0;
-    do {
-      type = optionsBuffer.get();
-      length = optionsBuffer.get();
-      boolean isFinal = Option.isFinal(type);
-      type &= Option.USER_TYPES_FLAG;
+    if (optionsBuffer.remaining() > 0) {
+      byte type = 0;
+      byte length = 0;
+      do {
+        type = optionsBuffer.get();
+        length = optionsBuffer.get();
+        boolean isFinal = Option.isFinal(type);
+        type &= Option.USER_TYPES_FLAG;
 
-      if (type == RecursiveRequestOption.TYPE) {
-        boolean recursive = (optionsBuffer.getUnsignedShort() != 0);
-        lastOption = new RecursiveRequestOption(recursive);
-        if (isFinal) {
-          lastOption.setFinal();
+        if (type == RecursiveRequestOption.TYPE) {
+          boolean recursive = (optionsBuffer.getUnsignedShort() != 0);
+          lastOption = new RecursiveRequestOption(recursive);
+          if (isFinal) {
+            lastOption.setFinal();
+          }
+          options.add(lastOption);
+        } else {
+          LOG.info("Unsupported options type {}", type);
+
+          break;
         }
-        options.add(lastOption);
-      } else {
-        LOG.info("Unsupported options type {}", type);
 
-        break;
-      }
-
-    } while (lastOption != null && !lastOption.isFinal());
-
+      } while (lastOption != null && !lastOption.isFinal());
+    }
     return options;
   }
 }

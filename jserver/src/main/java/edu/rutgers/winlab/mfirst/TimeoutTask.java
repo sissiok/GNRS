@@ -98,7 +98,7 @@ public class TimeoutTask implements Callable<Object> {
           relayMessage.addOption(opt);
         }
       }
-
+      relayMessage.finalizeOptions();
       relayMessage.setOriginAddress(this.server.getOriginAddress());
       relayMessage.setVersion((byte) 0);
       relayMessage.setRequestId(requestId.intValue());
