@@ -4,6 +4,8 @@
  */
 package edu.rutgers.winlab.mfirst.net.ipv4udp;
 
+import java.util.List;
+
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
@@ -13,6 +15,7 @@ import org.apache.mina.filter.codec.demux.MessageDecoderResult;
 import edu.rutgers.winlab.mfirst.GUID;
 import edu.rutgers.winlab.mfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mfirst.messages.MessageType;
+import edu.rutgers.winlab.mfirst.messages.Option;
 import edu.rutgers.winlab.mfirst.net.AddressType;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 
@@ -70,6 +73,12 @@ public class InsertDecoder implements MessageDecoder {
     // Ignore message length (not used)
     buffer.getUnsignedShort();
     final long requestId = buffer.getUnsignedInt();
+    
+    // Offset values
+    final int optionsOffset = buffer.getUnsignedShort();
+    final int payloadOffset = buffer.getUnsignedShort();
+    
+   
 
     // Origin address
     final AddressType addrType = AddressType.valueOf(buffer.getUnsignedShort());
@@ -92,8 +101,7 @@ public class InsertDecoder implements MessageDecoder {
     guid.setBinaryForm(guidBytes);
     msg.setGuid(guid);
 
-    final long options = buffer.getUnsignedInt();
-    msg.setOptions(options);
+
 
     final long numBindings = buffer.getUnsignedInt();
     final NetworkAddress[] bindings = new NetworkAddress[(int) numBindings];
@@ -109,6 +117,15 @@ public class InsertDecoder implements MessageDecoder {
       bindings[i] = netAddr;
     }
     msg.setBindings(bindings);
+    
+    if(optionsOffset > 0){
+      List<Option> options = RequestOptionsTranscoder.decode(buffer);
+      if(options != null && !options.isEmpty()){
+        for(Option opt : options){
+          msg.addOption(opt);
+        }
+      }
+    }
 
     // Send the decoded message to the next filter
     out.write(msg);

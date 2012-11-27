@@ -10,8 +10,8 @@ import java.util.Map;
  * @author <a href="http://stackoverflow.com/users/4203/hank-gay">Hank Gay</a>
  * @author Robert Moore II
  *
- * @param <K> 
- * @param <V>
+ * @param <K> the key value, must implement {@code hashCode()}
+ * @param <V> the value to store.
  */
 public class LRUCache<K, V> extends LinkedHashMap<K, V> {
   

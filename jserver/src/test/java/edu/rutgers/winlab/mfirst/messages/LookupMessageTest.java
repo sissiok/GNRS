@@ -57,7 +57,6 @@ public class LookupMessageTest {
   public void testFields() {
     LookupMessage msg = new LookupMessage();
     Assert.assertNull(msg.getGuid());
-    Assert.assertEquals(0, msg.getOptions());
     Assert.assertNull(msg.getOriginAddress());
     Assert.assertEquals(0, msg.getRequestId());
     Assert.assertEquals(4, msg.getPayloadLength());
@@ -65,13 +64,13 @@ public class LookupMessageTest {
     Assert.assertEquals(0,msg.getVersion());
     
     msg.setGuid(guid1);
-    msg.setOptions(1234);
+    
     msg.setOriginAddress(addr1);
     msg.setRequestId(0xFFFFFFFF);
     msg.setVersion((byte) 0x10);
     
     Assert.assertTrue(this.guid1.equals(msg.getGuid()));
-    Assert.assertEquals(1234,msg.getOptions());
+    
     Assert.assertTrue(this.addr1.equals(msg.getOriginAddress()));
     Assert.assertEquals(0xFFFFFFFFl,msg.getRequestId());
     Assert.assertEquals((byte)0x10, msg.getVersion());
@@ -97,7 +96,7 @@ public class LookupMessageTest {
       Assert.assertEquals(STRING_NULL,msg.toString());
       
       msg.setGuid(guid1);
-      msg.setOptions(1234);
+      
       msg.setOriginAddress(addr1);
       msg.setRequestId(0xFFFFFFFF);
       msg.setVersion((byte) 0x10);

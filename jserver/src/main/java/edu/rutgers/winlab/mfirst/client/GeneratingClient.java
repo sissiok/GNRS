@@ -40,6 +40,7 @@ import com.thoughtworks.xstream.XStream;
 import edu.rutgers.winlab.mfirst.GUID;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
+import edu.rutgers.winlab.mfirst.messages.RecursiveRequestOption;
 import edu.rutgers.winlab.mfirst.messages.ResponseCode;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.GNRSProtocolCodecFactory;
@@ -305,7 +306,8 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
       for (int i = 0; i < this.numLookups; ++i) {
 
         message = new LookupMessage();
-        message.setRecursive(true);
+        message.addOption(new RecursiveRequestOption(true));
+        message.finalizeOptions();
 
         message.setGuid(GUID.fromASCII("" + rand.nextInt(1000000)));
         message.setRequestId(i);

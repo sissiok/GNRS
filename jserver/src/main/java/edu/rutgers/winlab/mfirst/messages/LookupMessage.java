@@ -23,13 +23,6 @@ public class LookupMessage extends AbstractMessage {
   private GUID guid;
 
   /**
-   * Options for this lookup request.
-   */
-  private long options = 0;
-
-  private static final long FLAG_RECURSIVE = 0x01l;
-
-  /**
    * Creates a new Lookup message.
    */
   public LookupMessage() {
@@ -60,31 +53,10 @@ public class LookupMessage extends AbstractMessage {
   @Override
   public String toString() {
     final StringBuilder buffer = new StringBuilder("LKP");
-    if (this.isRecursive()) {
-      buffer.append("(R)");
-    }
+   
     buffer.append(" #").append(this.getRequestId()).append(" (");
     buffer.append(this.guid).append(")");
     return buffer.toString();
-  }
-
-  /**
-   * Gets the options flags for this message.
-   * 
-   * @return the options flags.
-   */
-  public long getOptions() {
-    return this.options;
-  }
-
-  /**
-   * Sets the options flags for this message.
-   * 
-   * @param options
-   *          the new options flags.
-   */
-  public void setOptions(final long options) {
-    this.options = options & 0xFFFFFFFF;
   }
 
   @Override
@@ -97,15 +69,4 @@ public class LookupMessage extends AbstractMessage {
     return length;
   }
 
-  public void setRecursive(final boolean recursive) {
-    if (recursive) {
-      this.options |= FLAG_RECURSIVE;
-    } else {
-      this.options &= ~FLAG_RECURSIVE;
-    }
-  }
-
-  public boolean isRecursive() {
-    return (this.options & FLAG_RECURSIVE) != 0;
-  }
 }

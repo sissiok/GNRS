@@ -4,6 +4,7 @@
  */
 package edu.rutgers.winlab.mfirst;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ import edu.rutgers.winlab.mfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mfirst.messages.InsertResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
+import edu.rutgers.winlab.mfirst.messages.Option;
 import edu.rutgers.winlab.mfirst.messages.ResponseCode;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 
@@ -90,7 +92,13 @@ public class TimeoutTask implements Callable<Object> {
 
       LookupMessage relayMessage = new LookupMessage();
       relayMessage.setGuid(orig.getGuid());
-      relayMessage.setOptions(orig.getOptions());
+      List<Option> options = orig.getOptions();
+      if(!options.isEmpty()){
+        for(Option opt : options){
+          relayMessage.addOption(opt);
+        }
+      }
+
       relayMessage.setOriginAddress(this.server.getOriginAddress());
       relayMessage.setVersion((byte) 0);
       relayMessage.setRequestId(requestId.intValue());
@@ -106,7 +114,13 @@ public class TimeoutTask implements Callable<Object> {
 
         final InsertMessage relayMessage = new InsertMessage();
         relayMessage.setGuid(orig.getGuid());
-        relayMessage.setOptions(orig.getOptions());
+        List<Option> options = orig.getOptions();
+        if(!options.isEmpty()){
+          for(Option opt : options){
+            relayMessage.addOption(opt);
+          }
+        }
+        relayMessage.finalizeOptions();
         relayMessage.setOriginAddress(this.server.getOriginAddress());
         relayMessage.setVersion((byte) 0);
         relayMessage.setRequestId(requestId.intValue());

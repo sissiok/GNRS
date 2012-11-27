@@ -30,6 +30,7 @@ import edu.rutgers.winlab.mfirst.messages.AbstractMessage;
 import edu.rutgers.winlab.mfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mfirst.messages.MessageType;
+import edu.rutgers.winlab.mfirst.messages.RecursiveRequestOption;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.GNRSProtocolCodecFactory;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPAddress;
@@ -215,6 +216,7 @@ public class TraceClient extends IoHandlerAdapter {
         }
 
         message.setOriginAddress(fromAddress);
+        message.finalizeOptions();
 
         session.write(message);
 //        try {
@@ -277,7 +279,7 @@ public class TraceClient extends IoHandlerAdapter {
         }
         case LOOKUP: {
           final LookupMessage lookMsg = new LookupMessage();
-          lookMsg.setRecursive(true);
+          lookMsg.addOption(new RecursiveRequestOption(true));
           msg = lookMsg;
           lookMsg.setGuid(guid);
           lookMsg.setRequestId(sequenceNumber);
@@ -342,7 +344,7 @@ public class TraceClient extends IoHandlerAdapter {
       insMsg.setBindings(bindings);
       insMsg.setGuid(guid);
       insMsg.setRequestId(sequenceNumber);
-      insMsg.setRecursive(true);
+      insMsg.addOption(new RecursiveRequestOption(true));
     }
     return msg;
   }

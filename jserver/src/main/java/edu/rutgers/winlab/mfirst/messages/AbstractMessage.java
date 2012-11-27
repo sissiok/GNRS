@@ -5,6 +5,9 @@
  */
 package edu.rutgers.winlab.mfirst.messages;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 
 /**
@@ -41,6 +44,11 @@ public abstract class AbstractMessage {
    * Who sent the message originally.
    */
   protected NetworkAddress originAddress;
+  
+  /**
+   * List of message options
+   */
+  protected List<Option> options = new LinkedList<Option>();
 
   /**
    * Protected constructor. Only to be called by subclasses.
@@ -121,6 +129,12 @@ public abstract class AbstractMessage {
     if(this.originAddress != null){
       length += this.originAddress.getLength();
     }
+    if(!this.options.isEmpty()){
+      for(Option opt : this.options){
+        length += 2+opt.getLength();
+      }
+    }
+    
     return length;
   }
 
@@ -148,5 +162,28 @@ public abstract class AbstractMessage {
    */
   public void setVersion(final byte version) {
     this.version = version;
+  }
+  
+  /**
+   * Adds an option to this message.
+   * @param option
+   */
+  public void addOption(final Option option){
+    this.options.add(option);
+  }
+  
+  /**
+   * Gets the list of options for this message.
+   * @return
+   */
+  public List<Option> getOptions(){
+    return this.options;
+  }
+  
+  public void finalizeOptions(){
+    if(!this.options.isEmpty()){
+      Option lastOption = this.options.get(this.options.size()-1);
+      lastOption.setFinal();
+    }
   }
 }

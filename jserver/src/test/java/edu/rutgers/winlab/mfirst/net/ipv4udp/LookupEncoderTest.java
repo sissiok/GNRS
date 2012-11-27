@@ -31,9 +31,9 @@ public class LookupEncoderTest {
   @Test
   public void testEncode() {
     try {
-      byte[] shouldBytes = new byte[] { 16, 1, 0, 42, 0, 0, 4, -46, 0, 0, 0, 6,
-          1, 2, 3, 4, 19, -120, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
-          14, 15, 16, 17, 18, 19, 0, 0, 0, 0 };
+      byte[] shouldBytes = new byte[] { 16, 1, 0, 42, 0, 0, 4, -46, 0, 0, 0,
+          22, 0, 0, 0, 6, 1, 2, 3, 4, 19, -120, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+          10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
 
       DummySession session = new DummySession();
       ProtocolEncoderTest out = new ProtocolEncoderTest();
@@ -45,7 +45,7 @@ public class LookupEncoderTest {
           0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0x10, 0x11, 0x12, 0x13 };
       guid.setBinaryForm(guidBytes);
       message.setGuid(guid);
-      message.setOptions(0l);
+
       IPv4UDPAddress origin = IPv4UDPAddress.fromASCII("1.2.3.4:5000");
       message.setOriginAddress(origin);
       message.setRequestId(1234);

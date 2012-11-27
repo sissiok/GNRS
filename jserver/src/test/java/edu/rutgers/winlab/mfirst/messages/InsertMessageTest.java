@@ -59,31 +59,30 @@ public class InsertMessageTest {
     InsertMessage msg = new InsertMessage();
 
     Assert.assertNull(msg.getGuid());
-    Assert.assertEquals(0, msg.getOptions());
     Assert.assertNull(msg.getOriginAddress());
     Assert.assertEquals(0, msg.getRequestId());
     Assert.assertEquals(0, msg.getNumBindings());
     Assert.assertEquals(0, msg.getBindingsLength());
     Assert.assertEquals(8, msg.getPayloadLength());
-    Assert.assertEquals(20,msg.getMessageLength());
-    Assert.assertEquals(0,msg.getVersion());
+    Assert.assertEquals(20, msg.getMessageLength());
+    Assert.assertEquals(0, msg.getVersion());
 
     msg.setGuid(this.guid1);
-    msg.setOptions(0);
+
     msg.setOriginAddress(this.addr1);
     msg.setRequestId(1234);
     msg.setBindings(this.bind1);
     msg.setVersion((byte) 0x10);
 
     Assert.assertTrue(this.guid1.equals(msg.getGuid()));
-    Assert.assertEquals(0, msg.getOptions());
+
     Assert.assertTrue(this.addr1.equals(msg.getOriginAddress()));
     Assert.assertEquals(1234, msg.getRequestId());
     Assert.assertEquals(this.bind1.length, msg.getNumBindings());
     Assert.assertEquals(30, msg.getBindingsLength());
     Assert.assertEquals(58, msg.getPayloadLength());
-    Assert.assertEquals(76,msg.getMessageLength());
-    Assert.assertEquals(0x10,msg.getVersion());
+    Assert.assertEquals(76, msg.getMessageLength());
+    Assert.assertEquals(0x10, msg.getVersion());
 
     msg.setType(MessageType.UNKNOWN);
     Assert.assertTrue(MessageType.UNKNOWN.equals(msg.getType()));
@@ -105,7 +104,7 @@ public class InsertMessageTest {
     Assert.assertEquals(STRING_INIT, msg.toString());
 
     msg.setGuid(this.guid1);
-    msg.setOptions(0);
+
     msg.setOriginAddress(this.addr1);
     msg.setRequestId(1234);
     msg.setBindings(this.bind1);

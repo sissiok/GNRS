@@ -12,7 +12,6 @@ import edu.rutgers.winlab.mfirst.net.NetworkAddress;
  * A message for inserting a GUID->NetworkAddress binding into the GNRS server.
  * 
  * @author Robert Moore
- * 
  */
 public class InsertMessage extends AbstractMessage {
   /**
@@ -24,26 +23,6 @@ public class InsertMessage extends AbstractMessage {
    * The set of GUID&rarr;NetworkAddress bindings for this Insert message.
    */
   private NetworkAddress[] bindings;
-
-  /**
-   * Set of message options.
-   */
-  private long options;
-  
-  private static final long FLAG_RECURSIVE = 0x01l;
-  
-  
-  public void setRecursive(final boolean recursive) {
-    if (recursive) {
-      this.options |= FLAG_RECURSIVE;
-    } else {
-      this.options &= ~FLAG_RECURSIVE;
-    }
-  }
-
-  public boolean isRecursive() {
-    return (this.options & FLAG_RECURSIVE) != 0;
-  }
 
   /**
    * Creates a new Insert message.
@@ -80,12 +59,13 @@ public class InsertMessage extends AbstractMessage {
   public NetworkAddress[] getBindings() {
     return this.bindings;
   }
-  
+
   /**
    * Returns the number of bindings in this message.
+   * 
    * @return the number of bindings.
    */
-  public long getNumBindings(){
+  public long getNumBindings() {
     return this.bindings == null ? 0 : this.bindings.length;
   }
 
@@ -117,10 +97,10 @@ public class InsertMessage extends AbstractMessage {
   }
 
   @Override
-  protected int getPayloadLength() {
+  public int getPayloadLength() {
     // GUID, Options, num bindings, bindings
     int length = 8 + this.getBindingsLength();
-    if(this.guid != null && this.guid.getBinaryForm() != null){
+    if (this.guid != null && this.guid.getBinaryForm() != null) {
       length += this.guid.getBinaryForm().length;
     }
     return length;
@@ -141,25 +121,6 @@ public class InsertMessage extends AbstractMessage {
       }
     }
     return length;
-  }
-
-  /**
-   * Gets the message options.
-   * 
-   * @return the message options value.
-   */
-  public long getOptions() {
-    return this.options;
-  }
-
-  /**
-   * Sets the message options.
-   * 
-   * @param options
-   *          the new message options value.
-   */
-  public void setOptions(final long options) {
-    this.options = options & 0xFFFFFFFF;
   }
 
 }

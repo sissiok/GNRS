@@ -6,6 +6,8 @@ package edu.rutgers.winlab.mfirst;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
@@ -15,6 +17,8 @@ import edu.rutgers.winlab.mfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mfirst.messages.InsertResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
+import edu.rutgers.winlab.mfirst.messages.Option;
+import edu.rutgers.winlab.mfirst.messages.RecursiveRequestOption;
 import edu.rutgers.winlab.mfirst.messages.ResponseCode;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.SessionParameters;
@@ -89,18 +93,29 @@ public class InsertTask implements Callable<Object> {
       }
     }
     boolean localSuccess = false;
+    
+    boolean recursive = false;
+    List<Option> options = this.message.getOptions();
+    if(!options.isEmpty()){
+      for(Option opt : options){
+        if(opt instanceof RecursiveRequestOption){
+          recursive = ((RecursiveRequestOption)opt).isRecursive();
+          break;
+        }
+      }
+    }
 
     if (resolvedLocally) {
       localSuccess = this.server.appendBindings(this.message.getGuid(),
           this.message.getBindings());
-    } else if (this.message.isRecursive() && this.message.getBindings() != null) {
+    } else if (recursive && this.message.getBindings() != null) {
       this.server
           .addToCache(this.message.getGuid(), this.message.getBindings());
     }
     long t30 = System.nanoTime();
     // At least one IP prefix binding was for the local server
-    if (this.message.isRecursive()) {
-      this.message.setRecursive(false);
+    if (recursive) {
+//      this.message.setRecursive(false);
 
       final RelayInfo info = new RelayInfo();
       info.clientMessage = this.message;
@@ -110,7 +125,14 @@ public class InsertTask implements Callable<Object> {
 
       final InsertMessage relayMessage = new InsertMessage();
       relayMessage.setGuid(this.message.getGuid());
-      relayMessage.setOptions(this.message.getOptions());
+      
+      for(Option opt : this.message.getOptions()){
+        if(!(opt instanceof RecursiveRequestOption)){
+          relayMessage.addOption(opt);
+        }
+      }
+      relayMessage.finalizeOptions();
+      
       relayMessage.setOriginAddress(this.server.getOriginAddress());
       relayMessage.setVersion((byte) 0);
       relayMessage.setRequestId(requestId);
@@ -126,7 +148,7 @@ public class InsertTask implements Callable<Object> {
       }
     }
 
-    if (resolvedLocally && !this.message.isRecursive()) {
+    if (resolvedLocally && !recursive) {
 
       InsertResponseMessage response = new InsertResponseMessage();
       response.setOriginAddress(this.server.getOriginAddress());
