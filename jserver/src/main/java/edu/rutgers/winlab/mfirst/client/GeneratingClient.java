@@ -89,9 +89,18 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     final int numClients = Integer.parseInt(args[3]);
     final int numLookups = Integer.parseInt(args[1]);
 
+    boolean verbose = false;
+    if (args.length > 4) {
+      for (int i = 4; i < args.length; ++i) {
+        if ("-v".equalsIgnoreCase(args[i])) {
+          verbose = true;
+        }
+      }
+    }
+
     final GeneratingClient[] clients = new GeneratingClient[numClients];
     for (int i = 0; i < clients.length; ++i) {
-      clients[i] = new GeneratingClient(config, delay, numLookups);
+      clients[i] = new GeneratingClient(config, delay, numLookups, verbose);
     }
 
     final Thread[] threads = new Thread[numClients];
@@ -116,7 +125,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
    */
   public static void printUsageInfo() {
     System.out
-        .println("Usage: <Config File> <Num Request> <Request Delay> <Num Clients>");
+        .println("Usage: <Config File> <Num Request> <Request Delay> <Num Clients> [-v]");
   }
 
   /**
@@ -156,8 +165,15 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
   private final transient AtomicInteger numFailures = new AtomicInteger(0);
 
   private final Map<Integer, Long> sendTimes = new ConcurrentHashMap<Integer, Long>();
+  
+  private final Map<Integer, LookupMessage> sentMessages = new ConcurrentHashMap<Integer, LookupMessage>();
 
   private final Queue<Long> rtts = new ConcurrentLinkedQueue<Long>();
+  
+  /**
+   * Flag for verbose (per-message) outputs.
+   */
+  private final transient boolean verbose;
 
   /**
    * Creates a new GeneratingClient with the configuration and delay values
@@ -169,11 +185,13 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
    *          how long to wait (in microseconds) between messages.
    * @param numLookups
    *          total number of messages to send.
+   * @param verbose
+   *          flag to print each response to the log.
    */
   public GeneratingClient(final Configuration config, final int delay,
-      final int numLookups) {
+      final int numLookups, boolean verbose) {
     super();
-
+    this.verbose = verbose;
     this.config = config;
     this.delay = delay;
     this.numLookups = numLookups;
@@ -268,18 +286,19 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     Collections.sort(rttList);
 
     Long median = rttList.isEmpty() ? 0 : rttList.get(length / 2);
-    if(!rttList.isEmpty()){
-    LOG.info(String.format("Min: %,dus | Med: %,dus | Max: %,dus",
-        rttList.get(0) / 1000, median / 1000, rttList.get(length - 1) / 1000));
+    if (!rttList.isEmpty()) {
+      LOG.info(String.format("Min: %,dus | Med: %,dus | Max: %,dus",
+          rttList.get(0) / 1000, median / 1000, rttList.get(length - 1) / 1000));
     }
 
     final int succ = GeneratingClient.this.numSuccess.get();
     final int total = succ + GeneratingClient.this.numFailures.get();
-   
+
     LOG.info(String.format(
-        "Total: %,d  |  Success: %,d  |  Bound: %,d  |  Loss: %,d)",
-        Integer.valueOf(total), Integer.valueOf(succ), Integer.valueOf(GeneratingClient.this.numHits.get()),
-        Integer.valueOf(GeneratingClient.this.numLookups-total)));
+        "Total: %,d  |  Success: %,d  |  Bound: %,d  |  Loss: %,d",
+        Integer.valueOf(total), Integer.valueOf(succ),
+        Integer.valueOf(GeneratingClient.this.numHits.get()),
+        Integer.valueOf(GeneratingClient.this.numLookups - total)));
     session.close(true);
     this.acceptor.dispose(true);
     this.connector.dispose(true);
@@ -315,6 +334,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
         lastSend = System.nanoTime();
         final WriteFuture future = session.write(message);
         this.sendTimes.put(Integer.valueOf(i), Long.valueOf(lastSend));
+        this.sentMessages.put(Integer.valueOf(i), message);
 
         future.awaitUninterruptibly();
 
@@ -375,6 +395,13 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     if (startNanos != null) {
       this.rtts.add(Long.valueOf(recvNanos - startNanos.longValue()));
     }
+    
+    if(this.verbose){
+      LookupMessage sentMessage = this.sentMessages.remove(Integer.valueOf((int)msg.getRequestId()));
+      LOG.info(String.format("[%,dns] %s -> %s", recvNanos-startNanos.longValue(),sentMessage.getGuid(), msg));
+    }
+    
+    
     if (ResponseCode.SUCCESS.equals(msg.getResponseCode())) {
       this.numSuccess.incrementAndGet();
       if (msg.getBindings() != null && msg.getBindings().length > 0) {

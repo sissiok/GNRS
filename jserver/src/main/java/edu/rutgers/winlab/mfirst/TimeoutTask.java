@@ -76,7 +76,7 @@ public class TimeoutTask implements Callable<Object> {
       if(response != null){
         response.setOriginAddress(this.server.getOriginAddress());
         response.setRequestId(this.info.clientMessage.getRequestId());
-        response.setResponseCode(ResponseCode.FAILED);
+       
         response.setVersion((byte)0);
         
         this.server.sendMessage(response, this.info.clientMessage.getOriginAddress());

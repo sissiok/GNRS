@@ -47,4 +47,12 @@
   <!-- Number of GUID entries to store in the local cache.  A non-positive value
        disables caching. -->
   <cacheEntries>0</cacheEntries>
+  
+  <!-- How long to keep a binding in the GNRS replica servers if no expiration
+       value is specified. Value is in milliseconds. -->
+  <defaultExpiration>900000</defaultExpiration>
+  
+  <!-- How long to keep a binding in caches if no TTL value is specified. Value is in
+       milliseconds. -->
+  <defaultTtl>30000</defaultTtl>
 </edu.rutgers.winlab.mfirst.Configuration>

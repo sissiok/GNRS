@@ -70,6 +70,16 @@ public class Configuration {
    * Number of GUID values in the local cache.
    */
   private int cacheEntries = 0;
+  
+  /**
+   * How long to keep bindings in the server when no expiration value is specified.
+   */
+  private long defaultExpiration = 900000;
+  
+  /**
+   * How long to cache values in the server when no TTL value is specified.
+   */
+  private long defaultTtl = 60000;
 
   /**
    * Gets the current number of worker threads used.
@@ -281,6 +291,22 @@ public class Configuration {
    */
   public void setCacheEntries(final int cacheEntries) {
     this.cacheEntries = cacheEntries;
+  }
+
+  public long getDefaultExpiration() {
+    return defaultExpiration;
+  }
+
+  public void setDefaultExpiration(long defaultExpiration) {
+    this.defaultExpiration = defaultExpiration;
+  }
+
+  public long getDefaultTtl() {
+    return defaultTtl;
+  }
+
+  public void setDefaultTtl(long defaultTtl) {
+    this.defaultTtl = defaultTtl;
   }
 
 }

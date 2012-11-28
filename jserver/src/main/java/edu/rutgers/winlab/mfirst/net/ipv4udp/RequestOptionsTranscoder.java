@@ -16,8 +16,10 @@ import org.apache.mina.core.buffer.IoBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.rutgers.winlab.mfirst.messages.ExpirationOption;
 import edu.rutgers.winlab.mfirst.messages.Option;
 import edu.rutgers.winlab.mfirst.messages.RecursiveRequestOption;
+import edu.rutgers.winlab.mfirst.messages.TTLOption;
 
 /**
  * @author Robert Moore
@@ -58,19 +60,29 @@ public class RequestOptionsTranscoder {
         boolean isFinal = Option.isFinal(type);
         type &= Option.USER_TYPES_FLAG;
 
-        if (type == RecursiveRequestOption.TYPE) {
+        switch (type) {
+        case RecursiveRequestOption.TYPE:
           boolean recursive = (optionsBuffer.getUnsignedShort() != 0);
           lastOption = new RecursiveRequestOption(recursive);
-          if (isFinal) {
-            lastOption.setFinal();
-          }
-          options.add(lastOption);
-        } else {
+          
+          break;
+        case TTLOption.TYPE:
+          long ttl = optionsBuffer.getLong();
+          lastOption = new TTLOption(ttl);
+          break;
+        case ExpirationOption.TYPE:
+          long timestamp = optionsBuffer.getLong();
+          lastOption = new ExpirationOption(timestamp);
+          break;
+        default:
           LOG.info("Unsupported options type {}", type);
-
+          lastOption = null;
           break;
         }
-
+        if (isFinal) {
+          lastOption.setFinal();
+        }
+        options.add(lastOption);
       } while (lastOption != null && !lastOption.isFinal());
     }
     return options;

@@ -10,6 +10,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
+import java.util.Collection;
+import java.util.LinkedList;
 
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.core.future.ConnectFuture;
@@ -31,6 +33,7 @@ import edu.rutgers.winlab.mfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mfirst.messages.MessageType;
 import edu.rutgers.winlab.mfirst.messages.RecursiveRequestOption;
+import edu.rutgers.winlab.mfirst.messages.TTLOption;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.GNRSProtocolCodecFactory;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPAddress;
@@ -88,7 +91,7 @@ public class TraceClient extends IoHandlerAdapter {
    * Connector to communicate with the server.
    */
   private final transient NioDatagramConnector connector;
-  
+
   private final transient NioDatagramAcceptor acceptor;
   /**
    * Configuration for the client.
@@ -122,7 +125,6 @@ public class TraceClient extends IoHandlerAdapter {
     this.traceFile = traceFile;
     this.delay = delay;
 
-
     this.acceptor = new NioDatagramAcceptor();
     this.acceptor.setHandler(this);
     DatagramSessionConfig sessionConfig = this.acceptor.getSessionConfig();
@@ -131,11 +133,10 @@ public class TraceClient extends IoHandlerAdapter {
     DefaultIoFilterChainBuilder chain = this.acceptor.getFilterChain();
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
         new GNRSProtocolCodecFactory()));
-    
+
     this.connector = new NioDatagramConnector();
     this.connector.setHandler(this);
-    sessionConfig = this.connector
-        .getSessionConfig();
+    sessionConfig = this.connector.getSessionConfig();
     sessionConfig.setReuseAddress(true);
     sessionConfig.setCloseOnPortUnreachable(false);
     chain = this.connector.getFilterChain();
@@ -153,29 +154,29 @@ public class TraceClient extends IoHandlerAdapter {
   public boolean connect() {
     boolean retValue = true;
     try {
-  
-    this.acceptor.bind(new InetSocketAddress(this.config.getClientPort()));
-    
-    LOG.debug("Creating connect future.");
-    final ConnectFuture connectFuture = this.connector
-        .connect(new InetSocketAddress(this.config.getServerHost(), this.config
-            .getServerPort()));
 
-    connectFuture.awaitUninterruptibly();
+      this.acceptor.bind(new InetSocketAddress(this.config.getClientPort()));
 
-    connectFuture.addListener(new IoFutureListener<ConnectFuture>() {
-      @Override
-      public void operationComplete(final ConnectFuture future) {
-        if (future.isConnected()) {
+      LOG.debug("Creating connect future.");
+      final ConnectFuture connectFuture = this.connector
+          .connect(new InetSocketAddress(this.config.getServerHost(),
+              this.config.getServerPort()));
 
-          TraceClient.this.runTrace(future.getSession());
+      connectFuture.awaitUninterruptibly();
 
+      connectFuture.addListener(new IoFutureListener<ConnectFuture>() {
+        @Override
+        public void operationComplete(final ConnectFuture future) {
+          if (future.isConnected()) {
+
+            TraceClient.this.runTrace(future.getSession());
+
+          }
         }
-      }
 
-    });
+      });
 
-    LOG.debug("Future listener will handle connection event and start trace.");
+      LOG.debug("Future listener will handle connection event and start trace.");
     } catch (IOException e) {
       LOG.error("Unable to bind to local port.", e);
       retValue = false;
@@ -209,22 +210,26 @@ public class TraceClient extends IoHandlerAdapter {
         }
 
         LOG.debug("FILE: {}", line);
-        final AbstractMessage message = TraceClient.parseMessage(line);
-        if (message == null) {
+        final Collection<AbstractMessage> messages = TraceClient
+            .parseMessage(line);
+        if (messages == null) {
           LOG.warn("Unable to parse message from \"" + line + "\".");
           continue;
         }
 
-        message.setOriginAddress(fromAddress);
-        message.finalizeOptions();
+        for (AbstractMessage msg : messages) {
 
-        session.write(message);
-//        try {
-          java.util.concurrent.locks.LockSupport.parkNanos(this.delay*1000l);
-//          Thread.sleep(this.delay);
-//        } catch (final InterruptedException ie) {
-          // Ignored
-//        }
+          msg.setOriginAddress(fromAddress);
+          msg.finalizeOptions();
+
+          session.write(msg);
+        }
+        // try {
+        java.util.concurrent.locks.LockSupport.parkNanos(this.delay * 1000l);
+        // Thread.sleep(this.delay);
+        // } catch (final InterruptedException ie) {
+        // Ignored
+        // }
 
       }
       LOG.info("Finished reading trace file. Waiting 5 seconds.");
@@ -254,11 +259,11 @@ public class TraceClient extends IoHandlerAdapter {
    *          a line from the trace file.
    * @return the parsed message, or {@code null} if none was parsed.
    */
-  public static AbstractMessage parseMessage(final String asString) {
+  public static Collection<AbstractMessage> parseMessage(final String asString) {
     LOG.debug("Parsing \"{}\"", asString);
     // Extract any comments and discard
     final String line = asString.split("#")[0];
-    AbstractMessage msg = null;
+    final LinkedList<AbstractMessage> messages = new LinkedList<AbstractMessage>();
 
     final String[] generalComponents = line.split("\\s+");
     if (generalComponents.length >= 3) {
@@ -274,13 +279,15 @@ public class TraceClient extends IoHandlerAdapter {
 
         switch (type) {
         case INSERT: {
-          msg = parseInsertMessage(guid, sequenceNumber, generalComponents);
+          messages.addAll(parseInsertMessage(guid, sequenceNumber,
+              generalComponents));
           break;
         }
         case LOOKUP: {
           final LookupMessage lookMsg = new LookupMessage();
           lookMsg.addOption(new RecursiveRequestOption(true));
-          msg = lookMsg;
+
+          messages.add(lookMsg);
           lookMsg.setGuid(guid);
           lookMsg.setRequestId(sequenceNumber);
           break;
@@ -296,7 +303,7 @@ public class TraceClient extends IoHandlerAdapter {
       LOG.error("Not enough components to parse from the line {}.",
           Integer.valueOf(generalComponents.length));
     }
-    return msg;
+    return messages;
   }
 
   /**
@@ -311,9 +318,11 @@ public class TraceClient extends IoHandlerAdapter {
    * @return an Insert Message parsed from the line, or {@code null} if parsing
    *         failed.
    */
-  private static InsertMessage parseInsertMessage(final GUID guid,
+  private static Collection<InsertMessage> parseInsertMessage(final GUID guid,
       final int sequenceNumber, final String[] generalComponents) {
-    InsertMessage msg = null;
+
+    LinkedList<InsertMessage> messages = new LinkedList<InsertMessage>();
+
     // Make sure there is something to split
     if (generalComponents.length < 4) {
       LOG.error("Missing GUID binding value.");
@@ -325,8 +334,10 @@ public class TraceClient extends IoHandlerAdapter {
         LOG.error("Binding values are not a multiple of 3: {}",
             Integer.valueOf(bindingValues.length));
       }
-      final NetworkAddress[] bindings = new NetworkAddress[bindingValues.length / 3];
-      for (int i = 0; i < bindings.length; ++i) {
+      int numBindings = bindingValues.length / 3;
+
+      // final NetworkAddress[] bindings = new NetworkAddress[];
+      for (int i = 0; i < numBindings; ++i) {
         NetworkAddress netAddr = null;
         try {
           netAddr = IPv4UDPAddress.fromASCII(bindingValues[0]);
@@ -334,19 +345,24 @@ public class TraceClient extends IoHandlerAdapter {
           LOG.error("Unable to parse network address from ASCII string.", uee);
           break;
         }
+        // TODO: Need to figure-out how to send TTL values per-NA
+        long ttl = Long.parseLong(bindingValues[1]);
 
-        bindings[i] = netAddr;
+        final InsertMessage insMsg = new InsertMessage();
+
+        insMsg.setBindings(new NetworkAddress[] { netAddr });
+        insMsg.setGuid(guid);
+        insMsg.setRequestId(sequenceNumber);
+        insMsg.addOption(new RecursiveRequestOption(true));
+        insMsg.addOption(new TTLOption(ttl));
+        
+
+        messages.add(insMsg);
 
       }
 
-      final InsertMessage insMsg = new InsertMessage();
-      msg = insMsg;
-      insMsg.setBindings(bindings);
-      insMsg.setGuid(guid);
-      insMsg.setRequestId(sequenceNumber);
-      insMsg.addOption(new RecursiveRequestOption(true));
     }
-    return msg;
+    return messages;
   }
 
   @Override
