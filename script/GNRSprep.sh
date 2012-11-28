@@ -2,6 +2,9 @@
 
 # do experiment preparation from the console 
 # it will generate config files, send config files to corresponding nodes, and config node IP address and install click delay module
+# input:
+# AS_topo_file: AS topology as a 3xN matrix
+# node_list_file: nodes that are successfully imaged
 
 AS_topo_file=$1
 node_list_file=$2
