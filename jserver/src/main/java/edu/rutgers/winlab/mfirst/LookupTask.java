@@ -88,7 +88,7 @@ public class LookupTask implements Callable<Object> {
 
   @Override
   public Object call() {
-
+    final long startProc = System.nanoTime();
     GNRSServer.NUM_LOOKUPS.incrementAndGet();
 
     Collection<GUIDBinding> cachedBindings = this.server
@@ -193,10 +193,12 @@ public class LookupTask implements Callable<Object> {
 
       }
 
+      long endProc = System.nanoTime();
       if (this.server.getConfig().isCollectStatistics()) {
+        GNRSServer.LOOKUP_STATS[GNRSServer.QUEUE_TIME_INDEX].addAndGet(startProc-this.message.createdNanos);
+        GNRSServer.LOOKUP_STATS[GNRSServer.PROC_TIME_INDEX].addAndGet(endProc-startProc);
+        GNRSServer.LOOKUP_STATS[GNRSServer.TOTAL_TIME_INDEX].addAndGet(endProc-this.message.createdNanos);
 
-        GNRSServer.MSG_LIFETIME.addAndGet(System.nanoTime()
-            - this.message.createdNanos);
       }
     }
 

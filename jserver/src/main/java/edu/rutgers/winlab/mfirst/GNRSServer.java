@@ -1,22 +1,22 @@
 /*
  * Copyright (c) 2012, Rutgers University
  * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without 
+ * 
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
- * + Redistributions of source code must retain the above copyright notice, 
+ * 
+ * + Redistributions of source code must retain the above copyright notice,
  *   this list of conditions and the following disclaimer.
  * + Redistributions in binary form must reproduce the above copyright notice,
  *   this list of conditions and the following disclaimer in the documentation
  *   and/or other materials provided with the distribution.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
  * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
  * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
@@ -168,10 +168,42 @@ public class GNRSServer implements MessageListener {
   static final AtomicInteger NUM_RESPONSES = new AtomicInteger(0);
 
   /**
-   * Total number of nanoseconds spent processing messages since last stats
-   * report.
+   * Total number of nanoseconds spent processing lookup messages since last
+   * stats report.
    */
-  static final AtomicLong MSG_LIFETIME = new AtomicLong(0);
+  static final AtomicLong[] LOOKUP_STATS = new AtomicLong[3];
+
+  /**
+   * Total number of nanoseconds spent processing insert messages since last
+   * stats report.
+   */
+  static final AtomicLong[] INSERT_STATS = new AtomicLong[3];
+  
+  /**
+   * Total number of nanoseconds spent processing response messages since last
+   * stats report.
+   */
+  static final AtomicLong[] RESPONSE_STATS = new AtomicLong[3];
+
+  static final transient int QUEUE_TIME_INDEX = 0;
+
+  static final transient int PROC_TIME_INDEX = 1;
+
+  static final transient int TOTAL_TIME_INDEX = 2;
+
+  static {
+    LOOKUP_STATS[QUEUE_TIME_INDEX] = new AtomicLong(0);
+    LOOKUP_STATS[PROC_TIME_INDEX] = new AtomicLong(0);
+    LOOKUP_STATS[TOTAL_TIME_INDEX] = new AtomicLong(0);
+
+    INSERT_STATS[QUEUE_TIME_INDEX] = new AtomicLong(0);
+    INSERT_STATS[PROC_TIME_INDEX] = new AtomicLong(0);
+    INSERT_STATS[TOTAL_TIME_INDEX] = new AtomicLong(0);
+    
+    RESPONSE_STATS[QUEUE_TIME_INDEX] = new AtomicLong(0);
+    RESPONSE_STATS[PROC_TIME_INDEX] = new AtomicLong(0);
+    RESPONSE_STATS[TOTAL_TIME_INDEX] = new AtomicLong(0);
+  }
 
   /**
    * Thread pool for distributing tasks.
@@ -554,11 +586,29 @@ public class GNRSServer implements MessageListener {
 
     @Override
     public void run() {
-      final long totalNanos = GNRSServer.MSG_LIFETIME.getAndSet(0l);
+      final long now = System.currentTimeMillis();
+
+      final long lkpQueueNanos = GNRSServer.LOOKUP_STATS[QUEUE_TIME_INDEX]
+          .getAndSet(0);
+      final long lkpProcNanos = GNRSServer.LOOKUP_STATS[PROC_TIME_INDEX]
+          .getAndSet(0);
+      final long lkpTotalNanos = GNRSServer.LOOKUP_STATS[TOTAL_TIME_INDEX]
+          .getAndSet(0);
+
+      final long insQueueNanos = GNRSServer.INSERT_STATS[QUEUE_TIME_INDEX]
+          .getAndSet(0);
+      final long insProcNanos = GNRSServer.INSERT_STATS[PROC_TIME_INDEX]
+          .getAndSet(0);
+      final long insTotalNanos = GNRSServer.INSERT_STATS[TOTAL_TIME_INDEX]
+          .getAndSet(0);
+      
+      final long rspQueueNanos = GNRSServer.RESPONSE_STATS[QUEUE_TIME_INDEX].getAndSet(0);
+      final long rspProcNanos = GNRSServer.RESPONSE_STATS[PROC_TIME_INDEX].getAndSet(0);
+      final long rspTotalNanos = GNRSServer.RESPONSE_STATS[TOTAL_TIME_INDEX].getAndSet(0);
+
       final int numLookups = GNRSServer.NUM_LOOKUPS.getAndSet(0);
       final int numInserts = GNRSServer.NUM_INSERTS.getAndSet(0);
       final int numResponse = GNRSServer.NUM_RESPONSES.getAndSet(0);
-      final long now = System.currentTimeMillis();
 
       final long timeDiff = now - this.lastTimestamp;
       this.lastTimestamp = now;
@@ -566,16 +616,33 @@ public class GNRSServer implements MessageListener {
       final float lookupsPerSecond = numLookups / numSeconds;
       final float insertsPerSecond = numInserts / numSeconds;
       final float responsesPerSecond = numResponse / numSeconds;
-      final int totalMessages = numLookups + numInserts + numResponse;
-      final float avgLifetimeUsec = totalMessages == 0 ? 0
-          : ((totalNanos / (float) totalMessages) / 1000);
-      LOG_STATS.info(String.format("\nLookups: %.3f per second (%.2f s)"
-          + "\nInserts: %.3f per second (%.2f s)"
-          + "\nResponses: %.3f per second (%.2f s)"
-          + "\nAverage Lifetime: %,.0fus", Float.valueOf(lookupsPerSecond),
-          Float.valueOf(numSeconds), Float.valueOf(insertsPerSecond),
-          Float.valueOf(numSeconds), Float.valueOf(responsesPerSecond),
-          Float.valueOf(numSeconds), Float.valueOf(avgLifetimeUsec)));
+
+      final float insQueueAvg = numInserts == 0 ? 0 : (insQueueNanos / numInserts)/1000f;
+      final float insProcAvg = numInserts == 0 ? 0 : (insProcNanos / numInserts)/1000f;
+      final float insTotAvg = numInserts == 0 ? 0 : (insTotalNanos / numInserts)/1000f;
+      
+      final float lkpQueueAvg = numLookups == 0 ? 0 : (lkpQueueNanos / numLookups) / 1000f;
+      final float lkpProcAvg = numLookups == 0 ? 0 : (lkpProcNanos / numLookups)/1000f;
+      final float lkpTotAvg = numLookups == 0 ? 0 : (lkpTotalNanos/numLookups)/1000f;
+      
+      final float rspQueueAvg = numResponse == 0 ? 0 : (rspQueueNanos / numResponse) / 1000f;
+      final float rspProcAvg = numResponse == 0 ? 0 : (rspProcNanos / numResponse) / 1000f;
+      final float rspTotAvg = numResponse == 0 ? 0 : (rspTotalNanos / numResponse) / 1000f;
+      
+
+      String statsFormatString = "\n==Lookups==\n"
+          + "%.3f per second (Q: %,.1f us, P: %,.1f us, T: %,.1f us)\n"
+          + "==Inserts==\n"
+          + "%.3f per second (Q: %,.1f us, P: %,.1f us, T: %,.1f us)\n"
+          + "==Responses==\n"
+          + "%.3f per second (Q: %,.1f us, P: %,.1f us, T: %,.1f us)\n";
+
+      LOG_STATS.info(String.format(statsFormatString, Float.valueOf(lookupsPerSecond),
+          Float.valueOf(lkpQueueAvg), Float.valueOf(lkpProcAvg), Float.valueOf(lkpTotAvg),
+          Float.valueOf(insertsPerSecond),
+          Float.valueOf(insQueueAvg), Float.valueOf(insProcAvg), Float.valueOf(insTotAvg),
+          Float.valueOf(responsesPerSecond),
+          Float.valueOf(rspQueueAvg), Float.valueOf(rspProcAvg), Float.valueOf(rspTotAvg)));
 
       LOG_STATS.info(String.format("Outstanding responses: %,d",
           Integer.valueOf(this.server.awaitingResponse.size())));

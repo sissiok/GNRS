@@ -60,7 +60,7 @@ public class ResponseTask implements Callable<Object> {
 
   @Override
   public Object call() throws Exception {
-
+    final long startProc = System.nanoTime();
     GNRSServer.NUM_RESPONSES.incrementAndGet();
     // LOG.info("Using relay info for {}", respMsg);
     Integer reqId = Integer.valueOf((int) this.message.getRequestId());
@@ -113,10 +113,11 @@ public class ResponseTask implements Callable<Object> {
       }
     }
 
+    long endProc = System.nanoTime();
     if (this.server.getConfig().isCollectStatistics()) {
-
-      GNRSServer.MSG_LIFETIME.addAndGet(System.nanoTime()
-          - this.message.createdNanos);
+      GNRSServer.RESPONSE_STATS[GNRSServer.QUEUE_TIME_INDEX].addAndGet(startProc-this.message.createdNanos);
+      GNRSServer.RESPONSE_STATS[GNRSServer.PROC_TIME_INDEX].addAndGet(endProc-startProc);
+      GNRSServer.RESPONSE_STATS[GNRSServer.TOTAL_TIME_INDEX].addAndGet(endProc-this.message.createdNanos);
 
     }
 

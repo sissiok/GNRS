@@ -98,13 +98,13 @@ public class InsertTask implements Callable<Object> {
 
   @Override
   public Object call() {
-    final long t10 = System.nanoTime();
+    final long startProc = System.nanoTime();
     GNRSServer.NUM_INSERTS.incrementAndGet();
 
     final Collection<NetworkAddress> serverAddxes = this.server.getMappings(
         this.message.getGuid(), this.message.getOriginAddress().getType());
 
-    final long t20 = System.nanoTime();
+    
 
     boolean resolvedLocally = false;
     if (serverAddxes != null && !serverAddxes.isEmpty()) {
@@ -119,19 +119,20 @@ public class InsertTask implements Callable<Object> {
       }
     }
     boolean localSuccess = false;
-    
+
     boolean recursive = false;
     List<Option> options = this.message.getOptions();
-    long expirationTime = this.server.getConfig().getDefaultExpiration()+System.currentTimeMillis();
+    long expirationTime = this.server.getConfig().getDefaultExpiration()
+        + System.currentTimeMillis();
     long ttlValue = this.server.getConfig().getDefaultTtl();
-    if(!options.isEmpty()){
-      for(Option opt : options){
-        if(opt instanceof RecursiveRequestOption){
-          recursive = ((RecursiveRequestOption)opt).isRecursive();
-        }else if(opt instanceof ExpirationOption){
-          expirationTime = ((ExpirationOption)opt).getExpiration();
-        } else if(opt instanceof TTLOption){
-          ttlValue = ((TTLOption)opt).getTtl();
+    if (!options.isEmpty()) {
+      for (Option opt : options) {
+        if (opt instanceof RecursiveRequestOption) {
+          recursive = ((RecursiveRequestOption) opt).isRecursive();
+        } else if (opt instanceof ExpirationOption) {
+          expirationTime = ((ExpirationOption) opt).getExpiration();
+        } else if (opt instanceof TTLOption) {
+          ttlValue = ((TTLOption) opt).getTtl();
         }
       }
     }
@@ -141,22 +142,21 @@ public class InsertTask implements Callable<Object> {
           this.message.getBindings());
     } else if (recursive && this.message.getBindings() != null) {
       GUIDBinding[] bindings = new GUIDBinding[this.message.getBindings().length];
-      
-      for(int i = 0; i < bindings.length; ++i){
+
+      for (int i = 0; i < bindings.length; ++i) {
         NetworkAddress netAddr = this.message.getBindings()[i];
         GUIDBinding bind = new GUIDBinding();
         bind.setAddress(netAddr);
         bind.setExpiration(expirationTime);
         bind.setTtl(ttlValue);
       }
-      
-      this.server
-          .addToCache(this.message.getGuid(), bindings);
+
+      this.server.addToCache(this.message.getGuid(), bindings);
     }
-    long t30 = System.nanoTime();
+    
     // At least one IP prefix binding was for the local server
     if (recursive) {
-//      this.message.setRecursive(false);
+      // this.message.setRecursive(false);
 
       final RelayInfo info = new RelayInfo();
       info.clientMessage = this.message;
@@ -166,14 +166,14 @@ public class InsertTask implements Callable<Object> {
 
       final InsertMessage relayMessage = new InsertMessage();
       relayMessage.setGuid(this.message.getGuid());
-      
-      for(Option opt : this.message.getOptions()){
-        if(!(opt instanceof RecursiveRequestOption)){
+
+      for (Option opt : this.message.getOptions()) {
+        if (!(opt instanceof RecursiveRequestOption)) {
           relayMessage.addOption(opt);
         }
       }
       relayMessage.finalizeOptions();
-      
+
       relayMessage.setOriginAddress(this.server.getOriginAddress());
       relayMessage.setVersion((byte) 0);
       relayMessage.setRequestId(requestId);
@@ -202,18 +202,12 @@ public class InsertTask implements Callable<Object> {
 
     }
 
-    long t40 = System.nanoTime();
+    long endProc = System.nanoTime();
     if (this.server.getConfig().isCollectStatistics()) {
+      GNRSServer.INSERT_STATS[GNRSServer.QUEUE_TIME_INDEX].addAndGet(startProc-this.message.createdNanos);
+      GNRSServer.INSERT_STATS[GNRSServer.PROC_TIME_INDEX].addAndGet(endProc-startProc);
+      GNRSServer.INSERT_STATS[GNRSServer.TOTAL_TIME_INDEX].addAndGet(endProc-this.message.createdNanos);
 
-      GNRSServer.MSG_LIFETIME.addAndGet(System.nanoTime()
-          - this.message.createdNanos);
-
-    }
-    if (LOG.isDebugEnabled()) {
-      LOG.debug(String.format(
-          "Processing: %,dns [Map: %,dns, Bind: %,dns, Write: %,dns] \n",
-          Long.valueOf(t40 - t10), Long.valueOf(t20 - t10),
-          Long.valueOf(t30 - t20), Long.valueOf(t40 - t30)));
     }
 
     return null;
