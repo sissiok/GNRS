@@ -31,8 +31,15 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.core.future.ConnectFuture;
@@ -51,9 +58,12 @@ import com.thoughtworks.xstream.XStream;
 import edu.rutgers.winlab.mfirst.GUID;
 import edu.rutgers.winlab.mfirst.messages.AbstractMessage;
 import edu.rutgers.winlab.mfirst.messages.InsertMessage;
+import edu.rutgers.winlab.mfirst.messages.InsertResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
+import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.MessageType;
 import edu.rutgers.winlab.mfirst.messages.RecursiveRequestOption;
+import edu.rutgers.winlab.mfirst.messages.ResponseCode;
 import edu.rutgers.winlab.mfirst.messages.TTLOption;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.GNRSProtocolCodecFactory;
@@ -70,6 +80,32 @@ public class TraceClient extends IoHandlerAdapter {
    * Logging for this class.
    */
   private static final Logger LOG = LoggerFactory.getLogger(TraceClient.class);
+
+  private final transient AtomicInteger numLookup = new AtomicInteger(0);
+
+  private final transient AtomicInteger numLookupSuccess = new AtomicInteger(0);
+
+  private final transient AtomicInteger numLookupFailures = new AtomicInteger(0);
+
+  private final transient AtomicInteger numLookupHits = new AtomicInteger(0);
+
+  private final Queue<Long> lookupRtts = new ConcurrentLinkedQueue<Long>();
+
+  private final transient AtomicInteger numInsert = new AtomicInteger(0);
+
+  private final transient AtomicInteger numInsertSuccess = new AtomicInteger(0);
+
+  private final transient AtomicInteger numInsertFailures = new AtomicInteger(0);
+
+  private final Queue<Long> insertRtts = new ConcurrentLinkedQueue<Long>();
+
+  private final Map<Integer, Long> sendTimes = new ConcurrentHashMap<Integer, Long>();
+
+  private final Map<Integer, AbstractMessage> sentMessages = new ConcurrentHashMap<Integer, AbstractMessage>();
+
+  private transient long lastReceiveTime = System.currentTimeMillis();
+
+  private transient boolean verbose = false;
 
   /**
    * Sends messages to a server based on a trace file.
@@ -94,7 +130,17 @@ public class TraceClient extends IoHandlerAdapter {
 
     final int delay = Integer.parseInt(args[2]);
 
-    final TraceClient client = new TraceClient(config, traceFile, delay);
+    boolean verbose = false;
+    if (args.length > 3) {
+      for (int i = 3; i < args.length; ++i) {
+        if ("-v".equalsIgnoreCase(args[i])) {
+          verbose = true;
+        }
+      }
+    }
+
+    final TraceClient client = new TraceClient(config, traceFile, delay,
+        verbose);
 
     LOG.debug("Configured trace client.");
     client.connect();
@@ -139,9 +185,10 @@ public class TraceClient extends IoHandlerAdapter {
    *          how long to pause between messages, in microseconds.
    */
   public TraceClient(final Configuration config, final File traceFile,
-      final int delay) {
+      final int delay, boolean verbose) {
     super();
 
+    this.verbose = verbose;
     this.config = config;
     this.traceFile = traceFile;
     this.delay = delay;
@@ -176,7 +223,7 @@ public class TraceClient extends IoHandlerAdapter {
     boolean retValue = true;
     try {
 
-      this.acceptor.bind(new InetSocketAddress(this.config.getClientPort()));
+      this.acceptor.bind(new InetSocketAddress(this.config.getClientHost(),this.config.getClientPort()));
 
       LOG.debug("Creating connect future.");
       final ConnectFuture connectFuture = this.connector
@@ -244,6 +291,15 @@ public class TraceClient extends IoHandlerAdapter {
           msg.finalizeOptions();
 
           session.write(msg);
+          long sendTime = System.nanoTime();
+          this.sentMessages.put(Integer.valueOf((int) msg.getRequestId()), msg);
+          this.sendTimes.put(Integer.valueOf((int) msg.getRequestId()),
+              Long.valueOf(sendTime));
+          if (msg instanceof LookupMessage) {
+            this.numLookup.incrementAndGet();
+          } else if (msg instanceof InsertMessage) {
+            this.numInsert.incrementAndGet();
+          }
         }
         // try {
         java.util.concurrent.locks.LockSupport.parkNanos(this.delay * 1000l);
@@ -253,11 +309,13 @@ public class TraceClient extends IoHandlerAdapter {
         // }
 
       }
-      LOG.info("Finished reading trace file. Waiting 5 seconds.");
-      try {
-        Thread.sleep(5000);
-      } catch (final InterruptedException ie) {
-        // Ignored?
+      LOG.info("Finished reading trace file. Waiting for outstanding messages.");
+      while (this.lastReceiveTime > (System.currentTimeMillis() - 5000)) {
+        try {
+          Thread.sleep(500);
+        } catch (final InterruptedException ie) {
+          // Ignored
+        }
       }
       reader.close();
     } catch (final UnsupportedEncodingException uee) {
@@ -271,6 +329,51 @@ public class TraceClient extends IoHandlerAdapter {
     session.close(true);
     this.connector.dispose(true);
     this.acceptor.dispose(true);
+
+    this.printStatistics();
+  }
+
+  private void printStatistics() {
+    int length = this.insertRtts.size();
+    ArrayList<Long> insList = new ArrayList<Long>(length);
+    insList.addAll(this.insertRtts);
+    Collections.sort(insList);
+
+    long minInsRtt = insList.isEmpty() ? 0 : insList.get(0);
+    long medInsRtt = insList.isEmpty() ? 0 : insList.get(length / 2);
+    long maxInsRtt = insList.isEmpty() ? 0 : insList.get(length - 1);
+
+    int totalIns = this.numInsert.get();
+    int succIns = this.numInsertSuccess.get();
+    int failIns = this.numInsertFailures.get();
+    int returnedIns = succIns + failIns;
+
+    length = this.lookupRtts.size();
+    ArrayList<Long> lookList = new ArrayList<Long>(length);
+    lookList.addAll(this.lookupRtts);
+    Collections.sort(lookList);
+
+    long minLkpRtt = lookList.isEmpty() ? 0 : lookList.get(0);
+    long medLkpRtt = lookList.isEmpty() ? 0 : lookList.get(length / 2);
+    long maxLkpRtt = lookList.isEmpty() ? 0 : lookList.get(length - 1);
+
+    int totalLkp = this.numLookup.get();
+    int succLkp = this.numLookupSuccess.get();
+    int failLkp = this.numLookupFailures.get();
+    int returnedLkp = succLkp + failLkp;
+    int hitLkp = this.numLookupHits.get();
+
+    final String formatString = "\n==Insert==\n"
+        + "Min: %,dus | Med: %,dus | Max: %,dus\n"
+        + "Total: %,d  |  Success: %,d  |  Loss: %,d\n" + "==Lookup==\n"
+        + "Min: %,dus | Med: %,dus | Max: %,dus\n"
+        + "Total: %,d  |  Success: %,d  |  Bound: %,d  |  Loss: %,d\n";
+    
+    LOG.info(String.format(formatString,Long.valueOf(minInsRtt), Long.valueOf(medInsRtt), Long.valueOf(maxInsRtt),
+        Integer.valueOf(totalIns), Integer.valueOf(succIns), Integer.valueOf(totalIns-returnedIns),
+        Long.valueOf(minLkpRtt), Long.valueOf(medLkpRtt), Long.valueOf(maxLkpRtt),
+        Integer.valueOf(totalLkp), Integer.valueOf(succLkp), Integer.valueOf(hitLkp), Integer.valueOf(totalLkp-returnedLkp)));
+
   }
 
   /**
@@ -376,7 +479,6 @@ public class TraceClient extends IoHandlerAdapter {
         insMsg.setRequestId(sequenceNumber);
         insMsg.addOption(new RecursiveRequestOption(true));
         insMsg.addOption(new TTLOption(ttl));
-        
 
         messages.add(insMsg);
 
@@ -393,7 +495,76 @@ public class TraceClient extends IoHandlerAdapter {
 
   @Override
   public void messageReceived(final IoSession session, final Object message) {
-    LOG.debug("[{}] Received {}", session, message);
+    final long rcvTime = System.nanoTime();
+    this.lastReceiveTime = System.currentTimeMillis();
+    // LOG.info("Received {} on {}", message, session);
+    if (message instanceof LookupResponseMessage) {
+      this.handleLookupResponse((LookupResponseMessage) message, rcvTime);
+    } else if (message instanceof InsertResponseMessage) {
+      this.handleInsertResponse((InsertResponseMessage) message, rcvTime);
+    }
+  }
+
+  /**
+   * Handles a response message from the server.
+   * 
+   * @param msg
+   *          the response message.
+   */
+  public void handleLookupResponse(final LookupResponseMessage msg,
+      final long recvNanos) {
+
+    Long startNanos = this.sendTimes.remove(Integer.valueOf((int) msg
+        .getRequestId()));
+    if (startNanos != null) {
+      this.lookupRtts.add(Long.valueOf(recvNanos - startNanos.longValue()));
+    }
+
+    if (this.verbose) {
+      LookupMessage sentMessage = (LookupMessage) this.sentMessages
+          .remove(Integer.valueOf((int) msg.getRequestId()));
+      LOG.info(String.format("[%,dns] %s -> %s",
+          recvNanos - startNanos.longValue(), sentMessage.getGuid(), msg));
+    }
+
+    if (ResponseCode.SUCCESS.equals(msg.getResponseCode())) {
+      this.numLookupSuccess.incrementAndGet();
+      if (msg.getBindings() != null && msg.getBindings().length > 0) {
+        this.numLookupHits.incrementAndGet();
+      }
+    } else {
+      this.numLookupFailures.incrementAndGet();
+    }
+  }
+
+  /**
+   * Handles a response message from the server.
+   * 
+   * @param msg
+   *          the response message.
+   */
+  public void handleInsertResponse(final InsertResponseMessage msg,
+      final long recvNanos) {
+
+    Long startNanos = this.sendTimes.remove(Integer.valueOf((int) msg
+        .getRequestId()));
+    if (startNanos != null) {
+      this.insertRtts.add(Long.valueOf(recvNanos - startNanos.longValue()));
+    }
+
+    if (this.verbose) {
+      InsertMessage sentMessage = (InsertMessage) this.sentMessages
+          .remove(Integer.valueOf((int) msg.getRequestId()));
+      LOG.info(String.format("[%,dns] %s -> %s",
+          recvNanos - startNanos.longValue(), sentMessage.getGuid(), msg));
+    }
+
+    if (ResponseCode.SUCCESS.equals(msg.getResponseCode())) {
+      this.numInsertSuccess.incrementAndGet();
+
+    } else {
+      this.numInsertFailures.incrementAndGet();
+    }
   }
 
   @Override

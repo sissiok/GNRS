@@ -149,6 +149,7 @@ public class InsertTask implements Callable<Object> {
         bind.setAddress(netAddr);
         bind.setExpiration(expirationTime);
         bind.setTtl(ttlValue);
+        bindings[i] = bind;
       }
 
       this.server.addToCache(this.message.getGuid(), bindings);

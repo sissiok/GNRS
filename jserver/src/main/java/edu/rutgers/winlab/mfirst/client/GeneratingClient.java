@@ -251,7 +251,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
   public boolean connect() {
     boolean retValue = true;
     try {
-      this.acceptor.bind(new InetSocketAddress(this.config.getClientPort()));
+      this.acceptor.bind(new InetSocketAddress(this.config.getClientHost(), this.config.getClientPort()));
 
       LOG.debug("Creating connect future.");
       final ConnectFuture connectFuture = this.connector
@@ -353,7 +353,9 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
         lastSend = System.nanoTime();
         final WriteFuture future = session.write(message);
         this.sendTimes.put(Integer.valueOf(i), Long.valueOf(lastSend));
-        this.sentMessages.put(Integer.valueOf(i), message);
+        if(this.verbose){
+          this.sentMessages.put(Integer.valueOf(i), message);
+        }
 
         future.awaitUninterruptibly();
 

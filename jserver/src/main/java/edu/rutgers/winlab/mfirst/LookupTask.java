@@ -91,24 +91,22 @@ public class LookupTask implements Callable<Object> {
     final long startProc = System.nanoTime();
     GNRSServer.NUM_LOOKUPS.incrementAndGet();
 
-    Collection<GUIDBinding> cachedBindings = this.server
-        .getCached(this.message.getGuid());
+    Collection<GUIDBinding> cachedBindings = this.server.getCached(this.message
+        .getGuid());
     if (cachedBindings != null && !cachedBindings.isEmpty()) {
-      LOG.info("Using cached values for {}.",this.message.getGuid());
+      LOG.info("Using cached values for {}: {}.", this.message.getGuid(),
+          cachedBindings);
       LookupResponseMessage response = new LookupResponseMessage();
-      
       NetworkAddress[] addxes = new NetworkAddress[cachedBindings.size()];
       int i = 0;
-      for(GUIDBinding b : cachedBindings){
+      for (GUIDBinding b : cachedBindings) {
         addxes[i++] = b.getAddress();
       }
-      
       response.setBindings(addxes);
       response.setOriginAddress(this.server.getOriginAddress());
       response.setRequestId(this.message.getRequestId());
       response.setResponseCode(ResponseCode.SUCCESS);
-      response.setVersion((byte)0);
-      
+      response.setVersion((byte) 0);
       this.server.sendMessage(response, this.message.getOriginAddress());
     } else {
 
@@ -133,13 +131,13 @@ public class LookupTask implements Callable<Object> {
 
         }
       }
-      
+
       boolean recursive = false;
       List<Option> options = this.message.getOptions();
-      if(!options.isEmpty()){
-        for(Option opt : options){
-          if(opt instanceof RecursiveRequestOption){
-            recursive = ((RecursiveRequestOption)opt).isRecursive();
+      if (!options.isEmpty()) {
+        for (Option opt : options) {
+          if (opt instanceof RecursiveRequestOption) {
+            recursive = ((RecursiveRequestOption) opt).isRecursive();
             break;
           }
         }
@@ -147,7 +145,7 @@ public class LookupTask implements Callable<Object> {
 
       // No bindings were for the local server
       if (recursive && !resolvedLocally) {
-//        this.message.setRecursive(false);
+        // this.message.setRecursive(false);
 
         RelayInfo info = new RelayInfo();
         info.clientMessage = this.message;
@@ -157,8 +155,8 @@ public class LookupTask implements Callable<Object> {
 
         LookupMessage relayMessage = new LookupMessage();
         relayMessage.setGuid(this.message.getGuid());
-        for(Option opt : this.message.getOptions()){
-          if(!(opt instanceof RecursiveRequestOption)){
+        for (Option opt : this.message.getOptions()) {
+          if (!(opt instanceof RecursiveRequestOption)) {
             relayMessage.addOption(opt);
           }
         }
@@ -193,13 +191,16 @@ public class LookupTask implements Callable<Object> {
 
       }
 
-      long endProc = System.nanoTime();
-      if (this.server.getConfig().isCollectStatistics()) {
-        GNRSServer.LOOKUP_STATS[GNRSServer.QUEUE_TIME_INDEX].addAndGet(startProc-this.message.createdNanos);
-        GNRSServer.LOOKUP_STATS[GNRSServer.PROC_TIME_INDEX].addAndGet(endProc-startProc);
-        GNRSServer.LOOKUP_STATS[GNRSServer.TOTAL_TIME_INDEX].addAndGet(endProc-this.message.createdNanos);
+    }
+    long endProc = System.nanoTime();
+    if (this.server.getConfig().isCollectStatistics()) {
+      GNRSServer.LOOKUP_STATS[GNRSServer.QUEUE_TIME_INDEX].addAndGet(startProc
+          - this.message.createdNanos);
+      GNRSServer.LOOKUP_STATS[GNRSServer.PROC_TIME_INDEX].addAndGet(endProc
+          - startProc);
+      GNRSServer.LOOKUP_STATS[GNRSServer.TOTAL_TIME_INDEX].addAndGet(endProc
+          - this.message.createdNanos);
 
-      }
     }
 
     return null;
