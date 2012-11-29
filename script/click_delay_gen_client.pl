@@ -25,8 +25,10 @@
 # arriving from that AS.  One file will be generated for each AS, and named
 # with the template "as_xxx_delay.dat", where "xxx" is the AS #.
 
-# modified by Feixiong Zhang to adapt to the click delay config file format requirement.
+######################################################################################
+# modified by Feixiong Zhang to adapt to the click delay config file format requirement for client.
 # also modify the output file name "as_xxx_delay.dat", "xxx" starts from 1 and increases.
+
 
 # Standard imports.
 use v5.10;
@@ -95,16 +97,16 @@ my $outFile;
 # Skip the first line of the delay matrix file
 readFileLine($delayFile);
 
-my Count = 1;
+my $Count = 1;
 #port number is hardcoded as 5001 amd 4001
-my $severPort = 5001;
+my $serverPort = 5001;
 my $clientPort = 4001;
 my $intraDelay = 5;  #assume intradomain delay is 5ms
 # Go through each AS and generate a file
 GEN_OUTPUT: {
   foreach $asNum (@asList) {
     # The output file, named by AS number
-    open($outFile, ">", "as_".$Count."_delay.dat");
+    open($outFile, ">", "as_".$Count."_delay_client.dat");
     # Get the delays for each source AS from the delay matrix
     my $delayLine = readFileLine($delayFile);
 
@@ -118,9 +120,9 @@ GEN_OUTPUT: {
 	$count++;
         # Get the next delay, remove it from the array
         my $delay = shift(@delayList);
-        # Skip the local AS
+        # For the local AS, add the intradomain delay
         if($srcAS == $asNum) {
-          print $outFile "192.168.1.$count, $clientPort, $intraDelay,\n";
+          print $outFile "192.168.1.$count, $serverPort, $intraDelay,\n";
           next;
         }
         # Write the line to the output file.
