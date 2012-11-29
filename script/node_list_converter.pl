@@ -8,7 +8,7 @@
 # node_list_perline.data: node list: one line for one node
 # ID_list.data: node ID
 #
-# usage: ./node_list_converter.pl <node list>
+# usage: ./node_list_converter.pl <node list> <node list perline> <ID_list>
 
 use v5.10;
 use strict;
@@ -26,9 +26,9 @@ $inFile->open("<" . $ARGV[0])
 
 my $outNodeFile = FileHandle->new;
 my $outIDFile = FileHandle->new;
-$outNodeFile->open("> node_list_perline.data")
+$outNodeFile->open(">" . $ARGV[1])
     || die "Could not create \"node_list_perline.data\" for writing.";
-$outIDFile->open("> ID_list.data")
+$outIDFile->open(">" . $ARGV[2])
     || die "Could not create \"ID_list.data\" for writing.";
 
 #read file content
