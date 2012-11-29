@@ -25,7 +25,7 @@
   <networkConfiguration>src/main/resources/net-ipv4.xml</networkConfiguration>
   
   <!-- Configuration file name for the GUID mapping object. -->
-  <mappingConfiguration>map-ipv4.xml</mappingConfiguration>
+  <mappingConfiguration>src/main/resources/map-ipv4.xml</mappingConfiguration>
 
   <!-- The type of GUID storage object to use.  Changes to this value mean that
        the config storeConfiguration parameter must reference the correct

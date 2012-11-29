@@ -1,18 +1,42 @@
 /*
- * Mobility First GNRS Server Copyright (C) 2012 Robert Moore and Rutgers
- * University All rights reserved.
+ * Copyright (c) 2012, Rutgers University
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * + Redistributions of source code must retain the above copyright notice, 
+ *   this list of conditions and the following disclaimer.
+ * + Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 package edu.rutgers.winlab.mfirst;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.rutgers.winlab.mfirst.messages.ExpirationOption;
 import edu.rutgers.winlab.mfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mfirst.messages.InsertResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
@@ -20,8 +44,10 @@ import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.Option;
 import edu.rutgers.winlab.mfirst.messages.RecursiveRequestOption;
 import edu.rutgers.winlab.mfirst.messages.ResponseCode;
+import edu.rutgers.winlab.mfirst.messages.TTLOption;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.SessionParameters;
+import edu.rutgers.winlab.mfirst.storage.GUIDBinding;
 
 /**
  * Task to handle Insert messages within the server. Designed to operate
@@ -96,11 +122,16 @@ public class InsertTask implements Callable<Object> {
     
     boolean recursive = false;
     List<Option> options = this.message.getOptions();
+    long expirationTime = this.server.getConfig().getDefaultExpiration()+System.currentTimeMillis();
+    long ttlValue = this.server.getConfig().getDefaultTtl();
     if(!options.isEmpty()){
       for(Option opt : options){
         if(opt instanceof RecursiveRequestOption){
           recursive = ((RecursiveRequestOption)opt).isRecursive();
-          break;
+        }else if(opt instanceof ExpirationOption){
+          expirationTime = ((ExpirationOption)opt).getExpiration();
+        } else if(opt instanceof TTLOption){
+          ttlValue = ((TTLOption)opt).getTtl();
         }
       }
     }
@@ -109,8 +140,18 @@ public class InsertTask implements Callable<Object> {
       localSuccess = this.server.appendBindings(this.message.getGuid(),
           this.message.getBindings());
     } else if (recursive && this.message.getBindings() != null) {
+      GUIDBinding[] bindings = new GUIDBinding[this.message.getBindings().length];
+      
+      for(int i = 0; i < bindings.length; ++i){
+        NetworkAddress netAddr = this.message.getBindings()[i];
+        GUIDBinding bind = new GUIDBinding();
+        bind.setAddress(netAddr);
+        bind.setExpiration(expirationTime);
+        bind.setTtl(ttlValue);
+      }
+      
       this.server
-          .addToCache(this.message.getGuid(), this.message.getBindings());
+          .addToCache(this.message.getGuid(), bindings);
     }
     long t30 = System.nanoTime();
     // At least one IP prefix binding was for the local server
