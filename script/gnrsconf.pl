@@ -43,6 +43,9 @@ while (my $line = $inFile->getline) {
 	printf $outFile1 "  <mappingConfiguration>/usr/local/mobilityfirst/conf/map-ipv4.xml</mappingConfiguration>\n";
 	printf $outFile1 "  <storeType>berkeleydb</storeType>\n";
 	printf $outFile1 "  <storeConfiguration>/usr/local/mobilityfirst/conf/berkeleydb.xml</storeConfiguration>\n";
+	printf $outFile1 "  <numAttempts>2</numAttempts>\n";
+	printf $outFile1 "  <timeoutMillis>500</timeoutMillis>\n";
+	printf $outFile1 "  <cacheEntries>0</cacheEntries>\n";
 	printf $outFile1 "</edu.rutgers.winlab.mfirst.Configuration>";
 
 	open($outFile2, ">", "net-ipv4_".$line.".xml");
@@ -50,7 +53,7 @@ while (my $line = $inFile->getline) {
 	printf $outFile2 "<edu.rutgers.winlab.mfirst.net.ipv4udp.Configuration>\n";
 	printf $outFile2 "  <bindPort>5001</bindPort>\n";
 	printf $outFile2 "  <bindAddress>192.168.1.".$count."</bindAddress>\n";
-	printf $outFile2 "  <ascynchronousWrite>false</ascynchronousWrite>\n";
+	printf $outFile2 "  <asynchronousWrite>false</asynchronousWrite>\n";
 	printf $outFile2 "</edu.rutgers.winlab.mfirst.net.ipv4udp.Configuration>";
 
 	close $outFile1;
