@@ -191,7 +191,7 @@ public class InsertTask implements Callable<Object> {
     }
 
     if (resolvedLocally && !recursive) {
-
+      LOG.info("Received {}", this.message);
       InsertResponseMessage response = new InsertResponseMessage();
       response.setOriginAddress(this.server.getOriginAddress());
       response.setRequestId(this.message.getRequestId());

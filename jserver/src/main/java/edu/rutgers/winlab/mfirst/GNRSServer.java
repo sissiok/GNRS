@@ -492,6 +492,7 @@ public class GNRSServer implements MessageListener {
   public void messageReceived(final SessionParameters parameters,
       final AbstractMessage msg) {
 
+//    LOG.info("Received {}.", msg);
     if (msg instanceof InsertMessage) {
       this.workers
           .submit(new InsertTask(this, parameters, (InsertMessage) msg));

@@ -37,6 +37,7 @@ import edu.rutgers.winlab.mfirst.messages.InsertResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.Option;
+import edu.rutgers.winlab.mfirst.messages.RecursiveRequestOption;
 import edu.rutgers.winlab.mfirst.messages.ResponseCode;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 
@@ -79,66 +80,73 @@ public class TimeoutTask implements Callable<Object> {
   @Override
   public Object call() throws Exception {
     // Too many failed attempts, respond with FAILURE
-    if(this.info.getNumAttempts() >= this.server.getConfig().getNumAttempts()){
+    if (this.info.getNumAttempts() >= this.server.getConfig().getNumAttempts()) {
       AbstractResponseMessage response = null;
-      if(this.info.clientMessage instanceof LookupMessage){
+      if (this.info.clientMessage instanceof LookupMessage) {
         response = new LookupResponseMessage();
-        if(!this.info.responseAddresses.isEmpty()){
-          ((LookupResponseMessage)response).setBindings(this.info.responseAddresses.toArray(new NetworkAddress[]{}));
+        if (!this.info.responseAddresses.isEmpty()) {
+          ((LookupResponseMessage) response)
+              .setBindings(this.info.responseAddresses
+                  .toArray(new NetworkAddress[] {}));
           response.setResponseCode(ResponseCode.SUCCESS);
-        }else{
+        } else {
           response.setResponseCode(ResponseCode.FAILED);
         }
-      } else if(this.info.clientMessage instanceof InsertMessage){
+      } else if (this.info.clientMessage instanceof InsertMessage) {
         response = new InsertResponseMessage();
         response.setResponseCode(ResponseCode.FAILED);
       }
       // We have a message to send
-      if(response != null){
+      if (response != null) {
         response.setOriginAddress(this.server.getOriginAddress());
         response.setRequestId(this.info.clientMessage.getRequestId());
-       
-        response.setVersion((byte)0);
-        
-        this.server.sendMessage(response, this.info.clientMessage.getOriginAddress());
+
+        response.setVersion((byte) 0);
+
+        this.server.sendMessage(response,
+            this.info.clientMessage.getOriginAddress());
       }
     }
     // Can still reattempt the message
-    else{
+    else {
       // Lookup message
-      if(this.info.clientMessage instanceof LookupMessage){
-        LookupMessage orig = (LookupMessage)this.info.clientMessage;
-      
-      Integer requestId = Integer.valueOf(this.server.getNextRequestId());
+      if (this.info.clientMessage instanceof LookupMessage) {
+        LookupMessage orig = (LookupMessage) this.info.clientMessage;
 
-      LookupMessage relayMessage = new LookupMessage();
-      relayMessage.setGuid(orig.getGuid());
-      List<Option> options = orig.getOptions();
-      if(!options.isEmpty()){
-        for(Option opt : options){
-          relayMessage.addOption(opt);
+        Integer requestId = Integer.valueOf(this.server.getNextRequestId());
+
+        LookupMessage relayMessage = new LookupMessage();
+        relayMessage.setGuid(orig.getGuid());
+        List<Option> options = orig.getOptions();
+        if (!options.isEmpty()) {
+          for (Option opt : options) {
+            if (!(opt instanceof RecursiveRequestOption)) {
+              relayMessage.addOption(opt);
+            }
+          }
         }
-      }
-      relayMessage.finalizeOptions();
-      relayMessage.setOriginAddress(this.server.getOriginAddress());
-      relayMessage.setVersion((byte) 0);
-      relayMessage.setRequestId(requestId.intValue());
+        relayMessage.finalizeOptions();
+        relayMessage.setOriginAddress(this.server.getOriginAddress());
+        relayMessage.setVersion((byte) 0);
+        relayMessage.setRequestId(requestId.intValue());
 
-      this.server.addNeededServer(requestId, this.info);
-      this.info.markAttempt();
-      this.server.sendMessage(relayMessage,
-          this.info.remainingServers.toArray(new NetworkAddress[]{}));
-      
-      }else if(this.info.clientMessage instanceof InsertMessage){
-        InsertMessage orig = (InsertMessage)this.info.clientMessage;
+        this.server.addNeededServer(requestId, this.info);
+        this.info.markAttempt();
+        this.server.sendMessage(relayMessage,
+            this.info.remainingServers.toArray(new NetworkAddress[] {}));
+
+      } else if (this.info.clientMessage instanceof InsertMessage) {
+        InsertMessage orig = (InsertMessage) this.info.clientMessage;
         Integer requestId = Integer.valueOf(this.server.getNextRequestId());
 
         final InsertMessage relayMessage = new InsertMessage();
         relayMessage.setGuid(orig.getGuid());
         List<Option> options = orig.getOptions();
-        if(!options.isEmpty()){
-          for(Option opt : options){
-            relayMessage.addOption(opt);
+        if (!options.isEmpty()) {
+          for (Option opt : options) {
+            if (!(opt instanceof RecursiveRequestOption)) {
+              relayMessage.addOption(opt);
+            }
           }
         }
         relayMessage.finalizeOptions();
@@ -151,10 +159,11 @@ public class TimeoutTask implements Callable<Object> {
 
         this.info.markAttempt();
         this.server.sendMessage(relayMessage,
-            this.info.remainingServers.toArray(new NetworkAddress[]{}));
-        
-      }else {
-        LOG.warn("Retry unhandled for type {}",this.info.clientMessage.getClass());
+            this.info.remainingServers.toArray(new NetworkAddress[] {}));
+
+      } else {
+        LOG.warn("Retry unhandled for type {}",
+            this.info.clientMessage.getClass());
       }
     }
     return null;
