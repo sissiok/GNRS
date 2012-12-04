@@ -342,6 +342,9 @@ public class TraceClient extends IoHandlerAdapter {
     long minInsRtt = insList.isEmpty() ? 0 : insList.get(0);
     long medInsRtt = insList.isEmpty() ? 0 : insList.get(length / 2);
     long maxInsRtt = insList.isEmpty() ? 0 : insList.get(length - 1);
+    minInsRtt /= 1000;
+    medInsRtt /= 1000;
+    maxInsRtt /= 1000;
 
     int totalIns = this.numInsert.get();
     int succIns = this.numInsertSuccess.get();
@@ -356,6 +359,10 @@ public class TraceClient extends IoHandlerAdapter {
     long minLkpRtt = lookList.isEmpty() ? 0 : lookList.get(0);
     long medLkpRtt = lookList.isEmpty() ? 0 : lookList.get(length / 2);
     long maxLkpRtt = lookList.isEmpty() ? 0 : lookList.get(length - 1);
+    
+    minLkpRtt /= 1000;
+    medLkpRtt /= 1000;
+    maxLkpRtt /= 1000;
 
     int totalLkp = this.numLookup.get();
     int succLkp = this.numLookupSuccess.get();

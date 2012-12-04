@@ -1,0 +1,88 @@
+<h1>Shortest Path Generator</h1>
+
+<p><strong>IMPORTANT</strong>: This application produces 3 rather large matrices in-memory.
+As a result, it requires a non-trivial amount of memory in order to run.  As
+an example, an input file consisting of ~24,000 AS's (~90,000 links) used
+nearly 24GB of RAM at its peak, and produced an output file of 4GB.  The size
+of the matrices are effectively the square of the number of AS's, so be sure
+to allocate sufficient resources when running on large data sets.</p>
+
+<p>The shortest-path generator takes as input a topology file for different
+Autonomous Systems (AS's) and the associated cost of that inter-AS link. It
+then uses Djikstra's algorithm to compute the shortest-path between every pair
+of AS's and output it into a matrix file.</p>
+
+<h2>Building the Program</h2>
+
+<p>To build the shortest path generator, run GMake with the makefile in the
+current directory.  If you use the default invocation, it should produce a
+binary output file named 'run.now'.</p>
+
+<pre><code>make clean all
+</code></pre>
+
+<p>Alternatively, you can enable some debugging statements by executing either
+the debug1 or debug2 directives in the makefile.</p>
+
+<pre><code>make clean debug1
+# Or for more verbose output
+make clean debug2
+</code></pre>
+
+<p>The output of either of the debug directives is named 'run.debug'.</p>
+
+<h2>Running the Program</h2>
+
+<p>The program takes a single input, the name of a topology file, and produces an
+output file in the same location as the input, and with the same name that
+only appends the '.route' suffix to the name.  For example:</p>
+
+<pre><code>./run.now topology.txt
+# Produces the output file 'topology.txt.route'
+</code></pre>
+
+<h2>File Formats</h2>
+
+<p>The input file (topology file) is expected to have be an ASCII-encoded (text)
+file with inter-AS link weights on individual lines.  For example, the simple
+network illustrated below:</p>
+
+<pre><code>AS6
+ |  \
+ |   7
+ |    \
+ 5     AS3
+ |    /
+ |   4
+ |  /
+AS2
+</code></pre>
+
+<p>Could be represented by a topology file like this:</p>
+
+<pre><code>6 3 7
+6 2 5
+2 3 4
+</code></pre>
+
+<p>Equally, you could use a different arrangement of the lines:</p>
+
+<pre><code>2 3 4
+6 2 5
+3 6 7
+</code></pre>
+
+<p>The output of the program is a '.route' file that has the computed
+shortest-path cost from each AS to every other AS, arranged in a 2-dimensional
+matrix.  There are no headers present in the output file, but each row or
+column represents some single AS, ordered in non-decreasing order, based on
+the values found in the input file.  For the example above, the output would
+be this:</p>
+
+<pre><code>0 4 5
+4 0 7
+5 7 0
+</code></pre>
+
+<p>Note the lack of any column/row header information.  Also check so that you
+understand how the AS number values are used to order the rows and columns.</p>
