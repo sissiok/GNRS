@@ -155,7 +155,11 @@ public class InsertTask implements Callable<Object> {
       this.server.addToCache(this.message.getGuid(), bindings);
     }
     
-    // At least one IP prefix binding was for the local server
+    // Corner case for only a single server.
+    if(resolvedLocally && serverAddxes.isEmpty()){
+      recursive = false;
+    }
+    
     if (recursive) {
       // this.message.setRecursive(false);
 
