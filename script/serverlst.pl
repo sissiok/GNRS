@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 
+# the script is not used any more. replaced by ASbinding.pl
 # perl script to generate serverlist used by the GNRS server. the serverlist file contains all the server IP that are used in the experiment
 # input: number of servers that are used
 # output: servers.lst
