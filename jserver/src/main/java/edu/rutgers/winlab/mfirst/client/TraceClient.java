@@ -155,10 +155,8 @@ public class TraceClient extends IoHandlerAdapter {
   }
 
   /**
-   * Connector to communicate with the server.
+   * Acceptor for receiving messages from the server.
    */
-  private final transient NioDatagramConnector connector;
-
   private final transient NioDatagramAcceptor acceptor;
   /**
    * Configuration for the client.
@@ -202,14 +200,6 @@ public class TraceClient extends IoHandlerAdapter {
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
         new GNRSProtocolCodecFactory()));
 
-    this.connector = new NioDatagramConnector();
-    this.connector.setHandler(this);
-    sessionConfig = this.connector.getSessionConfig();
-    sessionConfig.setReuseAddress(true);
-    sessionConfig.setCloseOnPortUnreachable(false);
-    chain = this.connector.getFilterChain();
-    chain.addLast("gnrs codec", new ProtocolCodecFilter(
-        new GNRSProtocolCodecFactory()));
 
   }
 
@@ -223,28 +213,16 @@ public class TraceClient extends IoHandlerAdapter {
     boolean retValue = true;
     try {
 
-      this.acceptor.bind(new InetSocketAddress(this.config.getClientHost(),this.config.getClientPort()));
+      this.acceptor.bind(new InetSocketAddress(this.config.getClientHost(),
+          this.config.getClientPort()));
 
-      LOG.debug("Creating connect future.");
-      final ConnectFuture connectFuture = this.connector
-          .connect(new InetSocketAddress(this.config.getServerHost(),
-              this.config.getServerPort()));
+      // LOG.debug("Creating connect future.");
+      final IoSession session = this.acceptor.newSession(new InetSocketAddress(
+          this.config.getServerHost(), this.config.getServerPort()),
+          this.acceptor.getLocalAddress());
 
-      connectFuture.awaitUninterruptibly();
+      TraceClient.this.runTrace(session);
 
-      connectFuture.addListener(new IoFutureListener<ConnectFuture>() {
-        @Override
-        public void operationComplete(final ConnectFuture future) {
-          if (future.isConnected()) {
-
-            TraceClient.this.runTrace(future.getSession());
-
-          }
-        }
-
-      });
-
-      LOG.debug("Future listener will handle connection event and start trace.");
     } catch (IOException e) {
       LOG.error("Unable to bind to local port.", e);
       retValue = false;
@@ -327,7 +305,6 @@ public class TraceClient extends IoHandlerAdapter {
 
     }
     session.close(true);
-    this.connector.dispose(true);
     this.acceptor.dispose(true);
 
     this.printStatistics();
@@ -359,7 +336,7 @@ public class TraceClient extends IoHandlerAdapter {
     long minLkpRtt = lookList.isEmpty() ? 0 : lookList.get(0);
     long medLkpRtt = lookList.isEmpty() ? 0 : lookList.get(length / 2);
     long maxLkpRtt = lookList.isEmpty() ? 0 : lookList.get(length - 1);
-    
+
     minLkpRtt /= 1000;
     medLkpRtt /= 1000;
     maxLkpRtt /= 1000;
@@ -375,11 +352,14 @@ public class TraceClient extends IoHandlerAdapter {
         + "Total: %,d  |  Success: %,d  |  Loss: %,d\n" + "==Lookup==\n"
         + "Min: %,dus | Med: %,dus | Max: %,dus\n"
         + "Total: %,d  |  Success: %,d  |  Bound: %,d  |  Loss: %,d\n";
-    
-    LOG.info(String.format(formatString,Long.valueOf(minInsRtt), Long.valueOf(medInsRtt), Long.valueOf(maxInsRtt),
-        Integer.valueOf(totalIns), Integer.valueOf(succIns), Integer.valueOf(totalIns-returnedIns),
-        Long.valueOf(minLkpRtt), Long.valueOf(medLkpRtt), Long.valueOf(maxLkpRtt),
-        Integer.valueOf(totalLkp), Integer.valueOf(succLkp), Integer.valueOf(hitLkp), Integer.valueOf(totalLkp-returnedLkp)));
+
+    LOG.info(String.format(formatString, Long.valueOf(minInsRtt),
+        Long.valueOf(medInsRtt), Long.valueOf(maxInsRtt),
+        Integer.valueOf(totalIns), Integer.valueOf(succIns),
+        Integer.valueOf(totalIns - returnedIns), Long.valueOf(minLkpRtt),
+        Long.valueOf(medLkpRtt), Long.valueOf(maxLkpRtt),
+        Integer.valueOf(totalLkp), Integer.valueOf(succLkp),
+        Integer.valueOf(hitLkp), Integer.valueOf(totalLkp - returnedLkp)));
 
   }
 

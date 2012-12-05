@@ -146,12 +146,9 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     System.out
         .println("Usage: <Config File> <Num Request> <Request Delay> <Num Clients> [-v]");
   }
-
   /**
-   * Connector to communicate with the server.
+   * Acceptor for accepting messages from the server.
    */
-  private final transient NioDatagramConnector connector;
-
   private final transient NioDatagramAcceptor acceptor;
 
   /**
@@ -184,11 +181,11 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
   private final transient AtomicInteger numFailures = new AtomicInteger(0);
 
   private final Map<Integer, Long> sendTimes = new ConcurrentHashMap<Integer, Long>();
-  
+
   private final Map<Integer, LookupMessage> sentMessages = new ConcurrentHashMap<Integer, LookupMessage>();
 
   private final Queue<Long> rtts = new ConcurrentLinkedQueue<Long>();
-  
+
   /**
    * Flag for verbose (per-message) outputs.
    */
@@ -224,15 +221,6 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
         new GNRSProtocolCodecFactory()));
 
-    this.connector = new NioDatagramConnector();
-    this.connector.setHandler(this);
-    sessionConfig = this.connector.getSessionConfig();
-    sessionConfig.setReuseAddress(true);
-    sessionConfig.setCloseOnPortUnreachable(false);
-    chain = this.connector.getFilterChain();
-    chain.addLast("gnrs codec", new ProtocolCodecFilter(
-        new GNRSProtocolCodecFactory()));
-
     LOG.info(String.format("Assuming timer precision of %,dns.",
         Long.valueOf(SLEEP_PRECISION)));
 
@@ -251,28 +239,15 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
   public boolean connect() {
     boolean retValue = true;
     try {
-      this.acceptor.bind(new InetSocketAddress(this.config.getClientHost(), this.config.getClientPort()));
+      this.acceptor.bind(new InetSocketAddress(this.config.getClientHost(),
+          this.config.getClientPort()));
 
       LOG.debug("Creating connect future.");
-      final ConnectFuture connectFuture = this.connector
-          .connect(new InetSocketAddress(this.config.getServerHost(),
-              this.config.getServerPort()));
+      IoSession session = this.acceptor.newSession(new InetSocketAddress(
+          this.config.getServerHost(), this.config.getServerPort()),
+          this.acceptor.getLocalAddress());
 
-      // FIXME: Must call awaitUninterruptably. This is a known issue in MINA
-      // <https://issues.apache.org/jira/browse/DIRMINA-911>
-      connectFuture.awaitUninterruptibly();
-
-      connectFuture.addListener(new IoFutureListener<ConnectFuture>() {
-        @Override
-        public void operationComplete(final ConnectFuture future) {
-          if (future.isConnected()) {
-            GeneratingClient.this.perform(future.getSession());
-          }
-        }
-
-      });
-
-      LOG.debug("Future listener will handle connection event and start trace.");
+      GeneratingClient.this.perform(session);
 
     } catch (IOException e) {
       LOG.error("Unable to bind to local port.", e);
@@ -313,14 +288,15 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     final int succ = GeneratingClient.this.numSuccess.get();
     final int total = succ + GeneratingClient.this.numFailures.get();
 
-    LOG.info(String.format(
-        "Sent: %,d  |  Received: %,d  |  Success: %,d  |  Bound: %,d  |  Loss: %,d",
-        Integer.valueOf(numLookups),Integer.valueOf(total), Integer.valueOf(succ),
-        Integer.valueOf(GeneratingClient.this.numHits.get()),
-        Integer.valueOf(GeneratingClient.this.numLookups - total)));
+    LOG.info(String
+        .format(
+            "Sent: %,d  |  Received: %,d  |  Success: %,d  |  Bound: %,d  |  Loss: %,d",
+            Integer.valueOf(numLookups), Integer.valueOf(total),
+            Integer.valueOf(succ),
+            Integer.valueOf(GeneratingClient.this.numHits.get()),
+            Integer.valueOf(GeneratingClient.this.numLookups - total)));
     session.close(true);
     this.acceptor.dispose(true);
-    this.connector.dispose(true);
   }
 
   /**
@@ -353,7 +329,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
         lastSend = System.nanoTime();
         final WriteFuture future = session.write(message);
         this.sendTimes.put(Integer.valueOf(i), Long.valueOf(lastSend));
-        if(this.verbose){
+        if (this.verbose) {
           this.sentMessages.put(Integer.valueOf(i), message);
         }
 
@@ -416,13 +392,14 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     if (startNanos != null) {
       this.rtts.add(Long.valueOf(recvNanos - startNanos.longValue()));
     }
-    
-    if(this.verbose){
-      LookupMessage sentMessage = this.sentMessages.remove(Integer.valueOf((int)msg.getRequestId()));
-      LOG.info(String.format("[%,dns] %s -> %s", recvNanos-startNanos.longValue(),sentMessage.getGuid(), msg));
+
+    if (this.verbose) {
+      LookupMessage sentMessage = this.sentMessages.remove(Integer
+          .valueOf((int) msg.getRequestId()));
+      LOG.info(String.format("[%,dns] %s -> %s",
+          recvNanos - startNanos.longValue(), sentMessage.getGuid(), msg));
     }
-    
-    
+
     if (ResponseCode.SUCCESS.equals(msg.getResponseCode())) {
       this.numSuccess.incrementAndGet();
       if (msg.getBindings() != null && msg.getBindings().length > 0) {
