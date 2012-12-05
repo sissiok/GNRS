@@ -245,6 +245,7 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
       if (params == null) {
         params = new IPv4UDPParameters();
          params.session = this.acceptor.newSession(IPv4UDPAddress.toSocketAddr(destAddr), this.listenSockAddr);
+         this.sessions.put(params.session,destAddr);
         this.connections.put(destAddr,params);
         // LOG.info("Establishing connection to {}",
         // IPv4UDPAddress.toSocketAddr(destAddr));
@@ -299,6 +300,11 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
    */
 
   @Override
+  public void messageSent(final IoSession session, final Object message){
+    LOG.info("Sent {} to {}",message,session);
+  }
+  
+  @Override
   public void messageReceived(final IoSession session, final Object message) {
     if (message instanceof AbstractMessage) {
       AbstractMessage msg = (AbstractMessage) message;
@@ -320,6 +326,8 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
 
   @Override
   public void sessionIdle(final IoSession session, final IdleStatus idleStatus) {
+    NetworkAddress netAddr = this.sessions.remove(session);
+    this.connections.remove(netAddr);
     session.close(true);
   }
 

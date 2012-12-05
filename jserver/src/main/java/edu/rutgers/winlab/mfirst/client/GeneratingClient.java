@@ -372,7 +372,6 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
   public void messageReceived(final IoSession session, final Object message) {
     final long rcvTime = System.nanoTime();
     this.lastReceiveTime = System.currentTimeMillis();
-    // LOG.info("Received {} on {}", message, session);
     if (message instanceof LookupResponseMessage) {
       this.handleResponse((LookupResponseMessage) message, rcvTime);
     }
