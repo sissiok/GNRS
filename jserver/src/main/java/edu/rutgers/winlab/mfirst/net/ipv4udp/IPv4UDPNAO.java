@@ -300,11 +300,6 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
    */
 
   @Override
-  public void messageSent(final IoSession session, final Object message){
-    LOG.info("Sent {} to {}",message,session);
-  }
-  
-  @Override
   public void messageReceived(final IoSession session, final Object message) {
     if (message instanceof AbstractMessage) {
       AbstractMessage msg = (AbstractMessage) message;
