@@ -314,8 +314,8 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     final int total = succ + GeneratingClient.this.numFailures.get();
 
     LOG.info(String.format(
-        "Total: %,d  |  Success: %,d  |  Bound: %,d  |  Loss: %,d",
-        Integer.valueOf(total), Integer.valueOf(succ),
+        "Sent: %,d  |  Received: %,d  |  Success: %,d  |  Bound: %,d  |  Loss: %,d",
+        Integer.valueOf(numLookups),Integer.valueOf(total), Integer.valueOf(succ),
         Integer.valueOf(GeneratingClient.this.numHits.get()),
         Integer.valueOf(GeneratingClient.this.numLookups - total)));
     session.close(true);
