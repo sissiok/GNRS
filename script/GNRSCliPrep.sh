@@ -33,6 +33,7 @@ for line in $(cat $data_path/client_nodeID_list.data); do
     scp $data_path/client_${line}.xml root@node$line:$MF_path/conf/
     scp $data_path/as_${count}_delay_client.dat root@node$line:$MF_path/conf/
     scp $data_path/gbench.sh root@node$line:$MF_path/scripts/
+    scp $data_path/ggen.sh root@node$line:$MF_path/scripts/
     ((count++))
     myIP=$(( $count + 100 ))
     ssh root@node$line "cp /etc/gnrs/delayModule.click $MF_path/conf/; cp $MF_server/target/gnrs-server-1.0.0-SNAPSHOT-jar-with-dependencies.jar $MF_path/bin/"
