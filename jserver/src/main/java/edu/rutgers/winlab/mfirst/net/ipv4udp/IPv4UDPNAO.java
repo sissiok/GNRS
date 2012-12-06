@@ -52,7 +52,6 @@ import org.apache.mina.util.ConcurrentHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import com.thoughtworks.xstream.XStream;
 
 import edu.rutgers.winlab.mfirst.client.GeneratingClient;
@@ -74,10 +73,9 @@ import edu.rutgers.winlab.mfirst.net.SessionParameters;
  * 
  * @author Robert Moore
  */
-public class IPv4UDPNAO extends IoHandlerAdapter implements
-    NetworkAccessObject 
-//    ,IoFutureListener<ConnectFuture> 
-    {
+public class IPv4UDPNAO extends IoHandlerAdapter implements NetworkAccessObject
+// ,IoFutureListener<ConnectFuture>
+{
 
   /**
    * Logging for this class.
@@ -101,7 +99,8 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
   /**
    * Messages that are awaiting connections.
    */
-//  private final transient Map<ConnectFuture, RelayInfo> awaitingConnect = new ConcurrentHashMap<ConnectFuture, RelayInfo>();
+  // private final transient Map<ConnectFuture, RelayInfo> awaitingConnect = new
+  // ConcurrentHashMap<ConnectFuture, RelayInfo>();
 
   /**
    * Incoming datagram acceptor.
@@ -111,15 +110,15 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
   /**
    * For sending datagrams.
    */
-//  private final transient NioDatagramConnector connector;
+  // private final transient NioDatagramConnector connector;
 
   private final transient IPv4UDPAddress listenAddress;
-  
+
   private final transient InetSocketAddress listenSockAddr;
 
-//  private final transient IPv4UDPAddress sendAddress;
-//
-//  private final transient InetSocketAddress sendSockAddr;
+  // private final transient IPv4UDPAddress sendAddress;
+  //
+  // private final transient InetSocketAddress sendSockAddr;
 
   /**
    * Creates a new instance of network access object for IPv4/UDP networking.
@@ -138,20 +137,20 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
     }
     this.listenAddress = IPv4UDPAddress.fromASCII(this.config.getBindAddress()
         + ":" + this.config.getBindPort());
-    
+
     this.listenSockAddr = new InetSocketAddress(this.config.getBindAddress(),
         this.config.getBindPort());
 
-//    this.sendAddress = IPv4UDPAddress.fromASCII(this.config.getBindAddress()
-//        + ":" + this.config.getSendPort());
-//    this.sendSockAddr = IPv4UDPAddress.toSocketAddr(this.sendAddress);
+    // this.sendAddress = IPv4UDPAddress.fromASCII(this.config.getBindAddress()
+    // + ":" + this.config.getSendPort());
+    // this.sendSockAddr = IPv4UDPAddress.toSocketAddr(this.sendAddress);
 
     // Incoming messages (and direct replies)
     this.acceptor = new NioDatagramAcceptor();
     this.configureAcceptor();
     // Outgoing messages
-//    this.connector = new NioDatagramConnector();
-//    this.configureConnector();
+    // this.connector = new NioDatagramConnector();
+    // this.configureConnector();
 
   }
 
@@ -187,19 +186,19 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
    * 
    * @throws IOException
    */
-//  private void configureConnector() throws IOException {
-//    this.connector.setHandler(this);
-//    final DatagramSessionConfig sessionConfig = this.connector
-//        .getSessionConfig();
-//    sessionConfig.setReuseAddress(true);
-//    sessionConfig.setCloseOnPortUnreachable(false);
-//    sessionConfig.setIdleTime(IdleStatus.BOTH_IDLE, 1);
-//    sessionConfig.setIdleTime(IdleStatus.BOTH_IDLE, 1);
-//
-//    final DefaultIoFilterChainBuilder chain = this.connector.getFilterChain();
-//    chain.addLast("gnrs codec", new ProtocolCodecFilter(
-//        new GNRSProtocolCodecFactory()));
-//  }
+  // private void configureConnector() throws IOException {
+  // this.connector.setHandler(this);
+  // final DatagramSessionConfig sessionConfig = this.connector
+  // .getSessionConfig();
+  // sessionConfig.setReuseAddress(true);
+  // sessionConfig.setCloseOnPortUnreachable(false);
+  // sessionConfig.setIdleTime(IdleStatus.BOTH_IDLE, 1);
+  // sessionConfig.setIdleTime(IdleStatus.BOTH_IDLE, 1);
+  //
+  // final DefaultIoFilterChainBuilder chain = this.connector.getFilterChain();
+  // chain.addLast("gnrs codec", new ProtocolCodecFilter(
+  // new GNRSProtocolCodecFactory()));
+  // }
 
   /**
    * Loads this NAOs configuration file from the filename provided.
@@ -244,27 +243,28 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
 
       if (params == null) {
         params = new IPv4UDPParameters();
-         params.session = this.acceptor.newSession(IPv4UDPAddress.toSocketAddr(destAddr), this.listenSockAddr);
-         this.sessions.put(params.session,destAddr);
-        this.connections.put(destAddr,params);
+        params.session = this.acceptor.newSession(
+            IPv4UDPAddress.toSocketAddr(destAddr), this.listenSockAddr);
+        this.sessions.put(params.session, destAddr);
+        this.connections.put(destAddr, params);
         // LOG.info("Establishing connection to {}",
         // IPv4UDPAddress.toSocketAddr(destAddr));
-//        final ConnectFuture future = this.connector.connect(
-//            IPv4UDPAddress.toSocketAddr(destAddr), this.listenSockAddr);
-//        RelayInfo info = new RelayInfo();
-//        info.clientMessage = message;
-//        info.remoteAddress = destAddr;
-//        this.awaitingConnect.put(future, info);
-//        future.addListener(this);
+        // final ConnectFuture future = this.connector.connect(
+        // IPv4UDPAddress.toSocketAddr(destAddr), this.listenSockAddr);
+        // RelayInfo info = new RelayInfo();
+        // info.clientMessage = message;
+        // info.remoteAddress = destAddr;
+        // this.awaitingConnect.put(future, info);
+        // future.addListener(this);
         // FIXME: Must call awaitUninterruptably. This is a known issue in MINA
         // <https://issues.apache.org/jira/browse/DIRMINA-911>
-//        future.awaitUninterruptibly();
+        // future.awaitUninterruptibly();
       }
       // Have an existing connection
-//      else {
+      // else {
 
-        this.actualSend(params, message);
-//      }
+      this.actualSend(params, message);
+      // }
     }
 
   }
@@ -322,7 +322,9 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
   @Override
   public void sessionIdle(final IoSession session, final IdleStatus idleStatus) {
     NetworkAddress netAddr = this.sessions.remove(session);
-    this.connections.remove(netAddr);
+    if (netAddr != null) {
+      this.connections.remove(netAddr);
+    }
     session.close(true);
   }
 
@@ -339,10 +341,6 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
   public void exceptionCaught(final IoSession session, final Throwable cause) {
     if (!(cause instanceof PortUnreachableException || cause instanceof WriteToClosedSessionException)) {
       LOG.error("Caught exception for " + session + ".", cause);
-      NetworkAddress addr = this.sessions.remove(session);
-      if (addr != null) {
-        this.connections.remove(addr);
-      }
     }
 
     NetworkAddress addr = this.sessions.remove(session);
@@ -356,19 +354,19 @@ public class IPv4UDPNAO extends IoHandlerAdapter implements
     this.acceptor.dispose(true);
   }
 
-//  @Override
-//  public void operationComplete(ConnectFuture future) {
-//    RelayInfo info = this.awaitingConnect.remove(future);
-//    if (info == null) {
-//      LOG.error("Unable to find correct message for {}", future);
-//    } else {
-//      IPv4UDPParameters params = new IPv4UDPParameters();
-//      params.session = future.getSession();
-//      info.serverParams = params;
-//      this.connections.put(info.remoteAddress, info.serverParams);
-//      this.sessions.put(params.session, info.remoteAddress);
-//      this.sendMessage(info.clientMessage, info.remoteAddress);
-//    }
-//  }
+  // @Override
+  // public void operationComplete(ConnectFuture future) {
+  // RelayInfo info = this.awaitingConnect.remove(future);
+  // if (info == null) {
+  // LOG.error("Unable to find correct message for {}", future);
+  // } else {
+  // IPv4UDPParameters params = new IPv4UDPParameters();
+  // params.session = future.getSession();
+  // info.serverParams = params;
+  // this.connections.put(info.remoteAddress, info.serverParams);
+  // this.sessions.put(params.session, info.remoteAddress);
+  // this.sendMessage(info.clientMessage, info.remoteAddress);
+  // }
+  // }
 
 }
