@@ -23,48 +23,65 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package edu.rutgers.winlab.mfirst.messages;
+package edu.rutgers.winlab.mfirst.messages.opt;
 
 /**
- * A generic interface for message options to implement.
+ * Message option for recursive requests.
  * 
  * @author Robert Moore
  */
-public abstract class Option {
+public class RecursiveRequestOption extends Option {
 
-  private static final byte FINAL_FLAG = (byte) 0x80;
-  public static final transient byte USER_TYPES_FLAG = (byte) 0x7F;
+  /**
+   * Type value for this option.
+   */
+  public static final byte TYPE = 0x01;
 
-  private transient byte type;
-  private final transient byte length;
+  /**
+   * Length for this option.
+   */
+  public static final byte LENGTH = 0x02;
 
-  protected Option(final byte type, final byte length) {
-    super();
-    this.type = (byte) (type & USER_TYPES_FLAG);
-    this.length = length;
+  private static final byte[][] BYTES = new byte[][] { { 0, 0 }, { 0, 1 } };
+
+  /**
+   * Flag to indicate recursion.
+   */
+  private final transient boolean recursive;
+
+  /**
+   * Creates a new option with the specified recursion value.
+   * 
+   * @param recursive
+   *          {@code true} if a recursion is requested, else {@code false} for a
+   *          non-recursive request.
+   */
+  public RecursiveRequestOption(final boolean recursive) {
+    super(TYPE, LENGTH);
+    this.recursive = recursive;
   }
 
-  public byte getType() {
-    return this.type;
+  /**
+   * A Boolean object indicating whether the message should be processed in a
+   * recursive manner (from a client) or not (from another server).
+   */
+  @Override
+  public Object getOption() {
+    return Boolean.valueOf(this.recursive);
   }
 
-  public byte getLength() {
-    return this.length;
+  @Override
+  public byte[] getBytes() {
+    return this.recursive ? BYTES[1] : BYTES[0];
   }
 
-  public abstract Object getOption();
-  
-  public abstract byte[] getBytes();
-
-  public boolean isFinal() {
-    return (this.type & FINAL_FLAG) == FINAL_FLAG;
+  /**
+   * Returns whether or not this message is recursive or not.
+   * 
+   * @return {@code true} if the message is recursive, else {@code false}.
+   */
+  public boolean isRecursive() {
+    return this.recursive;
   }
 
-  public void setFinal() {
-    this.type |= FINAL_FLAG;
-  }
-  
-  public static boolean isFinal(final byte type){
-    return (type & FINAL_FLAG) == FINAL_FLAG;
-  }
 }

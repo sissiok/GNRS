@@ -23,49 +23,58 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package edu.rutgers.winlab.mfirst.messages;
+package edu.rutgers.winlab.mfirst.messages.opt;
 
 /**
+ * A generic interface for message options to implement.
+ * 
  * @author Robert Moore
- *
  */
-public class TTLOption extends Option {
+public abstract class Option {
 
-  public static final byte TYPE = 0x03;
+  private static final byte FINAL_FLAG = (byte) 0x80;
+  public static final transient byte USER_TYPES_FLAG = (byte) 0x7F;
+
+  private transient byte type;
+  private transient byte length;
   
-  public static final byte LENGTH = 0x08;
-  
-  private final transient Long ttl;
-  
-  public TTLOption(final long ttl){
-    super(TYPE, LENGTH);
-    this.ttl = Long.valueOf(ttl);
-  }
-  
- 
-  @Override
-  public Object getOption() {
-   return this.ttl;
+  protected Option(final byte type){
+    super();
+    this.type = (byte)(type & USER_TYPES_FLAG);
+    this.length = 0;
   }
 
-  
-  @Override
-  public byte[] getBytes() {
-    byte[] bytes = new byte[8];
-    int index = 7;
-    final long asLong = this.ttl.longValue();
-    for(int i = 0; i < 8; ++i, --index){
-      bytes[i] = (byte)(asLong >>> (index*8));
-    }
-    return bytes;
-  }
-  
-  /**
-   * Gets the TTL value for this option, in milliseconds.
-   * @return the TTL value for this option.
-   */
-  public long getTtl(){
-    return this.ttl;
+  protected Option(final byte type, final byte length) {
+    super();
+    this.type = (byte) (type & USER_TYPES_FLAG);
+    this.length = length;
   }
 
+  public byte getType() {
+    return this.type;
+  }
+
+  public byte getLength() {
+    return this.length;
+  }
+  
+  protected void setLength(final byte length){
+    this.length = length;
+  }
+
+  public abstract Object getOption();
+  
+  public abstract byte[] getBytes();
+
+  public boolean isFinal() {
+    return (this.type & FINAL_FLAG) == FINAL_FLAG;
+  }
+
+  public void setFinal() {
+    this.type |= FINAL_FLAG;
+  }
+  
+  public static boolean isFinal(final byte type){
+    return (type & FINAL_FLAG) == FINAL_FLAG;
+  }
 }

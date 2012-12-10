@@ -62,9 +62,9 @@ import edu.rutgers.winlab.mfirst.messages.InsertResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.MessageType;
-import edu.rutgers.winlab.mfirst.messages.RecursiveRequestOption;
 import edu.rutgers.winlab.mfirst.messages.ResponseCode;
-import edu.rutgers.winlab.mfirst.messages.TTLOption;
+import edu.rutgers.winlab.mfirst.messages.opt.RecursiveRequestOption;
+import edu.rutgers.winlab.mfirst.messages.opt.TTLOption;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.GNRSProtocolCodecFactory;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPAddress;
@@ -200,7 +200,6 @@ public class TraceClient extends IoHandlerAdapter {
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
         new GNRSProtocolCodecFactory()));
 
-
   }
 
   /**
@@ -256,29 +255,28 @@ public class TraceClient extends IoHandlerAdapter {
         }
 
         LOG.debug("FILE: {}", line);
-        final Collection<AbstractMessage> messages = TraceClient
+        final AbstractMessage message = TraceClient
             .parseMessage(line);
-        if (messages == null) {
+        if (message == null) {
           LOG.warn("Unable to parse message from \"" + line + "\".");
           continue;
         }
 
-        for (AbstractMessage msg : messages) {
 
-          msg.setOriginAddress(fromAddress);
-          msg.finalizeOptions();
+        message.setOriginAddress(fromAddress);
+        message.finalizeOptions();
 
-          session.write(msg);
+          session.write(message);
           long sendTime = System.nanoTime();
-          this.sentMessages.put(Integer.valueOf((int) msg.getRequestId()), msg);
-          this.sendTimes.put(Integer.valueOf((int) msg.getRequestId()),
+          this.sentMessages.put(Integer.valueOf((int) message.getRequestId()), message);
+          this.sendTimes.put(Integer.valueOf((int) message.getRequestId()),
               Long.valueOf(sendTime));
-          if (msg instanceof LookupMessage) {
+          if (message instanceof LookupMessage) {
             this.numLookup.incrementAndGet();
-          } else if (msg instanceof InsertMessage) {
+          } else if (message instanceof InsertMessage) {
             this.numInsert.incrementAndGet();
           }
-        }
+        
         // try {
         java.util.concurrent.locks.LockSupport.parkNanos(this.delay * 1000l);
         // Thread.sleep(this.delay);
@@ -370,15 +368,15 @@ public class TraceClient extends IoHandlerAdapter {
    *          a line from the trace file.
    * @return the parsed message, or {@code null} if none was parsed.
    */
-  public static Collection<AbstractMessage> parseMessage(final String asString) {
+  public static AbstractMessage parseMessage(final String asString) {
     LOG.debug("Parsing \"{}\"", asString);
     // Extract any comments and discard
     final String line = asString.split("#")[0];
-    final LinkedList<AbstractMessage> messages = new LinkedList<AbstractMessage>();
-
+//    final LinkedList<AbstractMessage> messages = new LinkedList<AbstractMessage>();
+    AbstractMessage message = null;
     final String[] generalComponents = line.split("\\s+");
     if (generalComponents.length >= 3) {
-
+      
       // Sequence number
       final int sequenceNumber = Integer.parseInt(generalComponents[0]);
       // Type
@@ -390,17 +388,17 @@ public class TraceClient extends IoHandlerAdapter {
 
         switch (type) {
         case INSERT: {
-          messages.addAll(parseInsertMessage(guid, sequenceNumber,
-              generalComponents));
+          message = parseInsertMessage(guid, sequenceNumber,
+              generalComponents);
           break;
         }
         case LOOKUP: {
-          final LookupMessage lookMsg = new LookupMessage();
-          lookMsg.addOption(new RecursiveRequestOption(true));
+          message = new LookupMessage();
+          message.addOption(new RecursiveRequestOption(true));
 
-          messages.add(lookMsg);
-          lookMsg.setGuid(guid);
-          lookMsg.setRequestId(sequenceNumber);
+        
+          ((LookupMessage)message).setGuid(guid);
+          message.setRequestId(sequenceNumber);
           break;
         }
         default:
@@ -414,7 +412,7 @@ public class TraceClient extends IoHandlerAdapter {
       LOG.error("Not enough components to parse from the line {}.",
           Integer.valueOf(generalComponents.length));
     }
-    return messages;
+    return message;
   }
 
   /**
@@ -429,24 +427,25 @@ public class TraceClient extends IoHandlerAdapter {
    * @return an Insert Message parsed from the line, or {@code null} if parsing
    *         failed.
    */
-  private static Collection<InsertMessage> parseInsertMessage(final GUID guid,
+  private static InsertMessage parseInsertMessage(final GUID guid,
       final int sequenceNumber, final String[] generalComponents) {
 
-    LinkedList<InsertMessage> messages = new LinkedList<InsertMessage>();
+    InsertMessage insMsg = null;
 
     // Make sure there is something to split
     if (generalComponents.length < 4) {
       LOG.error("Missing GUID binding value.");
 
     } else {
-
+      insMsg = new InsertMessage();
       final String[] bindingValues = generalComponents[3].split(",");
       if (bindingValues.length % 3 != 0) {
         LOG.error("Binding values are not a multiple of 3: {}",
             Integer.valueOf(bindingValues.length));
       }
       int numBindings = bindingValues.length / 3;
-
+      NetworkAddress[] bindings = new NetworkAddress[numBindings];
+      long[] ttlValues = new long[numBindings];
       // final NetworkAddress[] bindings = new NetworkAddress[];
       for (int i = 0; i < numBindings; ++i) {
         NetworkAddress netAddr = null;
@@ -459,20 +458,18 @@ public class TraceClient extends IoHandlerAdapter {
         // TODO: Need to figure-out how to send TTL values per-NA
         long ttl = Long.parseLong(bindingValues[1]);
 
-        final InsertMessage insMsg = new InsertMessage();
-
-        insMsg.setBindings(new NetworkAddress[] { netAddr });
-        insMsg.setGuid(guid);
-        insMsg.setRequestId(sequenceNumber);
-        insMsg.addOption(new RecursiveRequestOption(true));
-        insMsg.addOption(new TTLOption(ttl));
-
-        messages.add(insMsg);
-
+        
+        ttlValues[i] = ttl;
+        bindings[i] = netAddr;
       }
+      insMsg.setGuid(guid);
+      insMsg.setRequestId(sequenceNumber);
+      insMsg.setBindings(bindings);
+      insMsg.addOption(new TTLOption(ttlValues));
+      insMsg.addOption(new RecursiveRequestOption(true));
 
     }
-    return messages;
+    return insMsg;
   }
 
   @Override

@@ -34,7 +34,7 @@ import org.apache.mina.filter.codec.demux.MessageEncoder;
 
 import edu.rutgers.winlab.mfirst.GUID;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
-import edu.rutgers.winlab.mfirst.messages.Option;
+import edu.rutgers.winlab.mfirst.messages.opt.Option;
 
 /**
  * Apache MINA message encoder for {@link LookupMessage} objects.

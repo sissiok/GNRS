@@ -28,6 +28,7 @@ package edu.rutgers.winlab.mfirst.messages;
 import java.util.LinkedList;
 import java.util.List;
 
+import edu.rutgers.winlab.mfirst.messages.opt.Option;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 
 /**

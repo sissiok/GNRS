@@ -23,49 +23,65 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package edu.rutgers.winlab.mfirst.messages;
+package edu.rutgers.winlab.mfirst.messages.opt;
+
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * @author Robert Moore
- *
  */
 public class ExpirationOption extends Option {
 
   public static final byte TYPE = 0x02;
-  
-  public static final byte LENGTH = 0x08;
-  
-  private final transient Long timestamp;
-  
-  public ExpirationOption(final long timestamp){
-    super(TYPE, LENGTH);
-    this.timestamp = Long.valueOf(timestamp);
-  }
-  
- 
-  @Override
-  public Object getOption() {
-   return this.timestamp;
+
+  private final transient long[] timestamp;
+
+  public ExpirationOption(final long[] timestamp) {
+    super(TYPE);
+    if(timestamp != null){
+      this.timestamp = Arrays.copyOf(timestamp,timestamp.length);
+    }else{
+      this.timestamp = null;
+    }
+    super.setLength((byte) (this.timestamp.length * 8));
   }
 
-  
+  @Override
+  public Object getOption() {
+    return this.timestamp;
+  }
+
   @Override
   public byte[] getBytes() {
-    byte[] bytes = new byte[8];
-    int index = 7;
-    final long asLong = this.timestamp.longValue();
-    for(int i = 0; i < 8; ++i, --index){
-      bytes[i] = (byte)(asLong >>> (index*8));
+    ByteArrayOutputStream baos = new ByteArrayOutputStream(super.getLength());
+    DataOutputStream dos = new DataOutputStream(baos);
+    try {
+      for (long ts : this.timestamp) {
+        dos.writeLong(ts);
+      }
+      dos.flush();
+    } catch (IOException ioe) {
+      return null;
     }
-    return bytes;
+
+    return baos.toByteArray();
   }
-  
+
   /**
    * Returns the expiration timestamp value for this option.
+   * 
    * @return the expiration timestamp, in milliseconds since the Unix epoch.
    */
-  public long getExpiration(){
-    return this.timestamp;
+  public long[] getExpiration() {
+    long[] returned = null;
+    if (this.timestamp != null) {
+      returned = Arrays.copyOf(this.timestamp, this.timestamp.length);
+    }
+
+    return returned;
   }
 
 }

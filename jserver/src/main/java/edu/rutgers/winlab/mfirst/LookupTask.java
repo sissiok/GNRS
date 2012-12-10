@@ -34,9 +34,9 @@ import org.slf4j.LoggerFactory;
 
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
-import edu.rutgers.winlab.mfirst.messages.Option;
-import edu.rutgers.winlab.mfirst.messages.RecursiveRequestOption;
 import edu.rutgers.winlab.mfirst.messages.ResponseCode;
+import edu.rutgers.winlab.mfirst.messages.opt.Option;
+import edu.rutgers.winlab.mfirst.messages.opt.RecursiveRequestOption;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.SessionParameters;
 import edu.rutgers.winlab.mfirst.storage.GUIDBinding;

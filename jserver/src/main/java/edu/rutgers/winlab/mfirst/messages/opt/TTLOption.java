@@ -23,65 +23,67 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package edu.rutgers.winlab.mfirst.messages;
+package edu.rutgers.winlab.mfirst.messages.opt;
+
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
 
 /**
- * Message option for recursive requests.
- * 
  * @author Robert Moore
  */
-public class RecursiveRequestOption extends Option {
+public class TTLOption extends Option {
 
-  /**
-   * Type value for this option.
-   */
-  public static final byte TYPE = 0x01;
+  public static final byte TYPE = 0x03;
 
-  /**
-   * Length for this option.
-   */
-  public static final byte LENGTH = 0x02;
+  public static final byte LENGTH = 0x08;
 
-  private static final byte[][] BYTES = new byte[][] { { 0, 0 }, { 0, 1 } };
+  private final transient long[] ttl;
 
-  /**
-   * Flag to indicate recursion.
-   */
-  private final transient boolean recursive;
-
-  /**
-   * Creates a new option with the specified recursion value.
-   * 
-   * @param recursive
-   *          {@code true} if a recursion is requested, else {@code false} for a
-   *          non-recursive request.
-   */
-  public RecursiveRequestOption(final boolean recursive) {
-    super(TYPE, LENGTH);
-    this.recursive = recursive;
+  public TTLOption(final long[] ttl) {
+    super(TYPE);
+    if (ttl != null) {
+      this.ttl = Arrays.copyOf(ttl, ttl.length);
+    } else {
+      this.ttl = null;
+    }
+    super.setLength((byte) (this.ttl.length * 8));
   }
 
-  /**
-   * A Boolean object indicating whether the message should be processed in a
-   * recursive manner (from a client) or not (from another server).
-   */
   @Override
   public Object getOption() {
-    return Boolean.valueOf(this.recursive);
+    return this.ttl;
   }
 
   @Override
   public byte[] getBytes() {
-    return this.recursive ? BYTES[1] : BYTES[0];
+    ByteArrayOutputStream baos = new ByteArrayOutputStream(super.getLength());
+    DataOutputStream dos = new DataOutputStream(baos);
+    try {
+      for (long ts : this.ttl) {
+        dos.writeLong(ts);
+      }
+      dos.flush();
+    } catch (IOException ioe) {
+      return null;
+    }
+
+    return baos.toByteArray();
   }
 
   /**
-   * Returns whether or not this message is recursive or not.
+   * Gets the TTL value for this option, in milliseconds.
    * 
-   * @return {@code true} if the message is recursive, else {@code false}.
+   * @return the TTL value for this option.
    */
-  public boolean isRecursive() {
-    return this.recursive;
+  public long[] getTtl() {
+    long[] returned = null;
+    if (this.ttl != null) {
+      returned = Arrays.copyOf(this.ttl, this.ttl.length);
+    }
+
+    return returned;
   }
 
 }

@@ -31,6 +31,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,7 @@ import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
 import org.apache.mina.transport.socket.nio.NioDatagramConnector;
@@ -59,8 +61,8 @@ import com.thoughtworks.xstream.XStream;
 import edu.rutgers.winlab.mfirst.GUID;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
-import edu.rutgers.winlab.mfirst.messages.RecursiveRequestOption;
 import edu.rutgers.winlab.mfirst.messages.ResponseCode;
+import edu.rutgers.winlab.mfirst.messages.opt.RecursiveRequestOption;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.GNRSProtocolCodecFactory;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPAddress;
@@ -273,6 +275,12 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
         // Ignored
       }
     }
+    this.printStats();
+    session.close(true);
+    this.acceptor.dispose(true);
+  }
+
+  private void printStats(){
     int length = this.rtts.size();
     ArrayList<Long> rttList = new ArrayList<Long>(length);
     rttList.addAll(this.rtts);
@@ -283,6 +291,12 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     if (!rttList.isEmpty()) {
       LOG.info(String.format("Min: %,dus | Med: %,dus | Max: %,dus",
           rttList.get(0) / 1000, median / 1000, rttList.get(length - 1) / 1000));
+    }
+    
+    HashMap<Integer, Integer> rttBuckets = new HashMap<Integer,Integer>();
+    
+    for(Long rtt : rttList){
+      
     }
 
     final int succ = GeneratingClient.this.numSuccess.get();
@@ -295,10 +309,8 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
             Integer.valueOf(succ),
             Integer.valueOf(GeneratingClient.this.numHits.get()),
             Integer.valueOf(GeneratingClient.this.numLookups - total)));
-    session.close(true);
-    this.acceptor.dispose(true);
   }
-
+  
   /**
    * Creates a stream of lookup messages to send to the server.
    * 

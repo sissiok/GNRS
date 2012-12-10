@@ -36,10 +36,10 @@ import org.apache.mina.core.buffer.IoBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.rutgers.winlab.mfirst.messages.ExpirationOption;
-import edu.rutgers.winlab.mfirst.messages.Option;
-import edu.rutgers.winlab.mfirst.messages.RecursiveRequestOption;
-import edu.rutgers.winlab.mfirst.messages.TTLOption;
+import edu.rutgers.winlab.mfirst.messages.opt.ExpirationOption;
+import edu.rutgers.winlab.mfirst.messages.opt.Option;
+import edu.rutgers.winlab.mfirst.messages.opt.RecursiveRequestOption;
+import edu.rutgers.winlab.mfirst.messages.opt.TTLOption;
 
 /**
  * @author Robert Moore
@@ -84,15 +84,23 @@ public class RequestOptionsTranscoder {
         case RecursiveRequestOption.TYPE:
           boolean recursive = (optionsBuffer.getUnsignedShort() != 0);
           lastOption = new RecursiveRequestOption(recursive);
-          
+
           break;
-        case TTLOption.TYPE:
-          long ttl = optionsBuffer.getLong();
-          lastOption = new TTLOption(ttl);
+        case TTLOption.TYPE: {
+          long[] ttls = new long[length / 8];
+          for (int i = 0; i < ttls.length; ++i) {
+            ttls[i] = optionsBuffer.getLong();
+          }
+          lastOption = new TTLOption(ttls);
+        }
           break;
-        case ExpirationOption.TYPE:
-          long timestamp = optionsBuffer.getLong();
-          lastOption = new ExpirationOption(timestamp);
+        case ExpirationOption.TYPE: {
+          long[] expirations = new long[length / 8];
+          for (int i = 0; i < expirations.length; ++i) {
+            expirations[i] = optionsBuffer.getLong();
+          }
+          lastOption = new ExpirationOption(expirations);
+        }
           break;
         default:
           LOG.info("Unsupported options type {}", type);

@@ -36,15 +36,15 @@ import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.rutgers.winlab.mfirst.messages.ExpirationOption;
 import edu.rutgers.winlab.mfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mfirst.messages.InsertResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
-import edu.rutgers.winlab.mfirst.messages.Option;
-import edu.rutgers.winlab.mfirst.messages.RecursiveRequestOption;
 import edu.rutgers.winlab.mfirst.messages.ResponseCode;
-import edu.rutgers.winlab.mfirst.messages.TTLOption;
+import edu.rutgers.winlab.mfirst.messages.opt.ExpirationOption;
+import edu.rutgers.winlab.mfirst.messages.opt.Option;
+import edu.rutgers.winlab.mfirst.messages.opt.RecursiveRequestOption;
+import edu.rutgers.winlab.mfirst.messages.opt.TTLOption;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.SessionParameters;
 import edu.rutgers.winlab.mfirst.storage.GUIDBinding;
@@ -104,8 +104,6 @@ public class InsertTask implements Callable<Object> {
     final Collection<NetworkAddress> serverAddxes = this.server.getMappings(
         this.message.getGuid(), this.message.getOriginAddress().getType());
 
-    
-
     boolean resolvedLocally = false;
     if (serverAddxes != null && !serverAddxes.isEmpty()) {
       for (Iterator<NetworkAddress> iter = serverAddxes.iterator(); iter
@@ -122,46 +120,55 @@ public class InsertTask implements Callable<Object> {
 
     boolean recursive = false;
     List<Option> options = this.message.getOptions();
-    long expirationTime = this.server.getConfig().getDefaultExpiration()
-        + System.currentTimeMillis();
-    long ttlValue = this.server.getConfig().getDefaultTtl();
+    long[] expirationTimes = null;
+    long[] ttlValues = null;
     if (!options.isEmpty()) {
       for (Option opt : options) {
         if (opt instanceof RecursiveRequestOption) {
           recursive = ((RecursiveRequestOption) opt).isRecursive();
         } else if (opt instanceof ExpirationOption) {
-          expirationTime = ((ExpirationOption) opt).getExpiration();
+          expirationTimes = ((ExpirationOption) opt).getExpiration();
         } else if (opt instanceof TTLOption) {
-          ttlValue = ((TTLOption) opt).getTtl();
+          ttlValues = ((TTLOption) opt).getTtl();
         }
       }
     }
 
+    // Insert to local server if mapped to it.
     if (resolvedLocally) {
+      LOG.info("Resolved locally.");
       localSuccess = this.server.appendBindings(this.message.getGuid(),
           this.message.getBindings());
-    } else if (recursive && this.message.getBindings() != null) {
+    }
+    // Insert into the cache if the insert came from a local client.
+    if (recursive && this.message.getBindings() != null) {
       GUIDBinding[] bindings = new GUIDBinding[this.message.getBindings().length];
 
       for (int i = 0; i < bindings.length; ++i) {
         NetworkAddress netAddr = this.message.getBindings()[i];
         GUIDBinding bind = new GUIDBinding();
         bind.setAddress(netAddr);
-        bind.setExpiration(expirationTime);
-        bind.setTtl(ttlValue);
+        if (expirationTimes != null) {
+          bind.setExpiration(expirationTimes[i]);
+        }
+        if (ttlValues != null) {
+          bind.setTtl(ttlValues[i]);
+        }
         bindings[i] = bind;
       }
 
       this.server.addToCache(this.message.getGuid(), bindings);
     }
-    
+
     // Corner case for only a single server.
-    if(resolvedLocally && serverAddxes.isEmpty()){
+    if (resolvedLocally && serverAddxes.isEmpty()) {
       recursive = false;
     }
-    
+
+    // Now send to the remote servers
     if (recursive) {
       // this.message.setRecursive(false);
+      LOG.info("Need to contact {}",serverAddxes);
 
       final RelayInfo info = new RelayInfo();
       info.clientMessage = this.message;
@@ -194,6 +201,7 @@ public class InsertTask implements Callable<Object> {
       }
     }
 
+    // Send a response back if there are no remote servers contacted
     if (resolvedLocally && !recursive) {
       LOG.info("Received {}", this.message);
       InsertResponseMessage response = new InsertResponseMessage();
@@ -206,12 +214,16 @@ public class InsertTask implements Callable<Object> {
       this.server.sendMessage(response, this.message.getOriginAddress());
 
     }
-
+    
+    // Statistics
     long endProc = System.nanoTime();
     if (this.server.getConfig().isCollectStatistics()) {
-      GNRSServer.INSERT_STATS[GNRSServer.QUEUE_TIME_INDEX].addAndGet(startProc-this.message.createdNanos);
-      GNRSServer.INSERT_STATS[GNRSServer.PROC_TIME_INDEX].addAndGet(endProc-startProc);
-      GNRSServer.INSERT_STATS[GNRSServer.TOTAL_TIME_INDEX].addAndGet(endProc-this.message.createdNanos);
+      GNRSServer.INSERT_STATS[GNRSServer.QUEUE_TIME_INDEX].addAndGet(startProc
+          - this.message.createdNanos);
+      GNRSServer.INSERT_STATS[GNRSServer.PROC_TIME_INDEX].addAndGet(endProc
+          - startProc);
+      GNRSServer.INSERT_STATS[GNRSServer.TOTAL_TIME_INDEX].addAndGet(endProc
+          - this.message.createdNanos);
 
     }
 

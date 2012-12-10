@@ -33,7 +33,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 import org.apache.mina.filter.codec.demux.MessageEncoder;
 
 import edu.rutgers.winlab.mfirst.messages.InsertMessage;
-import edu.rutgers.winlab.mfirst.messages.Option;
+import edu.rutgers.winlab.mfirst.messages.opt.Option;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 
 /**
