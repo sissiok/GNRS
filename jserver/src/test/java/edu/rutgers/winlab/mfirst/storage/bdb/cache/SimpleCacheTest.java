@@ -38,6 +38,8 @@ import org.junit.Test;
 import edu.rutgers.winlab.mfirst.GUID;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPAddress;
 import edu.rutgers.winlab.mfirst.storage.GUIDBinding;
+import edu.rutgers.winlab.mfirst.storage.cache.CacheEntry;
+import edu.rutgers.winlab.mfirst.storage.cache.CacheOrigin;
 import edu.rutgers.winlab.mfirst.storage.cache.SimpleCache;
 
 /**
@@ -77,7 +79,7 @@ public class SimpleCacheTest {
   public void testSimplePutGet() {
     this.cache = new SimpleCache(this.guids.size());
     for(int i = 0; i < this.guids.size(); ++i){
-      this.cache.put(this.guids.get(i),this.bindings.get(i));
+      this.cache.put(this.guids.get(i),CacheOrigin.INSERT, this.bindings.get(i));
     }
     
     for(int i = 0; i < this.guids.size(); ++i){
@@ -93,7 +95,7 @@ public class SimpleCacheTest {
   public void testTtlValues(){
     this.cache = new SimpleCache(this.guids.size());
     for(int i = 0; i < this.guids.size(); ++i){
-      this.cache.put(this.guids.get(i),this.bindings.get(i));
+      this.cache.put(this.guids.get(i),CacheOrigin.INSERT,this.bindings.get(i));
     }
     
     try {
@@ -117,7 +119,7 @@ public class SimpleCacheTest {
     
     this.cache = new SimpleCache(this.guids.size());
     for(int i = 0; i < this.guids.size(); ++i){
-      this.cache.put(this.guids.get(i),this.bindings.get(i));
+      this.cache.put(this.guids.get(i),CacheOrigin.INSERT,this.bindings.get(i));
     }
     
     try {
@@ -153,7 +155,7 @@ public class SimpleCacheTest {
     this.cache = new SimpleCache(this.guids.size()-1);
     
     for(int i = 0; i < this.guids.size(); ++i){
-      this.cache.put(this.guids.get(i),this.bindings.get(i));
+      this.cache.put(this.guids.get(i),CacheOrigin.INSERT,this.bindings.get(i));
     }
     
     Collection<GUIDBinding> ejected = this.cache.get(this.guids.get(0));
@@ -174,7 +176,7 @@ public class SimpleCacheTest {
     GUIDBinding bound = this.bindings.get(0);
     bound.setTtl(System.currentTimeMillis()+EXPIRE_VALUE);
     
-    this.cache.put(this.guids.get(0),this.bindings.get(0),this.bindings.get(1));
+    this.cache.put(this.guids.get(0),CacheOrigin.INSERT,this.bindings.get(0),this.bindings.get(1));
     
     try {
       Thread.sleep(TTL_VALUE+100);

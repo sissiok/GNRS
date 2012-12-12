@@ -25,6 +25,7 @@
  */
 package edu.rutgers.winlab.mfirst;
 
+import java.util.Iterator;
 import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
@@ -38,6 +39,8 @@ import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.ResponseCode;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.SessionParameters;
+import edu.rutgers.winlab.mfirst.storage.GUIDBinding;
+import edu.rutgers.winlab.mfirst.storage.cache.CacheOrigin;
 
 /**
  * @author Robert Moore
@@ -87,6 +90,26 @@ public class ResponseTask implements Callable<Object> {
 
           if (info.clientMessage instanceof LookupMessage) {
             LookupResponseMessage lrm = new LookupResponseMessage();
+            LookupMessage clientMsg = (LookupMessage)info.clientMessage;
+            // Issue #13 Handle cache insert
+            GUID guid = clientMsg.getGuid();
+            
+            GUIDBinding[] cachedBind = new GUIDBinding[info.responseAddresses.size()];
+            int i = 0;
+            long now = System.currentTimeMillis();
+            long defaultTtl = now + this.server.getConfig().getDefaultTtl();
+            long defaultExpire = now + this.server.getConfig().getDefaultExpiration();
+            for(Iterator<NetworkAddress> iter = info.responseAddresses.iterator(); iter.hasNext(); ++i){
+              NetworkAddress addx = iter.next();
+              cachedBind[i] = new GUIDBinding();
+              cachedBind[i].setAddress(addx);
+              // TODO: Proper TTL/expiration for responses
+              cachedBind[i].setTtl(defaultTtl);
+              cachedBind[i].setExpiration(defaultExpire);
+            }
+            
+            this.server.addToCache(guid, CacheOrigin.LOOKUP_RESPONSE,cachedBind);
+            
             lrm.setRequestId(info.clientMessage.getRequestId());
             lrm.setOriginAddress(this.server.getOriginAddress());
             lrm.setResponseCode(ResponseCode.SUCCESS);

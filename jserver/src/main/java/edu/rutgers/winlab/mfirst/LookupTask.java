@@ -96,7 +96,7 @@ public class LookupTask implements Callable<Object> {
     Collection<GUIDBinding> cachedBindings = this.server.getCached(this.message
         .getGuid());
     if (cachedBindings != null && !cachedBindings.isEmpty()) {
-
+      LOG.info("Cache HIT: {}->{}",this.message.getGuid(),cachedBindings);
       LookupResponseMessage response = new LookupResponseMessage();
       NetworkAddress[] addxes = new NetworkAddress[cachedBindings.size()];
       int i = 0;

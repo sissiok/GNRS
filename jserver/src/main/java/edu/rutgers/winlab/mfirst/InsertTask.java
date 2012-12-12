@@ -48,6 +48,7 @@ import edu.rutgers.winlab.mfirst.messages.opt.TTLOption;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.SessionParameters;
 import edu.rutgers.winlab.mfirst.storage.GUIDBinding;
+import edu.rutgers.winlab.mfirst.storage.cache.CacheOrigin;
 
 /**
  * Task to handle Insert messages within the server. Designed to operate
@@ -164,7 +165,7 @@ public class InsertTask implements Callable<Object> {
         bindings[i] = bind;
       }
 
-      this.server.addToCache(this.message.getGuid(), bindings);
+      this.server.addToCache(this.message.getGuid(), CacheOrigin.INSERT,bindings);
     }
 
     // Corner case for only a single server.

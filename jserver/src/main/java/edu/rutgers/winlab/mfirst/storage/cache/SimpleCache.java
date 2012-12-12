@@ -51,7 +51,7 @@ public class SimpleCache {
   /**
    * The actual cache used.
    */
-  private final transient LRUCache<GUID, Collection<GUIDBinding>> cache;
+  private final transient LRUCache<GUID, CacheEntry> cache;
 
   /**
    * Creates a new cache for the specified number of GUID entries.
@@ -61,7 +61,7 @@ public class SimpleCache {
    */
   public SimpleCache(final int size) {
     super();
-    this.cache = new LRUCache<GUID, Collection<GUIDBinding>>(size);
+    this.cache = new LRUCache<GUID, CacheEntry>(size);
   }
 
   /**
@@ -73,12 +73,16 @@ public class SimpleCache {
    * @param bindings
    *          the new bindings.
    */
-  public void put(final GUID guid, final GUIDBinding... bindings) {
+  public void put(final GUID guid, final CacheOrigin origin,
+      final GUIDBinding... bindings) {
+
     final Set<GUIDBinding> bindSet = new HashSet<GUIDBinding>();
     for (GUIDBinding b : bindings) {
       bindSet.add(b);
     }
-    this.cache.put(guid, bindSet);
+    final CacheEntry entry = new CacheEntry(bindSet, origin);
+
+    this.cache.put(guid, entry);
   }
 
   /**
@@ -89,23 +93,27 @@ public class SimpleCache {
    * @return the bindings (if any) for the GUID stored in the cache.
    */
   public Collection<GUIDBinding> get(final GUID guid) {
-    Collection<GUIDBinding> bindings = this.cache.get(guid);
+    CacheEntry entry = this.cache.get(guid);
 
-    // Verify TTL and expiration values and remove the entries if they are too
-    // old
-    long now = System.currentTimeMillis();
+    Collection<GUIDBinding> bindings = null;
+    if (entry != null) {
+      bindings = entry.getBindings();
+      // Verify TTL and expiration values and remove the entries if they are too
+      // old
+      long now = System.currentTimeMillis();
 
-    if (bindings != null) {
+      if (bindings != null) {
 
-      for (Iterator<GUIDBinding> iter = bindings.iterator(); iter.hasNext();) {
-        GUIDBinding bind = iter.next();
-        if (bind.getExpiration() < now || bind.getTtl() < now) {
-          iter.remove();
+        for (Iterator<GUIDBinding> iter = bindings.iterator(); iter.hasNext();) {
+          GUIDBinding bind = iter.next();
+          if (bind.getExpiration() < now || bind.getTtl() < now) {
+            iter.remove();
+          }
         }
-      }
-      if (bindings.isEmpty()) {
-        this.cache.remove(guid);
-        bindings = null;
+        if (bindings.isEmpty()) {
+          this.cache.remove(guid);
+          bindings = null;
+        }
       }
     }
 

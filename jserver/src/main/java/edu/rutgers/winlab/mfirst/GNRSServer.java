@@ -60,6 +60,7 @@ import edu.rutgers.winlab.mfirst.storage.GUIDBinding;
 import edu.rutgers.winlab.mfirst.storage.GUIDStore;
 import edu.rutgers.winlab.mfirst.storage.SimpleGUIDStore;
 import edu.rutgers.winlab.mfirst.storage.bdb.BerkeleyDBStore;
+import edu.rutgers.winlab.mfirst.storage.cache.CacheOrigin;
 import edu.rutgers.winlab.mfirst.storage.cache.SimpleCache;
 
 /**
@@ -554,9 +555,9 @@ public class GNRSServer implements MessageListener {
    * @param bindings
    *          the addresses to bind.
    */
-  public void addToCache(final GUID guid, final GUIDBinding... bindings) {
+  public void addToCache(final GUID guid, final CacheOrigin origin, final GUIDBinding... bindings) {
     if (this.cache != null) {
-      this.cache.put(guid, bindings);
+      this.cache.put(guid, origin, bindings);
     }
   }
 
