@@ -142,6 +142,9 @@ public class InsertTask implements Callable<Object> {
     }
     // Insert into the cache if the insert came from a local client.
     if (recursive && this.message.getBindings() != null) {
+      final long now = System.currentTimeMillis();
+      final long defaultTtl = now + this.server.getConfig().getDefaultTtl();
+      final long defaultExpire = now + this.server.getConfig().getDefaultExpiration();
       GUIDBinding[] bindings = new GUIDBinding[this.message.getBindings().length];
 
       for (int i = 0; i < bindings.length; ++i) {
@@ -150,9 +153,13 @@ public class InsertTask implements Callable<Object> {
         bind.setAddress(netAddr);
         if (expirationTimes != null) {
           bind.setExpiration(expirationTimes[i]);
+        }else{
+          bind.setExpiration(defaultExpire);
         }
         if (ttlValues != null) {
-          bind.setTtl(ttlValues[i]);
+          bind.setTtl(now+ttlValues[i]);
+        }else{
+          bind.setTtl(defaultTtl);
         }
         bindings[i] = bind;
       }
@@ -168,7 +175,6 @@ public class InsertTask implements Callable<Object> {
     // Now send to the remote servers
     if (recursive) {
       // this.message.setRecursive(false);
-      LOG.info("Need to contact {}",serverAddxes);
 
       final RelayInfo info = new RelayInfo();
       info.clientMessage = this.message;

@@ -147,7 +147,7 @@ public class BerkeleyDBStoreTest {
     GNRSRecord record = this.store.getBindings(this.guid1);
     Assert.assertNotNull(record);
     Assert.assertTrue(this.guid1.equals(record.getGuid()));
-    NetworkAddress[] addresses = record.getBindings();
+    GUIDBinding[] addresses = record.getBindings();
     Assert.assertNotNull(addresses);
     Assert.assertEquals(0, addresses.length);
 
@@ -161,10 +161,10 @@ public class BerkeleyDBStoreTest {
     GNRSRecord record = this.store.getBindings(this.guid1);
     Assert.assertNotNull(record);
     Assert.assertTrue(this.guid1.equals(record.getGuid()));
-    NetworkAddress[] addresses = record.getBindings();
+    GUIDBinding[] addresses = record.getBindings();
     Assert.assertNotNull(addresses);
     Assert.assertEquals(1, addresses.length);
-    Assert.assertTrue(this.addr1.equals(addresses[0]));
+    Assert.assertTrue(this.addr1.equals(addresses[0].getAddress()));
 
   }
 
@@ -177,12 +177,12 @@ public class BerkeleyDBStoreTest {
     GNRSRecord record = this.store.getBindings(this.guid1);
     Assert.assertNotNull(record);
     Assert.assertTrue(this.guid1.equals(record.getGuid()));
-    NetworkAddress[] addresses = record.getBindings();
+    GUIDBinding[] addresses = record.getBindings();
     Assert.assertNotNull(addresses);
     Assert.assertEquals(3, addresses.length);
     LinkedList<NetworkAddress> addrList = new LinkedList<NetworkAddress>();
-    for (NetworkAddress addx : addresses) {
-      addrList.add(addx);
+    for (GUIDBinding bind : addresses) {
+      addrList.add(bind.getAddress());
     }
     Assert.assertTrue(addrList.contains(this.addr1));
     Assert.assertTrue(addrList.contains(this.addr2));
@@ -198,12 +198,12 @@ public class BerkeleyDBStoreTest {
     GNRSRecord record = this.store.getBindings(this.guid1);
     Assert.assertNotNull(record);
     Assert.assertTrue(this.guid1.equals(record.getGuid()));
-    NetworkAddress[] addresses = record.getBindings();
+    GUIDBinding[] addresses = record.getBindings();
     Assert.assertNotNull(addresses);
     Assert.assertEquals(2, addresses.length);
     LinkedList<NetworkAddress> addrList = new LinkedList<NetworkAddress>();
-    for (NetworkAddress addx : addresses) {
-      addrList.add(addx);
+    for (GUIDBinding bind : addresses) {
+      addrList.add(bind.getAddress());
     }
 
     Assert.assertTrue(addrList.contains(this.addr2));
@@ -222,7 +222,7 @@ public class BerkeleyDBStoreTest {
     GNRSRecord record = this.store.getBindings(this.guid1);
     Assert.assertNotNull(record);
     Assert.assertTrue(this.guid1.equals(record.getGuid()));
-    NetworkAddress[] addresses = record.getBindings();
+    GUIDBinding[] addresses = record.getBindings();
     Assert.assertNotNull(addresses);
     Assert.assertEquals(0, addresses.length);
 

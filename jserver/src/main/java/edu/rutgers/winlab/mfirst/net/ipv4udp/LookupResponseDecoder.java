@@ -44,6 +44,8 @@ import edu.rutgers.winlab.mfirst.net.NetworkAddress;
  */
 public class LookupResponseDecoder implements MessageDecoder {
 
+  // TODO: Options!
+  
   @Override
   public MessageDecoderResult decodable(final IoSession session,
       final IoBuffer buffer) {

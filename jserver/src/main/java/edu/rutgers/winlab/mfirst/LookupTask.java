@@ -35,8 +35,10 @@ import org.slf4j.LoggerFactory;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.ResponseCode;
+import edu.rutgers.winlab.mfirst.messages.opt.ExpirationOption;
 import edu.rutgers.winlab.mfirst.messages.opt.Option;
 import edu.rutgers.winlab.mfirst.messages.opt.RecursiveRequestOption;
+import edu.rutgers.winlab.mfirst.messages.opt.TTLOption;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.SessionParameters;
 import edu.rutgers.winlab.mfirst.storage.GUIDBinding;
@@ -94,8 +96,7 @@ public class LookupTask implements Callable<Object> {
     Collection<GUIDBinding> cachedBindings = this.server.getCached(this.message
         .getGuid());
     if (cachedBindings != null && !cachedBindings.isEmpty()) {
-      LOG.info("Using cached values for {}: {}.", this.message.getGuid(),
-          cachedBindings);
+
       LookupResponseMessage response = new LookupResponseMessage();
       NetworkAddress[] addxes = new NetworkAddress[cachedBindings.size()];
       int i = 0;
@@ -175,9 +176,23 @@ public class LookupTask implements Callable<Object> {
       else {
         // Resolved at this server
         if (resolvedLocally) {
-
-          response.setBindings(this.server.getBindings(this.message.getGuid()));
+          GUIDBinding[] bindings = this.server.getBindings(this.message
+              .getGuid());
+          if (bindings != null) {
+            long[] ttls = new long[bindings.length];
+            long[] expires = new long[bindings.length];
+            NetworkAddress[] addxes = new NetworkAddress[bindings.length];
+            for (int i = 0; i < bindings.length; ++i) {
+              addxes[i] = bindings[i].getAddress();
+              ttls[i] = bindings[i].getTtl();
+              expires[i] = bindings[i].getExpiration();
+            }
+            response.setBindings(addxes);
+            response.addOption(new TTLOption(ttls));
+            response.addOption(new ExpirationOption(expires));
+          }
           response.setResponseCode(ResponseCode.SUCCESS);
+          response.finalizeOptions();
 
         }
         // Non-local but not recursive, so a problem with the remote host

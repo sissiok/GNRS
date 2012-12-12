@@ -49,7 +49,7 @@ public class GUIDBinding {
    * different bindings when a client requests.
    */
   private int weight;
-  
+
   /**
    * When the binding is no longer valid.
    */
@@ -86,14 +86,15 @@ public class GUIDBinding {
 
   /**
    * Sets the new TTL value for this binding. Note that the wire protocol
-   * specifies and unsigned 32-bit integer, but Java does not support unsigned
-   * types.
+   * specifies an unsigned 64-bit integer, but Java does not support unsigned
+   * types, so signed is used to approximate.
    * 
    * @param ttl
    *          the new TTL value.
    */
+  // FIXME: Need to handle 64-bit unsigned type
   public void setTtl(final long ttl) {
-    this.ttl = ttl & 0xFFFFFFFFl;
+    this.ttl = ttl;
   }
 
   /**
@@ -162,8 +163,9 @@ public class GUIDBinding {
   @Override
   public String toString() {
     final StringBuilder sBuff = new StringBuilder();
-    sBuff.append("Bind (").append(this.address).append(", ").append(this.ttl)
-        .append(", ").append(this.weight).append(")");
+    sBuff.append("Bind (").append(this.address).append(", T").append(this.ttl)
+        .append("/E").append(this.expiration).append(", ").append(this.weight)
+        .append(")");
     return sBuff.toString();
 
   }

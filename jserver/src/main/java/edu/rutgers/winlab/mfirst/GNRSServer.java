@@ -408,8 +408,8 @@ public class GNRSServer implements MessageListener {
    *          the GUID value to get bindings for.
    * @return the current binding values.
    */
-  public NetworkAddress[] getBindings(final GUID guid) {
-    NetworkAddress[] addresses = null;
+  public GUIDBinding[] getBindings(final GUID guid) {
+    GUIDBinding[] addresses = null;
     final GNRSRecord record = this.guidStore.getBindings(guid);
     if (record != null) {
       addresses = record.getBindings();

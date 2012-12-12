@@ -81,9 +81,9 @@ public class SimpleGUIDStoreTest {
 
       GNRSRecord record = this.store.getBindings(guid1);
       Assert.assertTrue(guid1.equals(record.getGuid()));
-      NetworkAddress[] bound1 = record.getBindings();
+      GUIDBinding[] bound1 = record.getBindings();
       Assert.assertTrue(bound1.length == 1);
-      Assert.assertTrue(addr1.equals(bound1[0]));
+      Assert.assertTrue(addr1.equals(bound1[0].getAddress()));
 
       Assert.assertTrue(this.store.appendBindings(guid1, bind1, bind2));
       Assert.assertTrue(this.store.appendBindings(guid2, bind2, bind1));
@@ -92,16 +92,16 @@ public class SimpleGUIDStoreTest {
       Assert.assertTrue(guid1.equals(record.getGuid()));
       bound1 = record.getBindings();
       Assert.assertTrue(bound1.length == 2);
-      Assert.assertTrue( (addr1.equals(bound1[0]) && addr2.equals(bound1[1] ))
-          || (addr2.equals(bound1[0]) && addr1.equals(bound1[1])));
-      Assert.assertTrue(addr2.equals(bound1[1]));
+      Assert.assertTrue( (addr1.equals(bound1[0].getAddress()) && addr2.equals(bound1[1].getAddress() ))
+          || (addr2.equals(bound1[0].getAddress()) && addr1.equals(bound1[1].getAddress())));
+      Assert.assertTrue(addr2.equals(bound1[1].getAddress()));
 
       record = this.store.getBindings(guid2);
       Assert.assertTrue(guid2.equals(record.getGuid()));
-      NetworkAddress[] bound2 = record.getBindings();
+      GUIDBinding[] bound2 = record.getBindings();
       Assert.assertTrue(bound2.length == 2);
-      Assert.assertTrue((addr1.equals(bound1[0]) && addr2.equals(bound1[1]))
-          || (addr2.equals(bound1[0]) && addr1.equals(bound1[1])));
+      Assert.assertTrue((addr1.equals(bound1[0].getAddress()) && addr2.equals(bound1[1].getAddress()))
+          || (addr2.equals(bound1[0].getAddress()) && addr1.equals(bound1[1].getAddress())));
 
     } catch (UnsupportedEncodingException e) {
       Assert.fail();
@@ -142,17 +142,17 @@ public class SimpleGUIDStoreTest {
       Assert.assertTrue(this.store.replaceBindings(guid1, bind1));
       GNRSRecord record = this.store.getBindings(guid1);
       Assert.assertTrue(guid1.equals(record.getGuid()));
-      NetworkAddress[] bound1 = record.getBindings();
+      GUIDBinding[] bound1 = record.getBindings();
       Assert.assertTrue(bound1.length == 1);
-      Assert.assertTrue(addr1.equals(bound1[0]));
+      Assert.assertTrue(addr1.equals(bound1[0].getAddress()));
       
       Assert.assertTrue(this.store.replaceBindings(guid1,bind2, bind1));
       record = this.store.getBindings(guid1);
       Assert.assertTrue(guid1.equals(record.getGuid()));
       bound1 = record.getBindings();
       Assert.assertTrue(bound1.length == 2);
-      Assert.assertTrue((addr1.equals(bound1[0]) && addr2.equals(bound1[1] ))
-          || (addr2.equals(bound1[0]) && addr1.equals(bound1[1])));
+      Assert.assertTrue((addr1.equals(bound1[0].getAddress()) && addr2.equals(bound1[1].getAddress() ))
+          || (addr2.equals(bound1[0].getAddress()) && addr1.equals(bound1[1].getAddress())));
       
     } catch (UnsupportedEncodingException e) {
       Assert.fail();

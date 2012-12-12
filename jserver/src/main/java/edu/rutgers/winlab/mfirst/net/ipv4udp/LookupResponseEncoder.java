@@ -42,6 +42,7 @@ import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 public class LookupResponseEncoder implements
     MessageEncoder<LookupResponseMessage> {
 
+  // TODO: Options!
   
   @Override
   public void encode(final IoSession session, final LookupResponseMessage message,

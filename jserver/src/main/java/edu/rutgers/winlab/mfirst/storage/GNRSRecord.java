@@ -88,11 +88,11 @@ public class GNRSRecord {
    * 
    * @return an array of current bindings for this record
    */
-  public NetworkAddress[] getBindings() {
-    final NetworkAddress[] addresses = new NetworkAddress[this.bindings.size()];
+  public GUIDBinding[] getBindings() {
+    final GUIDBinding[] addresses = new GUIDBinding[this.bindings.size()];
     int index = 0;
     for (final GUIDBinding b : this.bindings) {
-      addresses[index] = b.getAddress();
+      addresses[index] = b;
       ++index;
     }
     return addresses;
