@@ -72,7 +72,7 @@ interval.
   commented.
 * Trace file - Contains a set of messages to send and to the server.  The
   format will be more formally specified at a future date.
-* Request Interval - To be determined.
+* Request Interval - The interval between messages, in milliseconds.
 
 Once you've gotten all of your files in order, you're ready to go.  Assuming
 you've just finished building the JAR file with Maven, you can launch the
