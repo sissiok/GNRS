@@ -295,7 +295,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
           rttList.get(0) / 1000, median / 1000, rttList.get(length - 1) / 1000));
     }
 
-    StatisticsCollector.setPath("client/");
+    StatisticsCollector.setPath("gen-client/");
     StatisticsCollector.toFiles();
 
     final int succ = GeneratingClient.this.numSuccess.get();
@@ -405,7 +405,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
       this.rtts.add(Long.valueOf(rtt));
 
       StatisticsCollector.addValue("clt-lkp-rtt",
-          (recvNanos - startNanos) / 1000f);
+          rtt / 1000f);
 
       if (this.verbose) {
         LookupMessage sentMessage = this.sentMessages.remove(Integer

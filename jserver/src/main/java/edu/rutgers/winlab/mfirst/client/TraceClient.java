@@ -56,6 +56,7 @@ import org.slf4j.LoggerFactory;
 import com.thoughtworks.xstream.XStream;
 
 import edu.rutgers.winlab.mfirst.GUID;
+import edu.rutgers.winlab.mfirst.StatisticsCollector;
 import edu.rutgers.winlab.mfirst.messages.AbstractMessage;
 import edu.rutgers.winlab.mfirst.messages.InsertMessage;
 import edu.rutgers.winlab.mfirst.messages.InsertResponseMessage;
@@ -172,6 +173,16 @@ public class TraceClient extends IoHandlerAdapter {
   private final transient int delay;
 
   /**
+   * Session for communicating with the server.
+   */
+  private transient IoSession session;
+
+  /**
+   * Flag to terminate early.
+   */
+  private transient boolean keepRunning = true;
+
+  /**
    * Creates a new client with the specified configuration file, trace file, and
    * intermessage delay (microsecond).
    * 
@@ -199,7 +210,12 @@ public class TraceClient extends IoHandlerAdapter {
     DefaultIoFilterChainBuilder chain = this.acceptor.getFilterChain();
     chain.addLast("gnrs codec", new ProtocolCodecFilter(
         new GNRSProtocolCodecFactory()));
-
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+      @Override
+      public void run() {
+        TraceClient.this.finishTrace();
+      }
+    });
   }
 
   /**
@@ -216,11 +232,11 @@ public class TraceClient extends IoHandlerAdapter {
           this.config.getClientPort()));
 
       // LOG.debug("Creating connect future.");
-      final IoSession session = this.acceptor.newSession(new InetSocketAddress(
-          this.config.getServerHost(), this.config.getServerPort()),
-          this.acceptor.getLocalAddress());
+      this.session = this.acceptor.newSession(
+          new InetSocketAddress(this.config.getServerHost(), this.config
+              .getServerPort()), this.acceptor.getLocalAddress());
 
-      TraceClient.this.runTrace(session);
+      this.runTrace();
 
     } catch (IOException e) {
       LOG.error("Unable to bind to local port.", e);
@@ -236,8 +252,8 @@ public class TraceClient extends IoHandlerAdapter {
    * @param session
    *          the connection to the server.
    */
-  public void runTrace(final IoSession session) {
-    LOG.info("Connected to {}", session);
+  public void runTrace() {
+    LOG.info("Connected to {}", this.session);
     LOG.info("Starting trace from {}.", this.traceFile);
 
     String line = null;
@@ -248,35 +264,34 @@ public class TraceClient extends IoHandlerAdapter {
       fromAddress = IPv4UDPAddress.fromASCII(this.config.getClientHost() + ":"
           + this.config.getClientPort());
 
-      while ((line = reader.readLine()) != null) {
+      while (this.keepRunning && (line = reader.readLine()) != null) {
         line = line.trim();
         if (line.length() == 0 || line.charAt(0) == '#') {
           continue;
         }
 
         LOG.debug("FILE: {}", line);
-        final AbstractMessage message = TraceClient
-            .parseMessage(line);
+        final AbstractMessage message = TraceClient.parseMessage(line);
         if (message == null) {
           LOG.warn("Unable to parse message from \"" + line + "\".");
           continue;
         }
 
-
         message.setOriginAddress(fromAddress);
         message.finalizeOptions();
 
-          session.write(message);
-          long sendTime = System.nanoTime();
-          this.sentMessages.put(Integer.valueOf((int) message.getRequestId()), message);
-          this.sendTimes.put(Integer.valueOf((int) message.getRequestId()),
-              Long.valueOf(sendTime));
-          if (message instanceof LookupMessage) {
-            this.numLookup.incrementAndGet();
-          } else if (message instanceof InsertMessage) {
-            this.numInsert.incrementAndGet();
-          }
-        
+        this.session.write(message);
+        long sendTime = System.nanoTime();
+        this.sentMessages.put(Integer.valueOf((int) message.getRequestId()),
+            message);
+        this.sendTimes.put(Integer.valueOf((int) message.getRequestId()),
+            Long.valueOf(sendTime));
+        if (message instanceof LookupMessage) {
+          this.numLookup.incrementAndGet();
+        } else if (message instanceof InsertMessage) {
+          this.numInsert.incrementAndGet();
+        }
+
         // try {
         java.util.concurrent.locks.LockSupport.parkNanos(this.delay * 1000l);
         // Thread.sleep(this.delay);
@@ -285,15 +300,9 @@ public class TraceClient extends IoHandlerAdapter {
         // }
 
       }
-      LOG.info("Finished reading trace file. Waiting for outstanding messages.");
-      while (this.lastReceiveTime > (System.currentTimeMillis() - 5000)) {
-        try {
-          Thread.sleep(500);
-        } catch (final InterruptedException ie) {
-          // Ignored
-        }
-      }
+
       reader.close();
+
     } catch (final UnsupportedEncodingException uee) {
       LOG.error(
           "Unable to parse local host name from configuration parameter.", uee);
@@ -302,7 +311,22 @@ public class TraceClient extends IoHandlerAdapter {
       LOG.error("Exception occurred while reading trace file.", ioe);
 
     }
-    session.close(true);
+    if (this.keepRunning) {
+      this.finishTrace();
+    }
+  }
+
+  protected void finishTrace() {
+    this.keepRunning = false;
+    LOG.info("Finished reading trace file. Waiting for outstanding messages.");
+    while (this.lastReceiveTime > (System.currentTimeMillis() - 5000)) {
+      try {
+        Thread.sleep(500);
+      } catch (final InterruptedException ie) {
+        // Ignored
+      }
+    }
+    this.session.close(true);
     this.acceptor.dispose(true);
 
     this.printStatistics();
@@ -345,6 +369,9 @@ public class TraceClient extends IoHandlerAdapter {
     int returnedLkp = succLkp + failLkp;
     int hitLkp = this.numLookupHits.get();
 
+    StatisticsCollector.setPath("trace-client/");
+    StatisticsCollector.toFiles();
+
     final String formatString = "\n==Insert==\n"
         + "Min: %,dus | Med: %,dus | Max: %,dus\n"
         + "Total: %,d  |  Success: %,d  |  Loss: %,d\n" + "==Lookup==\n"
@@ -372,11 +399,12 @@ public class TraceClient extends IoHandlerAdapter {
     LOG.debug("Parsing \"{}\"", asString);
     // Extract any comments and discard
     final String line = asString.split("#")[0];
-//    final LinkedList<AbstractMessage> messages = new LinkedList<AbstractMessage>();
+    // final LinkedList<AbstractMessage> messages = new
+    // LinkedList<AbstractMessage>();
     AbstractMessage message = null;
     final String[] generalComponents = line.split("\\s+");
     if (generalComponents.length >= 3) {
-      
+
       // Sequence number
       final int sequenceNumber = Integer.parseInt(generalComponents[0]);
       // Type
@@ -388,16 +416,14 @@ public class TraceClient extends IoHandlerAdapter {
 
         switch (type) {
         case INSERT: {
-          message = parseInsertMessage(guid, sequenceNumber,
-              generalComponents);
+          message = parseInsertMessage(guid, sequenceNumber, generalComponents);
           break;
         }
         case LOOKUP: {
           message = new LookupMessage();
           message.addOption(new RecursiveRequestOption(true));
 
-        
-          ((LookupMessage)message).setGuid(guid);
+          ((LookupMessage) message).setGuid(guid);
           message.setRequestId(sequenceNumber);
           break;
         }
@@ -458,7 +484,6 @@ public class TraceClient extends IoHandlerAdapter {
         // TODO: Need to figure-out how to send TTL values per-NA
         long ttl = Long.parseLong(bindingValues[1]);
 
-        
         ttlValues[i] = ttl;
         bindings[i] = netAddr;
       }
@@ -501,14 +526,16 @@ public class TraceClient extends IoHandlerAdapter {
     Long startNanos = this.sendTimes.remove(Integer.valueOf((int) msg
         .getRequestId()));
     if (startNanos != null) {
-      this.lookupRtts.add(Long.valueOf(recvNanos - startNanos.longValue()));
-    }
+      long rtt = recvNanos - startNanos.longValue();
+      StatisticsCollector.addValue("clt-lkp-rtt", rtt / 1000f);
+      this.lookupRtts.add(Long.valueOf(rtt));
 
-    if (this.verbose) {
-      LookupMessage sentMessage = (LookupMessage) this.sentMessages
-          .remove(Integer.valueOf((int) msg.getRequestId()));
-      LOG.info(String.format("[%,dns] %s -> %s",
-          recvNanos - startNanos.longValue(), sentMessage.getGuid(), msg));
+      if (this.verbose) {
+        LookupMessage sentMessage = (LookupMessage) this.sentMessages
+            .remove(Integer.valueOf((int) msg.getRequestId()));
+        LOG.info(String.format("[%,dns] %s -> %s", rtt, sentMessage.getGuid(),
+            msg));
+      }
     }
 
     if (ResponseCode.SUCCESS.equals(msg.getResponseCode())) {
@@ -533,14 +560,17 @@ public class TraceClient extends IoHandlerAdapter {
     Long startNanos = this.sendTimes.remove(Integer.valueOf((int) msg
         .getRequestId()));
     if (startNanos != null) {
-      this.insertRtts.add(Long.valueOf(recvNanos - startNanos.longValue()));
-    }
 
-    if (this.verbose) {
-      InsertMessage sentMessage = (InsertMessage) this.sentMessages
-          .remove(Integer.valueOf((int) msg.getRequestId()));
-      LOG.info(String.format("[%,dns] %s -> %s",
-          recvNanos - startNanos.longValue(), sentMessage.getGuid(), msg));
+      long rtt = recvNanos - startNanos.longValue();
+      StatisticsCollector.addValue("clt-ins-rtt", rtt / 1000f);
+      this.insertRtts.add(Long.valueOf(rtt));
+
+      if (this.verbose) {
+        InsertMessage sentMessage = (InsertMessage) this.sentMessages
+            .remove(Integer.valueOf((int) msg.getRequestId()));
+        LOG.info(String.format("[%,dns] %s -> %s", rtt, sentMessage.getGuid(),
+            msg));
+      }
     }
 
     if (ResponseCode.SUCCESS.equals(msg.getResponseCode())) {
