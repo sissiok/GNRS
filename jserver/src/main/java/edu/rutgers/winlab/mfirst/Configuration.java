@@ -106,6 +106,11 @@ public class Configuration {
    * Where to place statistics CSV files.
    */
   private String statsDirectory = "";
+  
+  /**
+   * The type of replica selector to use.
+   */
+  private String replicaSelector = "random";
 
   /**
    * Gets the current number of worker threads used.
@@ -319,28 +324,68 @@ public class Configuration {
     this.cacheEntries = cacheEntries;
   }
 
+  /**
+   * Returns the default binding expiration value.
+   * @return the expiration value, in milliseconds.
+   */
   public long getDefaultExpiration() {
-    return defaultExpiration;
+    return this.defaultExpiration;
   }
 
-  public void setDefaultExpiration(long defaultExpiration) {
+  /**
+   * Sets the default binding expiration value.
+   * @param defaultExpiration the new expiration value, in milliseconds.
+   */
+  public void setDefaultExpiration(final long defaultExpiration) {
     this.defaultExpiration = defaultExpiration;
   }
 
+  /**
+   * Gets the default TTL value.
+   * @return the TTL value, in milliseconds.
+   */
   public long getDefaultTtl() {
-    return defaultTtl;
+    return this.defaultTtl;
   }
 
-  public void setDefaultTtl(long defaultTtl) {
+  /**
+   * Sets the default TTL value.
+   * @param defaultTtl the new TTL value, in milliseconds.
+   */
+  public void setDefaultTtl(final long defaultTtl) {
     this.defaultTtl = defaultTtl;
   }
 
+  /**
+   * Gets the statistics output directory.
+   * @return the statistics file output directory.
+   */
   public String getStatsDirectory() {
-    return statsDirectory;
+    return this.statsDirectory;
   }
 
-  public void setStatsDirectory(String statsDirectory) {
+  /**
+   * Sets the statistics output directory.
+   * @param statsDirectory the new directory path.
+   */
+  public void setStatsDirectory(final String statsDirectory) {
     this.statsDirectory = statsDirectory;
+  }
+
+  /**
+   * Gets the replica selector type value.
+   * @return the replica selector type.
+   */
+  public String getReplicaSelector() {
+    return this.replicaSelector;
+  }
+
+  /**
+   * Sets the replica selector type value.
+   * @param replicaSelector the new type of the replica selector.
+   */
+  public void setReplicaSelector(final String replicaSelector) {
+    this.replicaSelector = replicaSelector;
   }
 
 }

@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -44,6 +45,8 @@ import org.slf4j.LoggerFactory;
 import com.thoughtworks.xstream.XStream;
 
 import edu.rutgers.winlab.mfirst.mapping.GUIDMapper;
+import edu.rutgers.winlab.mfirst.mapping.RandomSelector;
+import edu.rutgers.winlab.mfirst.mapping.ReplicaSelector;
 import edu.rutgers.winlab.mfirst.mapping.ipv4udp.IPv4UDPGUIDMapper;
 import edu.rutgers.winlab.mfirst.messages.AbstractMessage;
 import edu.rutgers.winlab.mfirst.messages.AbstractResponseMessage;
@@ -172,38 +175,36 @@ public class GNRSServer implements MessageListener {
    * Total number of nanoseconds spent processing lookup messages since last
    * stats report.
    */
-  static final AtomicLong[] LOOKUP_STATS = new AtomicLong[3];
+  static final AtomicLong[] LOOKUP_STATS = new AtomicLong[5];
 
   /**
    * Total number of nanoseconds spent processing insert messages since last
    * stats report.
    */
-  static final AtomicLong[] INSERT_STATS = new AtomicLong[3];
-
-  /**
-   * Total number of nanoseconds spent processing response messages since last
-   * stats report.
-   */
-  static final AtomicLong[] RESPONSE_STATS = new AtomicLong[3];
+  static final AtomicLong[] INSERT_STATS = new AtomicLong[5];
 
   static final transient int QUEUE_TIME_INDEX = 0;
 
   static final transient int PROC_TIME_INDEX = 1;
 
-  static final transient int TOTAL_TIME_INDEX = 2;
+  static final transient int REMOTE_TIME_INDEX = 2;
+
+  static final transient int RESP_PROC_TIME_INDEX = 3;
+
+  static final transient int TOTAL_TIME_INDEX = 4;
 
   static {
     LOOKUP_STATS[QUEUE_TIME_INDEX] = new AtomicLong(0);
     LOOKUP_STATS[PROC_TIME_INDEX] = new AtomicLong(0);
+    LOOKUP_STATS[REMOTE_TIME_INDEX] = new AtomicLong(0);
+    LOOKUP_STATS[RESP_PROC_TIME_INDEX] = new AtomicLong(0);
     LOOKUP_STATS[TOTAL_TIME_INDEX] = new AtomicLong(0);
 
     INSERT_STATS[QUEUE_TIME_INDEX] = new AtomicLong(0);
     INSERT_STATS[PROC_TIME_INDEX] = new AtomicLong(0);
+    INSERT_STATS[REMOTE_TIME_INDEX] = new AtomicLong(0);
+    INSERT_STATS[RESP_PROC_TIME_INDEX] = new AtomicLong(0);
     INSERT_STATS[TOTAL_TIME_INDEX] = new AtomicLong(0);
-
-    RESPONSE_STATS[QUEUE_TIME_INDEX] = new AtomicLong(0);
-    RESPONSE_STATS[PROC_TIME_INDEX] = new AtomicLong(0);
-    RESPONSE_STATS[TOTAL_TIME_INDEX] = new AtomicLong(0);
   }
 
   /**
@@ -244,6 +245,11 @@ public class GNRSServer implements MessageListener {
   private final transient SimpleCache cache;
 
   /**
+   * Selector for which of the k replicas to contact for lookups.
+   */
+  private final transient ReplicaSelector replicaSelector;
+
+  /**
    * Creates a new GNRS server with the specified configuration. The server will
    * not start running until the {@link #startup()} method is invoked.
    * 
@@ -270,7 +276,7 @@ public class GNRSServer implements MessageListener {
     if (numThreads < 1) {
       numThreads = 1;
     }
-    
+
     StatisticsCollector.setPath(this.config.getStatsDirectory());
 
     // LOG.info("Using threadpool of {} threads.", Integer.valueOf(numThreads));
@@ -295,6 +301,14 @@ public class GNRSServer implements MessageListener {
       this.cache = new SimpleCache(this.config.getCacheEntries());
     } else {
       this.cache = null;
+    }
+
+    this.replicaSelector = this.createRepSelector(this.config);
+    if (this.replicaSelector == null) {
+      LOG.error("Unable to create replica selector type {}",
+          this.config.getReplicaSelector());
+      throw new IllegalArgumentException(
+          "Unable to create replica selector object.");
     }
 
     this.networkAccess.addMessageListener(this);
@@ -394,6 +408,24 @@ public class GNRSServer implements MessageListener {
   }
 
   /**
+   * Creates a Replica Selector based on the configuration parameters.
+   * 
+   * @param config
+   *          the server configuration.
+   * @return a new ReplicaSelector, or {@code null} if an error occurred.
+   */
+  private ReplicaSelector createRepSelector(final Configuration config) {
+    ReplicaSelector selector = null;
+    if ("random".equalsIgnoreCase(config.getReplicaSelector())) {
+      selector = new RandomSelector(2);
+    } else {
+      LOG.error("Unrecognized replica selector type: {}",
+          config.getReplicaSelector());
+    }
+    return selector;
+  }
+
+  /**
    * Terminates the server in a graceful way.
    */
   public void shutdown() {
@@ -469,6 +501,33 @@ public class GNRSServer implements MessageListener {
         .getMapping(guid, this.config.getNumReplicas(), types);
   }
 
+  /**
+   * Returns a List of NetworkAddresses based on the replica selector policy
+   * defined
+   * in the configuration of this server.
+   * 
+   * @param replicas
+   *          the total set of possible servers.
+   * @return a List of replicas to contact, ordered from most to least
+   *         preferred.
+   */
+  public List<NetworkAddress> getPreferredReplicas(
+      final Collection<NetworkAddress> replicas) {
+    return this.replicaSelector.getContactList(replicas);
+  }
+
+  /**
+   * Sends the specified message to the destination addresses, if possible.
+   * Actual send of the message may be delayed or aborted if, for instance the
+   * remote addresses are temporarily unreachable, of a type the server cannot
+   * handle,
+   * or if networking is disabled or non-functional.
+   * 
+   * @param message
+   *          the message to send.
+   * @param destAddrs
+   *          the recipient addresses.
+   */
   public void sendMessage(final AbstractMessage message,
       final NetworkAddress... destAddrs) {
     this.networkAccess.sendMessage(message, destAddrs);
@@ -604,6 +663,10 @@ public class GNRSServer implements MessageListener {
           .getAndSet(0);
       final long lkpProcNanos = GNRSServer.LOOKUP_STATS[PROC_TIME_INDEX]
           .getAndSet(0);
+      final long lkpRemNanos = GNRSServer.LOOKUP_STATS[REMOTE_TIME_INDEX]
+          .getAndSet(0);
+      final long lkpRespNanos = GNRSServer.LOOKUP_STATS[RESP_PROC_TIME_INDEX]
+          .getAndSet(0);
       final long lkpTotalNanos = GNRSServer.LOOKUP_STATS[TOTAL_TIME_INDEX]
           .getAndSet(0);
 
@@ -611,14 +674,11 @@ public class GNRSServer implements MessageListener {
           .getAndSet(0);
       final long insProcNanos = GNRSServer.INSERT_STATS[PROC_TIME_INDEX]
           .getAndSet(0);
+      final long insRemNanos = GNRSServer.INSERT_STATS[REMOTE_TIME_INDEX]
+          .getAndSet(0);
+      final long insRespNanos = GNRSServer.INSERT_STATS[RESP_PROC_TIME_INDEX]
+          .getAndSet(0);
       final long insTotalNanos = GNRSServer.INSERT_STATS[TOTAL_TIME_INDEX]
-          .getAndSet(0);
-
-      final long rspQueueNanos = GNRSServer.RESPONSE_STATS[QUEUE_TIME_INDEX]
-          .getAndSet(0);
-      final long rspProcNanos = GNRSServer.RESPONSE_STATS[PROC_TIME_INDEX]
-          .getAndSet(0);
-      final long rspTotalNanos = GNRSServer.RESPONSE_STATS[TOTAL_TIME_INDEX]
           .getAndSet(0);
 
       final int numLookups = GNRSServer.NUM_LOOKUPS.getAndSet(0);
@@ -636,6 +696,10 @@ public class GNRSServer implements MessageListener {
           : (insQueueNanos / numInserts) / 1000f;
       final float insProcAvg = numInserts == 0 ? 0
           : (insProcNanos / numInserts) / 1000f;
+      final float insRemAvg = numInserts == 0 ? 0
+          : (insRemNanos / numInserts) / 1000f;
+      final float insRespAvg = numInserts == 0 ? 0
+          : (insRespNanos / numInserts) / 1000f;
       final float insTotAvg = numInserts == 0 ? 0
           : (insTotalNanos / numInserts) / 1000f;
 
@@ -643,49 +707,42 @@ public class GNRSServer implements MessageListener {
           : (lkpQueueNanos / numLookups) / 1000f;
       final float lkpProcAvg = numLookups == 0 ? 0
           : (lkpProcNanos / numLookups) / 1000f;
+      final float lkpRemAvg = numLookups == 0 ? 0
+          : (lkpRemNanos / numLookups) / 1000f;
+      final float lkpRespAvg = numLookups == 0 ? 0
+          : (lkpRespNanos / numLookups) / 1000f;
       final float lkpTotAvg = numLookups == 0 ? 0
           : (lkpTotalNanos / numLookups) / 1000f;
-
-      final float rspQueueAvg = numResponse == 0 ? 0
-          : (rspQueueNanos / numResponse) / 1000f;
-      final float rspProcAvg = numResponse == 0 ? 0
-          : (rspProcNanos / numResponse) / 1000f;
-      final float rspTotAvg = numResponse == 0 ? 0
-          : (rspTotalNanos / numResponse) / 1000f;
 
       if (lkpTotAvg > 0) {
         StatisticsCollector.addValue("lkp-queue", lkpQueueAvg);
         StatisticsCollector.addValue("lkp-proc", lkpProcAvg);
+        StatisticsCollector.addValue("lkp-remote", lkpRemAvg);
+        StatisticsCollector.addValue("lkp-resp", lkpRespAvg);
         StatisticsCollector.addValue("lkp-total", lkpTotAvg);
       }
 
       if (insTotAvg > 0) {
         StatisticsCollector.addValue("ins-queue", insQueueAvg);
         StatisticsCollector.addValue("ins-proc", insProcAvg);
+        StatisticsCollector.addValue("ins-remote", insRemAvg);
+        StatisticsCollector.addValue("ins-resp", insRespAvg);
         StatisticsCollector.addValue("ins-total", insTotAvg);
-      }
-      if (rspTotAvg > 0) {
-        StatisticsCollector.addValue("rsp-queue", rspQueueAvg);
-        StatisticsCollector.addValue("rsp-proc", rspProcAvg);
-        StatisticsCollector.addValue("rsp-total", rspTotAvg);
       }
 
       String statsFormatString = "\n==Lookups==\n"
-          + "%.3f per second (Q: %,.1f us, P: %,.1f us, T: %,.1f us)\n"
+          + "%.3f per second (Q: %,.1f us, P: %,.1f us, R: %,.1f us, S: %,.1f us, T: %,.1f us)\n"
           + "==Inserts==\n"
-          + "%.3f per second (Q: %,.1f us, P: %,.1f us, T: %,.1f us)\n"
-          + "==Responses==\n"
-          + "%.3f per second (Q: %,.1f us, P: %,.1f us, T: %,.1f us)\n";
+          + "%.3f per second (Q: %,.1f us, P: %,.1f us, R: %,.1f us, S: %,.1f us, T: %,.1f us)\n"
+          + "Outstanding responses: %,d\n";
 
       LOG_STATS.info(String.format(statsFormatString,
           Float.valueOf(lookupsPerSecond), Float.valueOf(lkpQueueAvg),
-          Float.valueOf(lkpProcAvg), Float.valueOf(lkpTotAvg),
+          Float.valueOf(lkpProcAvg), Float.valueOf(lkpRemAvg),
+          Float.valueOf(lkpRespAvg), Float.valueOf(lkpTotAvg),
           Float.valueOf(insertsPerSecond), Float.valueOf(insQueueAvg),
-          Float.valueOf(insProcAvg), Float.valueOf(insTotAvg),
-          Float.valueOf(responsesPerSecond), Float.valueOf(rspQueueAvg),
-          Float.valueOf(rspProcAvg), Float.valueOf(rspTotAvg)));
-
-      LOG_STATS.info(String.format("Outstanding responses: %,d",
+          Float.valueOf(insProcAvg), Float.valueOf(insRemAvg),
+          Float.valueOf(insRespAvg), Float.valueOf(insTotAvg),
           Integer.valueOf(this.server.awaitingResponse.size())));
     }
   }

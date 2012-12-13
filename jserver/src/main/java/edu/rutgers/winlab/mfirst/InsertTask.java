@@ -105,6 +105,7 @@ public class InsertTask implements Callable<Object> {
     final Collection<NetworkAddress> serverAddxes = this.server.getMappings(
         this.message.getGuid(), this.message.getOriginAddress().getType());
 
+    // Determine if the local server should also handle this insert
     boolean resolvedLocally = false;
     if (serverAddxes != null && !serverAddxes.isEmpty()) {
       for (Iterator<NetworkAddress> iter = serverAddxes.iterator(); iter
@@ -142,7 +143,7 @@ public class InsertTask implements Callable<Object> {
           this.message.getBindings());
     }
     // Insert into the cache if the insert came from a local client.
-    if (recursive && this.message.getBindings() != null) {
+    if (!resolvedLocally && recursive && this.message.getBindings() != null) {
       final long now = System.currentTimeMillis();
       final long defaultTtl = now + this.server.getConfig().getDefaultTtl();
       final long defaultExpire = now + this.server.getConfig().getDefaultExpiration();
@@ -202,6 +203,12 @@ public class InsertTask implements Callable<Object> {
         this.server.addNeededServer(Integer.valueOf(requestId), info);
         this.server.sendMessage(relayMessage,
             serverAddxes.toArray(new NetworkAddress[] {}));
+        if (this.server.getConfig().isCollectStatistics()) {
+          long endProc = System.nanoTime();
+          this.message.processingNanos = endProc-startProc;
+          this.message.queueNanos = startProc-this.message.createdNanos;
+          this.message.forwardNanos = endProc;
+        }
         info.markAttempt();
       } else {
         LOG.error("Invalid server addresses.  Cannot forward.");
@@ -223,8 +230,9 @@ public class InsertTask implements Callable<Object> {
     }
     
     // Statistics
-    long endProc = System.nanoTime();
+    
     if (this.server.getConfig().isCollectStatistics()) {
+      long endProc = System.nanoTime();
       GNRSServer.INSERT_STATS[GNRSServer.QUEUE_TIME_INDEX].addAndGet(startProc
           - this.message.createdNanos);
       GNRSServer.INSERT_STATS[GNRSServer.PROC_TIME_INDEX].addAndGet(endProc

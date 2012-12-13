@@ -59,4 +59,9 @@
   <!-- Where to place statistics output (CSV) files if statistics generation
        is enabled. -->
   <statsDirectory>stats/</statsDirectory>
+  <!-- Which module will be used to select subsets of the K replicas
+       for contact during a Lookup request from client.  Possible values:
+       * "random" - randomly select 2 of the servers.
+       -->
+  <replicaSelector>random</replicaSelector>
 </edu.rutgers.winlab.mfirst.Configuration>

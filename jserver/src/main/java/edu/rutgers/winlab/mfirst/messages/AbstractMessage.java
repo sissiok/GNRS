@@ -45,6 +45,21 @@ public abstract class AbstractMessage {
    * nanosecond time is only relative and has nothing to do with "wall time".
    */
   public final long createdNanos = System.nanoTime();
+  
+  /**
+   * How long this message was queued (created until received by worker).
+   */
+  public long queueNanos = 0l;
+  
+  /**
+   * How much time is spent processing the message.
+   */
+  public long processingNanos = 0l;
+  
+  /**
+   * Nanosecond timestamp of when the request was forwarded to a remote server.
+   */
+  public long forwardNanos = 0l;
 
   /**
    * Actually used as 32-bit unsigned int

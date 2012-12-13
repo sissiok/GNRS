@@ -47,4 +47,8 @@
   <!-- Number of GUID entries to store in the local cache.  A non-positive value
        disables caching. -->
   <cacheEntries>0</cacheEntries>
+  <defaultExpiration>10000</defaultExpiration>
+  <defaultTtl>10000</defaultTtl>
+  <statsDirectory>target/</statsDirectory>
+  <replicaSelector>random</replicaSelector>
 </edu.rutgers.winlab.mfirst.Configuration>

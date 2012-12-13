@@ -111,19 +111,20 @@ public class LookupTask implements Callable<Object> {
       this.server.sendMessage(response, this.message.getOriginAddress());
     } else {
 
-      final Collection<NetworkAddress> serverAddxes = this.server.getMappings(
+      final Collection<NetworkAddress> allAddxes = this.server.getMappings(
           this.message.getGuid(), this.message.getOriginAddress().getType());
+      
 
       final LookupResponseMessage response = new LookupResponseMessage();
       response.setRequestId(this.message.getRequestId());
 
-      if (serverAddxes == null || serverAddxes.isEmpty()) {
+      if (allAddxes == null || allAddxes.isEmpty()) {
         response.setResponseCode(ResponseCode.FAILED);
       }
 
       boolean resolvedLocally = false;
-      if (serverAddxes != null && !serverAddxes.isEmpty()) {
-        for (final NetworkAddress addx : serverAddxes) {
+      if (allAddxes != null && !allAddxes.isEmpty()) {
+        for (final NetworkAddress addx : allAddxes) {
           // Loopback? Then the local server should handle it.
           if (this.server.isLocalAddress(addx)) {
             resolvedLocally = true;
@@ -143,6 +144,8 @@ public class LookupTask implements Callable<Object> {
           }
         }
       }
+      
+      final List<NetworkAddress> serverAddxes = this.server.getPreferredReplicas(allAddxes);
 
       // No bindings were for the local server
       if (recursive && !resolvedLocally) {
@@ -170,6 +173,12 @@ public class LookupTask implements Callable<Object> {
 
         this.server.sendMessage(relayMessage,
             serverAddxes.toArray(new NetworkAddress[] {}));
+        if (this.server.getConfig().isCollectStatistics()) {
+          long endProc = System.nanoTime();
+          this.message.processingNanos = endProc-startProc;
+          this.message.queueNanos = startProc-this.message.createdNanos;
+          this.message.forwardNanos = endProc;
+        }
         info.markAttempt();
       }
       // Either resolved at this server or non-recursive
@@ -203,20 +212,22 @@ public class LookupTask implements Callable<Object> {
 
         // log.debug("[{}] Writing {}", this.container.session, response);
         this.server.sendMessage(response, this.message.getOriginAddress());
+        
+        if (this.server.getConfig().isCollectStatistics()) {
+          long endProc = System.nanoTime();
+          GNRSServer.LOOKUP_STATS[GNRSServer.QUEUE_TIME_INDEX].addAndGet(startProc
+              - this.message.createdNanos);
+          GNRSServer.LOOKUP_STATS[GNRSServer.PROC_TIME_INDEX].addAndGet(endProc
+              - startProc);
+          GNRSServer.LOOKUP_STATS[GNRSServer.TOTAL_TIME_INDEX].addAndGet(endProc
+              - this.message.createdNanos);
+
+        }
 
       }
 
     }
-    long endProc = System.nanoTime();
-    if (this.server.getConfig().isCollectStatistics()) {
-      GNRSServer.LOOKUP_STATS[GNRSServer.QUEUE_TIME_INDEX].addAndGet(startProc
-          - this.message.createdNanos);
-      GNRSServer.LOOKUP_STATS[GNRSServer.PROC_TIME_INDEX].addAndGet(endProc
-          - startProc);
-      GNRSServer.LOOKUP_STATS[GNRSServer.TOTAL_TIME_INDEX].addAndGet(endProc
-          - this.message.createdNanos);
-
-    }
+    
 
     return null;
   }

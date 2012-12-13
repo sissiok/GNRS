@@ -90,16 +90,19 @@ public class ResponseTask implements Callable<Object> {
 
           if (info.clientMessage instanceof LookupMessage) {
             LookupResponseMessage lrm = new LookupResponseMessage();
-            LookupMessage clientMsg = (LookupMessage)info.clientMessage;
+            LookupMessage clientMsg = (LookupMessage) info.clientMessage;
             // Issue #13 Handle cache insert
             GUID guid = clientMsg.getGuid();
-            
-            GUIDBinding[] cachedBind = new GUIDBinding[info.responseAddresses.size()];
+
+            GUIDBinding[] cachedBind = new GUIDBinding[info.responseAddresses
+                .size()];
             int i = 0;
             long now = System.currentTimeMillis();
             long defaultTtl = now + this.server.getConfig().getDefaultTtl();
-            long defaultExpire = now + this.server.getConfig().getDefaultExpiration();
-            for(Iterator<NetworkAddress> iter = info.responseAddresses.iterator(); iter.hasNext(); ++i){
+            long defaultExpire = now
+                + this.server.getConfig().getDefaultExpiration();
+            for (Iterator<NetworkAddress> iter = info.responseAddresses
+                .iterator(); iter.hasNext(); ++i) {
               NetworkAddress addx = iter.next();
               cachedBind[i] = new GUIDBinding();
               cachedBind[i].setAddress(addx);
@@ -107,9 +110,10 @@ public class ResponseTask implements Callable<Object> {
               cachedBind[i].setTtl(defaultTtl);
               cachedBind[i].setExpiration(defaultExpire);
             }
-            
-            this.server.addToCache(guid, CacheOrigin.LOOKUP_RESPONSE,cachedBind);
-            
+
+            this.server.addToCache(guid, CacheOrigin.LOOKUP_RESPONSE,
+                cachedBind);
+
             lrm.setRequestId(info.clientMessage.getRequestId());
             lrm.setOriginAddress(this.server.getOriginAddress());
             lrm.setResponseCode(ResponseCode.SUCCESS);
@@ -118,6 +122,25 @@ public class ResponseTask implements Callable<Object> {
                 .toArray(new NetworkAddress[] {}));
             // LOG.info("Going to send reply back to client: {}", lrm);
             this.server.sendMessage(lrm, info.clientMessage.getOriginAddress());
+            if (this.server.getConfig().isCollectStatistics()) {
+              long endProc = System.nanoTime();
+              GNRSServer.LOOKUP_STATS[GNRSServer.QUEUE_TIME_INDEX]
+                  .addAndGet((startProc - this.message.createdNanos)
+                      + info.clientMessage.queueNanos);
+              GNRSServer.LOOKUP_STATS[GNRSServer.PROC_TIME_INDEX]
+                  .addAndGet(info.clientMessage.processingNanos);
+              GNRSServer.LOOKUP_STATS[GNRSServer.REMOTE_TIME_INDEX]
+                  .addAndGet(this.message.createdNanos
+                      - info.clientMessage.forwardNanos);
+              GNRSServer.LOOKUP_STATS[GNRSServer.RESP_PROC_TIME_INDEX]
+                  .addAndGet(endProc - startProc);
+              GNRSServer.LOOKUP_STATS[GNRSServer.TOTAL_TIME_INDEX]
+                  .addAndGet((endProc - this.message.createdNanos)
+                      + info.clientMessage.queueNanos
+                      + info.clientMessage.processingNanos
+                      + (this.message.createdNanos - info.clientMessage.forwardNanos));
+
+            }
           } else if (info.clientMessage instanceof InsertMessage) {
             InsertResponseMessage irm = new InsertResponseMessage();
             irm.setRequestId(info.clientMessage.getRequestId());
@@ -125,6 +148,25 @@ public class ResponseTask implements Callable<Object> {
             irm.setResponseCode(ResponseCode.SUCCESS);
             irm.setVersion((byte) 0);
             this.server.sendMessage(irm, info.clientMessage.getOriginAddress());
+            if (this.server.getConfig().isCollectStatistics()) {
+              long endProc = System.nanoTime();
+              GNRSServer.INSERT_STATS[GNRSServer.QUEUE_TIME_INDEX]
+                  .addAndGet((startProc - this.message.createdNanos)
+                      + info.clientMessage.queueNanos);
+              GNRSServer.INSERT_STATS[GNRSServer.PROC_TIME_INDEX]
+                  .addAndGet(info.clientMessage.processingNanos);
+              GNRSServer.INSERT_STATS[GNRSServer.REMOTE_TIME_INDEX]
+                  .addAndGet(this.message.createdNanos
+                      - info.clientMessage.forwardNanos);
+              GNRSServer.INSERT_STATS[GNRSServer.RESP_PROC_TIME_INDEX]
+                  .addAndGet(endProc - startProc);
+              GNRSServer.INSERT_STATS[GNRSServer.TOTAL_TIME_INDEX]
+                  .addAndGet((endProc - this.message.createdNanos)
+                      + info.clientMessage.queueNanos
+                      + info.clientMessage.processingNanos
+                      + (this.message.createdNanos - info.clientMessage.forwardNanos));
+
+            }
           } else {
             LOG.error("Unsupported message received?");
           }
@@ -136,15 +178,6 @@ public class ResponseTask implements Callable<Object> {
       }
     }
 
-    long endProc = System.nanoTime();
-    if (this.server.getConfig().isCollectStatistics()) {
-      GNRSServer.RESPONSE_STATS[GNRSServer.QUEUE_TIME_INDEX].addAndGet(startProc-this.message.createdNanos);
-      GNRSServer.RESPONSE_STATS[GNRSServer.PROC_TIME_INDEX].addAndGet(endProc-startProc);
-      GNRSServer.RESPONSE_STATS[GNRSServer.TOTAL_TIME_INDEX].addAndGet(endProc-this.message.createdNanos);
-
-    }
-
-    
     return null;
   }
 
