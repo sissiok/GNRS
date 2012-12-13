@@ -59,6 +59,7 @@ import org.slf4j.LoggerFactory;
 import com.thoughtworks.xstream.XStream;
 
 import edu.rutgers.winlab.mfirst.GUID;
+import edu.rutgers.winlab.mfirst.StatisticsCollector;
 import edu.rutgers.winlab.mfirst.messages.LookupMessage;
 import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.ResponseCode;
@@ -148,6 +149,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     System.out
         .println("Usage: <Config File> <Num Request> <Request Delay> <Num Clients> [-v]");
   }
+
   /**
    * Acceptor for accepting messages from the server.
    */
@@ -280,7 +282,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     this.acceptor.dispose(true);
   }
 
-  private void printStats(){
+  private void printStats() {
     int length = this.rtts.size();
     ArrayList<Long> rttList = new ArrayList<Long>(length);
     rttList.addAll(this.rtts);
@@ -292,12 +294,9 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
       LOG.info(String.format("Min: %,dus | Med: %,dus | Max: %,dus",
           rttList.get(0) / 1000, median / 1000, rttList.get(length - 1) / 1000));
     }
-    
-    HashMap<Integer, Integer> rttBuckets = new HashMap<Integer,Integer>();
-    
-    for(Long rtt : rttList){
-      
-    }
+
+    StatisticsCollector.setPath("client/");
+    StatisticsCollector.toFiles();
 
     final int succ = GeneratingClient.this.numSuccess.get();
     final int total = succ + GeneratingClient.this.numFailures.get();
@@ -310,7 +309,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
             Integer.valueOf(GeneratingClient.this.numHits.get()),
             Integer.valueOf(GeneratingClient.this.numLookups - total)));
   }
-  
+
   /**
    * Creates a stream of lookup messages to send to the server.
    * 
@@ -401,16 +400,20 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
     Long startNanos = this.sendTimes.remove(Integer.valueOf((int) msg
         .getRequestId()));
     if (startNanos != null) {
-      this.rtts.add(Long.valueOf(recvNanos - startNanos.longValue()));
-    }
+      long rtt = recvNanos - startNanos.longValue();
 
-    if (this.verbose) {
-      LookupMessage sentMessage = this.sentMessages.remove(Integer
-          .valueOf((int) msg.getRequestId()));
-      LOG.info(String.format("[%,dns] %s -> %s",
-          recvNanos - startNanos.longValue(), sentMessage.getGuid(), msg));
-    }
+      this.rtts.add(Long.valueOf(rtt));
 
+      StatisticsCollector.addValue("clt-lkp-rtt",
+          (recvNanos - startNanos) / 1000f);
+
+      if (this.verbose) {
+        LookupMessage sentMessage = this.sentMessages.remove(Integer
+            .valueOf((int) msg.getRequestId()));
+        LOG.info(String.format("[%,dns] %s -> %s", rtt, sentMessage.getGuid(),
+            msg));
+      }
+    }
     if (ResponseCode.SUCCESS.equals(msg.getResponseCode())) {
       this.numSuccess.incrementAndGet();
       if (msg.getBindings() != null && msg.getBindings().length > 0) {

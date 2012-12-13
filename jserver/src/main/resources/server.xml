@@ -55,4 +55,8 @@
   <!-- How long to keep a binding in caches if no TTL value is specified. Value is in
        milliseconds. -->
   <defaultTtl>30000</defaultTtl>
+  
+  <!-- Where to place statistics output (CSV) files if statistics generation
+       is enabled. -->
+  <statsDirectory>stats/</statsDirectory>
 </edu.rutgers.winlab.mfirst.Configuration>

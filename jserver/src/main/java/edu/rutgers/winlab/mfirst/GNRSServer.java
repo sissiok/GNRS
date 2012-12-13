@@ -179,7 +179,7 @@ public class GNRSServer implements MessageListener {
    * stats report.
    */
   static final AtomicLong[] INSERT_STATS = new AtomicLong[3];
-  
+
   /**
    * Total number of nanoseconds spent processing response messages since last
    * stats report.
@@ -200,7 +200,7 @@ public class GNRSServer implements MessageListener {
     INSERT_STATS[QUEUE_TIME_INDEX] = new AtomicLong(0);
     INSERT_STATS[PROC_TIME_INDEX] = new AtomicLong(0);
     INSERT_STATS[TOTAL_TIME_INDEX] = new AtomicLong(0);
-    
+
     RESPONSE_STATS[QUEUE_TIME_INDEX] = new AtomicLong(0);
     RESPONSE_STATS[PROC_TIME_INDEX] = new AtomicLong(0);
     RESPONSE_STATS[TOTAL_TIME_INDEX] = new AtomicLong(0);
@@ -270,6 +270,8 @@ public class GNRSServer implements MessageListener {
     if (numThreads < 1) {
       numThreads = 1;
     }
+    
+    StatisticsCollector.setPath(this.config.getStatsDirectory());
 
     // LOG.info("Using threadpool of {} threads.", Integer.valueOf(numThreads));
     this.workers = Executors.newFixedThreadPool(numThreads);
@@ -400,6 +402,13 @@ public class GNRSServer implements MessageListener {
 
     this.timer.cancel();
     this.workers.shutdown();
+
+    this.outputCDF();
+  }
+
+  private void outputCDF() {
+    LOG.info("Generating CDF files.");
+    StatisticsCollector.toFiles();
   }
 
   /**
@@ -493,7 +502,7 @@ public class GNRSServer implements MessageListener {
   public void messageReceived(final SessionParameters parameters,
       final AbstractMessage msg) {
 
-//    LOG.info("Received {}.", msg);
+    // LOG.info("Received {}.", msg);
     if (msg instanceof InsertMessage) {
       this.workers
           .submit(new InsertTask(this, parameters, (InsertMessage) msg));
@@ -555,7 +564,8 @@ public class GNRSServer implements MessageListener {
    * @param bindings
    *          the addresses to bind.
    */
-  public void addToCache(final GUID guid, final CacheOrigin origin, final GUIDBinding... bindings) {
+  public void addToCache(final GUID guid, final CacheOrigin origin,
+      final GUIDBinding... bindings) {
     if (this.cache != null) {
       this.cache.put(guid, origin, bindings);
     }
@@ -603,10 +613,13 @@ public class GNRSServer implements MessageListener {
           .getAndSet(0);
       final long insTotalNanos = GNRSServer.INSERT_STATS[TOTAL_TIME_INDEX]
           .getAndSet(0);
-      
-      final long rspQueueNanos = GNRSServer.RESPONSE_STATS[QUEUE_TIME_INDEX].getAndSet(0);
-      final long rspProcNanos = GNRSServer.RESPONSE_STATS[PROC_TIME_INDEX].getAndSet(0);
-      final long rspTotalNanos = GNRSServer.RESPONSE_STATS[TOTAL_TIME_INDEX].getAndSet(0);
+
+      final long rspQueueNanos = GNRSServer.RESPONSE_STATS[QUEUE_TIME_INDEX]
+          .getAndSet(0);
+      final long rspProcNanos = GNRSServer.RESPONSE_STATS[PROC_TIME_INDEX]
+          .getAndSet(0);
+      final long rspTotalNanos = GNRSServer.RESPONSE_STATS[TOTAL_TIME_INDEX]
+          .getAndSet(0);
 
       final int numLookups = GNRSServer.NUM_LOOKUPS.getAndSet(0);
       final int numInserts = GNRSServer.NUM_INSERTS.getAndSet(0);
@@ -619,18 +632,43 @@ public class GNRSServer implements MessageListener {
       final float insertsPerSecond = numInserts / numSeconds;
       final float responsesPerSecond = numResponse / numSeconds;
 
-      final float insQueueAvg = numInserts == 0 ? 0 : (insQueueNanos / numInserts)/1000f;
-      final float insProcAvg = numInserts == 0 ? 0 : (insProcNanos / numInserts)/1000f;
-      final float insTotAvg = numInserts == 0 ? 0 : (insTotalNanos / numInserts)/1000f;
-      
-      final float lkpQueueAvg = numLookups == 0 ? 0 : (lkpQueueNanos / numLookups) / 1000f;
-      final float lkpProcAvg = numLookups == 0 ? 0 : (lkpProcNanos / numLookups)/1000f;
-      final float lkpTotAvg = numLookups == 0 ? 0 : (lkpTotalNanos/numLookups)/1000f;
-      
-      final float rspQueueAvg = numResponse == 0 ? 0 : (rspQueueNanos / numResponse) / 1000f;
-      final float rspProcAvg = numResponse == 0 ? 0 : (rspProcNanos / numResponse) / 1000f;
-      final float rspTotAvg = numResponse == 0 ? 0 : (rspTotalNanos / numResponse) / 1000f;
-      
+      final float insQueueAvg = numInserts == 0 ? 0
+          : (insQueueNanos / numInserts) / 1000f;
+      final float insProcAvg = numInserts == 0 ? 0
+          : (insProcNanos / numInserts) / 1000f;
+      final float insTotAvg = numInserts == 0 ? 0
+          : (insTotalNanos / numInserts) / 1000f;
+
+      final float lkpQueueAvg = numLookups == 0 ? 0
+          : (lkpQueueNanos / numLookups) / 1000f;
+      final float lkpProcAvg = numLookups == 0 ? 0
+          : (lkpProcNanos / numLookups) / 1000f;
+      final float lkpTotAvg = numLookups == 0 ? 0
+          : (lkpTotalNanos / numLookups) / 1000f;
+
+      final float rspQueueAvg = numResponse == 0 ? 0
+          : (rspQueueNanos / numResponse) / 1000f;
+      final float rspProcAvg = numResponse == 0 ? 0
+          : (rspProcNanos / numResponse) / 1000f;
+      final float rspTotAvg = numResponse == 0 ? 0
+          : (rspTotalNanos / numResponse) / 1000f;
+
+      if (lkpTotAvg > 0) {
+        StatisticsCollector.addValue("lkp-queue", lkpQueueAvg);
+        StatisticsCollector.addValue("lkp-proc", lkpProcAvg);
+        StatisticsCollector.addValue("lkp-total", lkpTotAvg);
+      }
+
+      if (insTotAvg > 0) {
+        StatisticsCollector.addValue("ins-queue", insQueueAvg);
+        StatisticsCollector.addValue("ins-proc", insProcAvg);
+        StatisticsCollector.addValue("ins-total", insTotAvg);
+      }
+      if (rspTotAvg > 0) {
+        StatisticsCollector.addValue("rsp-queue", rspQueueAvg);
+        StatisticsCollector.addValue("rsp-proc", rspProcAvg);
+        StatisticsCollector.addValue("rsp-total", rspTotAvg);
+      }
 
       String statsFormatString = "\n==Lookups==\n"
           + "%.3f per second (Q: %,.1f us, P: %,.1f us, T: %,.1f us)\n"
@@ -639,12 +677,13 @@ public class GNRSServer implements MessageListener {
           + "==Responses==\n"
           + "%.3f per second (Q: %,.1f us, P: %,.1f us, T: %,.1f us)\n";
 
-      LOG_STATS.info(String.format(statsFormatString, Float.valueOf(lookupsPerSecond),
-          Float.valueOf(lkpQueueAvg), Float.valueOf(lkpProcAvg), Float.valueOf(lkpTotAvg),
-          Float.valueOf(insertsPerSecond),
-          Float.valueOf(insQueueAvg), Float.valueOf(insProcAvg), Float.valueOf(insTotAvg),
-          Float.valueOf(responsesPerSecond),
-          Float.valueOf(rspQueueAvg), Float.valueOf(rspProcAvg), Float.valueOf(rspTotAvg)));
+      LOG_STATS.info(String.format(statsFormatString,
+          Float.valueOf(lookupsPerSecond), Float.valueOf(lkpQueueAvg),
+          Float.valueOf(lkpProcAvg), Float.valueOf(lkpTotAvg),
+          Float.valueOf(insertsPerSecond), Float.valueOf(insQueueAvg),
+          Float.valueOf(insProcAvg), Float.valueOf(insTotAvg),
+          Float.valueOf(responsesPerSecond), Float.valueOf(rspQueueAvg),
+          Float.valueOf(rspProcAvg), Float.valueOf(rspTotAvg)));
 
       LOG_STATS.info(String.format("Outstanding responses: %,d",
           Integer.valueOf(this.server.awaitingResponse.size())));

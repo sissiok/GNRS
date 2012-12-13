@@ -137,7 +137,7 @@ public class InsertTask implements Callable<Object> {
 
     // Insert to local server if mapped to it.
     if (resolvedLocally) {
-      LOG.info("Resolved locally.");
+//      LOG.info("Resolved locally.");
       localSuccess = this.server.appendBindings(this.message.getGuid(),
           this.message.getBindings());
     }
@@ -210,7 +210,7 @@ public class InsertTask implements Callable<Object> {
 
     // Send a response back if there are no remote servers contacted
     if (resolvedLocally && !recursive) {
-      LOG.info("Received {}", this.message);
+//      LOG.info("Received {}", this.message);
       InsertResponseMessage response = new InsertResponseMessage();
       response.setOriginAddress(this.server.getOriginAddress());
       response.setRequestId(this.message.getRequestId());

@@ -101,6 +101,11 @@ public class Configuration {
    * How long to cache values in the server when no TTL value is specified.
    */
   private long defaultTtl = 60000;
+  
+  /**
+   * Where to place statistics CSV files.
+   */
+  private String statsDirectory = "";
 
   /**
    * Gets the current number of worker threads used.
@@ -328,6 +333,14 @@ public class Configuration {
 
   public void setDefaultTtl(long defaultTtl) {
     this.defaultTtl = defaultTtl;
+  }
+
+  public String getStatsDirectory() {
+    return statsDirectory;
+  }
+
+  public void setStatsDirectory(String statsDirectory) {
+    this.statsDirectory = statsDirectory;
   }
 
 }
