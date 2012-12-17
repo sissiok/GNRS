@@ -2,8 +2,8 @@
 
 #
 # Delay Combiner script for GNRS toolchain.
-# Author: Robert Moore
-# Last Modified: 2012/09/06
+# Author: Robert Moore, Feixiong Zhang
+# Last Modified: 2012/11/28
 # Args: <AS List> <Delay Matrix>
 #
 # The AS List input file should be a list of AS numbers, identical to those in
