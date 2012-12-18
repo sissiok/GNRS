@@ -8,10 +8,10 @@
 cla :: Classifier( 12/0800,  
 		   -);
 
-// Classifier to extract UDP packets destined for ports 5000, 5001, or 9000
+// Classifier to extract UDP packets destined for ports 4000, 5001
 // Matching packets go to output 0
 // The remaining (non-UDP or alternate ports) go to output 1
-ip_cla :: IPClassifier( dst udp port 5000 or dst udp port 5001 or dst udp port 9000,
+ip_cla :: IPClassifier( dst udp port 4001 or dst udp port 5001,
 			-);
 
 // Create an instance of the delay module.
@@ -21,7 +21,7 @@ ip_cla :: IPClassifier( dst udp port 5000 or dst udp port 5001 or dst udp port 9
 delayMod :: NetDelay();
 
 // Start classifying packets arriving on /dev/eth1
-FromDevice(eth1)
+FromDevice(eth0)
 // Extract IP datagrams
   ->cla
 // Validate the IP headers, don't validate checksum
