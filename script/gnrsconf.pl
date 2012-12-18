@@ -39,13 +39,17 @@ while (my $line = $inFile->getline) {
 	printf $outFile1 "  <numReplicas>5</numReplicas>\n";
 	printf $outFile1 "  <collectStatistics>true</collectStatistics>\n";
 	printf $outFile1 "  <networkType>ipv4udp</networkType>\n";
-	printf $outFile1 "  <networkConfiguration>/usr/local/mobilityfirst/conf/net-ipv4_".$line.".xml</networkConfiguration>\n";
-	printf $outFile1 "  <mappingConfiguration>/usr/local/mobilityfirst/conf/map-ipv4.xml</mappingConfiguration>\n";
+	printf $outFile1 "  <networkConfiguration>/etc/gnrs/net-ipv4_".$line.".xml</networkConfiguration>\n";
+	printf $outFile1 "  <mappingConfiguration>/etc/gnrs/map-ipv4.xml</mappingConfiguration>\n";
 	printf $outFile1 "  <storeType>berkeleydb</storeType>\n";
-	printf $outFile1 "  <storeConfiguration>/usr/local/mobilityfirst/conf/berkeleydb.xml</storeConfiguration>\n";
+	printf $outFile1 "  <storeConfiguration>/etc/gnrs/berkeleydb.xml</storeConfiguration>\n";
 	printf $outFile1 "  <numAttempts>2</numAttempts>\n";
 	printf $outFile1 "  <timeoutMillis>500</timeoutMillis>\n";
 	printf $outFile1 "  <cacheEntries>0</cacheEntries>\n";
+	printf $outFile1 "  <defaultExpiration>900000</defaultExpiration>\n";
+	printf $outFile1 "  <defaultTtl>30000</defaultTtl>\n";
+	printf $outFile1 "  <statsDirectory>/var/log/gnrs/</statsDirectory>\n";
+	printf $outFile1 "  <replicaSelector>random</replicaSelector>\n";
 	printf $outFile1 "</edu.rutgers.winlab.mfirst.Configuration>";
 
 	open($outFile2, ">", "net-ipv4_".$line.".xml");
