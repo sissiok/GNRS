@@ -48,7 +48,7 @@ while (my $line = $inFile->getline) {
 	printf $outFile1 "  <cacheEntries>0</cacheEntries>\n";
 	printf $outFile1 "  <defaultExpiration>900000</defaultExpiration>\n";
 	printf $outFile1 "  <defaultTtl>30000</defaultTtl>\n";
-	printf $outFile1 "  <statsDirectory>/var/log/gnrs/</statsDirectory>\n";
+	printf $outFile1 "  <statsDirectory>/var/gnrs/stats/</statsDirectory>\n";
 	printf $outFile1 "  <replicaSelector>random</replicaSelector>\n";
 	printf $outFile1 "</edu.rutgers.winlab.mfirst.Configuration>";
 
