@@ -40,11 +40,12 @@ I will assume you are in the `jserver/` directory:
     java -jar target/gnrs-server-1.0.0-SNAPSHOT-jar-with-dependencies.jar \\
       src/main/resources/server.xml
 
-Since this is a bit cumbersome to remember, a launch script (Bash), `gnrsd` has been
-provided in the base directory and will pass any arguments directly to the
-server.  Using this launch script, the above startup command becomes:
+Since this is a bit cumbersome to remember, a launch script (Bash),
+`gnrsd-local` has been provided in the base directory and will pass any
+arguments directly to the server.  Using this launch script, the above startup
+command becomes:
 
-    ./gnrsd src/main/resources/server.xml
+    ./gnrsd-local src/main/resources/server.xml
 
 ## Logging Configuration ##
 The server uses logging through the Log4J logging library (indirectly through
