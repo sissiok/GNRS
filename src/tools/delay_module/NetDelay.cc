@@ -190,17 +190,21 @@ void NetDelay::run_timer(Timer *) {
 #ifdef DEBUG_TIM
     click_chatter("DMRtim: Fired at %lld", currTime);
 #endif
-    // Grab the head of the queue
-    DelayUnit topUnit = packetQueue.top();
-    Packet *somePacket = topUnit.pkt;
-    packetQueue.pop();
+    while(!packetQueue.empty()){
+      // Grab the head of the queue
+      DelayUnit topUnit = packetQueue.top();
+      if(topUnit.clockTime > nowTs){
+        break;
+      }
+      Packet *somePacket = topUnit.pkt;
+      packetQueue.pop();
+      output(0).push(somePacket);
+    }
     // If the queue is not empty, then reschedule the timer
     if(!packetQueue.empty())  {
         sendTimer.schedule_at_steady(packetQueue.top().clockTime);
     }
-    output(0).push(somePacket);
 }
-
 
 CLICK_ENDDECLS
 ELEMENT_REQUIRES(linuxmodule)
