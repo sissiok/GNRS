@@ -114,6 +114,7 @@ void NetDelay::push(int port, Packet *p) {
     int64_t nowMsec = ((int64_t)arrivalTs.sec())*1000 + arrivalTs.msec();
 #ifdef DEBUG_PSH
     click_chatter("DMPsh: Received a packet @%lld.",nowMsec);
+    click_chatter("DMPsh: Updated!.");
 #endif
     uint64_t hash = 0;
     delayUnit.pkt=p;
@@ -143,24 +144,37 @@ void NetDelay::push(int port, Packet *p) {
     if(pkt_delay > 0){
         // Calculate the actual delay for this packet
         delayUnit.clockTime = arrivalTs + Timestamp::make_msec(pkt_delay);
+        bool empty = packetQueue.empty();
         packetQueue.push(delayUnit);
 #ifdef DEBUG_PSH
         click_chatter("DMPsh: pkt queue size: %d", packetQueue.size());
 #endif
-        if(packetQueue.empty()){
+        if(empty){
+#ifdef DEBUG_PSH
+        click_chatter("DMPsh: Scheduling for empty queue.");
+#endif
             sendTimer.schedule_at_steady(arrivalTs+Timestamp::make_msec(pkt_delay));
         }
         else {
             Timestamp nextTs = packetQueue.top().clockTime;
             // This is probably wrong
             if(nextTs > Timestamp::now_steady()){
-            sendTimer.unschedule();
-            sendTimer.schedule_at_steady(nextTs);
+              sendTimer.unschedule();
+              sendTimer.schedule_at_steady(nextTs);
+#ifdef DEBUG_PSH
+        click_chatter("DMPsh: Cancelling and rescheduling.");
+#endif
             }
+#ifdef DEBUG_PSH
+        click_chatter("DMPsh: Finished non-empty queue.");
+#endif
         }
     }
     else { // No delay configured
         output(0).push(p);
+#ifdef DEBUG_PSH
+        click_chatter("DMPsh: No delay configured.");
+#endif
     }
 }
 
