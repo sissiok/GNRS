@@ -4,104 +4,81 @@ clear all
 close all
 clc
 
-%AS number format: 5 digits XYUVW. X stands for shell(1) or Hang(0),
-%Y stands for the layer, UVW is the tag
-%e.g. 11002 stands for the AS 002 for Shell-1
-
-%we emulate the Internet as the following layers: shell-0, hang-0, 
-% shell-1, hang-1, shell-2, hang-2
+% we emulate the Internet as the following layers: shell-0, hang-0, shell-1, hang-1, shell-2, hang-2
+% AS number starts from 1, and maps to different layers of the Internet in the following sequence: shell-0, hang-0, shell-1, hang-1, shell-2, hang-2
 
 
-%%% generate node for each layer
-total_node_num=30;
-node_num=zeros(1,6);
-node_num(1)= ceil(total_node_num*0.09/100);   %shell-0
-node_num(2)= ceil(total_node_num*8.04/100);   %hang-0
-node_num(4)= ceil(total_node_num*20.5/100);   %hang-1
-node_num(5)= ceil(total_node_num*22.43/100);   %shell-2
-node_num(6)= ceil(total_node_num*0.85/100);   %hang-2
-node_num(3)= total_node_num-node_num(1)-node_num(2)-node_num(4)-node_num(5)-node_num(6);   %shell-1
+%%% generate AS for each layer
+total_AS_num=30;
+AS_num=zeros(1,6);
+AS_num(1)= ceil(total_AS_num*0.09/100);   %shell-0
+AS_num(2)= ceil(total_AS_num*8.04/100);   %hang-0
+AS_num(4)= ceil(total_AS_num*20.5/100);   %hang-1
+AS_num(5)= ceil(total_AS_num*22.43/100);   %shell-2
+AS_num(6)= ceil(total_AS_num*0.85/100);   %hang-2
+AS_num(3)= total_AS_num-AS_num(1)-AS_num(2)-AS_num(4)-AS_num(5)-AS_num(6);   %shell-1
 
+%generate the AS list file
 as_fid = fopen('AS.data', 'wt');
-%shell-0
-fprintf(as_fid, '10001\n');
-%hang-0
-for i=1:node_num(2)
-    fprintf(as_fid, '00%d%d%d\n',floor(i/100),floor((i-100*floor(i/100))/10),i-100*floor(i/100)-10*floor((i-100*floor(i/100))/10));
-end
-%shell-1
-for i=1:node_num(3)
-    fprintf(as_fid, '11%d%d%d\n',floor(i/100),floor((i-100*floor(i/100))/10),i-100*floor(i/100)-10*floor((i-100*floor(i/100))/10));
-end
-%hang-1
-for i=1:node_num(4)
-    fprintf(as_fid, '01%d%d%d\n',floor(i/100),floor((i-100*floor(i/100))/10),i-100*floor(i/100)-10*floor((i-100*floor(i/100))/10));
-end
-%shell-2
-for i=1:node_num(5)
-    fprintf(as_fid, '12%d%d%d\n',floor(i/100),floor((i-100*floor(i/100))/10),i-100*floor(i/100)-10*floor((i-100*floor(i/100))/10));
-end
-%hang-2
-for i=1:node_num(6)
-    fprintf(as_fid, '02%d%d%d\n',floor(i/100),floor((i-100*floor(i/100))/10),i-100*floor(i/100)-10*floor((i-100*floor(i/100))/10));
+as = 1;
+for i=1:6
+    for j=1:AS_num(i);
+    	fprintf(as_fid, '%d\n', as);
+	as = as +1;
+    end
 end
 
-fid = fopen('jellyfish_topo.data', 'wt');
 
 %%% generate transit connection
-%% delay: uniform distributed between 555~65555 us
+%% delay: uniform distributed between 0.555~100 ms
 
-%%TODO: a node from lower layer might have multiple connections to upper layer 
+%%TODO: a AS from lower layer might have multiple connections to upper layer 
+fid = fopen('jellyfish_topo.data', 'wt');
+as = 1;
 
-% shell-0  <--> hang-0
-for j=1:node_num(2)
-    fprintf(fid, '10001 00%d%d%d %d\n',floor(j/100),floor((j-100*floor(j/100))/10),j-100*floor(j/100)-10*floor((j-100*floor(j/100))/10),floor(555+65000*rand(1))); 
+for i=2:6
+    for j=1:AS_num(i)
+	dst = as + j;
+	% i=2: shell-0  <--> hang-0
+	% i=3: shell-0  <--> shell-1
+	if(i==2 || i==3)
+		src = floor(AS_num(1)*rand(1));
+	% i=4: shell-1  <--> hang-1
+	% i=5: shell-1  <--> shell-2
+	elseif(i==4 || i==5)
+		src = floor(AS_num(1) + AS_num(2) + AS_num(3)*rand(1));
+	% i=6: shell-2  <--> hang-2
+	else
+		src= floor(AS_num(1) + AS_num(2) + AS_num(3) + AS_num(4) + AS_num(5)*rand(1));
+	end
+	fprintf(fid, '%d %d %d\n', src, dst, floor(0.555+100*rand(1)));
+    end
+    as = as + AS_num(i);
 end
 
-% shell-0  <--> shell-1
-for j=1:node_num(3)
-    fprintf(fid, '10001 11%d%d%d %d\n',floor(j/100),floor((j-100*floor(j/100))/10),j-100*floor(j/100)-10*floor((j-100*floor(j/100))/10),floor(555+65000*rand(1))); 
-end
-
-% shell-1  <--> hang-1
-for j=1:node_num(4)
-    i=floor(1+ node_num(3)*rand(1));
-    fprintf(fid, '11%d%d%d 01%d%d%d %d\n',floor(i/100),floor((i-100*floor(i/100))/10),i-100*floor(i/100)-10*floor((i-100*floor(i/100))/10),floor(j/100),floor((j-100*floor(j/100))/10),j-100*floor(j/100)-10*floor((j-100*floor(j/100))/10),floor(555+65000*rand(1))); 
-end
-
-% shell-1  <--> shell-2
-for j=1:node_num(5)
-    i=floor(1+ node_num(3)*rand(1));
-    fprintf(fid, '11%d%d%d 12%d%d%d %d\n',floor(i/100),floor((i-100*floor(i/100))/10),i-100*floor(i/100)-10*floor((i-100*floor(i/100))/10),floor(j/100),floor((j-100*floor(j/100))/10),j-100*floor(j/100)-10*floor((j-100*floor(j/100))/10),floor(555+65000*rand(1))); 
-end
-
-% shell-2  <--> hang-2
-for j=1:node_num(6)
-    i=floor(1+ node_num(5)*rand(1));
-    fprintf(fid, '12%d%d%d 02%d%d%d %d\n',floor(i/100),floor((i-100*floor(i/100))/10),i-100*floor(i/100)-10*floor((i-100*floor(i/100))/10),floor(j/100),floor((j-100*floor(j/100))/10),j-100*floor(j/100)-10*floor((j-100*floor(j/100))/10),floor(555+65000*rand(1))); 
-end
 
 %%% generate peer connection
 % shell-1
-for i=1:node_num(3)-1
-    for j=i+1:node_num(3)
-        if rand(1)<0.5
-            fprintf(fid, '11%d%d%d 11%d%d%d %d\n',floor(i/100),floor((i-100*floor(i/100))/10),i-100*floor(i/100)-10*floor((i-100*floor(i/100))/10),floor(j/100),floor((j-100*floor(j/100))/10),j-100*floor(j/100)-10*floor((j-100*floor(j/100))/10),floor(555+65000*rand(1))); 
+for i=1:AS_num(3)-1
+    for j=i+1:AS_num(3)
+        if rand(1)<0.5  %TODO: the value needs to be tuned
+	    src = AS_num(1) + AS_num(2) + i;
+	    dst = AS_num(1) + AS_num(2) + j;
+            fprintf(fid, '%d %d %d\n', src, dst, floor(0.555+100*rand(1)));
         end
     end
 end
 
 % shell-2
-for i=1:node_num(5)-1
-    for j=i+1:node_num(5)
-        if rand(1)<0.5
-            fprintf(fid, '12%d%d%d 12%d%d%d %d\n',floor(i/100),floor((i-100*floor(i/100))/10),i-100*floor(i/100)-10*floor((i-100*floor(i/100))/10),floor(j/100),floor((j-100*floor(j/100))/10),j-100*floor(j/100)-10*floor((j-100*floor(j/100))/10),floor(555+65000*rand(1))); 
-            %if i<node_num(5)-1||j<node_num(5)
-            %    fprintf(fid, '\n');
-            %end
+for i=1:AS_num(5)-1
+    for j=i+1:AS_num(5)
+        if rand(1)<0.5 %TODO: the value needs to be tuned
+            src = AS_num(1) + AS_num(2) + AS_num(3) + AS_num(4) + i;
+            dst = AS_num(1) + AS_num(2) + AS_num(3) + AS_num(4) + j;
+            fprintf(fid, '%d %d %d\n', src, dst, floor(0.555+100*rand(1)));
         end
     end
 end
 
-%% TODO: some shell node might only have 0 or 1 connection ( generate redundant connections between different layers)
+%% TODO: some shell AS might only have 0 or 1 connection ( generate redundant connections between different layers)
 
