@@ -42,14 +42,14 @@ for i=2:6
 	% i=2: shell-0  <--> hang-0
 	% i=3: shell-0  <--> shell-1
 	if(i==2 || i==3)
-		src = floor(AS_num(1)*rand(1));
+		src = floor(1+ AS_num(1)*rand(1));
 	% i=4: shell-1  <--> hang-1
 	% i=5: shell-1  <--> shell-2
 	elseif(i==4 || i==5)
-		src = floor(AS_num(1) + AS_num(2) + AS_num(3)*rand(1));
+		src = floor(AS_num(1) + AS_num(2) + 1 + AS_num(3)*rand(1));
 	% i=6: shell-2  <--> hang-2
 	else
-		src= floor(AS_num(1) + AS_num(2) + AS_num(3) + AS_num(4) + AS_num(5)*rand(1));
+		src= floor(AS_num(1) + AS_num(2) + AS_num(3) + AS_num(4) + 1 + AS_num(5)*rand(1));
 	end
 	fprintf(fid, '%d %d %d\n', src, dst, floor(0.555+100*rand(1)));
     end
@@ -80,5 +80,6 @@ for i=1:AS_num(5)-1
     end
 end
 
-%% TODO: some shell AS might only have 0 or 1 connection ( generate redundant connections between different layers)
+%% TODO: some shell AS might only have 0 or 1 connection, need to make sure that all nodes within one layer are connected with each other
+%% TODO: generate redundant connections between different layers
 
