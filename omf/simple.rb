@@ -4,9 +4,11 @@
 # Author: Robert Moore
 # Last Modified: Dec 21, 2012
 #
+# Runtime configuration of "domain" property can be effected like this:
+#  omf exec simple.rb -- --domain sub.domain.com
 
 # Global properties (pushed to nodes)
-defProperty('domain', 'sb5.orbit-lab.org', "Subdomain for nodes (grid, sb, etc.)")
+defProperty('domain', 'changeme.fakedomain', "Subdomain for nodes (grid, sb, etc.)")
 
 # Add node1-1 to the "server list"
 defGroup('server', "node1-1.#{property.domain}") do |node|
