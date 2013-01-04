@@ -3,17 +3,23 @@
 # Slightly-more complex example that uses the output of OMF load to generate
 # node groups.
 # Author: Robert Moore
-# Last Modified: Dec 21, 2012
+# Last Modified: Jan 4, 2013
 #
 # Runtime configuration of propertes can be effected like this:
 #  omf exec simple.rb -- --prop1 value1 --prop2 value2
 
-# Global properties (pushed to nodes)
-defProperty('numServers', 1, "Number of nodes to use for servers")
-defProperty('numClients', 1, "Number of clients to use for clients")
+# Resources file location can be configured with:
+#   --resourceFile /path/to/file.rb
+resourceFile = './resources.rb'
 
-# FIXME: This is an ugly hack.
-# Global variables
+if defined? property and not property.resourceFile.nil?
+	resourceFile = property.resourceFile
+end
+
+# Read the resources file and execute its code
+eval(File.new(resourceFile).read)
+
+# Global constants
 CLIENT_GRP_NAME = 'client'
 SERVER_GRP_NAME = 'server'
 
