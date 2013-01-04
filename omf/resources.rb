@@ -19,3 +19,4 @@ defProperty('clickModule', 'delayModule.click', 'Filename of delay module Click 
 
 # Local applications
 defProperty('wget', '/usr/bin/wget', 'Location of the wget utility.')
+defProperty('clickInstall', '/usr/local/sbin/click-install', 'Location of the click-install utility.')

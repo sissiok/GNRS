@@ -1,7 +1,9 @@
 #!/bin/ruby
 #
-# Slightly-more complex example that uses the output of OMF load to generate
-# node groups.
+# Simple GNRS experiment that performs the tasks outlined in the project Wiki.
+# See <https://bitbucket.org/romoore/gnrs/wiki/Running%20an%20Experiment%20on%20Orbit>
+# for more details.
+#
 # Author: Robert Moore
 # Last Modified: Jan 4, 2013
 #
@@ -10,14 +12,10 @@
 
 # Resources file location can be configured with:
 #   --resourceFile /path/to/file.rb
-resourceFile = './resources.rb'
-
-if defined? property and not property.resourceFile.nil?
-	resourceFile = property.resourceFile
-end
+defProperty('resourceFile', './resource.rb', 'Experiment resources configuration')
 
 # Read the resources file and execute its code
-eval(File.new(resourceFile).read)
+eval(File.new(property.resourceFile).read)
 
 # Global constants
 CLIENT_GRP_NAME = 'client'
@@ -73,9 +71,19 @@ def defineGroups(serversList, clientsList)
 	for serverCount in 1..property.numServers
 		serversList.push(nodelist.pop())
 	end
+	
+	info "Servers:"
+	serversList.each do |item|
+		info "\t#{item}"
+	end
 
 	for clientCount in 1..property.numClients
 		clientsList.push(nodelist.pop())
+	end
+	
+	info "Clients:"
+	clientsList.each do |item|
+		info "\t#{item}"
 	end
 
 	return 0
@@ -99,7 +107,33 @@ def prepareNodes(serversList, clientsList)
 end # prepareNodes
 
 def prepareDelayModule(baseUrl, clickScript)
-	group(SERVER_GRP_NAME).exec("#{property.wget} --timeout=10 -q #{property.dataUrl}/#{property.clickModule}")
+
+	# Download delay module click script
+	info "Downloading delay module script"
+	cmd = "#{property.wget} --timeout=3 -q #{property.dataUrl}/#{property.clickModule}"
+	info "Executing '#{cmd}'"
+	group(SERVER_GRP_NAME).exec(cmd)
+	group(CLIENT_GRP_NAME).exec(cmd)
+
+	wait 5
+
+	# Download the appropriate delay module configuration file
+	info "Installing Click delay module"
+	cmd = "#{property.clickInstall} -u #{property.clickModule}"
+	info "Executing '#{cmd}'"
+	group(SERVER_GRP_NAME).exec(cmd)
+	group(CLIENT_GRP_NAME).exec(cmd)
+
+	wait 5
+
+	# Delete any files we downloaded and no longer need
+	info "Cleaning up temporary files"
+	cmd = "rm #{property.bindingFile} #{property.clickModule}"
+	info "Executing '#{cmd}'"
+	group(SERVER_GRP_NAME).exec(cmd)
+	group(CLIENT_GRP_NAME).exec(cmd)
+
+	return 0
 end # prepareDelayModule
 
 # Called when all nodes are available for use.
