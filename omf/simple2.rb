@@ -12,50 +12,83 @@
 defProperty('numServers', 1, "Number of nodes to use for servers")
 defProperty('numClients', 1, "Number of clients to use for clients")
 
-# Defines successful topology as "topology.topo-success"
-#require("/tmp/#{property.topology}-topo-success.rb")
-#eval(File.new("/tmp/#{property.topology}-topo-success.rb").read)
-#baseTopo = Topology['/tmp/pxe_slice-2013-01-04t01.00.54-05.00-topo-success']
-# nodelist = Topology("#{property.topology}-topo-success").nodes
-successTopology = Topology['system:topo:imaged']
-nodelist = successTopology.nodes
-totalNodes = nodelist.size
+# FIXME: This is an ugly hack.
+# Global variables
+CLIENT_GRP_NAME = 'client'
+SERVER_GRP_NAME = 'server'
 
-if totalNodes < (property.numServers + property.numClients)
-		experiment.done
-end
+# Main function, used so we can "return" from the experiment early when
+# errors are detected.
+def main 
+	
+	serversList = []
+	clientsList = []
+	
+	# Grab the imaged topology (successful nodes) and break them into groups
+	puts "## Preparing node groups ##"
+	success = defineGroups(serversList, clientsList)
+	if(success == 0) 
+		puts "\t#{serversList.count} servers and #{clientsList.count} clients available."
+	else 
+		puts "Unable to prepare nodes. Exiting."
+		return
+	end
+	
+	puts "## Performing node pre-configuration ##"
+	success = prepareNodes(serversList, clientsList)
+	if(success == 0) 
+		puts "\tNode configuration complete."
+	else 
+		puts "Unable to configure nodes. Exiting."
+		return;
+	end
+end # main
 
-serversList = []
-clientsList = []
+def defineGroups(serversList, clientsList)
+	successTopology = Topology['system:topo:imaged']
+	nodelist = successTopology.nodes
+	totalNodes = nodelist.size
 
-for serverCount in 1..property.numServers
-	serversList.push(nodelist.pop())
-end
+	if totalNodes < (property.numServers + property.numClients)
+		puts "Not enough nodes available. Need #{property.numServers + property.numClients}, but only have #{totalNodes}"
+		puts "Consider using a smaller number of servers (numServers) or clients (numClients)."
+		return -1
+	end
 
-puts "Servers: #{serversList.to_s}"
+	for serverCount in 1..property.numServers
+		serversList.push(nodelist.pop())
+	end
 
-for clientCount in 1..property.numClients
-	clientsList.push(nodelist.pop())
-end
+	for clientCount in 1..property.numClients
+		clientsList.push(nodelist.pop())
+	end
 
-puts "Clients: #{clientsList.to_s}"
+	return 0
+end # defineGroups
 
-# Split the nodes into servers and clients
+def prepareNodes(serversList, clientsList) 
+	# Split the nodes into servers and clients
 
-i = 0
-defGroup('server', serversList.join(",")) do |node|
-  node.net.e0.ip="192.168.1.#{i + 2}"
-end
+	i = 0
+	defGroup(SERVER_GRP_NAME, serversList.join(",")) do |node|
+		node.net.e0.ip="192.168.1.#{i + 2}"
+	end
 
-i = 0
-# Add node1-2 to the "client list"
-defGroup('client', clientsList.join(",")) do |node|
-  node.net.e0.ip="192.168.1.#{i + 102}"
-end
+	i = 0
+	# Add node1-2 to the "client list"
+	defGroup(CLIENT_GRP_NAME, clientsList.join(",")) do |node|
+		node.net.e0.ip="192.168.1.#{i + 102}"
+	end
 
+	return 0
+end # prepareNodes
+
+# Called when all nodes are available for use.
 onEvent(:ALL_UP) do |event|
   info "GNRS: All nodes are up."
   wait 2
   Experiment.done
-end
+end # onEvent
 
+# Invoke the main method to get started
+main
