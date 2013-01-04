@@ -8,9 +8,14 @@
 # that can be overridden at runtime by commandline arguments.
 #
 
-# Global properties (pushed to nodes)
+# Basic properties (pushed to nodes)
 defProperty('numServers', 1, "Number of nodes to use for servers")
 defProperty('numClients', 1, "Number of clients to use for clients")
-defProperty('data-url', 'http://my.domain.com/path/to/files', 'Base URL for topology/delay files.')
-defProperty('binding-file', 'jellyfish_topo.bind', 'Filename of AS -> IP:Port binding information.')
 
+# Web resources
+defProperty('dataUrl', 'http://my.domain.com/path/to/files', 'Base URL for topology/delay files.')
+defProperty('bindingFile', 'jellyfish_topo.bind', 'Filename of AS -> IP:Port binding information.')
+defProperty('clickModule', 'delayModule.click', 'Filename of delay module Click script.')
+
+# Local applications
+defProperty('wget', '/usr/bin/wget', 'Location of the wget utility.')

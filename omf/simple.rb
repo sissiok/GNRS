@@ -31,21 +31,30 @@ def main
 	clientsList = []
 	
 	# Grab the imaged topology (successful nodes) and break them into groups
-	puts "## Preparing node groups ##"
+	info "## Preparing node groups ##"
 	success = defineGroups(serversList, clientsList)
-	if(success == 0) 
-		puts "\t#{serversList.count} servers and #{clientsList.count} clients available."
+	if success == 0
+		info "\t#{serversList.count} servers and #{clientsList.count} clients available."
 	else 
-		puts "Unable to prepare nodes. Exiting."
+		error "Unable to prepare nodes. Exiting."
 		return
 	end
 	
-	puts "## Performing node pre-configuration ##"
+	info "## Performing node pre-configuration ##"
 	success = prepareNodes(serversList, clientsList)
-	if(success == 0) 
-		puts "\tNode configuration complete."
+	if success == 0
+		info "\tNode configuration complete."
 	else 
-		puts "Unable to configure nodes. Exiting."
+		error "Unable to configure nodes. Exiting."
+		return;
+	end
+
+	info "## Preparing the delay modules ##"
+	success = prepareDelayModule(property.dataUrl, property.clickModule)
+	if success == 0
+		info "Successfully installed and configured delay module on all nodes."
+	else
+		error "Unable to configure delay module on one or more nodes. Exiting."
 		return;
 	end
 end # main
@@ -88,6 +97,10 @@ def prepareNodes(serversList, clientsList)
 
 	return 0
 end # prepareNodes
+
+def prepareDelayModule(baseUrl, clickScript)
+	group(SERVER_GRP_NAME).exec("#{property.wget} --timeout=10 -q #{property.dataUrl}/#{property.clickModule}")
+end # prepareDelayModule
 
 # Called when all nodes are available for use.
 onEvent(:ALL_UP) do |event|
