@@ -10,9 +10,12 @@
 # Runtime configuration of propertes can be effected like this:
 #  omf exec simple.rb -- --prop1 value1 --prop2 value2
 
+# Import the GNRSNode class
+require ('./gnrs_node.rb')
+
 # Resources file location can be configured with:
 #   --resourceFile /path/to/file.rb
-defProperty('resourceFile', './resource.rb', 'Experiment resources configuration')
+defProperty('resourceFile', './resources.rb', 'Experiment resources configuration')
 
 # Read the resources file and execute its code
 eval(File.new(property.resourceFile).read)
@@ -25,14 +28,14 @@ SERVER_GRP_NAME = 'server'
 # errors are detected.
 def main 
 	
-	serversList = []
-	clientsList = []
+	serversList = Hash.new 
+	clientsList = Hash.new
 	
 	# Grab the imaged topology (successful nodes) and break them into groups
 	info "## Preparing node groups ##"
 	success = defineGroups(serversList, clientsList)
 	if success == 0
-		info "\t#{serversList.count} servers and #{clientsList.count} clients available."
+		info "\t#{serversList.length} servers and #{clientsList.length} clients available."
 	else 
 		error "Unable to prepare nodes. Exiting."
 		return
@@ -69,21 +72,31 @@ def defineGroups(serversList, clientsList)
 	end
 
 	for serverCount in 1..property.numServers
-		serversList.push(nodelist.pop())
+		node = GNRSNode.new
+		node.hostname = nodelist.pop().to_s
+		node.asNumber = serverCount
+		node.ipAddress = "192.168.1.#{serverCount + 2}"
+		node.port = "5001"
+		serversList[node.hostname] = node
 	end
 	
 	info "Servers:"
-	serversList.each do |item|
-		info "\t#{item}"
+	serversList.each do |key, value|
+		info "\t#{key} => #{value}"
 	end
 
 	for clientCount in 1..property.numClients
-		clientsList.push(nodelist.pop())
+		node = GNRSNode.new
+		node.hostname = nodelist.pop().to_s
+		node.asNumber = clientCount
+		node.ipAddress = "192.168.1.#{clientCount + 102}"
+		node.port = "4001"
+		clientsList[node.hostname] = node
 	end
 	
 	info "Clients:"
-	clientsList.each do |item|
-		info "\t#{item}"
+	clientsList.each do |key, value|
+		info "\t#{key} => #{value}"
 	end
 
 	return 0
@@ -93,14 +106,39 @@ def prepareNodes(serversList, clientsList)
 	# Split the nodes into servers and clients
 
 	i = 0
-	defGroup(SERVER_GRP_NAME, serversList.join(",")) do |node|
-		node.net.e0.ip="192.168.1.#{i + 2}"
+	serverString = ""
+	serversList.each_value do |node|
+		serverString += node.hostname
+		if i != serversList.length-1
+			serverString += ","
+		end
+		i += 1
+	end
+
+	info serverString
+
+	i = 0
+	defGroup(SERVER_GRP_NAME, serverString) do |node|
+		info node.name
+		gnrsNode = serversList[node.to_s]
+		node.net.e0.ip=gnrsNode.ipAddress
+	end
+
+	i = 0
+	clientString = ""
+	clientsList.each_value do |node|
+		clientString += node.hostname
+		if i != clientsList.length-1
+			clientString += ","
+		end
+		i += 1
 	end
 
 	i = 0
 	# Add node1-2 to the "client list"
-	defGroup(CLIENT_GRP_NAME, clientsList.join(",")) do |node|
-		node.net.e0.ip="192.168.1.#{i + 102}"
+	defGroup(CLIENT_GRP_NAME, clientString) do |node|
+		gnrsNode = clientsList[node.to_s]
+		node.net.e0.ip=gnrsNode.ipAddress
 	end
 
 	return 0
@@ -128,7 +166,7 @@ def prepareDelayModule(baseUrl, clickScript)
 
 	# Delete any files we downloaded and no longer need
 	info "Cleaning up temporary files"
-	cmd = "rm #{property.bindingFile} #{property.clickModule}"
+	cmd = "rm #{property.clickModule}"
 	info "Executing '#{cmd}'"
 	group(SERVER_GRP_NAME).exec(cmd)
 	group(CLIENT_GRP_NAME).exec(cmd)
@@ -140,8 +178,8 @@ end # prepareDelayModule
 onEvent(:ALL_UP) do |event|
   info "GNRS: All nodes are up."
   wait 2
-  Experiment.done
 end # onEvent
 
 # Invoke the main method to get started
 main
+Experiment.done
