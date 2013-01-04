@@ -14,6 +14,7 @@ defProperty('domain', 'changeme.fakedomain', "Subdomain for nodes (grid, sb, etc
 defGroup('server', "node1-1.#{property.domain}") do |node|
   node.net.e0.ip="192.168.1.2"
 end
+
 # Add node1-2 to the "client list"
 defGroup('client', "node1-2.#{property.domain}") do |node|
   node.net.e0.ip="192.168.1.102"
