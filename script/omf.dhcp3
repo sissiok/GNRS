@@ -1,0 +1,7 @@
+
+omf_server_restart() {
+	invoke-rc.d omf-resctl-5.4 restart
+}
+
+
+omf_server_restart
