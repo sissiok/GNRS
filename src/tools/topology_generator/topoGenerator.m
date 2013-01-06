@@ -96,8 +96,16 @@ elseif(method==1)
 
 elseif(method==2)
     
-    
 end
 
+%asID mapping: map asID to a continuous integer space starting from 1. For
+%orbit grid evaluation purpose
+for i=1:length(asLinks)
+    asLinks(i,1)=find(asID==asLinks(i,1));
+    asLinks(i,2)=find(asID==asLinks(i,2));
+end
+for i=1:length(asPrefix)
+    asPrefix(i,1)=find(asID==asPrefix(i,1));
+end
 
 end
