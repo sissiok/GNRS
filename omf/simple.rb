@@ -24,43 +24,81 @@ eval(File.new(property.resourceFile).read)
 CLIENT_GRP_NAME = 'client'
 SERVER_GRP_NAME = 'server'
 
+
+# Initial work of configuring topology, groups, and readying for node "up"
+def doInitSetup
+
+	# Check initial parameters, make sure everything is sane.
+	success = checkParams
+	if success != 0
+		error "*** One or more parameters was invalid. See messages above for more details. ***"
+		return success
+	end
+
+	serversMap = Hash.new
+	clientsMap = Hash.new
+
+	# Grab the imaged topology (successful nodes) and break them into groups
+	info "## Selecting servers and clients from available nodes ##"
+	success = defineGroups(serversMap, clientsMap)
+	if success == 0
+		info "\t#{serversMap.length} servers and #{clientsMap.length} clients available."
+	else 
+		error "\tUnable to select nodes. Exiting."
+		return success
+	end
+
+	
+	info "## Defining OMF node groups ##"
+	success = buildGroups(serversMap, clientsMap)
+	if success == 0
+		info "\tNode groups defined."
+	else 
+		error "\tUnable to define groups. Exiting."
+		return success
+	end
+
+	return success, serversMap, clientsMap
+end
+
+# Verify that the input parameters are sensible and won't cause any problems
+# later on in the experiment.
+def checkParams
+	if property.numServers.to_s.to_i < 1
+		error "Must define at least 1 server."
+		return -1
+	elsif property.numClients.to_s.to_i < 1
+		error "Must define at least 1 client."
+		return -1
+	end
+
+	return 0
+end # checkParams
+
+
 # Main function, used so we can "return" from the experiment early when
 # errors are detected.
-def main 
-	
-	serversList = Hash.new 
-	clientsList = Hash.new
-	
-	# Grab the imaged topology (successful nodes) and break them into groups
-	info "## Preparing node groups ##"
-	success = defineGroups(serversList, clientsList)
+def doMainExperiment(serversMap, clientsMap)
+	info "## Configuring node network interfaces ##"
+	success = prepareNodes(serversMap, clientsMap)
 	if success == 0
-		info "\t#{serversList.length} servers and #{clientsList.length} clients available."
+		info "\tNetwork configuration complete."
 	else 
-		error "Unable to prepare nodes. Exiting."
-		return
-	end
-	
-	info "## Performing node pre-configuration ##"
-	success = prepareNodes(serversList, clientsList)
-	if success == 0
-		info "\tNode configuration complete."
-	else 
-		error "Unable to configure nodes. Exiting."
+		error "\tUnable to configure networking. Exiting."
 		return;
 	end
 
 	info "## Preparing the delay modules ##"
 	success = prepareDelayModule(property.dataUrl, property.clickModule)
 	if success == 0
-		info "Successfully installed and configured delay module on all nodes."
+		info "\tSuccessfully installed and configured delay module on all nodes."
 	else
-		error "Unable to configure delay module on one or more nodes. Exiting."
+		error "\tUnable to configure delay module on one or more nodes. Exiting."
 		return;
 	end
 end # main
 
-def defineGroups(serversList, clientsList)
+def defineGroups(serversMap, clientsMap)
 	successTopology = Topology['system:topo:imaged']
 	nodelist = successTopology.nodes
 	totalNodes = nodelist.size
@@ -77,11 +115,11 @@ def defineGroups(serversList, clientsList)
 		node.asNumber = serverCount
 		node.ipAddress = "192.168.1.#{serverCount + 1}"
 		node.port = "5001"
-		serversList[node.hostname] = node
+		serversMap[node.hostname] = node
 	end
 	
 	info "Servers:"
-	serversList.each do |key, value|
+	serversMap.each do |key, value|
 		info "\t#{key} => #{value}"
 	end
 
@@ -91,63 +129,64 @@ def defineGroups(serversList, clientsList)
 		node.asNumber = clientCount
 		node.ipAddress = "192.168.1.#{clientCount + 101}"
 		node.port = "4001"
-		clientsList[node.hostname] = node
+		clientsMap[node.hostname] = node
 	end
 	
 	info "Clients:"
-	clientsList.each do |key, value|
+	clientsMap.each do |key, value|
 		info "\t#{key} => #{value}"
 	end
 
 	return 0
 end # defineGroups
 
-def prepareNodes(serversList, clientsList) 
+def buildGroups(serversMap, clientsMap)
 	# Split the nodes into servers and clients
-
 	i = 0
 	serverString = ""
-	serversList.each_value do |node|
+	serversMap.each_value do |node|
 		serverString += node.hostname
-		if i != serversList.length-1
+		if i != serversMap.length-1
 			serverString += ","
 		end
 		i += 1
 	end
 
-	info serverString
 
-	i = 0
 	defGroup(SERVER_GRP_NAME, serverString) do |node|
-#	info node.to_yaml
-	#info node.nodeID
-#		gnrsNode = serversList[node.to_s]
-#		node.net.e0.ip=gnrsNode.ipAddress
+		# Nothing to do, wait until nodes are up in prepareNodes
 	end
 
-	serverNs = NodeSet[SERVER_GRP_NAME].each { |node|
-		gnrsNode = serversList[node.name.to_s]
-		info "Setting IP of #{node.name.to_s} to #{gnrsNode.ipAddress}"
-		node.net.e0.ip=gnrsNode.ipAddress
-	}
-
+	
+	# Now the clients
 	i = 0
 	clientString = ""
-	clientsList.each_value do |node|
+	clientsMap.each_value do |node|
 		clientString += node.hostname
-		if i != clientsList.length-1
+		if i != clientsMap.length-1
 			clientString += ","
 		end
 		i += 1
 	end
 
-	i = 0
-	# Add node1-2 to the "client list"
 	defGroup(CLIENT_GRP_NAME, clientString) do | node |
+		# Again, nothing to do yet
 	end
 
+	return 0
+end
+
+def prepareNodes(serversMap, clientsMap) 
+	
+	serverNs = NodeSet[SERVER_GRP_NAME].each { |node|
+		gnrsNode = serversMap[node.name.to_s]
+		info "Setting IP of #{node.name.to_s} to #{gnrsNode.ipAddress}"
+		node.net.e0.ip=gnrsNode.ipAddress
+	}
+
+
 	clientNs = NodeSet[CLIENT_GRP_NAME].each { | node |
-		gnrsNode = clientsList[node.name.to_s]
+		gnrsNode = clientsMap[node.name.to_s]
 		info "Setting IP of #{node.name.to_s} to #{gnrsNode.ipAddress}"
 		node.net.e0.ip=gnrsNode.ipAddress
 	}
@@ -185,12 +224,21 @@ def prepareDelayModule(baseUrl, clickScript)
 	return 0
 end # prepareDelayModule
 
-# Called when all nodes are available for use.
-onEvent(:ALL_UP) do |event|
-  info "GNRS: All nodes are up."
-  wait 2
-end # onEvent
+# Load resources, get topology, define groups
+success, serversMap, clientsMap = doInitSetup
 
-# Invoke the main method to get started
-main
-Experiment.done
+# Only register callback if we were able to prepare the experiment.
+if success == 0
+	info "Awaiting node readiness"
+	# Called when all nodes are available for use.
+	onEvent(:ALL_UP) do |event|
+		if success 
+			info "GNRS: All nodes are up."
+			doMainExperiment(serversMap, clientsMap)
+		end
+		Experiment.done
+	end # onEvent
+else
+	Experiment.done
+end
+
