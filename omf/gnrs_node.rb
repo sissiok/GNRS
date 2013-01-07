@@ -9,7 +9,7 @@ class GNRSNode
 	attr_accessor :ipAddress, :port, :asNumber, :hostname
 
 	def to_s
-		@hostname
+		"#{@hostname}/#{@ipAddress}:#{@port} (AS ##{@asNumber})"
 	end # to_s
 end # class GNRSNode
 

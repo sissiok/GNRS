@@ -75,7 +75,7 @@ def defineGroups(serversList, clientsList)
 		node = GNRSNode.new
 		node.hostname = nodelist.pop().to_s
 		node.asNumber = serverCount
-		node.ipAddress = "192.168.1.#{serverCount + 2}"
+		node.ipAddress = "192.168.1.#{serverCount + 1}"
 		node.port = "5001"
 		serversList[node.hostname] = node
 	end
@@ -89,7 +89,7 @@ def defineGroups(serversList, clientsList)
 		node = GNRSNode.new
 		node.hostname = nodelist.pop().to_s
 		node.asNumber = clientCount
-		node.ipAddress = "192.168.1.#{clientCount + 102}"
+		node.ipAddress = "192.168.1.#{clientCount + 101}"
 		node.port = "4001"
 		clientsList[node.hostname] = node
 	end
@@ -119,10 +119,17 @@ def prepareNodes(serversList, clientsList)
 
 	i = 0
 	defGroup(SERVER_GRP_NAME, serverString) do |node|
-		info node.name
-		gnrsNode = serversList[node.to_s]
-		node.net.e0.ip=gnrsNode.ipAddress
+#	info node.to_yaml
+	#info node.nodeID
+#		gnrsNode = serversList[node.to_s]
+#		node.net.e0.ip=gnrsNode.ipAddress
 	end
+
+	serverNs = NodeSet[SERVER_GRP_NAME].each { |node|
+		gnrsNode = serversList[node.name.to_s]
+		info "Setting IP of #{node.name.to_s} to #{gnrsNode.ipAddress}"
+		node.net.e0.ip=gnrsNode.ipAddress
+	}
 
 	i = 0
 	clientString = ""
@@ -136,10 +143,14 @@ def prepareNodes(serversList, clientsList)
 
 	i = 0
 	# Add node1-2 to the "client list"
-	defGroup(CLIENT_GRP_NAME, clientString) do |node|
-		gnrsNode = clientsList[node.to_s]
-		node.net.e0.ip=gnrsNode.ipAddress
+	defGroup(CLIENT_GRP_NAME, clientString) do | node |
 	end
+
+	clientNs = NodeSet[CLIENT_GRP_NAME].each { | node |
+		gnrsNode = clientsList[node.name.to_s]
+		info "Setting IP of #{node.name.to_s} to #{gnrsNode.ipAddress}"
+		node.net.e0.ip=gnrsNode.ipAddress
+	}
 
 	return 0
 end # prepareNodes
