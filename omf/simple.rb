@@ -187,7 +187,7 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 
 	wait 5
 
-	# Download the appropriate delay module configuration file
+	# Install the delay module click script
 	info "Installing Click delay module"
 	cmd = "#{property.clickInstall} -u #{property.clickModule}"
 	info "Executing '#{cmd}'"
@@ -200,6 +200,26 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 	}
 
 	wait 5
+
+	# Download and install the delay module configuration file
+	info "Retrieving node delay configurations"
+	wget = "#{property.wget} --timeout=3 -q #{property.dataUrl}/#{property.delayConfigServer}"
+	move = "cp #{property.delayConfigServer} /click/delayMod/config"
+	info "Executing '#{cmd}'"
+
+	serversMap.each_value { |node|
+		tmp = wget.gsub(/XxX/,node.asNumber.to_s)
+		info "Executing '#{tmp}'"
+		node.group.exec(wget.gsub(/XxX/,node.asNumber.to_s))
+		node.group.exec(move.gsub(/XxX/,node.asNumber.to_s))
+	}
+	wget = "#{property.wget} --timeout=3 -q #{property.dataUrl}/#{property.delayConfigClient}"
+	move = "cp #{property.delayConfigClient} /click/delayMod/config"
+	clientsMap.each_value { |node|
+		node.group.exec(wget.gsub(/XxX/,node.asNumber.to_s))
+		node.group.exec(move.gsub(/XxX/,node.asNumber.to_s))
+	}
+
 
 	# Delete any files we downloaded and no longer need
 	info "Cleaning up temporary files"
