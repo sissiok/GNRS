@@ -12,6 +12,7 @@
 
 # Import the GNRSNode class
 require ('./gnrs_node.rb')
+require ('./gnrs_config.rb')
 
 # Resources file location can be configured with:
 #   --resourceFile /path/to/file.rb
@@ -94,6 +95,15 @@ def doMainExperiment(serversMap, clientsMap)
 		info "\tSuccessfully installed and configured delay module on all nodes."
 	else
 		error "\tUnable to configure delay module on one or more nodes. Exiting."
+		return;
+	end
+
+	info "## Installing configuration files ##"
+	success = installConfigs(serversMap, clientsMap)
+	if success == 0
+		info "\tSuccessfully installed configuration files."
+	else
+		error "\tUnable to install configuration files."
 		return;
 	end
 end # main
@@ -245,6 +255,75 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 
 	return 0
 end # prepareDelayModule
+
+def installConfigs(serversMap, clientsMap)
+
+	info "Creating required directories"
+
+	mkVar = "mkdir -p /var/gnrs/stats"
+	mkEtc = "mkdir -p /etc/gnrs"
+	
+	serversMap.each_value { |node|
+		node.group.exec(mkVar)
+		node.group.exec(mkEtc)
+	}
+
+	clientsMap.each_value { |node|
+		node.group.exec(mkVar)
+		node.group.exec(mkEtc)
+	}
+
+	wait 2
+
+	info "Creating server configuration files."
+	serversMap.each_value { |node|
+		# Main server config
+		configContents = makeServerConfig(node)
+		cmd = "echo '#{configContents}' >/etc/gnrs/server_#{node.asNumber}.xml"
+		node.group.exec(cmd)
+
+		# Networking config
+		configContents = makeServerNetConfig(node)
+		cmd = "echo '#{configContents}' >/etc/gnrs/net-ipv4_#{node.asNumber}.xml"
+		node.group.exec(cmd)
+
+		# Download static files
+
+		# Binding file
+		cmd = "#{property.wget} #{property.dataUrl}/#{property.bindingFile}"
+		node.group.exec(cmd)
+		# IPv4 Prefix File (BGP Table)
+		cmd = "#{property.wget} #{property.dataUrl}/#{property.prefixIpv4}"
+		node.group.exec(cmd)
+		# BerkeleyDB Config
+		cmd = "#{property.wget} #{property.dataUrl}/#{property.serverBDB}"
+		node.group.exec(cmd)
+		# IPv4 Mapper Configuration
+		cmd = "#{property.wget} #{property.dataUrl}/#{property.mapIpv4}"
+		node.group.exec(cmd)
+
+	}
+
+	wait 5
+
+	# Install static files
+	serversMap.each_value { |node|
+		# Binding file
+		cmd = "mv #{property.bindingFile} /etc/gnrs/"
+		node.group.exec(cmd)
+		# BerkeleyDB Config
+		cmd = "mv #{property.serverBDB} /etc/gnrs/"
+		node.group.exec(cmd)
+		# IPv4 Mapper Configuration
+		cmd = "mv #{property.mapIpv4} /etc/gnrs/"
+		node.group.exec(cmd)
+		# IPv4 Prefix File (BGP Table)
+		cmd = "mv #{property.prefixIpv4} /etc/gnrs/"
+		node.group.exec(cmd)
+	}
+
+	return 0
+end
 
 # Load resources, get topology, define groups
 success, serversMap, clientsMap = doInitSetup
