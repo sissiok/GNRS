@@ -89,7 +89,7 @@ def doMainExperiment(serversMap, clientsMap)
 	end
 
 	info "## Preparing the delay modules ##"
-	success = prepareDelayModule(property.dataUrl, property.clickModule)
+	success = prepareDelayModule(serversMap, clientsMap, property.dataUrl, property.clickModule)
 	if success == 0
 		info "\tSuccessfully installed and configured delay module on all nodes."
 	else
@@ -171,14 +171,19 @@ def prepareNodes(serversMap, clientsMap)
 	return 0
 end # prepareNodes
 
-def prepareDelayModule(baseUrl, clickScript)
+def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 
 	# Download delay module click script
 	info "Downloading delay module script"
 	cmd = "#{property.wget} --timeout=3 -q #{property.dataUrl}/#{property.clickModule}"
 	info "Executing '#{cmd}'"
-	group(SERVER_GRP_NAME).exec(cmd)
-	group(CLIENT_GRP_NAME).exec(cmd)
+
+	serversMap.each_value { |node|
+		node.group.exec(cmd)
+	}
+	clientsMap.each_value { |node|
+		node.group.exec(cmd)
+	}
 
 	wait 5
 
@@ -186,8 +191,13 @@ def prepareDelayModule(baseUrl, clickScript)
 	info "Installing Click delay module"
 	cmd = "#{property.clickInstall} -u #{property.clickModule}"
 	info "Executing '#{cmd}'"
-	group(SERVER_GRP_NAME).exec(cmd)
-	group(CLIENT_GRP_NAME).exec(cmd)
+
+	serversMap.each_value { |node|
+		node.group.exec(cmd)
+	}
+	clientsMap.each_value { |node|
+		node.group.exec(cmd)
+	}
 
 	wait 5
 
@@ -195,8 +205,13 @@ def prepareDelayModule(baseUrl, clickScript)
 	info "Cleaning up temporary files"
 	cmd = "rm #{property.clickModule}"
 	info "Executing '#{cmd}'"
-	group(SERVER_GRP_NAME).exec(cmd)
-	group(CLIENT_GRP_NAME).exec(cmd)
+
+	serversMap.each_value { |node|
+		node.group.exec(cmd)
+	}
+	clientsMap.each_value { |node|
+		node.group.exec(cmd)
+	}
 
 	return 0
 end # prepareDelayModule
