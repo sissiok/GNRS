@@ -118,6 +118,15 @@ def doMainExperiment(serversMap, clientsMap)
 
 	wait 10
 
+	info "## Shutting down servers ##"
+	success = stopServers(serversMap)
+	if success == 0
+		info "\tTerminated servers successfully."
+	else
+		error "\tUnable to terminate servers."
+		return
+	end
+
 end # main
 
 def defineGroups(serversMap, clientsMap)
@@ -294,7 +303,7 @@ def installConfigs(serversMap, clientsMap)
 	serversMap.each_value { |node|
 		# Main server config
 		configContents = makeServerConfig(node)
-		cmd = "echo '#{configContents}' >/etc/gnrs/server_#{node.asNumber}.xml"
+		cmd = "echo '#{configContents}' >/etc/gnrs/server.xml"
 		node.group.exec(cmd)
 
 		# Networking config
@@ -321,6 +330,10 @@ def installConfigs(serversMap, clientsMap)
 		node.group.exec(cmd)
 		# GNRSD script
 		cmd = "#{property.wget} #{property.dataUrl}/#{property.gnrsd}"
+		node.group.exec(cmd)
+		# GNRSD Init script
+		cmd = "#{property.wget} #{property.dataUrl}/#{property.gnrsdInit}"
+		info "Executing '#{cmd}'"
 		node.group.exec(cmd)
 
 	}
@@ -368,6 +381,17 @@ def installConfigs(serversMap, clientsMap)
 		node.group.exec(cmd)
 		cmd = "mv #{property.gnrsd} /usr/local/bin/gnrs/"
 		node.group.exec(cmd)
+		# GNRSD Init script
+		cmd = "chmod +x #{property.gnrsdInit}"
+		info "Executing '#{cmd}'"
+		node.group.exec(cmd)
+		cmd = "mv #{property.gnrsdInit} /etc/init.d/gnrsd"
+		info "Executing '#{cmd}'"
+		node.group.exec(cmd)
+		# Update rc.d scripts
+		cmd = "#{property.updateRc} gnrsd stop 2 0 1 2 3 4 5 6 ."
+		info "Executing '#{cmd}'"
+		node.group.exec(cmd)
 	}
 
 	info "Installing client files"
@@ -395,14 +419,25 @@ def launchServers(serversMap)
 
 	info "Launching GNRS servers"
 
-	cmd = "/usr/local/bin/gnrs/#{property.gnrsd} /etc/gnrs/server_XxX.xml"
+	cmd = "service gnrsd start"
 
 	serversMap.each_value { |node|
-		info "Executing '#{cmd.gsub(/XxX/,node.asNumber.to_s)}'"
-		node.group.exec(cmd.gsub(/XxX/,node.asNumber.to_s))
+		info "Executing '#{cmd}'"
+		node.group.exec(cmd)
 	}
 
 	return 0
+end
+
+def stopServers(serversMap)
+	info "Stopping GNRS servers"
+
+	cmd = "service gnrsd stop"
+
+	serversMap.each_value { |node|
+		info "Executing '#{cmd}'"
+		node.group.exec(cmd)
+	}
 end
 
 # Load resources, get topology, define groups

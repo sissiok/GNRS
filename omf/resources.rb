@@ -26,9 +26,11 @@ defProperty('jarFile', 'gnrs.jar', 'Filename of the server/client JAR file.')
 defProperty('ggen', 'ggen', 'Filename of the "ggen" script.')
 defProperty('gbench', 'gbench', 'Filename of the "gbench" script.')
 defProperty('gnrsd', 'gnrsd', 'Filename of the "gnrsd" script.')
+defProperty('gnrsdInit', 'gnrsd.init', 'Filename of the "gnrsd" init.d script.')
 
 # Local applications
 # wget - 3 second timeout, quiet output, overwrite if newer
 defProperty('wget', '/usr/bin/wget --timeout=3 -qN', 'Location of the wget utility.')
 defProperty('clickInstall', '/usr/local/sbin/click-install', 'Location of the click-install utility.')
 defProperty('java', '/usr/bin/java', 'Location of the Java launcher.')
+defProperty('updateRc', '/usr/sbin/update-rc.d', 'Location of update-rc.d utility.')
