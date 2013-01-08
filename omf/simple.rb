@@ -106,6 +106,18 @@ def doMainExperiment(serversMap, clientsMap)
 		error "\tUnable to install configuration files."
 		return;
 	end
+
+	info "## Launching servers ##"
+	success = launchServers(serversMap)
+	if success == 0
+		info "\tSuccessfully launched servers."
+	else
+		error "\tUnable to launch servers."
+		return;
+	end
+
+	wait 10
+
 end # main
 
 def defineGroups(serversMap, clientsMap)
@@ -262,15 +274,18 @@ def installConfigs(serversMap, clientsMap)
 
 	mkVar = "mkdir -p /var/gnrs/stats"
 	mkEtc = "mkdir -p /etc/gnrs"
+	mkBin = "mkdir -p /usr/local/bin/gnrs/"
 	
 	serversMap.each_value { |node|
 		node.group.exec(mkVar)
 		node.group.exec(mkEtc)
+		node.group.exec(mkBin)
 	}
 
 	clientsMap.each_value { |node|
 		node.group.exec(mkVar)
 		node.group.exec(mkEtc)
+		node.group.exec(mkBin)
 	}
 
 	wait 2
@@ -301,10 +316,35 @@ def installConfigs(serversMap, clientsMap)
 		# IPv4 Mapper Configuration
 		cmd = "#{property.wget} #{property.dataUrl}/#{property.mapIpv4}"
 		node.group.exec(cmd)
+		# Jar file
+		cmd = "#{property.wget} #{property.dataUrl}/#{property.jarFile}"
+		node.group.exec(cmd)
+		# GNRSD script
+		cmd = "#{property.wget} #{property.dataUrl}/#{property.gnrsd}"
+		node.group.exec(cmd)
+
+	}
+	
+	info "Creating client configuration files."
+	clientsMap.each_value { |node|
+		# Download static files
+
+		# Jar file
+		cmd = "#{property.wget} #{property.dataUrl}/#{property.jarFile}"
+		node.group.exec(cmd)
+		# GGen script
+		cmd = "#{property.wget} #{property.dataUrl}/#{property.ggen}"
+		node.group.exec(cmd)
+		# GBench script
+		cmd = "#{property.wget} #{property.dataUrl}/#{property.gbench}"
+		node.group.exec(cmd)
 
 	}
 
+
 	wait 5
+
+	info "Installing server files"
 
 	# Install static files
 	serversMap.each_value { |node|
@@ -320,6 +360,46 @@ def installConfigs(serversMap, clientsMap)
 		# IPv4 Prefix File (BGP Table)
 		cmd = "mv #{property.prefixIpv4} /etc/gnrs/"
 		node.group.exec(cmd)
+		# Jar file
+		cmd = "mv #{property.jarFile} /usr/local/bin/gnrs/"
+		node.group.exec(cmd)
+		# GNRSD Script
+		cmd = "chmod +x #{property.gnrsd}"
+		node.group.exec(cmd)
+		cmd = "mv #{property.gnrsd} /usr/local/bin/gnrs/"
+		node.group.exec(cmd)
+	}
+
+	info "Installing client files"
+
+	clientsMap.each_value { |node|
+	 	# JAR file
+		cmd = "mv #{property.jarFile} /usr/local/bin/gnrs/"
+		node.group.exec(cmd)
+		# GBench script
+		cmd = "chmod +x #{property.gbench}"
+		node.group.exec(cmd)
+		cmd = "mv #{property.gbench} /usr/local/bin/gnrs/"
+		node.group.exec(cmd)
+		# GGen script
+		cmd = "chmod +x #{property.ggen}"
+		node.group.exec(cmd)
+		cmd = "mv #{property.ggen} /usr/local/bin/gnrs/"
+		node.group.exec(cmd)
+	}
+
+	return 0
+end
+
+def launchServers(serversMap)
+
+	info "Launching GNRS servers"
+
+	cmd = "/usr/local/bin/gnrs/#{property.gnrsd} /etc/gnrs/server_XxX.xml"
+
+	serversMap.each_value { |node|
+		info "Executing '#{cmd.gsub(/XxX/,node.asNumber.to_s)}'"
+		node.group.exec(cmd.gsub(/XxX/,node.asNumber.to_s))
 	}
 
 	return 0

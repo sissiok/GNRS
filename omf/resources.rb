@@ -22,8 +22,13 @@ defProperty('delayConfigClient', 'as_XxX_delay_client.dat', 'Filename of client 
 defProperty('serverBDB', 'berkeleydb.xml', 'Filename of BerkeleyDB configuration.')
 defProperty('mapIpv4', 'map-ipv4.xml', 'Filename of IPv4 mapper configuration.')
 defProperty('prefixIpv4', 'prefixes.ipv4', 'Filename of the IPv4 prefixes file (BGP table).')
+defProperty('jarFile', 'gnrs.jar', 'Filename of the server/client JAR file.')
+defProperty('ggen', 'ggen', 'Filename of the "ggen" script.')
+defProperty('gbench', 'gbench', 'Filename of the "gbench" script.')
+defProperty('gnrsd', 'gnrsd', 'Filename of the "gnrsd" script.')
 
 # Local applications
 # wget - 3 second timeout, quiet output, overwrite if newer
 defProperty('wget', '/usr/bin/wget --timeout=3 -qN', 'Location of the wget utility.')
 defProperty('clickInstall', '/usr/local/sbin/click-install', 'Location of the click-install utility.')
+defProperty('java', '/usr/bin/java', 'Location of the Java launcher.')

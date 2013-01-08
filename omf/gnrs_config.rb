@@ -43,3 +43,4 @@ ENDSTR
 
 	return asString.gsub(/_PORT_/,node.port.to_s).gsub(/_IPADDR_/,node.ipAddress.to_s)
 end
+
