@@ -175,7 +175,7 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 
 	# Download delay module click script
 	info "Downloading delay module script"
-	cmd = "#{property.wget} --timeout=3 -q #{property.dataUrl}/#{property.clickModule}"
+	cmd = "#{property.wget} #{property.dataUrl}/#{property.clickModule}"
 	info "Executing '#{cmd}'"
 
 	serversMap.each_value { |node|
@@ -203,23 +203,29 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 
 	# Download and install the delay module configuration file
 	info "Retrieving node delay configurations"
-	wget = "#{property.wget} --timeout=3 -q #{property.dataUrl}/#{property.delayConfigServer}"
-	move = "cp #{property.delayConfigServer} /click/delayMod/config"
-	info "Executing '#{cmd}'"
+	server = "#{property.wget} #{property.dataUrl}/#{property.delayConfigServer}"
+	client = "#{property.wget} #{property.dataUrl}/#{property.delayConfigClient}"
 
 	serversMap.each_value { |node|
-		tmp = wget.gsub(/XxX/,node.asNumber.to_s)
-		info "Executing '#{tmp}'"
-		node.group.exec(wget.gsub(/XxX/,node.asNumber.to_s))
-		node.group.exec(move.gsub(/XxX/,node.asNumber.to_s))
+		node.group.exec(server.gsub(/XxX/,node.asNumber.to_s))
 	}
-	wget = "#{property.wget} --timeout=3 -q #{property.dataUrl}/#{property.delayConfigClient}"
-	move = "cp #{property.delayConfigClient} /click/delayMod/config"
 	clientsMap.each_value { |node|
-		node.group.exec(wget.gsub(/XxX/,node.asNumber.to_s))
-		node.group.exec(move.gsub(/XxX/,node.asNumber.to_s))
+		node.group.exec(client.gsub(/XxX/,node.asNumber.to_s))
 	}
 
+	wait 5
+
+	info "Installing node delay configurations"
+	server = "cp #{property.delayConfigClient} /click/delayMod/config"
+	client  = "cp #{property.delayConfigServer} /click/delayMod/config"
+	serversMap.each_value { |node|
+		node.group.exec(server.gsub(/XxX/,node.asNumber.to_s))
+	}
+	clientsMap.each_value { |node|
+		node.group.exec(client.gsub(/XxX/,node.asNumber.to_s))
+	}
+
+	wait 5
 
 	# Delete any files we downloaded and no longer need
 	info "Cleaning up temporary files"
@@ -228,8 +234,12 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 
 	serversMap.each_value { |node|
 		node.group.exec(cmd)
+		cmd = "rm #{property.delayConfigServer}".gsub(/XxX/,node.asNumber.to_s)
+		node.group.exec(cmd)
 	}
 	clientsMap.each_value { |node|
+		node.group.exec(cmd)
+		cmd = "rm #{property.delayConfigClient}".gsub(/XxX/,node.asNumber.to_s)
 		node.group.exec(cmd)
 	}
 
