@@ -142,53 +142,30 @@ end # defineGroups
 
 def buildGroups(serversMap, clientsMap)
 	# Split the nodes into servers and clients
-	i = 0
-	serverString = ""
 	serversMap.each_value do |node|
-		serverString += node.hostname
-		if i != serversMap.length-1
-			serverString += ","
-		end
-		i += 1
+		grp = defGroup(node.hostname, node.hostname)
+		node.group = grp
 	end
 
-
-	defGroup(SERVER_GRP_NAME, serverString) do |node|
-		# Nothing to do, wait until nodes are up in prepareNodes
-	end
-
-	
 	# Now the clients
-	i = 0
-	clientString = ""
 	clientsMap.each_value do |node|
-		clientString += node.hostname
-		if i != clientsMap.length-1
-			clientString += ","
-		end
-		i += 1
-	end
-
-	defGroup(CLIENT_GRP_NAME, clientString) do | node |
-		# Again, nothing to do yet
+		grp = defGroup(node.hostname, node.hostname)
+		node.group = grp
 	end
 
 	return 0
 end
 
 def prepareNodes(serversMap, clientsMap) 
-	
-	serverNs = NodeSet[SERVER_GRP_NAME].each { |node|
-		gnrsNode = serversMap[node.name.to_s]
-		info "Setting IP of #{node.name.to_s} to #{gnrsNode.ipAddress}"
-		node.net.e0.ip=gnrsNode.ipAddress
+
+	serversMap.each_value { | node | 
+		info "Setting IP of #{node.hostname} to #{node.ipAddress}"
+		node.group.net.e0.ip = node.ipAddress
 	}
 
-
-	clientNs = NodeSet[CLIENT_GRP_NAME].each { | node |
-		gnrsNode = clientsMap[node.name.to_s]
-		info "Setting IP of #{node.name.to_s} to #{gnrsNode.ipAddress}"
-		node.net.e0.ip=gnrsNode.ipAddress
+	clientsMap.each_value { | node | 
+		info "Setting IP of #{node.hostname} to #{node.ipAddress}"
+		node.group.net.e0.ip = node.ipAddress
 	}
 
 	return 0
