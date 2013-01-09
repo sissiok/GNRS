@@ -12,6 +12,7 @@
 
 # Import the GNRSNode class
 require ('./gnrs_node.rb')
+require ('./gnrs_config.rb')
 
 # Resources file location can be configured with:
 #   --resourceFile /path/to/file.rb
@@ -89,13 +90,57 @@ def doMainExperiment(serversMap, clientsMap)
 	end
 
 	info "## Preparing the delay modules ##"
-	success = prepareDelayModule(property.dataUrl, property.clickModule)
+	success = prepareDelayModule(serversMap, clientsMap, property.dataUrl, property.clickModule)
 	if success == 0
 		info "\tSuccessfully installed and configured delay module on all nodes."
 	else
 		error "\tUnable to configure delay module on one or more nodes. Exiting."
 		return;
 	end
+
+	info "## Installing configuration files ##"
+	success = installConfigs(serversMap, clientsMap)
+	if success == 0
+		info "\tSuccessfully installed configuration files."
+	else
+		error "\tUnable to install configuration files."
+		return;
+	end
+
+	info "## Launching servers ##"
+	success = launchServers(serversMap)
+	if success == 0
+		info "\tSuccessfully launched servers."
+	else
+		error "\tUnable to launch servers."
+		return;
+	end
+
+	info "## Waiting 5 seconds for servers to start ##"
+	wait 5
+
+	info "## Launching clients ##"
+	success = launchClients(clientsMap)
+	if success == 0
+		info "\tSuccessfully launched clients."
+	else
+		error "\tUnable to launch clients."
+		stopServers(serversMap)
+		return;
+	end
+
+	info "Allowing experiment to run for #{property.runTime} seconds."
+	wait property.runTime
+
+	info "## Shutting down servers ##"
+	success = stopServers(serversMap)
+	if success == 0
+		info "\tTerminated servers successfully."
+	else
+		error "\tUnable to terminate servers."
+		return
+	end
+
 end # main
 
 def defineGroups(serversMap, clientsMap)
@@ -109,6 +154,8 @@ def defineGroups(serversMap, clientsMap)
 		return -1
 	end
 
+	asMap = Hash.new
+
 	for serverCount in 1..property.numServers
 		node = GNRSNode.new
 		node.hostname = nodelist.pop().to_s
@@ -116,6 +163,7 @@ def defineGroups(serversMap, clientsMap)
 		node.ipAddress = "192.168.1.#{serverCount + 1}"
 		node.port = "5001"
 		serversMap[node.hostname] = node
+		asMap[node.asNumber] = node
 	end
 	
 	info "Servers:"
@@ -129,6 +177,7 @@ def defineGroups(serversMap, clientsMap)
 		node.asNumber = clientCount
 		node.ipAddress = "192.168.1.#{clientCount + 101}"
 		node.port = "4001"
+		node.server = asMap[node.asNumber]
 		clientsMap[node.hostname] = node
 	end
 	
@@ -171,23 +220,59 @@ def prepareNodes(serversMap, clientsMap)
 	return 0
 end # prepareNodes
 
-def prepareDelayModule(baseUrl, clickScript)
+def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 
 	# Download delay module click script
 	info "Downloading delay module script"
-	cmd = "#{property.wget} --timeout=3 -q #{property.dataUrl}/#{property.clickModule}"
+	cmd = "#{property.wget} #{property.dataUrl}/#{property.clickModule}"
 	info "Executing '#{cmd}'"
-	group(SERVER_GRP_NAME).exec(cmd)
-	group(CLIENT_GRP_NAME).exec(cmd)
+
+	serversMap.each_value { |node|
+		node.group.exec(cmd)
+	}
+	clientsMap.each_value { |node|
+		node.group.exec(cmd)
+	}
 
 	wait 5
 
-	# Download the appropriate delay module configuration file
+	# Install the delay module click script
 	info "Installing Click delay module"
 	cmd = "#{property.clickInstall} -u #{property.clickModule}"
 	info "Executing '#{cmd}'"
-	group(SERVER_GRP_NAME).exec(cmd)
-	group(CLIENT_GRP_NAME).exec(cmd)
+
+	serversMap.each_value { |node|
+		node.group.exec(cmd)
+	}
+	clientsMap.each_value { |node|
+		node.group.exec(cmd)
+	}
+
+	wait 5
+
+	# Download and install the delay module configuration file
+	info "Retrieving node delay configurations"
+	server = "#{property.wget} #{property.dataUrl}/#{property.delayConfigServer}"
+	client = "#{property.wget} #{property.dataUrl}/#{property.delayConfigClient}"
+
+	serversMap.each_value { |node|
+		node.group.exec(server.gsub(/XxX/,node.asNumber.to_s))
+	}
+	clientsMap.each_value { |node|
+		node.group.exec(client.gsub(/XxX/,node.asNumber.to_s))
+	}
+
+	wait 5
+
+	info "Installing node delay configurations"
+	server = "cp #{property.delayConfigClient} /click/delayMod/config"
+	client  = "cp #{property.delayConfigServer} /click/delayMod/config"
+	serversMap.each_value { |node|
+		node.group.exec(server.gsub(/XxX/,node.asNumber.to_s))
+	}
+	clientsMap.each_value { |node|
+		node.group.exec(client.gsub(/XxX/,node.asNumber.to_s))
+	}
 
 	wait 5
 
@@ -195,11 +280,206 @@ def prepareDelayModule(baseUrl, clickScript)
 	info "Cleaning up temporary files"
 	cmd = "rm #{property.clickModule}"
 	info "Executing '#{cmd}'"
-	group(SERVER_GRP_NAME).exec(cmd)
-	group(CLIENT_GRP_NAME).exec(cmd)
+
+	serversMap.each_value { |node|
+		node.group.exec(cmd)
+		cmd = "rm #{property.delayConfigServer}".gsub(/XxX/,node.asNumber.to_s)
+		node.group.exec(cmd)
+	}
+	clientsMap.each_value { |node|
+		node.group.exec(cmd)
+		cmd = "rm #{property.delayConfigClient}".gsub(/XxX/,node.asNumber.to_s)
+		node.group.exec(cmd)
+	}
 
 	return 0
 end # prepareDelayModule
+
+def installConfigs(serversMap, clientsMap)
+
+	info "Creating required directories"
+
+	mkVar = "mkdir -p /var/gnrs/stats"
+	mkEtc = "mkdir -p /etc/gnrs"
+	mkBin = "mkdir -p /usr/local/bin/gnrs/"
+	
+	serversMap.each_value { |node|
+		node.group.exec(mkVar)
+		node.group.exec(mkEtc)
+		node.group.exec(mkBin)
+	}
+
+	clientsMap.each_value { |node|
+		node.group.exec(mkVar)
+		node.group.exec(mkEtc)
+		node.group.exec(mkBin)
+	}
+
+	wait 2
+
+	info "Creating server configuration files."
+	serversMap.each_value { |node|
+		# Main server config
+		configContents = makeServerConfig(node)
+		cmd = "echo '#{configContents}' >/etc/gnrs/server.xml"
+		node.group.exec(cmd)
+
+		# Networking config
+		configContents = makeServerNetConfig(node)
+		cmd = "echo '#{configContents}' >/etc/gnrs/net-ipv4_#{node.asNumber}.xml"
+		node.group.exec(cmd)
+
+		# Download static files
+
+		# Binding file
+		cmd = "#{property.wget} #{property.dataUrl}/#{property.bindingFile}"
+		node.group.exec(cmd)
+		# IPv4 Prefix File (BGP Table)
+		cmd = "#{property.wget} #{property.dataUrl}/#{property.prefixIpv4}"
+		node.group.exec(cmd)
+		# BerkeleyDB Config
+		cmd = "#{property.wget} #{property.dataUrl}/#{property.serverBDB}"
+		node.group.exec(cmd)
+		# IPv4 Mapper Configuration
+		cmd = "#{property.wget} #{property.dataUrl}/#{property.mapIpv4}"
+		node.group.exec(cmd)
+		# Jar file
+		cmd = "#{property.wget} #{property.dataUrl}/#{property.jarFile}"
+		node.group.exec(cmd)
+		# GNRSD script
+		cmd = "#{property.wget} #{property.dataUrl}/#{property.gnrsd}"
+		node.group.exec(cmd)
+		# GNRSD Init script
+		cmd = "#{property.wget} #{property.dataUrl}/#{property.gnrsdInit}"
+		info "Executing '#{cmd}'"
+		node.group.exec(cmd)
+
+	}
+	
+	info "Creating client configuration files."
+	clientsMap.each_value { |node|
+		# Main client config
+		configContents = makeClientConfig(node,node.server)
+		cmd = "echo '#{configContents}' >/etc/gnrs/client.xml"
+		node.group.exec(cmd)
+		# Download static files
+
+		# Jar file
+		cmd = "#{property.wget} #{property.dataUrl}/#{property.jarFile}"
+		node.group.exec(cmd)
+		# GGen script
+		cmd = "#{property.wget} #{property.dataUrl}/#{property.ggen}"
+		node.group.exec(cmd)
+		# GBench script
+		cmd = "#{property.wget} #{property.dataUrl}/#{property.gbench}"
+		node.group.exec(cmd)
+		# Client trace file
+		cmd = "#{property.wget} #{property.dataUrl}/#{property.clientTrace}".gsub(/XxX/,node.asNumber.to_s)
+		node.group.exec(cmd)
+	}
+
+
+	wait 5
+
+	info "Installing server files"
+
+	# Install static files
+	serversMap.each_value { |node|
+		# Binding file
+		cmd = "mv #{property.bindingFile} /etc/gnrs/"
+		node.group.exec(cmd)
+		# BerkeleyDB Config
+		cmd = "mv #{property.serverBDB} /etc/gnrs/"
+		node.group.exec(cmd)
+		# IPv4 Mapper Configuration
+		cmd = "mv #{property.mapIpv4} /etc/gnrs/"
+		node.group.exec(cmd)
+		# IPv4 Prefix File (BGP Table)
+		cmd = "mv #{property.prefixIpv4} /etc/gnrs/"
+		node.group.exec(cmd)
+		# Jar file
+		cmd = "mv #{property.jarFile} /usr/local/bin/gnrs/"
+		node.group.exec(cmd)
+		# GNRSD Script
+		cmd = "chmod +x #{property.gnrsd}"
+		node.group.exec(cmd)
+		cmd = "mv #{property.gnrsd} /usr/local/bin/gnrs/"
+		node.group.exec(cmd)
+		# GNRSD Init script
+		cmd = "chmod +x #{property.gnrsdInit}"
+		info "Executing '#{cmd}'"
+		node.group.exec(cmd)
+		cmd = "mv #{property.gnrsdInit} /etc/init.d/gnrsd"
+		info "Executing '#{cmd}'"
+		node.group.exec(cmd)
+		# Update rc.d scripts
+		cmd = "#{property.updateRc} gnrsd stop 2 0 1 2 3 4 5 6 ."
+		info "Executing '#{cmd}'"
+		node.group.exec(cmd)
+	}
+
+	info "Installing client files"
+
+	clientsMap.each_value { |node|
+	 	# JAR file
+		cmd = "mv #{property.jarFile} /usr/local/bin/gnrs/"
+		node.group.exec(cmd)
+		# GBench script
+		cmd = "chmod +x #{property.gbench}"
+		node.group.exec(cmd)
+		cmd = "mv #{property.gbench} /usr/local/bin/gnrs/"
+		node.group.exec(cmd)
+		# GGen script
+		cmd = "chmod +x #{property.ggen}"
+		node.group.exec(cmd)
+		cmd = "mv #{property.ggen} /usr/local/bin/gnrs/"
+		node.group.exec(cmd)
+		# Trace file
+		cmd = "mv #{property.clientTrace} /etc/gnrs/".gsub(/XxX/,node.asNumber.to_s)
+		node.group.exec(cmd)
+	}
+
+	return 0
+end # installConfigs
+
+def launchServers(serversMap)
+
+	cmd = "service gnrsd start"
+
+	serversMap.each_value { |node|
+		info "Launching server on #{node.to_s}"
+		node.group.exec(cmd)
+	}
+
+	return 0
+end #launchServers
+
+def launchClients(clientsMap)
+
+	# 3 parameters to gbench: client config, trace file, inter-message send time in microseconds
+	baseCmd = "/usr/local/bin/gnrs/#{property.gbench} /etc/gnrs/client.xml /etc/gnrs/#{property.clientTrace} 500000"
+
+	clientsMap.each_value { |node|
+		cmd = baseCmd.gsub(/XxX/,node.asNumber.to_s)
+		info "Launching client on #{node.to_s}"
+		node.group.exec(cmd)
+	}
+
+	return 0
+end # launchClients
+
+def stopServers(serversMap)
+	info "Stopping GNRS servers"
+
+	cmd = "service gnrsd stop"
+
+	serversMap.each_value { |node|
+		info "Executing '#{cmd}'"
+		node.group.exec(cmd)
+	}
+
+	return 0
+end # stopServers
 
 # Load resources, get topology, define groups
 success, serversMap, clientsMap = doInitSetup

@@ -11,12 +11,34 @@
 # Basic properties (pushed to nodes)
 defProperty('numServers', 1, "Number of nodes to use for servers")
 defProperty('numClients', 1, "Number of clients to use for clients")
+defProperty('runTime', 60, "Number of seconds that the experiment should be allowed to run")
 
 # Web resources
 defProperty('dataUrl', 'http://my.domain.com/path/to/files', 'Base URL for topology/delay files.')
 defProperty('bindingFile', 'jellyfish_topo.bind', 'Filename of AS -> IP:Port binding information.')
 defProperty('clickModule', 'delayModule.click', 'Filename of delay module Click script.')
+# 'XxX' is a placeholder for the AS number in the experiment script
+defProperty('delayConfigServer', 'as_XxX_delay_serv.dat', 'Filename of server delay module configuration.')
+defProperty('delayConfigClient', 'as_XxX_delay_client.dat', 'Filename of client delay module configuration.')
+defProperty('serverBDB', 'berkeleydb.xml', 'Filename of BerkeleyDB configuration.')
+defProperty('mapIpv4', 'map-ipv4.xml', 'Filename of IPv4 mapper configuration.')
+defProperty('prefixIpv4', 'prefixes.ipv4', 'Filename of the IPv4 prefixes file (BGP table).')
+
+# Client/Server compiled JAR file
+defProperty('jarFile', 'gnrs.jar', 'Filename of the server/client JAR file.')
+# Client Scripts
+defProperty('ggen', 'ggen', 'Filename of the "ggen" script.')
+defProperty('gbench', 'gbench', 'Filename of the "gbench" script.')
+# Server launch script
+defProperty('gnrsd', 'gnrsd', 'Filename of the "gnrsd" script.')
+# Server rc.d (init.d) script
+defProperty('gnrsdInit', 'gnrsd.init', 'Filename of the "gnrsd" init.d script.')
+# Client trace file
+defProperty('clientTrace', 'client_XxX.trace', 'Trace file for client "XxX" (will be replaced with AS number at runtime.')
 
 # Local applications
-defProperty('wget', '/usr/bin/wget', 'Location of the wget utility.')
+# wget - 3 second timeout, quiet output, overwrite if newer
+defProperty('wget', '/usr/bin/wget --timeout=3 -qN', 'Location of the wget utility.')
 defProperty('clickInstall', '/usr/local/sbin/click-install', 'Location of the click-install utility.')
+defProperty('java', '/usr/bin/java', 'Location of the Java launcher.')
+defProperty('updateRc', '/usr/sbin/update-rc.d', 'Location of update-rc.d utility.')
