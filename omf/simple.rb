@@ -438,6 +438,8 @@ def stopServers(serversMap)
 		info "Executing '#{cmd}'"
 		node.group.exec(cmd)
 	}
+
+	return 0
 end
 
 # Load resources, get topology, define groups
