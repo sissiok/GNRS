@@ -30,7 +30,7 @@ ENDSTR
 
 	# Replace placeholder with node-specific info
 	return asString.gsub(/XxX/,node.asNumber.to_s)
-end
+end # makeServerConfig
 
 def makeServerNetConfig(node)
 	asString = <<-ENDSTR
@@ -42,5 +42,19 @@ def makeServerNetConfig(node)
 ENDSTR
 
 	return asString.gsub(/_PORT_/,node.port.to_s).gsub(/_IPADDR_/,node.ipAddress.to_s)
-end
+end # makeServerNetConfig
+
+def makeClientConfig(client,server)
+	asString = <<-ENDSTR
+<edu.rutgers.winlab.mfirst.client.Configuration>
+\t<serverHost>_SRV-IPADDR_</serverHost>
+\t<serverPort>_SRV-PORT_</serverPort>
+\t<clientPort>_CLT-PORT_</clientPort>
+\t<clientHost>_CLT-IPADDR_</clientHost>
+\t<randomSeed>-1</randomSeed>
+</edu.rutgers.winlab.mfirst.client.Configuration>
+ENDSTR
+
+	return asString.gsub(/_SRV-IPADDR_/,server.ipAddress.to_s).gsub(/_SRV-PORT_/,server.port.to_s).gsub(/_CLT-IPADDR_/,client.ipAddress.to_s).gsub(/_CLT-PORT_/,client.port.to_s)
+end # makeClientConfig
 

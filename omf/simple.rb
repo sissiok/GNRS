@@ -116,7 +116,21 @@ def doMainExperiment(serversMap, clientsMap)
 		return;
 	end
 
-	wait 10
+	info "## Waiting 5 seconds for servers to start ##"
+	wait 5
+
+	info "## Launching clients ##"
+	success = launchClients(clientsMap)
+	if success == 0
+		info "\tSuccessfully launched clients."
+	else
+		error "\tUnable to launch clients."
+		stopServers(serversMap)
+		return;
+	end
+
+	info "Allowing experiment to run for #{property.runTime} seconds."
+	wait property.runTime
 
 	info "## Shutting down servers ##"
 	success = stopServers(serversMap)
@@ -140,6 +154,8 @@ def defineGroups(serversMap, clientsMap)
 		return -1
 	end
 
+	asMap = Hash.new
+
 	for serverCount in 1..property.numServers
 		node = GNRSNode.new
 		node.hostname = nodelist.pop().to_s
@@ -147,6 +163,7 @@ def defineGroups(serversMap, clientsMap)
 		node.ipAddress = "192.168.1.#{serverCount + 1}"
 		node.port = "5001"
 		serversMap[node.hostname] = node
+		asMap[node.asNumber] = node
 	end
 	
 	info "Servers:"
@@ -160,6 +177,7 @@ def defineGroups(serversMap, clientsMap)
 		node.asNumber = clientCount
 		node.ipAddress = "192.168.1.#{clientCount + 101}"
 		node.port = "4001"
+		node.server = asMap[node.asNumber]
 		clientsMap[node.hostname] = node
 	end
 	
@@ -340,6 +358,10 @@ def installConfigs(serversMap, clientsMap)
 	
 	info "Creating client configuration files."
 	clientsMap.each_value { |node|
+		# Main client config
+		configContents = makeClientConfig(node,node.server)
+		cmd = "echo '#{configContents}' >/etc/gnrs/client.xml"
+		node.group.exec(cmd)
 		# Download static files
 
 		# Jar file
@@ -351,7 +373,9 @@ def installConfigs(serversMap, clientsMap)
 		# GBench script
 		cmd = "#{property.wget} #{property.dataUrl}/#{property.gbench}"
 		node.group.exec(cmd)
-
+		# Client trace file
+		cmd = "#{property.wget} #{property.dataUrl}/#{property.clientTrace}".gsub(/XxX/,node.asNumber.to_s)
+		node.group.exec(cmd)
 	}
 
 
@@ -410,24 +434,39 @@ def installConfigs(serversMap, clientsMap)
 		node.group.exec(cmd)
 		cmd = "mv #{property.ggen} /usr/local/bin/gnrs/"
 		node.group.exec(cmd)
-	}
-
-	return 0
-end
-
-def launchServers(serversMap)
-
-	info "Launching GNRS servers"
-
-	cmd = "service gnrsd start"
-
-	serversMap.each_value { |node|
-		info "Executing '#{cmd}'"
+		# Trace file
+		cmd = "mv #{property.clientTrace} /etc/gnrs/".gsub(/XxX/,node.asNumber.to_s)
 		node.group.exec(cmd)
 	}
 
 	return 0
-end
+end # installConfigs
+
+def launchServers(serversMap)
+
+	cmd = "service gnrsd start"
+
+	serversMap.each_value { |node|
+		info "Launching server on #{node.to_s}"
+		node.group.exec(cmd)
+	}
+
+	return 0
+end #launchServers
+
+def launchClients(clientsMap)
+
+	# 3 parameters to gbench: client config, trace file, inter-message send time in microseconds
+	baseCmd = "/usr/local/bin/gnrs/#{property.gbench} /etc/gnrs/client.xml /etc/gnrs/#{property.clientTrace} 500000"
+
+	clientsMap.each_value { |node|
+		cmd = baseCmd.gsub(/XxX/,node.asNumber.to_s)
+		info "Launching client on #{node.to_s}"
+		node.group.exec(cmd)
+	}
+
+	return 0
+end # launchClients
 
 def stopServers(serversMap)
 	info "Stopping GNRS servers"
@@ -440,7 +479,7 @@ def stopServers(serversMap)
 	}
 
 	return 0
-end
+end # stopServers
 
 # Load resources, get topology, define groups
 success, serversMap, clientsMap = doInitSetup

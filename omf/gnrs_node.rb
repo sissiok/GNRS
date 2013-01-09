@@ -6,7 +6,7 @@
 # Last Modified: Jan 7, 2013
 #
 class GNRSNode
-	attr_accessor :ipAddress, :port, :asNumber, :hostname, :group
+	attr_accessor :ipAddress, :port, :asNumber, :hostname, :group, :server
 
 	def to_s
 		"#{@hostname}/#{@ipAddress}:#{@port} (AS ##{@asNumber})"
