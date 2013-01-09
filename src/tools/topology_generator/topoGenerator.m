@@ -32,5 +32,23 @@ for i=1:length(asLinks)
     fprintf(link_fid, '%d -- %d\n', asLinks(i,1), asLinks(i,2));
 end
 
+%generate two files for orbit evaluation: topology.data and prefix.data
+topo_fid = fopen('topology.data','wt');
+if method==2
+    for i=1:length(asLinks)
+        fprintf(topo_fid, '%d %d %d\n', asLinks(i,1), asLinks(i,2), asLinks(i,3));
+    end
+else
+    for i=1:length(asLinks)
+        fprintf(topo_fid, '%d %d %d\n', asLinks(i,1), asLinks(i,2), round(asLinks(i,3)/1000));
+    end
+end
+prefix_fid = fopen('prefix.data','wt');
+for i=1:length(asPrefix)
+    fprintf(prefix_fid, '%d.%d.%d.%d/%d %d\n', asPrefix(i,2), asPrefix(i,3), asPrefix(i,4), asPrefix(i,5), asPrefix(i,6), asPrefix(i,1));
+end
+    
 fclose(link_fid);
+fclose(topo_fid);
+fclose(prefix_fid);
 end
