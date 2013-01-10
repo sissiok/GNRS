@@ -15,8 +15,8 @@ AS_UNIQ='as-uniq.pl'
 DEL_GEN_CLT='click_delay_gen_client.pl'
 DEL_GEN_SRV='click_delay_gen_serv.pl'
 SPG='spg.i386'
-if [ ${ARCH} == 'x86_64' ] then
-	SPG='spg.amd64'
+if [ ${ARCH} == 'x86_64' ]; then
+	SPG='spg.amd64';
 fi
 
 echo "Downloading required files"
