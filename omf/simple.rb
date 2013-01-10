@@ -178,6 +178,11 @@ def defineGroups(serversMap, clientsMap)
 		node.ipAddress = "192.168.1.#{clientCount + 101}"
 		node.port = "4001"
 		node.server = asMap[node.asNumber]
+		# Randomly pick a server for this client
+		if node.server.nil?
+			node.asNumber = rand(property.numServers.to_s.to_i)+1
+			node.server = asMap[node.asNumber]
+		end
 		clientsMap[node.hostname] = node
 	end
 	
