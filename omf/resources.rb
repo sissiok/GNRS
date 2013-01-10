@@ -35,6 +35,10 @@ defProperty('gnrsd', 'gnrsd', 'Filename of the "gnrsd" script.')
 defProperty('gnrsdInit', 'gnrsd.init', 'Filename of the "gnrsd" init.d script.')
 # Client trace file
 defProperty('clientTrace', 'client_XxX.trace', 'Trace file for client "XxX" (will be replaced with AS number at runtime.')
+# Client lookup count
+defProperty('numLookups', 10000, 'Number of lookups to perform.')
+# Client inter-message delay (microseconds)
+defProperty('messageDelay', 2000, 'Number of microseconds between each message.')
 
 # Local applications
 # wget - 3 second timeout, quiet output, overwrite if newer
