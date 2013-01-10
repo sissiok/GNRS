@@ -9,7 +9,9 @@ PREFIX_FILE="prefix.data"
 ROUTE_FILE="$TOPO_FILE.route"
 AS_FILE="$BASE_FILE.aslist"
 BIND_FILE="$BASE_FILE.bind"
-UPLOAD_DIR="$BASE_FILE.up/"
+BDB_FILE="berkeleydb.xml"
+MAP_FILE="map-ipv4.xml"
+UPLOAD_DIR="$BASE_FILE/"
 
 WGET='wget --timeout=10 -N'
 ARCH=`uname -m`
@@ -25,6 +27,8 @@ if [ ${ARCH} == 'x86_64' ]; then
 fi
 
 echo "Downloading required files"
+$WGET $DWNLD_URL$MAP_FILE
+$WGET $DWNLD_URL$BDB_FILE
 $WGET $DWNLD_URL$SPG
 chmod +x $SPG
 $WGET $SCRIPT_URL$AS_UNIQ
@@ -42,8 +46,12 @@ $DEL_GEN_CLT $AS_FILE $ROUTE_FILE
 
 echo "Creating upload directory"
 mkdir -p $UPLOAD_DIR
-mv "as_*.dat" $UPLOAD_DIR
+mv as_*.dat $UPLOAD_DIR
 cp $PREFIX_FILE $UPLOAD_DIR/prefixes.ipv4
+mv $BDB_FILE $UPLOAD_DIR
+mv $MAP_FILE $UPLOAD_DIR
+
+tar -czvf $BASE_FILE.tgz $UPLOAD_DIR
 
 echo "Removing temporary files"
 rm $AS_UNIQ
@@ -53,3 +61,6 @@ rm $SPG
 rm AS_arr.data
 rm $AS_FILE
 rm $ROUTE_FILE
+rm -rf $UPLOAD_DIR
+
+echo "Prepared files are located in $BASE_FILE.tgz"
