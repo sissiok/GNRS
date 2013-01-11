@@ -243,7 +243,6 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 	# Download delay module click script
 	info "Downloading delay module script"
 	cmd = "#{property.wget} #{property.scriptUrl}/#{property.clickModule}"
-	info "Executing '#{cmd}'"
 
 	serversMap.each_value { |node|
 		node.group.exec(cmd)
@@ -257,7 +256,6 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 	# Install the delay module click script
 	info "Installing Click delay module"
 	cmd = "#{property.clickInstall} -u #{property.clickModule}"
-	info "Executing '#{cmd}'"
 
 	serversMap.each_value { |node|
 		node.group.exec(cmd)
@@ -296,7 +294,6 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 
 	# Delete any files we downloaded and no longer need
 	info "Cleaning up temporary files"
-	info "Executing '#{cmd}'"
 
 	serversMap.each_value { |node|
 		cmd = "rm #{property.clickModule}"
@@ -370,7 +367,6 @@ def installConfigs(serversMap, clientsMap)
 		node.group.exec(cmd)
 		# GNRSD Init script
 		cmd = "#{property.wget} #{property.scriptUrl}/#{property.gnrsdInit}"
-		info "Executing '#{cmd}'"
 		node.group.exec(cmd)
 
 	}
@@ -426,14 +422,11 @@ def installConfigs(serversMap, clientsMap)
 		node.group.exec(cmd)
 		# GNRSD Init script
 		cmd = "chmod +x #{property.gnrsdInit}"
-		info "Executing '#{cmd}'"
 		node.group.exec(cmd)
 		cmd = "mv #{property.gnrsdInit} /etc/init.d/gnrsd"
-		info "Executing '#{cmd}'"
 		node.group.exec(cmd)
 		# Update rc.d scripts
 		cmd = "#{property.updateRc} gnrsd stop 2 0 1 2 3 4 5 6 ."
-		info "Executing '#{cmd}'"
 		node.group.exec(cmd)
 	}
 
@@ -476,7 +469,7 @@ end #launchServers
 def loadGUIDs(clientsMap)
 
 	# 3 parameters to gbench: client config, trace file, inter-message send time in microseconds
-	baseCmd = "/usr/local/bin/gnrs/#{property.gbench} /etc/gnrs/client.xml /etc/gnrs/#{property.clientTrace} 500000"
+	baseCmd = "/usr/local/bin/gnrs/#{property.gbench} /etc/gnrs/client.xml /etc/gnrs/#{property.clientTrace} #{property.messageDelay}"
 
 	clientsMap.each_value { |node|
 		cmd = baseCmd.gsub(/XxX/,node.asNumber.to_s)
@@ -504,7 +497,6 @@ def stopServers(serversMap)
 	cmd = "service gnrsd stop"
 
 	serversMap.each_value { |node|
-		info "Executing '#{cmd}'"
 		node.group.exec(cmd)
 	}
 
