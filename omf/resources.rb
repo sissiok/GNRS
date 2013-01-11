@@ -15,7 +15,8 @@ defProperty('runTime', 60, "Number of seconds that the experiment should be allo
 
 # Web resources
 defProperty('dataUrl', 'http://my.domain.com/path/to/files', 'Base URL for topology/delay files.')
-defProperty('bindingFile', 'jellyfish_topo.bind', 'Filename of AS -> IP:Port binding information.')
+defProperty('scriptUrl', 'https://bitbucket.org/romoore/gnrs/downloads', 'Base URL for script files.')
+defProperty('bindingFile', 'topology.bind', 'Filename of AS -> IP:Port binding information.')
 defProperty('clickModule', 'delayModule.click', 'Filename of delay module Click script.')
 # 'XxX' is a placeholder for the AS number in the experiment script
 defProperty('delayConfigServer', 'as_XxX_delay_serv.dat', 'Filename of server delay module configuration.')
@@ -35,6 +36,10 @@ defProperty('gnrsd', 'gnrsd', 'Filename of the "gnrsd" script.')
 defProperty('gnrsdInit', 'gnrsd.init', 'Filename of the "gnrsd" init.d script.')
 # Client trace file
 defProperty('clientTrace', 'client_XxX.trace', 'Trace file for client "XxX" (will be replaced with AS number at runtime.')
+# Client lookup count
+defProperty('numLookups', 10000, 'Number of lookups to perform.')
+# Client inter-message delay (microseconds)
+defProperty('messageDelay', 2000, 'Number of microseconds between each message.')
 
 # Local applications
 # wget - 3 second timeout, quiet output, overwrite if newer
