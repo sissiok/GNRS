@@ -15,7 +15,8 @@ defProperty('runTime', 60, "Number of seconds that the experiment should be allo
 
 # Web resources
 defProperty('dataUrl', 'http://my.domain.com/path/to/files', 'Base URL for topology/delay files.')
-defProperty('bindingFile', 'jellyfish_topo.bind', 'Filename of AS -> IP:Port binding information.')
+defProperty('scriptUrl', 'https://bitbucket.org/romoore/gnrs/downloads', 'Base URL for script files.')
+defProperty('bindingFile', 'topology.bind', 'Filename of AS -> IP:Port binding information.')
 defProperty('clickModule', 'delayModule.click', 'Filename of delay module Click script.')
 # 'XxX' is a placeholder for the AS number in the experiment script
 defProperty('delayConfigServer', 'as_XxX_delay_serv.dat', 'Filename of server delay module configuration.')

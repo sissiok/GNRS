@@ -130,7 +130,7 @@ def doMainExperiment(serversMap, clientsMap)
 	end
 
 	info "Press <RETURN> when all GUIDs are loaded."
-	gets
+	wait 600
 
 	info "## Generating lookups ##"
 	success = genLookups(clientsMap)
@@ -143,7 +143,7 @@ def doMainExperiment(serversMap, clientsMap)
 	end
 
 	info "Press <RETURN> when all lookups are complete."
-	gets
+	wait 600
 
 	info "## Shutting down servers ##"
 	success = stopServers(serversMap)
@@ -242,7 +242,7 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 
 	# Download delay module click script
 	info "Downloading delay module script"
-	cmd = "#{property.wget} #{property.dataUrl}/#{property.clickModule}"
+	cmd = "#{property.wget} #{property.scriptUrl}/#{property.clickModule}"
 	info "Executing '#{cmd}'"
 
 	serversMap.each_value { |node|
@@ -283,8 +283,8 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 	wait 5
 
 	info "Installing node delay configurations"
-	server = "cp #{property.delayConfigClient} /click/delayMod/config"
-	client  = "cp #{property.delayConfigServer} /click/delayMod/config"
+	client = "cp #{property.delayConfigClient} /click/delayMod/config"
+	server  = "cp #{property.delayConfigServer} /click/delayMod/config"
 	serversMap.each_value { |node|
 		node.group.exec(server.gsub(/XxX/,node.asNumber.to_s))
 	}
@@ -296,15 +296,16 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 
 	# Delete any files we downloaded and no longer need
 	info "Cleaning up temporary files"
-	cmd = "rm #{property.clickModule}"
 	info "Executing '#{cmd}'"
 
 	serversMap.each_value { |node|
+		cmd = "rm #{property.clickModule}"
 		node.group.exec(cmd)
 		cmd = "rm #{property.delayConfigServer}".gsub(/XxX/,node.asNumber.to_s)
 		node.group.exec(cmd)
 	}
 	clientsMap.each_value { |node|
+		cmd = "rm #{property.clickModule}"
 		node.group.exec(cmd)
 		cmd = "rm #{property.delayConfigClient}".gsub(/XxX/,node.asNumber.to_s)
 		node.group.exec(cmd)
@@ -356,19 +357,19 @@ def installConfigs(serversMap, clientsMap)
 		cmd = "#{property.wget} #{property.dataUrl}/#{property.prefixIpv4}"
 		node.group.exec(cmd)
 		# BerkeleyDB Config
-		cmd = "#{property.wget} #{property.dataUrl}/#{property.serverBDB}"
+		cmd = "#{property.wget} #{property.scriptUrl}/#{property.serverBDB}"
 		node.group.exec(cmd)
 		# IPv4 Mapper Configuration
-		cmd = "#{property.wget} #{property.dataUrl}/#{property.mapIpv4}"
+		cmd = "#{property.wget} #{property.scriptUrl}/#{property.mapIpv4}"
 		node.group.exec(cmd)
 		# Jar file
-		cmd = "#{property.wget} #{property.dataUrl}/#{property.jarFile}"
+		cmd = "#{property.wget} #{property.scriptUrl}/#{property.jarFile}"
 		node.group.exec(cmd)
 		# GNRSD script
-		cmd = "#{property.wget} #{property.dataUrl}/#{property.gnrsd}"
+		cmd = "#{property.wget} #{property.scriptUrl}/#{property.gnrsd}"
 		node.group.exec(cmd)
 		# GNRSD Init script
-		cmd = "#{property.wget} #{property.dataUrl}/#{property.gnrsdInit}"
+		cmd = "#{property.wget} #{property.scriptUrl}/#{property.gnrsdInit}"
 		info "Executing '#{cmd}'"
 		node.group.exec(cmd)
 
@@ -383,13 +384,13 @@ def installConfigs(serversMap, clientsMap)
 		# Download static files
 
 		# Jar file
-		cmd = "#{property.wget} #{property.dataUrl}/#{property.jarFile}"
+		cmd = "#{property.wget} #{property.scriptUrl}/#{property.jarFile}"
 		node.group.exec(cmd)
 		# GGen script
-		cmd = "#{property.wget} #{property.dataUrl}/#{property.ggen}"
+		cmd = "#{property.wget} #{property.scriptUrl}/#{property.ggen}"
 		node.group.exec(cmd)
 		# GBench script
-		cmd = "#{property.wget} #{property.dataUrl}/#{property.gbench}"
+		cmd = "#{property.wget} #{property.scriptUrl}/#{property.gbench}"
 		node.group.exec(cmd)
 		# Client trace file
 		cmd = "#{property.wget} #{property.dataUrl}/#{property.clientTrace}".gsub(/XxX/,node.asNumber.to_s)
@@ -493,6 +494,8 @@ def genLookups(clientsMap)
 		info "Launching lookup generator on #{node.to_s}"
 		node.group.exec(baseCmd)
 	}
+
+	return 0
 end # genLookups
 
 def stopServers(serversMap)
