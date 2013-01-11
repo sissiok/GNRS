@@ -6,6 +6,9 @@ function [ asID, asLinks, asPrefix ] = topoGenerator( method, asNum )
 % (prefix)
 % method=2: generate a synthetic AS-level topology based on jellyfish model
 
+method=str2num(method);
+asNum=str2num(asNum);
+
 if(method==0)
     [ asID, asLinks, asPrefix ] = degreeTopoGenerator( asNum );
     
@@ -15,6 +18,7 @@ elseif(method==1)
 elseif(method==2)
     [ asID, asLinks, asPrefix ] = jellyfishTopoGenerator( asNum );
 end
+
 
 %asID mapping: map asID to a continuous integer space starting from 1. For
 %orbit grid evaluation purpose

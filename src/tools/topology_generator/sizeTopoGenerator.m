@@ -1,7 +1,9 @@
 function [ asID, asLinks, asPrefix ] = sizeTopoGenerator( asNum )
 % Analyse Number of /32 Addresses in each AS, extract the largest 200 ASes,
 % and generate the topology    
-inputFile = csvread('ASNumDataMod-2_1_11.csv');
+
+%inputFile = csvread('ASNumDataMod-2_1_11.csv');
+load ASPrefixData;
 numPrefix = length(inputFile);
 %addrCount is used to store number of /32 addresses
 addrCount = zeros(max(inputFile(:,1)),1);
@@ -34,7 +36,8 @@ for i = 1:numPrefix
 end
 
 %find links among those asNum ASes
-topologyData = importdata('topology_intra_adjusted.data');
+%topologyData = importdata('topology_intra_adjusted.data');
+load topologyData;
 asLinks = zeros(0,3);
 linkNum = 0;
 
