@@ -117,7 +117,7 @@ def doMainExperiment(serversMap, clientsMap)
 	end
 
 	info "## Waiting 5 seconds for servers to start ##"
-	wait 5
+	wait property.miniWait
 
 	info "## Loading GUIDs ##"
 	success = loadGUIDs(clientsMap)
@@ -130,7 +130,7 @@ def doMainExperiment(serversMap, clientsMap)
 	end
 
 	info "Press <RETURN> when all GUIDs are loaded."
-	wait 600
+	wait property.clientWait
 
 	info "## Generating lookups ##"
 	success = genLookups(clientsMap)
@@ -143,7 +143,7 @@ def doMainExperiment(serversMap, clientsMap)
 	end
 
 	info "Press <RETURN> when all lookups are complete."
-	wait 600
+	wait property.clientWait
 
 	info "## Shutting down servers ##"
 	success = stopServers(serversMap)
@@ -251,20 +251,22 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 		node.group.exec(cmd)
 	}
 
-	wait 5
+	wait property.miniWait
 
-	# Install the delay module click script
-	info "Installing Click delay module"
-	cmd = "#{property.clickInstall} -u #{property.clickModule}"
+	if (property.disableDelay.to_s == "") 
+		# Install the delay module click script
+		info "Installing Click delay module"
+		cmd = "#{property.clickInstall} -u #{property.clickModule}"
 
-	serversMap.each_value { |node|
-		node.group.exec(cmd)
-	}
-	clientsMap.each_value { |node|
-		node.group.exec(cmd)
-	}
+		serversMap.each_value { |node|
+			node.group.exec(cmd)
+		}
+		clientsMap.each_value { |node|
+			node.group.exec(cmd)
+		}
 
-	wait 5
+		wait property.miniWait
+	end
 
 	# Download and install the delay module configuration file
 	info "Retrieving node delay configurations"
@@ -278,19 +280,20 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 		node.group.exec(client.gsub(/XxX/,node.asNumber.to_s))
 	}
 
-	wait 5
+	wait property.miniWait
+	if (property.disableDelay.to_s == "") 
+		info "Installing node delay configurations"
+		client = "cp #{property.delayConfigClient} /click/delayMod/config"
+		server  = "cp #{property.delayConfigServer} /click/delayMod/config"
+		serversMap.each_value { |node|
+			node.group.exec(server.gsub(/XxX/,node.asNumber.to_s))
+		}
+		clientsMap.each_value { |node|
+			node.group.exec(client.gsub(/XxX/,node.asNumber.to_s))
+		}
 
-	info "Installing node delay configurations"
-	client = "cp #{property.delayConfigClient} /click/delayMod/config"
-	server  = "cp #{property.delayConfigServer} /click/delayMod/config"
-	serversMap.each_value { |node|
-		node.group.exec(server.gsub(/XxX/,node.asNumber.to_s))
-	}
-	clientsMap.each_value { |node|
-		node.group.exec(client.gsub(/XxX/,node.asNumber.to_s))
-	}
-
-	wait 5
+		wait property.miniWait
+	end # delay module installation
 
 	# Delete any files we downloaded and no longer need
 	info "Cleaning up temporary files"
@@ -331,7 +334,7 @@ def installConfigs(serversMap, clientsMap)
 		node.group.exec(mkBin)
 	}
 
-	wait 2
+	wait property.microWait
 
 	info "Creating server configuration files."
 	serversMap.each_value { |node|
@@ -394,7 +397,7 @@ def installConfigs(serversMap, clientsMap)
 	}
 
 
-	wait 5
+	wait property.miniWait
 
 	info "Installing server files"
 
@@ -473,7 +476,7 @@ def loadGUIDs(clientsMap)
 
 	clientsMap.each_value { |node|
 		cmd = baseCmd.gsub(/XxX/,node.asNumber.to_s)
-		info "Launching inserts on #{node.to_s}"
+		info "#{node.to_s}: Execing '#{cmd}'"
 		node.group.exec(cmd)
 	}
 
@@ -481,10 +484,10 @@ def loadGUIDs(clientsMap)
 end # loadGUIDs
 
 def genLookups(clientsMap)
-	baseCmd = "/usr/local/bin/gnrs/#{property.ggen} /etc/gnrs/client.xml #{property.numLookups} #{property.messageDelay}"
+	baseCmd = "/usr/local/bin/gnrs/#{property.ggen} /etc/gnrs/client.xml #{property.numLookups} #{property.messageDelay} 1"
 
 	clientsMap.each_value { |node|
-		info "Launching lookup generator on #{node.to_s}"
+		info "#{node.to_s}: Execing '#{baseCmd}'"
 		node.group.exec(baseCmd)
 	}
 
