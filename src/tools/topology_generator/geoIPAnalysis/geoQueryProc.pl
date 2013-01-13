@@ -31,10 +31,10 @@ my $line2 = $asInFile->getline;
 
 #extract AS and location info
 while($line1 and $line2)  {
-	chomp $line2;
+	chomp $line2; #AS ID
 	my @lineSplit = split(/,/,$line1);
-	my @elemSplit0 = split(/"/,$lineSplit[0]);
-	my @elemSplit1 = split(/"/,$lineSplit[1]);
+	my @elemSplit0 = split(/"/,$lineSplit[0]); #IP prefix
+	my @elemSplit1 = split(/"/,$lineSplit[1]); #location
 	printf $outFile "$line2 $elemSplit0[1] $elemSplit1[1]\n";
 	$line1 = $geoInFile->getline;
 	$line2 = $asInFile->getline;
@@ -59,16 +59,42 @@ while (my $line = $inFile->getline) {
         push @{$AS2LOC{$lineSplit[2]}}, $lineSplit[0];
 }
 
-$outFile = FileHandle->new;
-$outFile->open(">" . "ASArray.LOC")
-        || die "Could not create \"ASArray.LOC\" for writing.";
+# ASArray.LOC1 and ASArray.LOC2: each line contains the AS IDs for an AS
+# ASArray.LOC2: fill up 0 for each line to keep the same length, used for matlab input
+my $outFile1 = FileHandle->new;
+$outFile1->open(">" . "ASArray.LOC1")
+        || die "Could not create \"ASArray.LOC1\" for writing.";
+my $outFile2 = FileHandle->new;
+$outFile2->open(">" . "ASArray.LOC2")
+        || die "Could not create \"ASArray.LOC2\" for writing.";
 
-my $size = keys %AS2LOC;
-print "number of different countries in the database: $size\n";
 
+my $locCount = keys %AS2LOC;
+print "number of different countries in the database: $locCount\n";
+
+#generate ASArray.LOC1 and count max number of ASes in one location(country)
+my $maxLocSize = 0;
 for (keys %AS2LOC) {
-        printf $outFile "@{$AS2LOC{$_}}\n";
+        printf $outFile1 "@{$AS2LOC{$_}}\n";
+	if($maxLocSize < $#{$AS2LOC{$_}}+1)  {
+		$maxLocSize = $#{$AS2LOC{$_}}+1;
+	}
+}
+
+#generate ASArray.LOC2
+for (keys %AS2LOC) {
+	my $i = 0;
+	my $fillNum = $maxLocSize - $#{$AS2LOC{$_}} - 1;
+
+	printf $outFile2 "@{$AS2LOC{$_}}";
+
+	while ($i < $fillNum)  {
+		printf $outFile2 " 0";
+		$i++;
+	}
+	printf $outFile2 "\n";
 }
 
 close $inFile;
-close $outFile;
+close $outFile1;
+close $outFile2;
