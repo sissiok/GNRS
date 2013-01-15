@@ -129,8 +129,8 @@ def doMainExperiment(serversMap, clientsMap)
 		return;
 	end
 
-	info "Allowing experiment to run for #{property.runTime} seconds."
-	wait property.runTime
+	info "Allowing experiment to run for #{property.clientWait} seconds."
+	wait property.clientWait
 
 	info "## Shutting down servers ##"
 	success = stopServers(serversMap)
