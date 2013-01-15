@@ -116,8 +116,8 @@ def doMainExperiment(serversMap, clientsMap)
 		return;
 	end
 
-	info "## Waiting 5 seconds for servers to start ##"
-	wait 5
+	info "## Waiting #{property.miniWait} seconds for servers to start ##"
+	wait property.miniWait
 
 	info "## Launching clients ##"
 	success = launchClients(clientsMap)
@@ -239,7 +239,7 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 		node.group.exec(cmd)
 	}
 
-	wait 5
+	wait property.miniWait
 
 	# Install the delay module click script
 	info "Installing Click delay module"
@@ -253,7 +253,7 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 		node.group.exec(cmd)
 	}
 
-	wait 5
+	wait property.miniWait
 
 	# Download and install the delay module configuration file
 	info "Retrieving node delay configurations"
@@ -267,7 +267,7 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 		node.group.exec(client.gsub(/XxX/,node.asNumber.to_s))
 	}
 
-	wait 5
+	wait property.miniWait
 
 	info "Installing node delay configurations"
 	server = "cp #{property.delayConfigClient} /click/delayMod/config"
@@ -279,7 +279,7 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 		node.group.exec(client.gsub(/XxX/,node.asNumber.to_s))
 	}
 
-	wait 5
+	wait property.miniWait
 
 	# Delete any files we downloaded and no longer need
 	info "Cleaning up temporary files"
@@ -320,7 +320,7 @@ def installConfigs(serversMap, clientsMap)
 		node.group.exec(mkBin)
 	}
 
-	wait 2
+	wait property.microwait
 
 	info "Creating server configuration files."
 	serversMap.each_value { |node|
@@ -384,7 +384,7 @@ def installConfigs(serversMap, clientsMap)
 	}
 
 
-	wait 5
+	wait property.miniWait
 
 	info "Installing server files"
 
