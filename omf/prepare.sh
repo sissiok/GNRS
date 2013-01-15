@@ -55,7 +55,7 @@ cp $PREFIX_FILE $UPLOAD_DIR/prefixes.ipv4
 mv $BDB_FILE $UPLOAD_DIR
 mv $MAP_FILE $UPLOAD_DIR
 mv $BIND_FILE $UPLOAD_DIR
-cp "*.trace" $UPLOAD_DIR
+cp *.trace $UPLOAD_DIR
 
 tar -czvf $BASE_FILE.tgz $UPLOAD_DIR
 
