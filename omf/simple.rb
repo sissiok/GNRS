@@ -89,13 +89,15 @@ def doMainExperiment(serversMap, clientsMap)
 		return;
 	end
 
-	info "## Preparing the delay modules ##"
-	success = prepareDelayModule(serversMap, clientsMap, property.dataUrl, property.clickModule)
-	if success == 0
-		info "\tSuccessfully installed and configured delay module on all nodes."
-	else
-		error "\tUnable to configure delay module on one or more nodes. Exiting."
-		return;
+	if (property.disableDelay.to_s == "") 
+		info "## Preparing the delay modules ##"
+		success = prepareDelayModule(serversMap, clientsMap, property.dataUrl, property.clickModule)
+		if success == 0
+			info "\tSuccessfully installed and configured delay module on all nodes."
+		else
+			error "\tUnable to configure delay module on one or more nodes. Exiting."
+			return;
+		end
 	end
 
 	info "## Installing configuration files ##"
@@ -240,20 +242,18 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 
 	wait property.miniWait
 
-	if (property.disableDelay.to_s == "") 
-		# Install the delay module click script
-		info "Installing Click delay module"
-		cmd = "#{property.clickInstall} -u #{property.clickModule}"
+	# Install the delay module click script
+	info "Installing Click delay module"
+	cmd = "#{property.clickInstall} -u #{property.clickModule}"
 
-		serversMap.each_value { |node|
-			node.group.exec(cmd)
-		}
-		clientsMap.each_value { |node|
-			node.group.exec(cmd)
-		}
+	serversMap.each_value { |node|
+		node.group.exec(cmd)
+	}
+	clientsMap.each_value { |node|
+		node.group.exec(cmd)
+	}
 
-		wait property.miniWait
-	end
+	wait property.miniWait
 
 	# Download and install the delay module configuration file
 	info "Retrieving node delay configurations"
@@ -268,19 +268,17 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 	}
 
 	wait property.miniWait
-	if (property.disableDelay.to_s == "") 
-		info "Installing node delay configurations"
-		client = "cp #{property.delayConfigClient} /click/delayMod/config"
-		server  = "cp #{property.delayConfigServer} /click/delayMod/config"
-		serversMap.each_value { |node|
-			node.group.exec(server.gsub(/XxX/,node.asNumber.to_s))
-		}
-		clientsMap.each_value { |node|
-			node.group.exec(client.gsub(/XxX/,node.asNumber.to_s))
-		}
+	info "Installing node delay configurations"
+	client = "cp #{property.delayConfigClient} /click/delayMod/config"
+	server  = "cp #{property.delayConfigServer} /click/delayMod/config"
+	serversMap.each_value { |node|
+		node.group.exec(server.gsub(/XxX/,node.asNumber.to_s))
+	}
+	clientsMap.each_value { |node|
+		node.group.exec(client.gsub(/XxX/,node.asNumber.to_s))
+	}
 
-		wait property.miniWait
-	end # delay module installation
+	wait property.miniWait
 
 	# Delete any files we downloaded and no longer need
 	info "Cleaning up temporary files"
