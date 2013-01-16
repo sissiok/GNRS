@@ -9,7 +9,7 @@ defApplication('ping_app', 'pingmonitor') do |a| # What do the two strings mean?
 	a.description = "ping application"
 	a.defProperty('dest_addr', 'Address to ping', '-a', { :type => :string, :dynamic => false })
 	a.defProperty('count', 'Number of times to ping', '-c', { :type => :integer, :dynamic => false})
-	a.defProperty('interval', 'Interval between pings', '-i', { :type => integer, :dynamic => false})
+	a.defProperty('interval', 'Interval between pings', '-i', { :type => :integer, :dynamic => false})
 
 	a.defMeasurement('myping') do |m|
 		m.defMetric('dest_addr', :string)
