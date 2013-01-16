@@ -11,11 +11,16 @@
 # Basic properties (pushed to nodes)
 defProperty('numServers', 1, "Number of nodes to use for servers")
 defProperty('numClients', 1, "Number of clients to use for clients")
-defProperty('runTime', 60, "Number of seconds that the experiment should be allowed to run")
+defProperty('microWait', 2, "Number of seconds to wait for copies, writes, etc. to occur.")
+defProperty('miniWait', 5, 'Number of seconds to wait for things like file downloads.')
+defProperty('largeWait', 20, 'Number of seconds to wait for "heavy" things.')
+defProperty('clientWait', 120, 'Number of seconds to wait for each client to run.')
+defProperty('disableDelay', nil, 'Switch to disable the delay module.')
 
 # Web resources
 defProperty('dataUrl', 'http://my.domain.com/path/to/files', 'Base URL for topology/delay files.')
-defProperty('bindingFile', 'jellyfish_topo.bind', 'Filename of AS -> IP:Port binding information.')
+defProperty('scriptUrl', 'https://bitbucket.org/romoore/gnrs/downloads', 'Base URL for script files.')
+defProperty('bindingFile', 'topology.bind', 'Filename of AS -> IP:Port binding information.')
 defProperty('clickModule', 'delayModule.click', 'Filename of delay module Click script.')
 # 'XxX' is a placeholder for the AS number in the experiment script
 defProperty('delayConfigServer', 'as_XxX_delay_serv.dat', 'Filename of server delay module configuration.')

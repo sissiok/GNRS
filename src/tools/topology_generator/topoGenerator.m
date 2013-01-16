@@ -5,6 +5,10 @@ function [ asID, asLinks, asPrefix ] = topoGenerator( method, asNum )
 % method=1: extract the top asNum ASes from DIMES dataset based on AS size
 % (prefix)
 % method=2: generate a synthetic AS-level topology based on jellyfish model
+% method=3: geographical location model based synthetic topology
+
+method=str2num(method);
+asNum=str2num(asNum);
 
 if(method==0)
     [ asID, asLinks, asPrefix ] = degreeTopoGenerator( asNum );
@@ -14,7 +18,11 @@ elseif(method==1)
     
 elseif(method==2)
     [ asID, asLinks, asPrefix ] = jellyfishTopoGenerator( asNum );
+
+elseif(method==3)
+    [ asID, asLinks, asPrefix ] = locTopoGenerator( asNum );
 end
+
 
 %asID mapping: map asID to a continuous integer space starting from 1. For
 %orbit grid evaluation purpose
