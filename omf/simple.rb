@@ -146,7 +146,7 @@ def doMainExperiment(serversMap, clientsMap)
 end # main
 
 def defineGroups(serversMap, clientsMap)
-	successTopology = Topology['system:topo:imaged']
+	successTopology = Topology["#{property.topology}"]
 	nodelist = successTopology.nodes
 	totalNodes = nodelist.size
 
