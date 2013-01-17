@@ -13,6 +13,7 @@
 # Import the GNRSNode class
 require ('./gnrs_node.rb')
 require ('./gnrs_config.rb')
+require ('./statscollect.rb')
 
 # Resources file location can be configured with:
 #   --resourceFile /path/to/file.rb
@@ -143,10 +144,26 @@ def doMainExperiment(serversMap, clientsMap)
 		return
 	end
 
+	info "Collecting statistsics from nodes."
+	# clients
+	success = collectClientStats(clientsMap, '')
+	if success != 0
+		error "\tUnable to collect client statistics."
+		return
+	end
+
+	# servers
+	success = collectServerStats(serversMap,'')
+	if success != 0
+		error "\tUnable to collect server statistics."
+		return
+	end
+
+
 end # main
 
 def defineGroups(serversMap, clientsMap)
-	successTopology = Topology["#{property.topology}"]
+	successTopology = Topology[property.topology.to_s]
 	nodelist = successTopology.nodes
 	totalNodes = nodelist.size
 
