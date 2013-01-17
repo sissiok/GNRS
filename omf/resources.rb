@@ -18,7 +18,7 @@ defProperty('clientWait', 120, 'Number of seconds to wait for each client to run
 defProperty('disableDelay', nil, 'Switch to disable the delay module.')
 
 # Primary topology from which to draw nodes
-defProperty('topology' 'system:topo:imaged', 'The primary topology from which to draw nodes.')
+defProperty('topology', 'system:topo:imaged', 'The primary topology from which to draw nodes.')
 
 # Web resources
 defProperty('dataUrl', 'http://my.domain.com/path/to/files', 'Base URL for topology/delay files.')
