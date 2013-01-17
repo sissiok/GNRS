@@ -359,10 +359,10 @@ def installConfigs(serversMap, clientsMap)
 		cmd = "#{property.wget} #{property.dataUrl}/#{property.prefixIpv4}"
 		node.group.exec(cmd)
 		# BerkeleyDB Config
-		cmd = "#{property.wget} #{property.scriptUrl}/#{property.serverBDB}"
+		cmd = "#{property.wget} #{property.dataUrl}/#{property.serverBDB}"
 		node.group.exec(cmd)
 		# IPv4 Mapper Configuration
-		cmd = "#{property.wget} #{property.scriptUrl}/#{property.mapIpv4}"
+		cmd = "#{property.wget} #{property.dataUrl}/#{property.mapIpv4}"
 		node.group.exec(cmd)
 		# Jar file
 		cmd = "#{property.wget} #{property.scriptUrl}/#{property.jarFile}"
