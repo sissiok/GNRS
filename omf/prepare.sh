@@ -68,5 +68,6 @@ rm AS_arr.data
 rm $AS_FILE
 rm $ROUTE_FILE
 rm -rf $UPLOAD_DIR
+rm $AS_BIND
 
 echo "Prepared files are located in $BASE_FILE.tgz"
