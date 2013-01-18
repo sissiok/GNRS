@@ -54,3 +54,4 @@ defProperty('wget', '/usr/bin/wget --timeout=3 -qN', 'Location of the wget utili
 defProperty('clickInstall', '/usr/local/sbin/click-install', 'Location of the click-install utility.')
 defProperty('java', '/usr/bin/java', 'Location of the Java launcher.')
 defProperty('updateRc', '/usr/sbin/update-rc.d', 'Location of update-rc.d utility.')
+defProperty('scp', 'scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no', 'SCP utility to copy files.')

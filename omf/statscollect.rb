@@ -18,8 +18,8 @@ def collectClientStats(clientsMap, prefixDir)
 	clientsMap.each_value { |client|
 		path = prefixDir.empty? ? "client_#{client.asNumber}/" : "#{prefixDir}/client_#{client.asNumber}/";
 		system("mkdir -p #{path}");
-		system("scp root@#{client.hostname}:\"/trace-client/*\" #{path}");
-		system("scp root@#{client.hostname}:/var/gnrs/gnrsd.log #{path}");
+		system("#{property.scp} root@#{client.hostname}:\"/trace-client/*\" #{path}");
+		system("#{property.scp} root@#{client.hostname}:/var/gnrs/gnrsd.log #{path}");
 
 		# exitStatus = $?.exitstatus
 		#pid = $?.pid
@@ -41,9 +41,16 @@ def collectServerStats(serversMap, prefixDir)
 	serversMap.each_value { |server|
 		path = prefixDir.empty? ? "server_#{server.asNumber}/" : "#{prefixDir}/server_#{server.asNumber}/";
 		system("mkdir -p #{path}");
-		system("scp root@#{server.hostname}:\"/var/gnrs/stats/*\" #{path}");
-		system("scp root@#{server.hostname}:/var/gnrs/gnrsd.log #{path}");
+		system("#{property.scp} root@#{server.hostname}:\"/var/gnrs/stats/*\" #{path}");
+		system("#{property.scp} root@#{server.hostname}:/var/gnrs/gnrsd.log #{path}");
 	}
 	
 	return 0;
 end # collectServerStats
+
+def removeExperimentFiles(nodeMap)
+	nodeMap.each_value { |node|
+		node.group.exec("rm -rf /var/gnrs /etc/gnrs /usr/local/bin/gnrs /trace-client")
+	}
+	return 0
+end # removeExperimentFiles
