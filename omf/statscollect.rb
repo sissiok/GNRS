@@ -14,9 +14,15 @@ def collectClientStats(clientsMap, prefixDir)
 				return 1;
 			end
 	end
-
+	uniqueId = Hash.new(0)
 	clientsMap.each_value { |client|
 		path = prefixDir.empty? ? "client_#{client.asNumber}/" : "#{prefixDir}/client_#{client.asNumber}/";
+		if File.exists?(path)  and File.directory?(path)
+			nextId = uniqueId[path]
+			uniqueId[path] = nextId+1
+			path = path[0..-2]
+			path = "#{path}_#{nextId}/"
+		end
 		system("mkdir -p #{path}");
 		system("#{property.scp} root@#{client.hostname}:\"/trace-client/*\" #{path}");
 		system("#{property.scp} root@#{client.hostname}:/var/gnrs/gnrsd.log #{path}");
