@@ -1,15 +1,28 @@
 #!/bin/bash
+# 
+# A simple script to generate a sequential trace of inserts followed by
+# queries for a GNRS client.
+# 
+# Author: Robert Moore
+# Last Modified: Jan 14, 2013
 
-numInsert=$1
-numLookup=$2
-numTotal=$(($numInsert + $numLookup))
+FROM=1
+TO=100
 
-I=0
-for ((; I < $numInsert; I=$I+1)); do
-	echo "$I I $I $I,999,1"
+if [ $# -ge 1 ]; then
+	FROM=$1
+	if [ $# -ge 2 ]; then
+		TO=$2
+	fi
+fi
+
+SEQ=0
+for (( I=$FROM; I <= $TO; I++ )); do
+	echo "$SEQ I $I $I,999,1";
+	(( SEQ++ )) ;
 done
 
-for ((; I < $numTotal; I=$I+1)); do
-	echo "$I Q $(($I-$numInsert))"
+for (( I=$FROM; I <= $TO; I++ )); do
+	echo "$SEQ Q $I"
+	(( SEQ++ )) ;
 done
-
