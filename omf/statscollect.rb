@@ -54,9 +54,4 @@ def collectServerStats(serversMap, prefixDir)
 	return 0;
 end # collectServerStats
 
-def removeExperimentFiles(nodeMap)
-	nodeMap.each_value { |node|
-		node.group.exec("rm -rf /var/gnrs /etc/gnrs /usr/local/bin/gnrs /trace-client")
-	}
-	return 0
-end # removeExperimentFiles
+

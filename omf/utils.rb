@@ -413,3 +413,11 @@ def stopServers(serversMap)
 	return 0
 end # stopServers
 
+def removeExperimentFiles(nodeMap)
+	nodeMap.each_value { |node|
+		node.group.exec("rm -rf /var/gnrs /etc/gnrs /usr/local/bin/gnrs /trace-client")
+		node.group.exec("#{property.updateRc} -f gnrsd remove")
+		node.group.exec("rm /etc/init.d/gnrsd")
+	}
+	return 0
+end # removeExperimentFiles
