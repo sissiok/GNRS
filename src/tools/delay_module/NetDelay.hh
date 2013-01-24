@@ -11,6 +11,8 @@
 // Number of milliseconds needed to schedule the packet delay timer
 #define TIMER_TOLERANCE_MSEC 0
 
+#define DELIVER_BURST_LENGTH 4
+
 // Click includes
 #include <click/element.hh>
 #include <click/timer.hh>
@@ -54,6 +56,12 @@ private:
 
     Timer sendTimer;
     const HashTable<uint64_t, int> *delayTable;
+
+    //lock for multithread access (incl any separate enq and deq threads)
+    atomic_uint32_t pq_lock;
+
+	//stats
+	volatile uint32_t recvCnt, sndCnt, sndFires;
 };
 
 CLICK_ENDDECLS

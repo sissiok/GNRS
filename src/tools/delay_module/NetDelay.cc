@@ -6,9 +6,10 @@
 #include "NetDelay.hh"
 
 CLICK_DECLS
-NetDelay::NetDelay(): sendTimer(this)//,queueTop(-1)
+NetDelay::NetDelay(): sendTimer(this), recvCnt(0), sndCnt(0), sndFires(0)//,queueTop(-1)
 {    
     delayTable = new HashTable<uint64_t,int>(0);
+	pq_lock = false;	
 }
 
 NetDelay::~NetDelay() {
@@ -112,6 +113,8 @@ int NetDelay::live_reconfigure(Vector<String> &conf, ErrorHandler *errh) {
 void NetDelay::push(int port, Packet *p) {
     Timestamp arrivalTs = Timestamp::now_steady();
     int64_t nowMsec = ((int64_t)arrivalTs.sec())*1000 + arrivalTs.msec();
+
+	recvCnt++;
 #ifdef DEBUG_PSH
     click_chatter("DMPsh: Received a packet @%lld.",nowMsec);
     click_chatter("DMPsh: Updated!.");
@@ -144,6 +147,10 @@ void NetDelay::push(int port, Packet *p) {
     if(pkt_delay > 0){
         // Calculate the actual delay for this packet
         delayUnit.clockTime = arrivalTs + Timestamp::make_msec(pkt_delay);
+
+        //other threads spin while one enters critical section
+        while(pq_lock.compare_and_swap(false, true) != true);
+
         bool empty = packetQueue.empty();
         packetQueue.push(delayUnit);
 #ifdef DEBUG_PSH
@@ -169,6 +176,8 @@ void NetDelay::push(int port, Packet *p) {
         click_chatter("DMPsh: Finished non-empty queue.");
 #endif
         }
+        //leave critical section
+        pq_lock = false;
     }
     else { // No delay configured
         output(0).push(p);
@@ -184,26 +193,53 @@ void NetDelay::push(int port, Packet *p) {
  * it to the element's output, otherwise reschedules the timer.
  */
 void NetDelay::run_timer(Timer *) {
+
+	sndFires++;
     // Track the current time
     Timestamp nowTs = Timestamp::now_steady();
     int64_t currTime = ((int64_t)nowTs.sec())*1000 + nowTs.msec();
+
+    Packet* deliverArr[DELIVER_BURST_LENGTH];
+    int numPktsTx = 0;
 #ifdef DEBUG_TIM
     click_chatter("DMRtim: Fired at %lld", currTime);
 #endif
-    while(!packetQueue.empty()){
+    //enter critical section
+    while(pq_lock.compare_and_swap(false, true) != true);
+
+    while(!packetQueue.empty() && (numPktsTx < DELIVER_BURST_LENGTH)){
       // Grab the head of the queue
       DelayUnit topUnit = packetQueue.top();
       if(topUnit.clockTime > nowTs){
         break;
       }
-      Packet *somePacket = topUnit.pkt;
+      deliverArr[numPktsTx] = topUnit.pkt;
+      numPktsTx++;
       packetQueue.pop();
-      output(0).push(somePacket);
     }
+    //leave critical section
+    pq_lock = false;
+
+    //push out burst packets
+    for(int i = 0; i < numPktsTx; i++){
+        output(0).push(deliverArr[i]);
+	sndCnt++;
+    }
+    //enter critical section
+    while(pq_lock.compare_and_swap(false, true) != true);
     // If the queue is not empty, then reschedule the timer
     if(!packetQueue.empty())  {
         sendTimer.schedule_at_steady(packetQueue.top().clockTime);
     }
+
+    //leave critical section
+    pq_lock = false;
+	
+	//periodic stats
+        uint32_t div = sndCnt/10000;
+        if(div*10000 == sndCnt){
+		click_chatter("dmod: r %lu s %lu sf %lu", recvCnt, sndCnt, sndFires);
+	}
 }
 
 CLICK_ENDDECLS
