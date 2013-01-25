@@ -244,7 +244,7 @@ def installConfigs(serversMap, clientsMap)
 	serversMap.each_value { |node|
 		# Main server config
 		configContents = makeServerConfig(node)
-		cmd = "echo '#{configContents}' >/etc/gnrs/server.xml"
+		cmd = "echo '#{configContents}' >/etc/gnrs/server_#{node.asNumber}.xml"
 		node.group.exec(cmd)
 
 		# Networking config
@@ -273,8 +273,8 @@ def installConfigs(serversMap, clientsMap)
 		cmd = "#{property.wget} #{property.scriptUrl}/#{property.gnrsd}"
 		node.group.exec(cmd)
 		# GNRSD Init script
-		cmd = "#{property.wget} #{property.scriptUrl}/#{property.gnrsdInit}"
-		node.group.exec(cmd)
+		#cmd = "#{property.wget} #{property.scriptUrl}/#{property.gnrsdInit}"
+		#node.group.exec(cmd)
 
 	}
 
@@ -331,11 +331,6 @@ def installConfigs(serversMap, clientsMap)
 		# GNRSD Init script
 		cmd = "chmod +x #{property.gnrsdInit}"
 		node.group.exec(cmd)
-		cmd = "mv #{property.gnrsdInit} /etc/init.d/gnrsd"
-		node.group.exec(cmd)
-		# Update rc.d scripts
-		cmd = "#{property.updateRc} gnrsd stop 2 0 1 2 3 4 5 6 ."
-		node.group.exec(cmd)
 	}
 
 	info "Installing client configuration files"
@@ -359,16 +354,33 @@ def installConfigs(serversMap, clientsMap)
 		node.group.exec(cmd)
 	}
 
+	info "Installing init scripts"
+	installInit(serversMap)
+
 	return 0
 end # installConfigs
+
+def installInit(servers)
+	servers.each_value { |node|
+		initScript = makeServerInit(node)
+
+		cmd = "echo '#{initScript}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >/etc/init.d/gnrsd_#{node.asNumber}"
+		info "Execing\n#{cmd}"
+		node.group.exec(cmd)
+
+		# Update rc.d scripts
+		cmd = "#{property.updateRc} gnrsd_#{node.asNumber} stop 2 0 1 2 3 4 5 6 ."
+		node.group.exec(cmd)
+	}
+end
 
 def launchServers(serversMap)
 
 	info "Launching server processes"
 
-	cmd = "service gnrsd start"
 
 	serversMap.each_value { |node|
+		cmd = "service gnrsd_#{node.asNumber} start"
 		node.group.exec(cmd)
 	}
 
@@ -416,8 +428,8 @@ end # stopServers
 def removeExperimentFiles(nodeMap)
 	nodeMap.each_value { |node|
 		node.group.exec("rm -rf /var/gnrs /etc/gnrs /usr/local/bin/gnrs /trace-client")
-		node.group.exec("#{property.updateRc} -f gnrsd remove")
-		node.group.exec("rm /etc/init.d/gnrsd")
+		node.group.exec("#{property.updateRc} -f gnrsd_#{node.asNumber} remove")
+		node.group.exec("rm /etc/init.d/gnrsd_#{node.asNumber}")
 	}
 	return 0
 end # removeExperimentFiles
