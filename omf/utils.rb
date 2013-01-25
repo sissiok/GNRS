@@ -365,6 +365,9 @@ def installInit(servers)
 	servers.each_value { |node|
 		initScript = makeServerInit(node)
 
+		# The sed command below will replace any escaped ( or ) characters on the
+		# node side.  This is because the ResourceController (RC) in OMF will
+		# crash if the string contains unbalanced ( or ) characters.
 		cmd = "echo '#{initScript}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >/etc/init.d/gnrsd_#{node.asNumber}"
 		info "Execing\n#{cmd}"
 		node.group.exec(cmd)
