@@ -361,13 +361,28 @@ def installConfigs(serversMap, clientsMap)
 end # installConfigs
 
 def installInit(servers)
+	info "Creating server init scripts"
 	servers.each_value { |node|
 		initScript = makeServerInit(node)
 
 		cmd = "echo '#{initScript}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >/etc/init.d/gnrsd_#{node.asNumber}"
 		info "Execing\n#{cmd}"
 		node.group.exec(cmd)
+	}
 
+	wait property.microWait
+	info "Updating permissions for server init scripts"
+
+	servers.each_value { |node|
+		cmd = "chmod +x /etc/init.d/gnrsd_#{node.asNumber}"
+		node.group.exec(cmd)
+
+	}
+
+	wait property.microWait
+	info "Installing server init scripts."
+
+	servers.each_value { |node|
 		# Update rc.d scripts
 		cmd = "#{property.updateRc} gnrsd_#{node.asNumber} stop 2 0 1 2 3 4 5 6 ."
 		node.group.exec(cmd)
@@ -416,9 +431,9 @@ end # genLookups
 def stopServers(serversMap)
 
 	info "Stopping gnrs servers"
-	cmd = "service gnrsd stop"
 
 	serversMap.each_value { |node|
+		cmd = "service gnrsd_#{node.asNumber} stop"
 		node.group.exec(cmd)
 	}
 
