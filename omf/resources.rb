@@ -16,6 +16,7 @@ defProperty('miniWait', 5, 'Number of seconds to wait for things like file downl
 defProperty('largeWait', 20, 'Number of seconds to wait for "heavy" things.')
 defProperty('clientWait', 120, 'Number of seconds to wait for each client to run.')
 defProperty('disableDelay', nil, 'Switch to disable the delay module.')
+defProperty('serversPerNode' 1, 'Maximum number of server processes per node.')
 
 # Primary topology from which to draw nodes
 defProperty('topology', 'system:topo:imaged', 'The primary topology from which to draw nodes.')

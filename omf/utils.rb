@@ -368,6 +368,7 @@ def installInit(servers)
 		# The sed command below will replace any escaped ( or ) characters on the
 		# node side.  This is because the ResourceController (RC) in OMF will
 		# crash if the string contains unbalanced ( or ) characters.
+		# Big thanks to Ben Firner for the regular expression
 		cmd = "echo '#{initScript}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >/etc/init.d/gnrsd_#{node.asNumber}"
 		info "Execing\n#{cmd}"
 		node.group.exec(cmd)
