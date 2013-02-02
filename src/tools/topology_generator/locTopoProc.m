@@ -91,7 +91,6 @@ for i=2:length(asLinks)
         asLinks_(linkNum_,:) = asLinks(i,:);
     end
 end
-asLinks=asLinks_;
 
-save('linkPrefixofLOC.mat','asLinks','asPrefix');
+save('linkPrefixofLOC.mat','asLinks_','asPrefix');
 
