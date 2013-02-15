@@ -12,6 +12,7 @@
 
 # Import the GNRSNode class
 require ('./gnrs_node.rb')
+require ('./gnrs_group.rb')
 require ('./gnrs_config.rb')
 require ('./statscollect.rb')
 
