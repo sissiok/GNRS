@@ -92,5 +92,5 @@ for i=2:length(asLinks)
     end
 end
 
-save('linkPrefixofLOC.mat','asLinks','asPrefix');
+save('linkPrefixofLOC.mat','asLinks_','asPrefix');
 
