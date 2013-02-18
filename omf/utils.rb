@@ -131,12 +131,11 @@ def defineGroups(topology, serversMap, clientsMap)
 		for i in 1..remainingServers
 			node = GNRSNode.new
 			node.asNumber = asNumber
-			node.port = "500#{i+1}"
+			node.port = "500#{i}"
 			node.group = gnrsGroup
 			gnrsGroup.nodelist << node
 			asMap[node.asNumber] = node
 			asNumber += 1
-			info node.inspect;
 		end
 		ipOffset += 1
 	}
@@ -160,11 +159,10 @@ def defineGroups(topology, serversMap, clientsMap)
 			node = GNRSNode.new
 			node.asNumber = (asNumber % maxAsNumber) + 1;
 			node.server = asMap[node.asNumber];
-			node.port = "400#{i+1}"
+			node.port = "400#{i}"
 			node.group = gnrsGroup
 			gnrsGroup.nodelist << node
 			asNumber += 1
-			info node.inspect;
 		end
 
 		ipOffset += 1
@@ -283,19 +281,15 @@ def installConfigs(serversMap, clientsMap)
 	mkBin = "mkdir -p /usr/local/bin/gnrs/"
 	
 	serversMap.each_value { |group|
-		group.nodelist.each { |node|
-			node.group.group.exec(mkVar)
-			node.group.group.exec(mkEtc)
-			node.group.group.exec(mkBin)
-		}
+		group.group.exec(mkVar)
+		group.group.exec(mkEtc)
+		group.group.exec(mkBin)
 	}
 
 	clientsMap.each_value { |group|
-		group.nodelist.each { |node|
-			node.group.group.exec(mkVar)
-			node.group.group.exec(mkEtc)
-			node.group.group.exec(mkBin)
-		}
+		group.group.exec(mkVar)
+		group.group.exec(mkEtc)
+		group.group.exec(mkBin)
 	}
 
 	wait property.microWait
@@ -399,23 +393,25 @@ def installConfigs(serversMap, clientsMap)
 
 	info "Installing client configuration files"
 
-	clientsMap.each_value { |node|
+	clientsMap.each_value { |group|
 		# JAR file
 		cmd = "mv #{property.jarFile} /usr/local/bin/gnrs/"
-		node.group.exec(cmd)
+		group.group.exec(cmd)
 		# GBench script
 		cmd = "chmod +x #{property.gbench}"
-		node.group.exec(cmd)
+		group.group.exec(cmd)
 		cmd = "mv #{property.gbench} /usr/local/bin/gnrs/"
-		node.group.exec(cmd)
+		group.group.exec(cmd)
 		# GGen script
 		cmd = "chmod +x #{property.ggen}"
-		node.group.exec(cmd)
+		group.group.exec(cmd)
 		cmd = "mv #{property.ggen} /usr/local/bin/gnrs/"
-		node.group.exec(cmd)
-		# Trace file
-		cmd = "mv #{property.clientTrace} /etc/gnrs/".gsub(/XxX/,node.asNumber.to_s)
-		node.group.exec(cmd)
+		group.group.exec(cmd)
+		group.nodelist.each { |node|
+			# Trace file
+			cmd = "mv #{property.clientTrace} /etc/gnrs/".gsub(/XxX/,node.asNumber.to_s)
+			group.group.exec(cmd)
+		}
 	}
 
 	info "Installing init scripts"
@@ -436,7 +432,6 @@ def installInit(servers)
 			# crash if the string contains unbalanced ( or ) characters.
 			# Big thanks to Ben Firner for the regular expression
 			cmd = "echo '#{initScript}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >/etc/init.d/gnrsd_#{node.asNumber}"
-			info "Execing\n#{cmd}"
 			node.group.group.exec(cmd)
 		}
 	}
@@ -466,6 +461,9 @@ end
 def launchServers(serversMap)
 
 	info "Launching server processes"
+	serversMap.each_value { |group|
+		info "\t#{group}"
+	}
 
 
 	serversMap.each_value { |group|
@@ -481,6 +479,11 @@ end #launchServers
 def loadGUIDs(clientsMap)
 
 	info "Launching trace clients"
+	clientsMap.each_value { |group|
+		info "\t#{group}"
+	}	
+
+
 	# 3 parameters to gbench: client config, trace file, inter-message send time in microseconds
 	baseCmd = "/usr/local/bin/gnrs/#{property.gbench} /etc/gnrs/client.xml /etc/gnrs/#{property.clientTrace} #{property.messageDelay}"
 
@@ -521,10 +524,12 @@ def stopServers(serversMap)
 end # stopServers
 
 def removeExperimentFiles(nodeMap)
-	nodeMap.each_value { |node|
-		node.group.group.exec("rm -rf /var/gnrs /etc/gnrs /usr/local/bin/gnrs /trace-client")
-		node.group.group.exec("#{property.updateRc} -f gnrsd_#{node.asNumber} remove")
-		node.group.group.exec("rm /etc/init.d/gnrsd_#{node.asNumber}")
+	nodeMap.each_value { |group|
+		group.group.exec("rm -rf /var/gnrs /etc/gnrs /usr/local/bin/gnrs /trace-client")
+		group.nodelist.each { |node|
+			group.group.exec("#{property.updateRc} -f gnrsd_#{node.asNumber} remove")
+			group.group.exec("rm /etc/init.d/gnrsd_#{node.asNumber}")
+		}
 	}
 	return 0
 end # removeExperimentFiles

@@ -9,6 +9,6 @@
 class GNRSGroup 
 	attr_accessor :hostname, :group, :nodelist, :ipAddress
 	def to_s
-		"#{@hostname}"
+		"#{@hostname}/#{@ipAddress}: #{@nodelist}"
 	end
 end

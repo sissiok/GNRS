@@ -15,20 +15,22 @@ def collectClientStats(clientsMap, prefixDir)
 			end
 	end
 	uniqueId = Hash.new(0)
-	clientsMap.each_value { |client|
-		path = prefixDir.empty? ? "client_#{client.asNumber}/" : "#{prefixDir}/client_#{client.asNumber}/";
-		if File.exists?(path)  and File.directory?(path)
-			nextId = uniqueId[path]
-			uniqueId[path] = nextId+1
-			path = path[0..-2]
-			path = "#{path}_#{nextId}/"
-		end
-		system("mkdir -p #{path}");
-		system("#{property.scp} root@#{client.hostname}:\"/trace-client/*\" #{path}");
-		system("#{property.scp} root@#{client.hostname}:/var/gnrs/gnrsd.log #{path}");
+	clientsMap.each_value { |group|
+		group.nodelist.each { |client|
+			path = prefixDir.empty? ? "client_#{client.asNumber}/" : "#{prefixDir}/client_#{client.asNumber}/";
+			if File.exists?(path)  and File.directory?(path)
+				nextId = uniqueId[path]
+				uniqueId[path] = nextId+1
+				path = path[0..-2]
+				path = "#{path}_#{nextId}/"
+			end
+			system("mkdir -p #{path}");
+			system("#{property.scp} root@#{group.hostname}:\"/trace-client/*\" #{path}");
+			system("#{property.scp} root@#{group.hostname}:/var/gnrs/gnrsd.log #{path}");
 
-		# exitStatus = $?.exitstatus
-		#pid = $?.pid
+			# exitStatus = $?.exitstatus
+			#pid = $?.pid
+		}
 	}
 	return 0;
 end # collectClientStats
@@ -44,11 +46,13 @@ def collectServerStats(serversMap, prefixDir)
 		end
 	end
 
-	serversMap.each_value { |server|
-		path = prefixDir.empty? ? "server_#{server.asNumber}/" : "#{prefixDir}/server_#{server.asNumber}/";
-		system("mkdir -p #{path}");
-		system("#{property.scp} root@#{server.hostname}:\"/var/gnrs/stats/*\" #{path}");
-		system("#{property.scp} root@#{server.hostname}:/var/gnrs/gnrsd.log #{path}");
+	serversMap.each_value { |group|
+		group.nodelist.each { |server|
+			path = prefixDir.empty? ? "server_#{server.asNumber}/" : "#{prefixDir}/server_#{server.asNumber}/";
+			system("mkdir -p #{path}");
+			system("#{property.scp} root@#{group.hostname}:\"/var/gnrs/stats/*\" #{path}");
+			system("#{property.scp} root@#{group.hostname}:/var/gnrs/gnrsd.log #{path}");
+		}
 	}
 	
 	return 0;
