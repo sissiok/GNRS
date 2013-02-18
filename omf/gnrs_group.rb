@@ -6,8 +6,8 @@
 # Last Modified: Feb 15, 2013
 #
 
-class GNRSGroup
-	attr_accessor :hostname, :group, :nodelist
+class GNRSGroup 
+	attr_accessor :hostname, :group, :nodelist, :ipAddress
 	def to_s
 		"#{@hostname}"
 	end

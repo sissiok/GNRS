@@ -46,14 +46,6 @@ def doInitSetup
 		return success
 	end
 
-	
-	success = buildGroups(serversMap, clientsMap)
-	if success == 0
-	else 
-		error "\tUnable to define groups. Exiting."
-		return success
-	end
-
 	return success, serversMap, clientsMap
 end # doInitSetup
 
@@ -72,72 +64,124 @@ def defineGroups(topology, serversMap, clientsMap)
 	nodelist = topology.nodes
 	totalNodes = nodelist.size
 
-	if totalNodes < (property.numServers + property.numClients)
-		puts "Not enough nodes available. Need #{property.numServers + property.numClients}, but only have #{totalNodes}"
-		puts "Consider using a smaller number of servers (numServers) or clients (numClients)."
-		return -1
-	end
+	sNodes = property.sNodes.to_s.to_i
+	cNodes = property.cNodes.to_s.to_i
+	numServers = property.numServers.to_s.to_i
+	numClients = property.numClients.to_s.to_i
 
-	asMap = Hash.new
+	serversPerNode = []
+	clientsPerNode = []
 
-	for serverCount in 1..property.numServers
-		node = GNRSNode.new
-		node.hostname = nodelist.pop().to_s
-		node.asNumber = serverCount
-		node.ipAddress = "192.168.1.#{serverCount + 1}"
-		node.port = "5001"
-		serversMap[node.hostname] = node
-		asMap[node.asNumber] = node
-	end
+
+	quotient, remainder = numServers.divmod(sNodes)
+
 	
-	serversMap.each do |key, value|
-	end
-
-	for clientCount in 1..property.numClients
-		node = GNRSNode.new
-		node.hostname = nodelist.pop().to_s
-		node.asNumber = clientCount
-		node.ipAddress = "192.168.1.#{clientCount + 101}"
-		node.port = "4001"
-		node.server = asMap[node.asNumber]
-		# Randomly pick a server for this client
-		if node.server.nil?
-			node.asNumber = rand(property.numServers.to_s.to_i)+1
-			node.server = asMap[node.asNumber]
+	if(quotient >= 1 || remainder > 0)
+		for i in 1..sNodes
+			num = quotient
+			if(remainder > 0)
+				num += 1
+				remainder -= 1
+			end
+			serversPerNode << num
 		end
-		clientsMap[node.hostname] = node
+	else
+		for i in 1..sNodes
+			serversPerNode << 1
+		end
 	end
+
+	quotient, remainder = numServers.divmod(cNodes)
+
 	
-	clientsMap.each do |key, value|
+	if(quotient >= 1 || remainder > 0)
+		for i in 1..cNodes
+			num = quotient
+			if(remainder > 0)
+				num += 1
+				remainder -= 1
+			end
+			clientsPerNode << num
+		end
+	else
+		for i in 1..cNodes
+			clientsPerNode << 1
+		end
 	end
+
+	###############################
+
+	# Let's set the defGroup/nodes
+	asNumber = 1
+	ipOffset = 0
+	
+	asMap = Hash.new
+	
+	serversPerNode.each { |numServers|
+		remainingServers = numServers
+		hostname = nodelist.pop().to_s
+		group = defGroup(hostname, hostname)
+		gnrsGroup = GNRSGroup.new
+		gnrsGroup.hostname = hostname
+		gnrsGroup.group = group
+		gnrsGroup.nodelist = []
+		gnrsGroup.ipAddress = "192.168.1.#{ipOffset + 1}"
+		serversMap[hostname] = gnrsGroup
+
+		for i in 1..remainingServers
+			node = GNRSNode.new
+			node.asNumber = asNumber
+			node.port = "500#{i+1}"
+			node.group = gnrsGroup
+			gnrsGroup.nodelist << node
+			asMap[node.asNumber] = node
+			asNumber += 1
+			info node.inspect;
+		end
+		ipOffset += 1
+	}
+	maxAsNumber = asNumber - 1
+
+	ipOffset = 0
+	asNumber = 1
+	
+	clientsPerNode.each { |numClients|
+		remainingClients = numClients
+		hostname = nodelist.pop().to_s
+		group = defGroup(hostname, hostname)
+		gnrsGroup = GNRSGroup.new
+		gnrsGroup.hostname = hostname
+		gnrsGroup.group = group
+		gnrsGroup.nodelist = []
+		gnrsGroup.ipAddress = "192.168.1.#{ipOffset + 101}"
+		clientsMap[hostname] = gnrsGroup
+
+		for i in 1..remainingClients
+			node = GNRSNode.new
+			node.asNumber = (asNumber % maxAsNumber) + 1;
+			node.server = asMap[node.asNumber];
+			node.port = "400#{i+1}"
+			node.group = gnrsGroup
+			gnrsGroup.nodelist << node
+			asNumber += 1
+			info node.inspect;
+		end
+
+		ipOffset += 1
+		
+	}
 
 	return 0
 end # defineGroups
 
-def buildGroups(serversMap, clientsMap)
-	# Split the nodes into servers and clients
-	serversMap.each_value do |node|
-		grp = defGroup(node.hostname, node.hostname)
-		node.group = grp
-	end
-
-	# Now the clients
-	clientsMap.each_value do |node|
-		grp = defGroup(node.hostname, node.hostname)
-		node.group = grp
-	end
-
-	return 0
-end
-
 def prepareNodes(serversMap, clientsMap) 
 
-	serversMap.each_value { | node | 
-		node.group.net.e0.ip = node.ipAddress
+	serversMap.each_value { | group | 
+		group.group.net.e0.ip = group.ipAddress
 	}
 
-	clientsMap.each_value { | node | 
-		node.group.net.e0.ip = node.ipAddress
+	clientsMap.each_value { | group | 
+		group.group.net.e0.ip = group.ipAddress
 	}
 
 	return 0
@@ -150,10 +194,10 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 	cmd = "#{property.wget} #{property.scriptUrl}/#{property.clickModule}"
 
 	serversMap.each_value { |node|
-		node.group.exec(cmd)
+		node.group.group.exec(cmd)
 	}
 	clientsMap.each_value { |node|
-		node.group.exec(cmd)
+		node.group.group.exec(cmd)
 	}
 
 	wait property.miniWait
@@ -164,10 +208,10 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 	cmd = "#{property.clickInstall} -u #{property.clickModule}"
 
 	serversMap.each_value { |node|
-		node.group.exec(cmd)
+		node.group.group.exec(cmd)
 	}
 	clientsMap.each_value { |node|
-		node.group.exec(cmd)
+		node.group.group.exec(cmd)
 	}
 
 	wait property.miniWait
@@ -178,11 +222,15 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 	server = "#{property.wget} #{property.dataUrl}/#{property.delayConfigServer}"
 	client = "#{property.wget} #{property.dataUrl}/#{property.delayConfigClient}"
 
-	serversMap.each_value { |node|
-		node.group.exec(server.gsub(/XxX/,node.asNumber.to_s))
+	serversMap.each_value { |group|
+		group.nodelist.each { |node|
+			node.group.group.exec(server.gsub(/XxX/,node.asNumber.to_s))
+		}
 	}
-	clientsMap.each_value { |node|
-		node.group.exec(client.gsub(/XxX/,node.asNumber.to_s))
+	clientsMap.each_value { |group|
+		group.nodelist.each { |node|
+			node.group.group.exec(client.gsub(/XxX/,node.asNumber.to_s))
+		}
 	}
 
 	wait property.miniWait
@@ -191,11 +239,15 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 
 	client = "cp #{property.delayConfigClient} /click/delayMod/config"
 	server  = "cp #{property.delayConfigServer} /click/delayMod/config"
-	serversMap.each_value { |node|
-		node.group.exec(server.gsub(/XxX/,node.asNumber.to_s))
+	serversMap.each_value { |group|
+		group.nodelist.each { |node|
+			node.group.group.exec(server.gsub(/XxX/,node.asNumber.to_s))
+		}
 	}
-	clientsMap.each_value { |node|
-		node.group.exec(client.gsub(/XxX/,node.asNumber.to_s))
+	clientsMap.each_value { |group|
+		group.nodelist.each { |node|
+			node.group.group.exec(client.gsub(/XxX/,node.asNumber.to_s))
+		}
 	}
 
 	wait property.miniWait
@@ -203,17 +255,21 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 	# Delete any files we downloaded and no longer need
 	info "Deleting temporary files"
 
-	serversMap.each_value { |node|
-		cmd = "rm #{property.clickModule}"
-		node.group.exec(cmd)
-		cmd = "rm #{property.delayConfigServer}".gsub(/XxX/,node.asNumber.to_s)
-		node.group.exec(cmd)
+	serversMap.each_value { |group|
+		group.nodelist.each { |node|
+			cmd = "rm #{property.clickModule}"
+			node.group.group.exec(cmd)
+			cmd = "rm #{property.delayConfigServer}".gsub(/XxX/,node.asNumber.to_s)
+			node.group.group.exec(cmd)
+		}
 	}
-	clientsMap.each_value { |node|
-		cmd = "rm #{property.clickModule}"
-		node.group.exec(cmd)
-		cmd = "rm #{property.delayConfigClient}".gsub(/XxX/,node.asNumber.to_s)
-		node.group.exec(cmd)
+	clientsMap.each_value { |group|
+		group.nodelist.each { |node|
+			cmd = "rm #{property.clickModule}"
+			node.group.group.exec(cmd)
+			cmd = "rm #{property.delayConfigClient}".gsub(/XxX/,node.asNumber.to_s)
+			node.group.group.exec(cmd)
+		}
 	}
 
 	return 0
@@ -226,80 +282,87 @@ def installConfigs(serversMap, clientsMap)
 	mkEtc = "mkdir -p /etc/gnrs"
 	mkBin = "mkdir -p /usr/local/bin/gnrs/"
 	
-	serversMap.each_value { |node|
-		node.group.exec(mkVar)
-		node.group.exec(mkEtc)
-		node.group.exec(mkBin)
+	serversMap.each_value { |group|
+		group.nodelist.each { |node|
+			node.group.group.exec(mkVar)
+			node.group.group.exec(mkEtc)
+			node.group.group.exec(mkBin)
+		}
 	}
 
-	clientsMap.each_value { |node|
-		node.group.exec(mkVar)
-		node.group.exec(mkEtc)
-		node.group.exec(mkBin)
+	clientsMap.each_value { |group|
+		group.nodelist.each { |node|
+			node.group.group.exec(mkVar)
+			node.group.group.exec(mkEtc)
+			node.group.group.exec(mkBin)
+		}
 	}
 
 	wait property.microWait
 
 	info "Downloading server configuration files."
 
-	serversMap.each_value { |node|
-		# Main server config
-		configContents = makeServerConfig(node)
-		cmd = "echo '#{configContents}' >/etc/gnrs/server_#{node.asNumber}.xml"
-		node.group.exec(cmd)
+	serversMap.each_value { |group|
+		group.nodelist.each { |node|
+			# Main server config
+			configContents = makeServerConfig(node)
+			cmd = "echo '#{configContents}' >/etc/gnrs/server_#{node.asNumber}.xml"
+			node.group.group.exec(cmd)
 
-		# Networking config
-		configContents = makeServerNetConfig(node)
-		cmd = "echo '#{configContents}' >/etc/gnrs/net-ipv4_#{node.asNumber}.xml"
-		node.group.exec(cmd)
+			# Networking config
+			configContents = makeServerNetConfig(node)
+			cmd = "echo '#{configContents}' >/etc/gnrs/net-ipv4_#{node.asNumber}.xml"
+			node.group.group.exec(cmd)
 
-		# Download static files
+			# Download static files
 
-		# Binding file
-		cmd = "#{property.wget} #{property.dataUrl}/#{property.bindingFile}"
-		node.group.exec(cmd)
-		# IPv4 Prefix File (BGP Table)
-		cmd = "#{property.wget} #{property.dataUrl}/#{property.prefixIpv4}"
-		node.group.exec(cmd)
-		# BerkeleyDB Config
-		cmd = "#{property.wget} #{property.dataUrl}/#{property.serverBDB}"
-		node.group.exec(cmd)
-		# IPv4 Mapper Configuration
-		cmd = "#{property.wget} #{property.dataUrl}/#{property.mapIpv4}"
-		node.group.exec(cmd)
-		# Jar file
-		cmd = "#{property.wget} #{property.scriptUrl}/#{property.jarFile}"
-		node.group.exec(cmd)
-		# GNRSD script
-		cmd = "#{property.wget} #{property.scriptUrl}/#{property.gnrsd}"
-		node.group.exec(cmd)
-		# GNRSD Init script
-		#cmd = "#{property.wget} #{property.scriptUrl}/#{property.gnrsdInit}"
-		#node.group.exec(cmd)
-
+			# Binding file
+			cmd = "#{property.wget} #{property.dataUrl}/#{property.bindingFile}"
+			node.group.group.exec(cmd)
+			# IPv4 Prefix File (BGP Table)
+			cmd = "#{property.wget} #{property.dataUrl}/#{property.prefixIpv4}"
+			node.group.group.exec(cmd)
+			# BerkeleyDB Config
+			cmd = "#{property.wget} #{property.dataUrl}/#{property.serverBDB}"
+			node.group.group.exec(cmd)
+			# IPv4 Mapper Configuration
+			cmd = "#{property.wget} #{property.dataUrl}/#{property.mapIpv4}"
+			node.group.group.exec(cmd)
+			# Jar file
+			cmd = "#{property.wget} #{property.scriptUrl}/#{property.jarFile}"
+			node.group.group.exec(cmd)
+			# GNRSD script
+			cmd = "#{property.wget} #{property.scriptUrl}/#{property.gnrsd}"
+			node.group.group.exec(cmd)
+			# GNRSD Init script
+			#cmd = "#{property.wget} #{property.scriptUrl}/#{property.gnrsdInit}"
+			#node.group.group.exec(cmd)
+		}
 	}
 
 	info "Downloading client configuration files"
 	
-	clientsMap.each_value { |node|
-		# Main client config
-		configContents = makeClientConfig(node,node.server)
-		cmd = "echo '#{configContents}' >/etc/gnrs/client.xml"
-		node.group.exec(cmd)
-		# Download static files
+	clientsMap.each_value { |group|
+		group.nodelist.each { |node|
+			# Main client config
+			configContents = makeClientConfig(node,node.server)
+			cmd = "echo '#{configContents}' >/etc/gnrs/client.xml"
+			node.group.group.exec(cmd)
+			# Download static files
 
-		# Jar file
-		cmd = "#{property.wget} #{property.scriptUrl}/#{property.jarFile}"
-		node.group.exec(cmd)
-		# GGen script
-		cmd = "#{property.wget} #{property.scriptUrl}/#{property.ggen}"
-		node.group.exec(cmd)
-		# GBench script
-		cmd = "#{property.wget} #{property.scriptUrl}/#{property.gbench}"
-		node.group.exec(cmd)
-		# Client trace file
-		cmd = "#{property.wget} #{property.dataUrl}/#{property.clientTrace}".gsub(/XxX/,node.asNumber.to_s)
-		node.group.exec(cmd)
+			# Jar file
+			cmd = "#{property.wget} #{property.scriptUrl}/#{property.jarFile}"
+			node.group.group.exec(cmd)
+			# GGen script
+			cmd = "#{property.wget} #{property.scriptUrl}/#{property.ggen}"
+			node.group.group.exec(cmd)
+			# GBench script
+			cmd = "#{property.wget} #{property.scriptUrl}/#{property.gbench}"
+			node.group.group.exec(cmd)
+			# Client trace file
+			cmd = "#{property.wget} #{property.dataUrl}/#{property.clientTrace}".gsub(/XxX/,node.asNumber.to_s)
+			node.group.group.exec(cmd)
+		}
 	}
 
 
@@ -363,34 +426,40 @@ end # installConfigs
 
 def installInit(servers)
 	info "Creating server init scripts"
-	servers.each_value { |node|
-		initScript = makeServerInit(node)
+	servers.each_value { |group|
+		group.nodelist.each { |node|
 
-		# The sed command below will replace any escaped ( or ) characters on the
-		# node side.  This is because the ResourceController (RC) in OMF will
-		# crash if the string contains unbalanced ( or ) characters.
-		# Big thanks to Ben Firner for the regular expression
-		cmd = "echo '#{initScript}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >/etc/init.d/gnrsd_#{node.asNumber}"
-		info "Execing\n#{cmd}"
-		node.group.exec(cmd)
+			initScript = makeServerInit(node)
+
+			# The sed command below will replace any escaped ( or ) characters on the
+			# node side.  This is because the ResourceController (RC) in OMF will
+			# crash if the string contains unbalanced ( or ) characters.
+			# Big thanks to Ben Firner for the regular expression
+			cmd = "echo '#{initScript}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >/etc/init.d/gnrsd_#{node.asNumber}"
+			info "Execing\n#{cmd}"
+			node.group.group.exec(cmd)
+		}
 	}
 
 	wait property.microWait
 	info "Updating permissions for server init scripts"
 
-	servers.each_value { |node|
-		cmd = "chmod +x /etc/init.d/gnrsd_#{node.asNumber}"
-		node.group.exec(cmd)
-
+	servers.each_value { |group|
+		group.nodelist.each { |node|
+			cmd = "chmod +x /etc/init.d/gnrsd_#{node.asNumber}"
+			node.group.group.exec(cmd)
+		}
 	}
 
 	wait property.microWait
 	info "Installing server init scripts."
 
-	servers.each_value { |node|
-		# Update rc.d scripts
-		cmd = "#{property.updateRc} gnrsd_#{node.asNumber} stop 2 0 1 2 3 4 5 6 ."
-		node.group.exec(cmd)
+	servers.each_value { |group|
+		group.nodelist.each { |node|
+			# Update rc.d scripts
+			cmd = "#{property.updateRc} gnrsd_#{node.asNumber} stop 2 0 1 2 3 4 5 6 ."
+			node.group.group.exec(cmd)
+		}
 	}
 end
 
@@ -399,9 +468,11 @@ def launchServers(serversMap)
 	info "Launching server processes"
 
 
-	serversMap.each_value { |node|
-		cmd = "service gnrsd_#{node.asNumber} start"
-		node.group.exec(cmd)
+	serversMap.each_value { |group|
+		group.nodelist.each { |node|
+			cmd = "service gnrsd_#{node.asNumber} start"
+			node.group.group.exec(cmd)
+		}
 	}
 
 	return 0
@@ -413,9 +484,11 @@ def loadGUIDs(clientsMap)
 	# 3 parameters to gbench: client config, trace file, inter-message send time in microseconds
 	baseCmd = "/usr/local/bin/gnrs/#{property.gbench} /etc/gnrs/client.xml /etc/gnrs/#{property.clientTrace} #{property.messageDelay}"
 
-	clientsMap.each_value { |node|
-		cmd = baseCmd.gsub(/XxX/,node.asNumber.to_s)
-		node.group.exec(cmd)
+	clientsMap.each_value { |group|
+		group.nodelist.each { |node|
+			cmd = baseCmd.gsub(/XxX/,node.asNumber.to_s)
+			node.group.group.exec(cmd)
+		}
 	}
 
 	return 0
@@ -437,9 +510,11 @@ def stopServers(serversMap)
 
 	info "Stopping gnrs servers"
 
-	serversMap.each_value { |node|
-		cmd = "service gnrsd_#{node.asNumber} stop"
-		node.group.exec(cmd)
+	serversMap.each_value { |group|
+		group.nodelist.each { |node|
+			cmd = "service gnrsd_#{node.asNumber} stop"
+			node.group.group.exec(cmd)
+		}
 	}
 
 	return 0
@@ -447,9 +522,9 @@ end # stopServers
 
 def removeExperimentFiles(nodeMap)
 	nodeMap.each_value { |node|
-		node.group.exec("rm -rf /var/gnrs /etc/gnrs /usr/local/bin/gnrs /trace-client")
-		node.group.exec("#{property.updateRc} -f gnrsd_#{node.asNumber} remove")
-		node.group.exec("rm /etc/init.d/gnrsd_#{node.asNumber}")
+		node.group.group.exec("rm -rf /var/gnrs /etc/gnrs /usr/local/bin/gnrs /trace-client")
+		node.group.group.exec("#{property.updateRc} -f gnrsd_#{node.asNumber} remove")
+		node.group.group.exec("rm /etc/init.d/gnrsd_#{node.asNumber}")
 	}
 	return 0
 end # removeExperimentFiles

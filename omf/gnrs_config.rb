@@ -41,7 +41,7 @@ def makeServerNetConfig(node)
 </edu.rutgers.winlab.mfirst.net.ipv4udp.Configuration>
 ENDSTR
 
-	return asString.gsub(/_PORT_/,node.port.to_s).gsub(/_IPADDR_/,node.ipAddress.to_s)
+	return asString.gsub(/_PORT_/,node.port.to_s).gsub(/_IPADDR_/,node.group.ipAddress.to_s)
 end # makeServerNetConfig
 
 def makeClientConfig(client,server)
@@ -55,7 +55,7 @@ def makeClientConfig(client,server)
 </edu.rutgers.winlab.mfirst.client.Configuration>
 ENDSTR
 
-	return asString.gsub(/_SRV-IPADDR_/,server.ipAddress.to_s).gsub(/_SRV-PORT_/,server.port.to_s).gsub(/_CLT-IPADDR_/,client.ipAddress.to_s).gsub(/_CLT-PORT_/,client.port.to_s)
+	return asString.gsub(/_SRV-IPADDR_/,server.group.ipAddress.to_s).gsub(/_SRV-PORT_/,server.port.to_s).gsub(/_CLT-IPADDR_/,client.group.ipAddress.to_s).gsub(/_CLT-PORT_/,client.port.to_s)
 end # makeClientConfig
 
 def makeServerInit(server)
