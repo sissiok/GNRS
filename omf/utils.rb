@@ -191,11 +191,11 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 	# Download delay module click script
 	cmd = "#{property.wget} #{property.scriptUrl}/#{property.clickModule}"
 
-	serversMap.each_value { |node|
-		node.group.group.exec(cmd)
+	serversMap.each_value { |group|
+		group.group.exec(cmd)
 	}
-	clientsMap.each_value { |node|
-		node.group.group.exec(cmd)
+	clientsMap.each_value { |group|
+		group.group.exec(cmd)
 	}
 
 	wait property.miniWait
@@ -205,11 +205,11 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 	# Install the delay module click script
 	cmd = "#{property.clickInstall} -u #{property.clickModule}"
 
-	serversMap.each_value { |node|
-		node.group.group.exec(cmd)
+	serversMap.each_value { |group|
+		group.group.exec(cmd)
 	}
-	clientsMap.each_value { |node|
-		node.group.group.exec(cmd)
+	clientsMap.each_value { |group|
+		group.group.exec(cmd)
 	}
 
 	wait property.miniWait
@@ -533,66 +533,3 @@ def removeExperimentFiles(nodeMap)
 	}
 	return 0
 end # removeExperimentFiles
-#!/usr/ruby
-
-def getASList(fileName)
-	asList = Hash.new
-	File.open(fileName).readlines.each{ |line|
-		# Strip newline
-		line.chomp!
-		cols = line.split(' ')
-		asList[cols[0]] = cols[0]
-		asList[cols[1]] = cols[1]
-	}
-	sortedArray = asList.values
-	sortedArray.sort!
-	return sortedArray
-end # getASList
-
-#
-# asList - list of AS numbers
-# routeFileName - route file (output of shortest-path generator)
-# nodeMap - mapping from AS number to GNRSNode objects
-# isClient - boolean indicating if the output is for a client
-#
-def buildDelayFiles(asList, routeFileName, nodeMap, isClient)
-	routeFile = File.open(routeFileName)
-
-	asIndex = 0
-
-	# Each line of the matrix
-	routeFile.readlines.each { |line|
-
-		# Grab the next AS number
-		currAs = asList[asIndex].to_i
-		# For each AS number, let's make an output file
-		outFileName = "as_#{currAs}_delay_"
-		if isClient
-			outFileName .= "_client.dat"
-		else
-			outFileName .= "_server.dat"
-		end
-		outFile = File.open(outFileName, 'w')
-		lineParts = line.gsub(/\s+/m, ' ').strip.split(" ")
-		next if lineParts.length == 1
-
-		interlaced = asList.zip(lineParts)
-
-		interlaced.each { |pair|
-			asNum = pair[0].to_i
-			delay = pair[1]
-			node = nodeMap[asNum]
-			if(asNum == currAs)
-				outFile.write("#{node.group.ipAddress}, #{node.port}, 5\n")
-			else
-				outFile.write("#{node.group.ipAddress}, #{node.port}, #{delay}\n")
-			end
-		}
-
-		outFile.flush
-		outFile.close
-		asIndex += 1
-	}
-	routeFile.close
-end # buildDelayFiles
-
