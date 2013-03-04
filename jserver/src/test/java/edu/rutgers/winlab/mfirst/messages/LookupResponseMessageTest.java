@@ -103,7 +103,7 @@ public class LookupResponseMessageTest {
     Assert.assertEquals(0xFFFFFFFFl, msg.getRequestId());
     Assert.assertEquals(MessageType.UNKNOWN,msg.getType());
     Assert.assertEquals(ResponseCode.SUCCESS,msg.getResponseCode());
-    Assert.assertEquals(56,msg.getMessageLength());
+    Assert.assertEquals(60,msg.getMessageLength());
     Assert.assertEquals(38,msg.getPayloadLength());
     Assert.assertEquals(34,msg.getResponsePayloadLength());
     Assert.assertEquals(30,msg.getBindingsLength());

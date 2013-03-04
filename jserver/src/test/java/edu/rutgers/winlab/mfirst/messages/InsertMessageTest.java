@@ -84,8 +84,8 @@ public class InsertMessageTest {
     Assert.assertEquals(0, msg.getRequestId());
     Assert.assertEquals(0, msg.getNumBindings());
     Assert.assertEquals(0, msg.getBindingsLength());
-    Assert.assertEquals(8, msg.getPayloadLength());
-    Assert.assertEquals(20, msg.getMessageLength());
+    Assert.assertEquals(4, msg.getPayloadLength());
+    Assert.assertEquals(16, msg.getMessageLength());
     Assert.assertEquals(0, msg.getVersion());
 
     msg.setGuid(this.guid1);
@@ -101,7 +101,7 @@ public class InsertMessageTest {
     Assert.assertEquals(1234, msg.getRequestId());
     Assert.assertEquals(this.bind1.length, msg.getNumBindings());
     Assert.assertEquals(30, msg.getBindingsLength());
-    Assert.assertEquals(58, msg.getPayloadLength());
+    Assert.assertEquals(54, msg.getPayloadLength());
     Assert.assertEquals(76, msg.getMessageLength());
     Assert.assertEquals(0x10, msg.getVersion());
 
@@ -116,7 +116,7 @@ public class InsertMessageTest {
     Assert.assertEquals(0, msg.getNumBindings());
 
     Assert.assertEquals(0, msg.getBindingsLength());
-    Assert.assertEquals(8, msg.getPayloadLength());
+    Assert.assertEquals(4, msg.getPayloadLength());
   }
 
   @Test

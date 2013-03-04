@@ -119,7 +119,7 @@ public class InsertMessage extends AbstractMessage {
   @Override
   public int getPayloadLength() {
     // GUID, Options, num bindings, bindings
-    int length = 8 + this.getBindingsLength();
+    int length = 4 + this.getBindingsLength();
     if (this.guid != null && this.guid.getBinaryForm() != null) {
       length += this.guid.getBinaryForm().length;
     }
