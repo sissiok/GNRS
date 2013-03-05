@@ -211,13 +211,18 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 	info "Installing delay module click script"
 
 	# Install the delay module click script
-	cmd = "#{property.clickInstall} -u #{property.clickModule}"
 
 	serversMap.each_value { |group|
-		group.group.exec(cmd)
+		group.nodelist.each { |node|
+			cmd = "#{property.clickInstall} -u #{property.clickModule}.#{node.asNumber}"
+			node.group.group.exec(cmd)
+		}
 	}
 	clientsMap.each_value { |group|
-		group.group.exec(cmd)
+		group.nodelist.each { |node|
+			cmd = "#{property.clickInstall} -u #{property.clickModule}.#{node.asNumber}"
+			group.group.exec(cmd)
+		}
 	}
 
 	wait property.miniWait
