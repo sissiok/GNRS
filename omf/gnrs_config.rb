@@ -229,12 +229,12 @@ end
 
 def makeDelayScript(node,isClient)
 	asString = <<-ENDSTR
-cla#{node.asNumber} :: Classifier( 12/0800, -);
-ip_cla#{node.asNumber} :: IPClassifier( dst udp #{node.port}, -);
-delayMod#{node.asNumber} :: NetDelay();
-FromDevice(eth0)
+cla#{node.asNumber} :: Classifier\\( 12/0800, -\\);
+ip_cla#{node.asNumber} :: IPClassifier\\( dst udp #{node.port}, -\\);
+delayMod#{node.asNumber} :: NetDelay\\(\\);
+FromDevice\\(eth0\\)
   ->cla#{node.asNumber}
-  -> CheckIPHeader(14, CHECKSUM false) 
+  -> CheckIPHeader\\(14, CHECKSUM false\\) 
   -> ip_cla#{node.asNumber} 
   -> delayMod#{node.asNumber}
   -> ToHost;

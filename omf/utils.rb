@@ -194,14 +194,14 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 	serversMap.each_value { |group|
 		group.nodelist.each { |node|
 			clickScript = makeDelayScript(node,false)
-			cmd = "echo '#{clickScript}' >/#{property.clickModule}.#{node.asNumber}"
+			cmd = "echo '#{clickScript}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >/#{property.clickModule}.#{node.asNumber}"
 			node.group.exec(cmd)
 		}
 	}
 	clientsMap.each_value { |group|
 		group.nodelist.each { |node|
 			clickScript = makeDelayScript(node,true)
-			cmd = "echo '#{clickScript}' >/#{property.clickModule}.#{node.asNumber}"
+			cmd = "echo '#{clickScript}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >/#{property.clickModule}.#{node.asNumber}"
 			node.group.exec(cmd)
 		}
 	}
