@@ -189,13 +189,21 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 
 	info "Downloading delay module Click script"
 	# Download delay module click script
-	cmd = "#{property.wget} #{property.scriptUrl}/#{property.clickModule}"
+	#cmd = "#{property.wget} #{property.scriptUrl}/#{property.clickModule}"
 
 	serversMap.each_value { |group|
-		group.group.exec(cmd)
+		group.nodelist.each { |node|
+			clickScript = makeDelayScript(node,false)
+			cmd = "echo '#{clickScript}' >/#{property.clickModule}.#{node.asNumber}"
+			node.group.exec(cmd)
+		}
 	}
 	clientsMap.each_value { |group|
-		group.group.exec(cmd)
+		group.nodelist.each { |node|
+			clickScript = makeDelayScript(node,true)
+			cmd = "echo '#{clickScript}' >/#{property.clickModule}.#{node.asNumber}"
+			node.group.exec(cmd)
+		}
 	}
 
 	wait property.miniWait
