@@ -54,7 +54,7 @@ public class InsertDecoder implements MessageDecoder {
     // Store the current cursor position in the buffer
     buffer.mark();
     // Need 2 bytes to check version and type
-    if (buffer.remaining() < 2) {
+    if (buffer.remaining() < 4) {
       buffer.reset();
       result = MessageDecoderResult.NEED_DATA;
     } else {
@@ -63,11 +63,16 @@ public class InsertDecoder implements MessageDecoder {
       // TODO: What to do with the version?
       buffer.get();
       final byte type = buffer.get();
+      final int needRemaining = buffer.getUnsignedShort() - 4;
       // Reset the cursor so we don't modify the buffer data.
       buffer.reset();
-      if (type == MessageType.INSERT.value()) {
-        result = MessageDecoderResult.OK;
-      } else {
+      if (type == MessageType.INSERT.value())
+        if (buffer.remaining() >= needRemaining) {
+          result = MessageDecoderResult.OK;
+        } else {
+          result = MessageDecoderResult.NEED_DATA;
+        }
+      else {
         result = MessageDecoderResult.NOT_OK;
       }
     }
@@ -94,12 +99,10 @@ public class InsertDecoder implements MessageDecoder {
     // Ignore message length (not used)
     buffer.getUnsignedShort();
     final long requestId = buffer.getUnsignedInt();
-    
+
     // Offset values
     final int optionsOffset = buffer.getUnsignedShort();
     final int payloadOffset = buffer.getUnsignedShort();
-    
-   
 
     // Origin address
     final AddressType addrType = AddressType.valueOf(buffer.getUnsignedShort());
@@ -122,8 +125,6 @@ public class InsertDecoder implements MessageDecoder {
     guid.setBinaryForm(guidBytes);
     msg.setGuid(guid);
 
-
-
     final long numBindings = buffer.getUnsignedInt();
     final NetworkAddress[] bindings = new NetworkAddress[(int) numBindings];
 
@@ -138,11 +139,11 @@ public class InsertDecoder implements MessageDecoder {
       bindings[i] = netAddr;
     }
     msg.setBindings(bindings);
-    
-    if(optionsOffset > 0){
+
+    if (optionsOffset > 0) {
       List<Option> options = RequestOptionsTranscoder.decode(buffer);
-      if(options != null && !options.isEmpty()){
-        for(Option opt : options){
+      if (options != null && !options.isEmpty()) {
+        for (Option opt : options) {
           msg.addOption(opt);
         }
       }

@@ -54,7 +54,7 @@ public class LookupDecoder implements MessageDecoder {
     // Store the current cursor position in the buffer
     buffer.mark();
     // Need 5 bytes to check request ID and type
-    if (buffer.remaining() < 2) {
+    if (buffer.remaining() < 4) {
       result = MessageDecoderResult.NEED_DATA;
     } else {
 
@@ -62,10 +62,15 @@ public class LookupDecoder implements MessageDecoder {
       // TODO: What to do with version?
       buffer.get();
       final byte type = buffer.get();
+      final int needRemaining = buffer.getUnsignedShort() - 4;
       // Reset the cursor so we don't modify the buffer data.
       buffer.reset();
       if (type == MessageType.LOOKUP.value()) {
-        result = MessageDecoderResult.OK;
+        if (buffer.remaining() >= needRemaining) {
+          result = MessageDecoderResult.OK;
+        } else {
+          result = MessageDecoderResult.NEED_DATA;
+        }
       } else {
         result = MessageDecoderResult.NOT_OK;
       }
@@ -75,7 +80,7 @@ public class LookupDecoder implements MessageDecoder {
 
   @Override
   public MessageDecoderResult decode(final IoSession session,
-      final IoBuffer buffer, final ProtocolDecoderOutput out)  {
+      final IoBuffer buffer, final ProtocolDecoderOutput out) {
     /*
      * Common message header stuff
      */
@@ -85,7 +90,7 @@ public class LookupDecoder implements MessageDecoder {
     // Don't need message length
     buffer.getUnsignedShort();
     final long requestId = buffer.getUnsignedInt();
-    
+
     // Offsets
     final int optionsOffset = buffer.getUnsignedShort();
     final int payloadOffset = buffer.getUnsignedShort();
@@ -109,16 +114,15 @@ public class LookupDecoder implements MessageDecoder {
     buffer.get(guidBytes);
     final GUID queryGUID = new GUID();
     queryGUID.setBinaryForm(guidBytes);
-    
+
     msg.setGuid(queryGUID);
-    
+
     List<Option> options = RequestOptionsTranscoder.decode(buffer);
-    if(options != null){
-      for(Option opt : options){
+    if (options != null) {
+      for (Option opt : options) {
         msg.addOption(opt);
       }
     }
-    
 
     // Send the decoded message to the next filter
     out.write(msg);

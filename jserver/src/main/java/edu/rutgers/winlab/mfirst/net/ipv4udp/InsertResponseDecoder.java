@@ -51,7 +51,7 @@ public class InsertResponseDecoder implements MessageDecoder {
     // Store the current cursor position in the buffer
     buffer.mark();
     // Need 5 bytes to check request ID and type
-    if (buffer.remaining() < 2) {
+    if (buffer.remaining() < 4) {
       result = MessageDecoderResult.NEED_DATA;
     } else {
 
@@ -59,10 +59,15 @@ public class InsertResponseDecoder implements MessageDecoder {
       // TODO: What happens with version number?
       buffer.get();
       final byte type = buffer.get();
+      final int needRemaining = buffer.getUnsignedShort();
       // Reset the cursor so we don't modify the buffer data.
       buffer.reset();
       if (type == MessageType.INSERT_RESPONSE.value()) {
-        result = MessageDecoderResult.OK;
+        if (buffer.remaining() >= needRemaining) {
+          result = MessageDecoderResult.OK;
+        } else {
+          result = MessageDecoderResult.NEED_DATA;
+        }
       } else {
         result = MessageDecoderResult.NOT_OK;
       }

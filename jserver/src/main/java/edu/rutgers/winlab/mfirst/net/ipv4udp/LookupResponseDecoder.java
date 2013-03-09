@@ -45,7 +45,7 @@ import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 public class LookupResponseDecoder implements MessageDecoder {
 
   // TODO: Options!
-  
+
   @Override
   public MessageDecoderResult decodable(final IoSession session,
       final IoBuffer buffer) {
@@ -53,7 +53,7 @@ public class LookupResponseDecoder implements MessageDecoder {
     // Store the current cursor position in the buffer
     buffer.mark();
     // Need 2 bytes to check version and type
-    if (buffer.remaining() < 2) {
+    if (buffer.remaining() < 4) {
       result = MessageDecoderResult.NEED_DATA;
     } else {
 
@@ -61,10 +61,15 @@ public class LookupResponseDecoder implements MessageDecoder {
       // TODO: What to do with versions?
       buffer.get();
       final byte type = buffer.get();
+      final int needRemaining = buffer.getUnsignedShort() - 4;
       // Reset the cursor so we don't modify the buffer data.
       buffer.reset();
       if (type == MessageType.LOOKUP_RESPONSE.value()) {
-        result = MessageDecoderResult.OK;
+        if (buffer.remaining() >= needRemaining) {
+          result = MessageDecoderResult.OK;
+        } else {
+          result = MessageDecoderResult.NEED_DATA;
+        }
       } else {
         result = MessageDecoderResult.NOT_OK;
       }
@@ -135,7 +140,7 @@ public class LookupResponseDecoder implements MessageDecoder {
 
   @Override
   public void finishDecode(final IoSession arg0,
-      final ProtocolDecoderOutput arg1){
+      final ProtocolDecoderOutput arg1) {
     // Nothing to see here.
   }
 
