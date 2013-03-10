@@ -35,7 +35,7 @@ import java.util.Arrays;
  */
 public class TTLOption extends Option {
 
-  public static final byte TYPE = 0x03;
+  public static final byte TYPE = 0x02;
 
   public static final byte LENGTH = 0x08;
 

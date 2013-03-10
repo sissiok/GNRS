@@ -35,7 +35,7 @@ import java.util.Arrays;
  */
 public class ExpirationOption extends Option {
 
-  public static final byte TYPE = 0x02;
+  public static final byte TYPE = 0x01;
 
   private final transient long[] timestamp;
 

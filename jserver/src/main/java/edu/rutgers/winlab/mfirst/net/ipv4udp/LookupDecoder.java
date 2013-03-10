@@ -86,7 +86,7 @@ public class LookupDecoder implements MessageDecoder {
      */
     final byte version = buffer.get();
     // Ignoring message type, checked in decodable(IoSession, IoBuffer)
-    buffer.get();
+    final int length = buffer.get();
     // Don't need message length
     buffer.getUnsignedShort();
     final long requestId = buffer.getUnsignedInt();
@@ -117,9 +117,10 @@ public class LookupDecoder implements MessageDecoder {
 
     msg.setGuid(queryGUID);
 
-    List<Option> options = RequestOptionsTranscoder.decode(buffer);
-    if (options != null) {
-      for (Option opt : options) {
+    
+    List<Option> options = RequestOptionsTranscoder.decode(buffer, length-optionsOffset);
+    if(options != null){
+      for(Option opt : options){
         msg.addOption(opt);
       }
     }

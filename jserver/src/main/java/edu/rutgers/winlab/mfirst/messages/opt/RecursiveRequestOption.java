@@ -35,7 +35,7 @@ public class RecursiveRequestOption extends Option {
   /**
    * Type value for this option.
    */
-  public static final byte TYPE = 0x01;
+  public static final byte TYPE = 0x00;
 
   /**
    * Length for this option.

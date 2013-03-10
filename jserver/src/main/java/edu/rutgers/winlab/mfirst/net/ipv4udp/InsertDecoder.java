@@ -97,7 +97,7 @@ public class InsertDecoder implements MessageDecoder {
     // Ignore type, since this is checked in decodable(IoSession, IoBuffer)
     buffer.get();
     // Ignore message length (not used)
-    buffer.getUnsignedShort();
+    final int length = buffer.getUnsignedShort();
     final long requestId = buffer.getUnsignedInt();
 
     // Offset values
@@ -139,11 +139,11 @@ public class InsertDecoder implements MessageDecoder {
       bindings[i] = netAddr;
     }
     msg.setBindings(bindings);
-
-    if (optionsOffset > 0) {
-      List<Option> options = RequestOptionsTranscoder.decode(buffer);
-      if (options != null && !options.isEmpty()) {
-        for (Option opt : options) {
+    
+    if(optionsOffset > 0){
+      List<Option> options = RequestOptionsTranscoder.decode(buffer,length-optionsOffset);
+      if(options != null && !options.isEmpty()){
+        for(Option opt : options){
           msg.addOption(opt);
         }
       }

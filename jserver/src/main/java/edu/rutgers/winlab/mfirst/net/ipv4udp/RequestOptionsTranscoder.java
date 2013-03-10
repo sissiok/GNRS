@@ -68,23 +68,26 @@ public class RequestOptionsTranscoder {
     }
   }
 
-  public static List<Option> decode(IoBuffer optionsBuffer) {
+  public static List<Option> decode(IoBuffer optionsBuffer, int remainingLength) {
+    int bytesRemain = remainingLength;
     Option lastOption = null;
     List<Option> options = new LinkedList<Option>();
-    if (optionsBuffer.remaining() > 0) {
+    if (optionsBuffer.remaining() > 0 && bytesRemain > 0) {
       byte type = 0;
       byte length = 0;
+      boolean finished = false;
       do {
         type = optionsBuffer.get();
         length = optionsBuffer.get();
-        boolean isFinal = Option.isFinal(type);
+        bytesRemain -= 2;
+        finished = Option.isFinal(type);
         type &= Option.USER_TYPES_FLAG;
 
         switch (type) {
         case RecursiveRequestOption.TYPE:
           boolean recursive = (optionsBuffer.getUnsignedShort() != 0);
           lastOption = new RecursiveRequestOption(recursive);
-
+          bytesRemain -= 2;
           break;
         case TTLOption.TYPE: {
           long[] ttls = new long[length / 8];
@@ -92,6 +95,7 @@ public class RequestOptionsTranscoder {
             ttls[i] = optionsBuffer.getLong();
           }
           lastOption = new TTLOption(ttls);
+          bytesRemain -= length;
         }
           break;
         case ExpirationOption.TYPE: {
@@ -100,18 +104,26 @@ public class RequestOptionsTranscoder {
             expirations[i] = optionsBuffer.getLong();
           }
           lastOption = new ExpirationOption(expirations);
+          bytesRemain -= length;
         }
           break;
         default:
           LOG.info("Unsupported options type {}", type);
           lastOption = null;
-          break;
+          // FIXME: Maintain the option, send it along with the message
+          if(length > 0){
+            optionsBuffer.get(new byte[length]);
+          }
+          bytesRemain -= length;
+          
         }
-        if (isFinal) {
-          lastOption.setFinal();
+        if (lastOption != null) {
+          options.add(lastOption);
+          if(finished){
+            lastOption.setFinal();
+          }
         }
-        options.add(lastOption);
-      } while (lastOption != null && !lastOption.isFinal());
+      } while(!finished && bytesRemain > 0);
     }
     return options;
   }
