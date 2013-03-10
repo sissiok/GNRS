@@ -27,6 +27,8 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#include <stdint.h>
+
 typedef struct{
     uint8_t type;
     uint8_t len;

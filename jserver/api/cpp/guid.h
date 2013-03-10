@@ -30,6 +30,7 @@
 #include <sstream>
 #include <string>
 #include <string.h>
+#include <stdint.h>
 
 using namespace std;
 
