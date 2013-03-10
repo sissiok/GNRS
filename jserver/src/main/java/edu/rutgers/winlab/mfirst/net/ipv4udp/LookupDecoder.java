@@ -86,9 +86,9 @@ public class LookupDecoder implements MessageDecoder {
      */
     final byte version = buffer.get();
     // Ignoring message type, checked in decodable(IoSession, IoBuffer)
-    final int length = buffer.get();
-    // Don't need message length
-    buffer.getUnsignedShort();
+    final byte type = buffer.get();
+    // Don't (really?) need message length
+    final int buffer.getUnsignedShort();
     final long requestId = buffer.getUnsignedInt();
 
     // Offsets
