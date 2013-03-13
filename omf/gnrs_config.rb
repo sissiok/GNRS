@@ -227,20 +227,26 @@ ENDSTR
 	return asString
 end
 
-def makeDelayScript(node,isClient)
-	asString = <<-ENDSTR
-cla#{node.asNumber} :: Classifier\\( 12/0800, -\\);
-ip_cla#{node.asNumber} :: IPClassifier\\( dst udp #{node.port}, -\\);
-delayMod#{node.asNumber} :: NetDelay\\(\\);
-FromDevice\\(eth0\\)
-  ->cla#{node.asNumber}
-  -> CheckIPHeader\\(14, CHECKSUM false\\) 
-  -> ip_cla#{node.asNumber} 
-  -> delayMod#{node.asNumber}
-  -> ToHost;
-cla#{node.asNumber}[1] -> ToHost;
-ip_cla#{node.asNumber}[1] -> ToHost;
-ENDSTR
+def makeDelayScript(group,isClient)
+	asString = "cla :: Classifier\\(12/0800, -\\);\n"
+	asString << "ip_cla :: IPClassifier\\("
+	group.nodelist.each { |node|
+		asString << " dst udp #{node.port},"
+	}
+	asString << "-\\);\n"
+	group.nodelist.each { |node|
+		asString << "delayMod#{node.asNumber} :: NetDelay\\(\\);\n"
+	}
+	asString << "FromDevice\\(eth0\\)\n"
+	asString << " -> cla\n"
+	asString << " -> CheckIPHeader\\(14, CHECKSUM false\\)\n"
+	asString << " -> ip_cla;\n"
+	asString << "cla[1] -> ToHost;\n"
 
+
+	group.nodelist.each { |node|
+		asString << "ip_cla#{node.asNumber} -> delayMode#{node.asNumber} -> ToHost;\n"
+		asString << "ip_cla#{node.asNumber}[1] -> ToHost;\n"
+	}
 	return asString
 end # makeDelayScript

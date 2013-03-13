@@ -187,23 +187,19 @@ end # prepareNodes
 
 def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 
-	info "Downloading delay module Click script"
+	info "Building delay module Click script"
 	# Download delay module click script
 	#cmd = "#{property.wget} #{property.scriptUrl}/#{property.clickModule}"
 
 	serversMap.each_value { |group|
-		group.nodelist.each { |node|
-			clickScript = makeDelayScript(node,false)
-			cmd = "echo '#{clickScript}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >/#{property.clickModule}.#{node.asNumber}"
-			node.group.group.exec(cmd)
-		}
+		clickScript = makeDelayScript(group,false)
+		cmd = "echo '#{clickScript}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >/#{property.clickModule}"
+		group.group.exec(cmd)
 	}
 	clientsMap.each_value { |group|
-		group.nodelist.each { |node|
-			clickScript = makeDelayScript(node,true)
-			cmd = "echo '#{clickScript}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >/#{property.clickModule}.#{node.asNumber}"
-			node.group.group.exec(cmd)
-		}
+		clickScript = makeDelayScript(group,true)
+		cmd = "echo '#{clickScript}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >/#{property.clickModule}"
+		group.group.exec(cmd)
 	}
 
 	wait property.miniWait
@@ -213,21 +209,17 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 	# Install the delay module click script
 
 	serversMap.each_value { |group|
-		group.nodelist.each { |node|
-			cmd = "#{property.clickInstall} -u #{property.clickModule}.#{node.asNumber}"
-			node.group.group.exec(cmd)
-		}
+		cmd = "#{property.clickInstall} -u #{property.clickModule}"
+		group.group.exec(cmd)
 	}
 	clientsMap.each_value { |group|
-		group.nodelist.each { |node|
-			cmd = "#{property.clickInstall} -u #{property.clickModule}.#{node.asNumber}"
-			group.group.exec(cmd)
-		}
+		cmd = "#{property.clickInstall} -u #{property.clickModule}"
+		group.group.exec(cmd)
 	}
 
 	wait property.miniWait
 
-	info "Downloading the delay module configuration files"
+	info "Building the delay module configuration files"
 
 	# Download and install the delay module configuration file
 	server = "#{property.wget} #{property.dataUrl}/#{property.delayConfigServer}"
