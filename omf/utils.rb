@@ -365,7 +365,7 @@ def installConfigs(serversMap, clientsMap)
 		node.group.exec(cmd)
 		# BerkeleyDB Config
 		node.nodelist.each { |server|
-			bdb = makeBerkeleyDBConfig(node)
+			bdb = makeBerkeleyDBConfig(server)
 			cmd = "echo '#{bdb}' >/etc/gnrs/berkeleydb_#{server.asNumber}.xml"
 			node.group.exec(cmd)
 		}
