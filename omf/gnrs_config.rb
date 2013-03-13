@@ -265,14 +265,14 @@ def makeDelayConfig(serversMap, clientsMap)
 				otherHost.nodelist.each { |otherServer|
 					# Skip the same AS (same server)
 					next if (server.asNumber == otherServer.asNumber)
-					delayString << "#{otherHost.group.ipAddress},#{otherHost.port},100,\n"
+					delayString << "#{otherHost.ipAddress},#{otherServer.port},100,\n"
 				}
 			}
 			clientsMap.each_value { |clientHost|
 				clientHost.nodelist.each { |client|
 					# You shouldn't be talking to me unless we're in the same AS
 					next if (server.asNumber != client.asNumber)
-					delayString << "#{client.group.ipAddress},#{client.port},5,\n"
+					delayString << "#{clientHost.ipAddress},#{client.port},5,\n"
 				}
 			}
 			server.delayConfig = delayString
@@ -287,7 +287,7 @@ def makeDelayConfig(serversMap, clientsMap)
 			serversMap.each_value {|serverHost|
 				serverHost.nodelist.each {|server|
 					next if(server.asNumber != client.asNumber)
-					delayString << "#{server.group.ipAddress},#{server.port},5,\n"
+					delayString << "#{serverHost.ipAddress},#{server.port},5,\n"
 				}
 			}
 			client.delayConfig = delayString
