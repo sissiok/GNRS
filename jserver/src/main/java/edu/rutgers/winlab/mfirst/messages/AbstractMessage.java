@@ -160,8 +160,8 @@ public abstract class AbstractMessage {
    *         network protocol.
    */
   public int getMessageLength() {
-    // (Version, type, length)->4, (request id)->4, (options offset, payload offset)->4
-    int length = 12 + this.getPayloadLength();
+    // (Version, type, length)->4, (request id)->4
+    int length = 8 + this.getPayloadLength();
     // requestor address
     if(this.originAddress != null){
       // Origin address type, origin address length

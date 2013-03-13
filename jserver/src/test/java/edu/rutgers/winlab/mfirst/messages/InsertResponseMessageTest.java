@@ -44,7 +44,7 @@ public class InsertResponseMessageTest {
     InsertResponseMessage msg = new InsertResponseMessage();
     Assert.assertEquals(4,msg.getPayloadLength());
     Assert.assertEquals(0,msg.getResponsePayloadLength());
-    Assert.assertEquals(16,msg.getMessageLength());
+    Assert.assertEquals(12,msg.getMessageLength());
     Assert.assertEquals("INR #0/null",msg.toString());
     
     

@@ -79,7 +79,7 @@ public class LookupMessageTest {
     Assert.assertNull(msg.getGuid());
     Assert.assertNull(msg.getOriginAddress());
     Assert.assertEquals(0, msg.getRequestId());
-    Assert.assertEquals(0, msg.getPayloadLength());
+    Assert.assertEquals(4, msg.getPayloadLength());
     Assert.assertEquals(12,msg.getMessageLength());
     Assert.assertEquals(0,msg.getVersion());
     
@@ -94,18 +94,18 @@ public class LookupMessageTest {
     Assert.assertTrue(this.addr1.equals(msg.getOriginAddress()));
     Assert.assertEquals(0xFFFFFFFFl,msg.getRequestId());
     Assert.assertEquals((byte)0x10, msg.getVersion());
-    Assert.assertEquals(20, msg.getPayloadLength());
+    Assert.assertEquals(24, msg.getPayloadLength());
     Assert.assertEquals(42,msg.getMessageLength());
     
     msg.setGuid(nullGuid);
     Assert.assertTrue(this.nullGuid.equals(msg.getGuid()));
     Assert.assertTrue(msg.getGuid().equals(this.nullGuid));
-    Assert.assertEquals(0, msg.getPayloadLength());
+    Assert.assertEquals(4, msg.getPayloadLength());
     Assert.assertEquals(22,msg.getMessageLength());
     
     msg.setGuid(null);
     Assert.assertNull(msg.getGuid());
-    Assert.assertEquals(0, msg.getPayloadLength());
+    Assert.assertEquals(4, msg.getPayloadLength());
     Assert.assertEquals(22,msg.getMessageLength());
     
   }

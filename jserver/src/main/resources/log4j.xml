@@ -42,9 +42,8 @@
   </logger>
 
 	<root>
-		<priority value="debug" />
-      <appender-ref ref="rollingFile" /> 
-    	<appender-ref ref="console" />
+		<priority value="info" />
+    	<appender-ref ref="dailyRollingFile" />
     <!--
     <appender-ref ref="dailyRollingFile" />
     -->

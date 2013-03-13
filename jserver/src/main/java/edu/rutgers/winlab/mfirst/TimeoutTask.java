@@ -90,9 +90,11 @@ public class TimeoutTask implements Callable<Object> {
                   .toArray(new NetworkAddress[] {}));
           response.setResponseCode(ResponseCode.SUCCESS);
         } else {
+          LOG.info("One or more remote servers failed to respond for a Lookup Message {}.", this.info.clientMessage.getRequestId());
           response.setResponseCode(ResponseCode.FAILED);
         }
       } else if (this.info.clientMessage instanceof InsertMessage) {
+        LOG.info("One or more remote servers failed to respond for an Insert Message {}.",this.info.clientMessage.getRequestId());
         response = new InsertResponseMessage();
         response.setResponseCode(ResponseCode.FAILED);
       }
