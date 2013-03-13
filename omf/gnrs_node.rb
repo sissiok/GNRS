@@ -6,7 +6,7 @@
 # Last Modified: Feb 15, 2013
 #
 class GNRSNode
-	attr_accessor :port, :asNumber, :group, :server
+	attr_accessor :port, :asNumber, :group, :server, :delayConfig
 
 	def to_s
 		"#{@group.ipAddress}:#{@port} (AS ##{@asNumber})"

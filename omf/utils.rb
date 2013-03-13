@@ -221,37 +221,29 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 
 	info "Building the delay module configuration files"
 
-	# Download and install the delay module configuration file
-	server = "#{property.wget} #{property.dataUrl}/#{property.delayConfigServer}"
-	client = "#{property.wget} #{property.dataUrl}/#{property.delayConfigClient}"
-
-	serversMap.each_value { |group|
-		group.nodelist.each { |node|
-			node.group.group.exec(server.gsub(/XxX/,node.asNumber.to_s))
-		}
-	}
-	clientsMap.each_value { |group|
-		group.nodelist.each { |node|
-			node.group.group.exec(client.gsub(/XxX/,node.asNumber.to_s))
-		}
-	}
-
-	wait property.miniWait
+	# This function will set the "delayConfig" member of each server/client
+	makeDelayConfig(serversMap,clientsMap)
 
 	info "Installing the delay module configurations"
 
-	client = "cp #{property.delayConfigClient} /click/delayMod/config"
-	server  = "cp #{property.delayConfigServer} /click/delayMod/config"
 	serversMap.each_value { |group|
 		group.nodelist.each { |node|
-			node.group.group.exec(server.gsub(/XxX/,node.asNumber.to_s))
+			cmd = "echo '#{node.delayConfig}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >/delayMod#{node.asNumber}.dat"
+			node.group.group.exec(cmd)
+			cmd = "cp /delayMod#{node.asNumber}.dat /click/delayMod#{node.asNumber}/config"
+			node.group.group.exec(cmd)
 		}
 	}
+
 	clientsMap.each_value { |group|
 		group.nodelist.each { |node|
-			node.group.group.exec(client.gsub(/XxX/,node.asNumber.to_s))
+			cmd = "echo '#{node.delayConfig}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >/delayMod#{node.asNumber}.dat"
+			node.group.group.exec(cmd)
+			cmd = "cp /delayMod#{node.asNumber}.dat /click/delayMod#{node.asNumber}/config"
+			node.group.group.exec(cmd)
 		}
 	}
+
 
 	wait property.miniWait
 
@@ -260,10 +252,10 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 
 	serversMap.each_value { |group|
 		group.nodelist.each { |node|
-			cmd = "rm #{property.clickModule}"
-			node.group.group.exec(cmd)
-			cmd = "rm #{property.delayConfigServer}".gsub(/XxX/,node.asNumber.to_s)
-			node.group.group.exec(cmd)
+			#cmd = "rm #{property.clickModule}"
+			#node.group.group.exec(cmd)
+			#cmd = "rm #{property.delayConfigServer}".gsub(/XxX/,node.asNumber.to_s)
+			#node.group.group.exec(cmd)
 		}
 	}
 	clientsMap.each_value { |group|

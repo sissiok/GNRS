@@ -227,6 +227,8 @@ ENDSTR
 	return asString
 end
 
+# Creates a click delay module script for the set
+# of servers or clients assigned to an ORBIT node
 def makeDelayScript(group,isClient)
 	asString = "cla :: Classifier\\(12/0800, -\\);\n"
 	asString << "ip_cla :: IPClassifier\\("
@@ -250,3 +252,46 @@ def makeDelayScript(group,isClient)
 	asString << "ip_cla[#{group.nodelist.length}] -> ToHost;\n"
 	return asString
 end # makeDelayScript
+
+def makeDelayConfig(serversMap, clientsMap)
+
+	# Build a delayMod config for each server, include delays
+	# from all other servers (other AS), and matching clients (same AS)
+	serversMap.each_value { | host |
+		host.nodelist.each { | server | 
+			delayString = "";
+			# Go through all other servers
+			serversMap.each_value { |otherHost|
+				otherHost.nodelist.each { |otherServer|
+					# Skip the same AS (same server)
+					next if (server.asNumber == otherServer.asNumber)
+					delayString << "#{otherHost.group.ipAddress},#{otherHost.port},100,\n"
+				}
+			}
+			clientsMap.each_value { |clientHost|
+				clientHost.nodelist.each { |client|
+					# You shouldn't be talking to me unless we're in the same AS
+					next if (server.asNumber != client.asNumber)
+					delayString << "#{client.group.ipAddress},#{client.port},5,\n"
+				}
+			}
+			server.delayConfig = delayString
+		}
+	}
+
+	# Now do all the clients, but thankfully they're simpler
+	clientsMap.each_value { |host|
+		host.nodelist.each { |client|
+			delayString = "";
+			# Go through all servers and look for our "match"
+			serversMap.each_value {|serverHost|
+				serverHost.nodelist.each {|server|
+					next if(server.asNumber != client.asNumber)
+					delayString << "#{server.group.ipAddress},#{server.port},5,\n"
+				}
+			}
+			client.delayConfig = delayString
+		}
+	}
+	
+end # makeDelayConfig
