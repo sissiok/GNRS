@@ -23,7 +23,7 @@ def makeServerConfig(node)
 \t<cacheEntries>0</cacheEntries>
 \t<defaultExpiration>900000</defaultExpiration>
 \t<defaultTtl>30000</defaultTtl>
-\t<statsDirectory>/var/gnrs/stats/</statsDirectory>
+\t<statsDirectory>/var/gnrs/stats#{node.asNumber}/</statsDirectory>
 \t<replicaSelector>random</replicaSelector>
 </edu.rutgers.winlab.mfirst.Configuration>
 ENDSTR

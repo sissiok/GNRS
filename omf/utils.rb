@@ -278,7 +278,9 @@ def installConfigs(serversMap, clientsMap)
 	mkBin = "mkdir -p /usr/local/bin/gnrs/"
 	
 	serversMap.each_value { |group|
-		group.group.exec(mkVar)
+		group.nodelist.each { |server|
+			group.group.exec("#{mkVar}#{server.asNumber}")
+		}
 		group.group.exec(mkEtc)
 		group.group.exec(mkBin)
 	}
