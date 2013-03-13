@@ -313,9 +313,6 @@ def installConfigs(serversMap, clientsMap)
 			# IPv4 Prefix File (BGP Table)
 			cmd = "#{property.wget} #{property.dataUrl}/#{property.prefixIpv4}"
 			node.group.group.exec(cmd)
-			# BerkeleyDB Config
-			cmd = "#{property.wget} #{property.dataUrl}/#{property.serverBDB}"
-			node.group.group.exec(cmd)
 			# IPv4 Mapper Configuration
 			cmd = "#{property.wget} #{property.dataUrl}/#{property.mapIpv4}"
 			node.group.group.exec(cmd)
@@ -337,7 +334,7 @@ def installConfigs(serversMap, clientsMap)
 		group.nodelist.each { |node|
 			# Main client config
 			configContents = makeClientConfig(node,node.server)
-			cmd = "echo '#{configContents}' >/etc/gnrs/client.xml"
+			cmd = "echo '#{configContents}' >/etc/gnrs/client#{node.asNumber}.xml"
 			node.group.group.exec(cmd)
 			# Download static files
 
@@ -367,8 +364,9 @@ def installConfigs(serversMap, clientsMap)
 		cmd = "mv #{property.bindingFile} /etc/gnrs/"
 		node.group.exec(cmd)
 		# BerkeleyDB Config
-		cmd = "mv #{property.serverBDB} /etc/gnrs/"
-		node.group.exec(cmd)
+		bdb = makeBerkeleyDBConfig(node)
+		cmd = "echo '#{bdb}' >/etc/gnrs/berkeleydb_#{node.asNumber}.xml"
+		node.group.group.exec(cmd)
 		# IPv4 Mapper Configuration
 		cmd = "mv #{property.mapIpv4} /etc/gnrs/"
 		node.group.exec(cmd)
@@ -482,7 +480,7 @@ def loadGUIDs(clientsMap)
 
 
 	# 3 parameters to gbench: client config, trace file, inter-message send time in microseconds
-	baseCmd = "/usr/local/bin/gnrs/#{property.gbench} /etc/gnrs/client.xml /etc/gnrs/#{property.clientTrace} #{property.messageDelay}"
+	baseCmd = "/usr/local/bin/gnrs/#{property.gbench} /etc/gnrs/clientXxX.xml /etc/gnrs/#{property.clientTrace} #{property.messageDelay}"
 
 	clientsMap.each_value { |group|
 		group.nodelist.each { |node|
@@ -497,9 +495,9 @@ end # loadGUIDs
 def genLookups(clientsMap)
 
 	info "Launching generation clients"
-	baseCmd = "/usr/local/bin/gnrs/#{property.ggen} /etc/gnrs/client.xml #{property.numLookups} #{property.messageDelay} 1"
 
 	clientsMap.each_value { |node|
+		baseCmd = "/usr/local/bin/gnrs/#{property.ggen} /etc/gnrs/client#{node.asNumber}.xml #{property.numLookups} #{property.messageDelay} 1"
 		node.group.exec(baseCmd)
 	}
 

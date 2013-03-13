@@ -14,10 +14,10 @@ def makeServerConfig(node)
 \t<numReplicas>5</numReplicas>
 \t<collectStatistics>true</collectStatistics>
 \t<networkType>ipv4udp</networkType>
-\t<networkConfiguration>/etc/gnrs/net-ipv4_XxX.xml</networkConfiguration>
+\t<networkConfiguration>/etc/gnrs/net-ipv4_#{node.asNumber}.xml</networkConfiguration>
 \t<mappingConfiguration>/etc/gnrs/map-ipv4.xml</mappingConfiguration>
 \t<storeType>berkeleydb</storeType>
-\t<storeConfiguration>/etc/gnrs/berkeleydb.xml</storeConfiguration>
+\t<storeConfiguration>/etc/gnrs/berkeleydb_#{node.asNumber}.xml</storeConfiguration>
 \t<numAttempts>2</numAttempts>
 \t<timeoutMillis>500</timeoutMillis>
 \t<cacheEntries>0</cacheEntries>
@@ -28,34 +28,43 @@ def makeServerConfig(node)
 </edu.rutgers.winlab.mfirst.Configuration>
 ENDSTR
 
-	# Replace placeholder with node-specific info
-	return asString.gsub(/XxX/,node.asNumber.to_s)
+	return asString
 end # makeServerConfig
+
+def makeBerkeleyDBConfig(node)
+	asString = <<-ENDSTR
+<edu.rutgers.winlab.mfirst.storage.bdb.Configuration>
+\t<pathToFiles>/var/gnrs/bdb#{node.asNumber}/</pathToFiles>
+\t<cacheSizeMiB>16</cacheSizeMiB>
+</edu.rutgers.winlab.mfirst.storage.bdb.Configuration>
+ENDSTR
+	return asString
+end # makeBerkeleyDBConfig
 
 def makeServerNetConfig(node)
 	asString = <<-ENDSTR
 <edu.rutgers.winlab.mfirst.net.ipv4udp.Configuration>
-\t<bindPort>_PORT_</bindPort>
-\t<bindAddress>_IPADDR_</bindAddress>
+\t<bindPort>#{node.port}</bindPort>
+\t<bindAddress>#{node.group.ipAddress}</bindAddress>
 \t<asynchronousWrite>false</asynchronousWrite>
 </edu.rutgers.winlab.mfirst.net.ipv4udp.Configuration>
 ENDSTR
 
-	return asString.gsub(/_PORT_/,node.port.to_s).gsub(/_IPADDR_/,node.group.ipAddress.to_s)
+	return asString
 end # makeServerNetConfig
 
 def makeClientConfig(client,server)
 	asString = <<-ENDSTR
 <edu.rutgers.winlab.mfirst.client.Configuration>
-\t<serverHost>_SRV-IPADDR_</serverHost>
-\t<serverPort>_SRV-PORT_</serverPort>
-\t<clientPort>_CLT-PORT_</clientPort>
-\t<clientHost>_CLT-IPADDR_</clientHost>
+\t<serverHost>#{server.group.ipAddress}</serverHost>
+\t<serverPort>#{server.port}</serverPort>
+\t<clientPort>#{client.port}</clientPort>
+\t<clientHost>#{client.group.ipAddress}</clientHost>
 \t<randomSeed>-1</randomSeed>
 </edu.rutgers.winlab.mfirst.client.Configuration>
 ENDSTR
 
-	return asString.gsub(/_SRV-IPADDR_/,server.group.ipAddress.to_s).gsub(/_SRV-PORT_/,server.port.to_s).gsub(/_CLT-IPADDR_/,client.group.ipAddress.to_s).gsub(/_CLT-PORT_/,client.port.to_s)
+	return asString
 end # makeClientConfig
 
 def makeServerInit(server)
