@@ -91,7 +91,7 @@ def defineGroups(topology, serversMap, clientsMap)
 		end
 	end
 
-	quotient, remainder = numServers.divmod(cNodes)
+	quotient, remainder = numClients.divmod(cNodes)
 
 	
 	if(quotient >= 1 || remainder > 0)
