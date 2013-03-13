@@ -304,3 +304,13 @@ def makeDelayConfig(serversMap, clientsMap)
 	}
 	
 end # makeDelayConfig
+
+def makeBindingFile(serversMap)
+	asString = ""
+	serversMap.each_value { |group|
+		group.nodelist.each { |server|
+			asString << "#{server.asNumber} #{group.ipAddress} #{server.port}\n"
+		}
+	}
+	return asString
+end # makeBindingFile

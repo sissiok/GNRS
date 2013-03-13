@@ -308,8 +308,8 @@ def installConfigs(serversMap, clientsMap)
 			# Download static files
 
 			# Binding file
-			cmd = "#{property.wget} #{property.dataUrl}/#{property.bindingFile}"
-			node.group.group.exec(cmd)
+			#cmd = "#{property.wget} #{property.dataUrl}/#{property.bindingFile}"
+			#node.group.group.exec(cmd)
 			# IPv4 Prefix File (BGP Table)
 			cmd = "#{property.wget} #{property.dataUrl}/#{property.prefixIpv4}"
 			node.group.group.exec(cmd)
@@ -358,10 +358,13 @@ def installConfigs(serversMap, clientsMap)
 
 	info "Installing server configuration files"
 
+	# Build AS binding file
+	asBinding = makeBindingFile(serversMap)
+
 	# Install static files
 	serversMap.each_value { |node|
 		# Binding file
-		cmd = "mv #{property.bindingFile} /etc/gnrs/"
+		cmd = "echo '#{asBinding}' >/etc/gnrs/topology.bind"
 		node.group.exec(cmd)
 		# BerkeleyDB Config
 		node.nodelist.each { |server|
