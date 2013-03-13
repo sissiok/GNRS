@@ -142,7 +142,7 @@ def defineGroups(topology, serversMap, clientsMap)
 	maxAsNumber = asNumber - 1
 
 	ipOffset = 0
-	asNumber = 1
+	asNumber = 0
 	
 	clientsPerNode.each { |numClients|
 		remainingClients = numClients
