@@ -244,9 +244,9 @@ def makeDelayScript(group,isClient)
 	asString << "cla[1] -> ToHost;\n"
 
 
-	group.nodelist.each { |node|
-		asString << "ip_cla#{node.asNumber} -> delayMode#{node.asNumber} -> ToHost;\n"
-		asString << "ip_cla#{node.asNumber}[1] -> ToHost;\n"
+	group.nodelist.each_with_index { |node, index|
+		asString << "ip_cla[#{index}] -> delayMod#{node.asNumber} -> ToHost;\n"
 	}
+	asString << "ip_cla[#{group.nodelist.length}] -> ToHost;\n"
 	return asString
 end # makeDelayScript
