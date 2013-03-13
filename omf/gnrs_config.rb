@@ -61,6 +61,7 @@ def makeClientConfig(client,server)
 \t<clientPort>#{client.port}</clientPort>
 \t<clientHost>#{client.group.ipAddress}</clientHost>
 \t<randomSeed>-1</randomSeed>
+\t<statsDirectory>/var/gnrs/stats#{client.asNumber}/</statsDirectory>
 </edu.rutgers.winlab.mfirst.client.Configuration>
 ENDSTR
 

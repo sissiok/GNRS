@@ -25,7 +25,7 @@ def collectClientStats(clientsMap, prefixDir)
 				path = "#{path}_#{nextId}/"
 			end
 			system("mkdir -p #{path}");
-			system("#{property.scp} root@#{group.hostname}:\"/trace-client/*\" #{path}");
+			system("#{property.scp} root@#{group.hostname}:\"/var/gnrs/stats#{client.asNumber}/*\" #{path}");
 			system("#{property.scp} root@#{group.hostname}:/var/gnrs/gnrsd.log #{path}");
 
 			# exitStatus = $?.exitstatus
