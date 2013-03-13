@@ -364,9 +364,11 @@ def installConfigs(serversMap, clientsMap)
 		cmd = "mv #{property.bindingFile} /etc/gnrs/"
 		node.group.exec(cmd)
 		# BerkeleyDB Config
-		bdb = makeBerkeleyDBConfig(node)
-		cmd = "echo '#{bdb}' >/etc/gnrs/berkeleydb_#{node.asNumber}.xml"
-		node.group.group.exec(cmd)
+		node.nodelist.each { |server|
+			bdb = makeBerkeleyDBConfig(node)
+			cmd = "echo '#{bdb}' >/etc/gnrs/berkeleydb_#{server.asNumber}.xml"
+			node.group.exec(cmd)
+		}
 		# IPv4 Mapper Configuration
 		cmd = "mv #{property.mapIpv4} /etc/gnrs/"
 		node.group.exec(cmd)
