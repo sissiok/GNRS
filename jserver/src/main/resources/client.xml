@@ -11,4 +11,6 @@
   <!-- Seed value for random number generation.  A negative value will use the current
        millisecond timestamp. -->
   <randomSeed>-1</randomSeed>
+  <!-- Directory for statistics files to be written. -->
+  <statsDirectory>./stats</statsDirectory>
 </edu.rutgers.winlab.mfirst.client.Configuration>

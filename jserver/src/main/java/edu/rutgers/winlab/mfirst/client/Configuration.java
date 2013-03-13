@@ -60,6 +60,11 @@ public class Configuration {
    * Seed value for random generation.
    */
   private long randomSeed = -1;
+  
+  /**
+   * Where to output client statistics files.
+   */
+  private String statsDirectory = "";
 
   /**
    * Returns the server hostname for this configuration.
@@ -149,8 +154,24 @@ public class Configuration {
    * Sets the random number generator seed value.
    * @param randomSeed the new seed value.
    */
-  public void setRandomSeed(long randomSeed) {
+  public void setRandomSeed(final long randomSeed) {
     this.randomSeed = randomSeed;
+  }
+
+  /**
+   * Gets the directory for statistics files.
+   * @return the directory for statistics files.
+   */
+  public String getStatsDirectory() {
+    return this.statsDirectory;
+  }
+
+  /**
+   * Sets the directory for statistics files.
+   * @param statsDirectory the new directory for statistics files.
+   */
+  public void setStatsDirectory(final String statsDirectory) {
+    this.statsDirectory = statsDirectory;
   }
 
 }

@@ -295,7 +295,7 @@ public class GeneratingClient extends IoHandlerAdapter implements Runnable {
           rttList.get(0) / 1000, median / 1000, rttList.get(length - 1) / 1000));
     }
 
-    StatisticsCollector.setPath("gen-client/");
+    StatisticsCollector.setPath(this.config.getStatsDirectory());
     StatisticsCollector.toFiles();
 
     final int succ = GeneratingClient.this.numSuccess.get();

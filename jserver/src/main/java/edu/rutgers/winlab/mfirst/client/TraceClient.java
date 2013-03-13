@@ -369,7 +369,7 @@ public class TraceClient extends IoHandlerAdapter {
     int returnedLkp = succLkp + failLkp;
     int hitLkp = this.numLookupHits.get();
 
-    StatisticsCollector.setPath("trace-client/");
+    StatisticsCollector.setPath(this.config.getStatsDirectory());
     StatisticsCollector.toFiles();
 
     final String formatString = "\n==Insert==\n"
