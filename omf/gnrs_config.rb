@@ -233,7 +233,7 @@ def makeDelayScript(group,isClient)
 	asString = "cla :: Classifier\\(12/0800, -\\);\n"
 	asString << "ip_cla :: IPClassifier\\("
 	group.nodelist.each { |node|
-		asString << " dst udp #{node.port},"
+		asString << " dst udp port #{node.port},"
 	}
 	asString << "-\\);\n"
 	group.nodelist.each { |node|
