@@ -40,7 +40,7 @@ public abstract class AbstractResponseMessage extends AbstractMessage {
   protected ResponseCode responseCode;
 
   @Override
-  protected final int getPayloadLength() {
+  public final int getPayloadLength() {
     // 2-byte response code + 2-byte padding
     return 4 + this.getResponsePayloadLength();
   }

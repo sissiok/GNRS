@@ -58,6 +58,16 @@ public class LookupResponseEncoder implements
     buffer.putUnsignedShort(message.getMessageLength());
     buffer.putUnsignedInt(message.getRequestId());
     
+    // Offset values
+    int optionsOffset = 0;
+    // 12 + address T&L + address length
+    int payloadOffset = 16 + message.getOriginAddress().getLength();
+    if (!message.getOptions().isEmpty()) {
+      optionsOffset = payloadOffset + message.getPayloadLength();
+    }
+    buffer.putUnsignedShort(optionsOffset);
+    buffer.putUnsignedShort(payloadOffset);
+    
     // Address
     buffer.putUnsignedShort(message.getOriginAddress().getType().value());
     buffer.putUnsignedShort(message.getOriginAddress().getLength());
