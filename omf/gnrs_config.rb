@@ -295,7 +295,7 @@ def makeDelayConfig(serversMap, clientsMap, delayFileName)
 				otherHost.nodelist.each { |otherServer|
 					# Skip the same AS (same server)
 					next if (server.asNumber == otherServer.asNumber)
-					delayString << "#{otherHost.ipAddress},#{otherServer.port},#{delMat[server.asNumber][otherServer.asNumber]},\n"
+					delayString << "#{otherHost.ipAddress},#{otherServer.port},#{delMat[server.asNumber-1][otherServer.asNumber-1]},\n"
 				}
 			}
 			clientsMap.each_value { |clientHost|
