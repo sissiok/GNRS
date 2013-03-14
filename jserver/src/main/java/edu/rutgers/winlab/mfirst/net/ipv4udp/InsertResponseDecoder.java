@@ -25,6 +25,8 @@
  */
 package edu.rutgers.winlab.mfirst.net.ipv4udp;
 
+import java.util.List;
+
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
@@ -34,6 +36,7 @@ import org.apache.mina.filter.codec.demux.MessageDecoderResult;
 import edu.rutgers.winlab.mfirst.messages.InsertResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.MessageType;
 import edu.rutgers.winlab.mfirst.messages.ResponseCode;
+import edu.rutgers.winlab.mfirst.messages.opt.Option;
 import edu.rutgers.winlab.mfirst.net.AddressType;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 
@@ -59,7 +62,7 @@ public class InsertResponseDecoder implements MessageDecoder {
       // TODO: What happens with version number?
       buffer.get();
       final byte type = buffer.get();
-      final int needRemaining = buffer.getUnsignedShort();
+      final int needRemaining = buffer.getUnsignedShort() - 4;
       // Reset the cursor so we don't modify the buffer data.
       buffer.reset();
       if (type == MessageType.INSERT_RESPONSE.value()) {
@@ -79,7 +82,6 @@ public class InsertResponseDecoder implements MessageDecoder {
   @Override
   public MessageDecoderResult decode(final IoSession session,
       final IoBuffer buffer, final ProtocolDecoderOutput out) {
-    MessageDecoderResult result;
     /*
      * Common message header stuff
      */
@@ -87,43 +89,48 @@ public class InsertResponseDecoder implements MessageDecoder {
     final byte version = buffer.get();
     final byte type = buffer.get();
 
-    if (type == MessageType.INSERT_RESPONSE.value()) {
-      // Don't really care about message length
-      buffer.getUnsignedShort();
-      final long requestId = buffer.getUnsignedInt();
+    // Don't really care about message length
+    int length = buffer.getUnsignedShort();
+    final long requestId = buffer.getUnsignedInt();
 
-      final AddressType addrType = AddressType.valueOf(buffer
-          .getUnsignedShort());
+    // Offsets
+    final int optionsOffset = buffer.getUnsignedShort();
+    final int payloadOffset = buffer.getUnsignedShort();
 
-      final int originAddrLength = buffer.getUnsignedShort();
-      final byte[] originAddr = new byte[originAddrLength];
-      buffer.get(originAddr);
-      final NetworkAddress originAddress = new NetworkAddress(addrType,
-          originAddr);
+    final AddressType addrType = AddressType.valueOf(buffer.getUnsignedShort());
 
-      final InsertResponseMessage msg = new InsertResponseMessage();
-      msg.setVersion(version);
-      msg.setOriginAddress(originAddress);
-      msg.setRequestId(requestId);
+    final int originAddrLength = buffer.getUnsignedShort();
+    final byte[] originAddr = new byte[originAddrLength];
+    buffer.get(originAddr);
+    final NetworkAddress originAddress = new NetworkAddress(addrType,
+        originAddr);
 
-      // Response-specific stuff
+    final InsertResponseMessage msg = new InsertResponseMessage();
+    msg.setVersion(version);
+    msg.setOriginAddress(originAddress);
+    msg.setRequestId(requestId);
 
-      final int responseCode = buffer.getUnsignedShort();
+    // Response-specific stuff
 
-      msg.setResponseCode(ResponseCode.valueOf(responseCode));
+    final int responseCode = buffer.getUnsignedShort();
 
-      // Remove unused padding
-      buffer.getUnsignedShort();
+    msg.setResponseCode(ResponseCode.valueOf(responseCode));
 
-      // Write the decoded object to the next filter
-      out.write(msg);
+    // Remove unused padding
+    buffer.getUnsignedShort();
 
-      // Everything OK!
-      result = MessageDecoderResult.OK;
-    } else {
-      result = MessageDecoderResult.NOT_OK;
+    List<Option> options = RequestOptionsTranscoder.decode(buffer, length
+        - optionsOffset);
+    if (options != null) {
+      for (Option opt : options) {
+        msg.addOption(opt);
+      }
     }
-    return result;
+
+    // Write the decoded object to the next filter
+    out.write(msg);
+
+    return MessageDecoderResult.OK;
   }
 
   @Override

@@ -82,9 +82,8 @@ public class LookupMessage extends AbstractMessage {
 
   @Override
   protected int getPayloadLength() {
-    // (options offset, payload offset)->4
-    int length = 4;
-    // GUID, options
+    int length = 0;
+    // GUID
     if (this.guid != null && this.guid.getBinaryForm() != null) {
       length += this.guid.getBinaryForm().length;
     }

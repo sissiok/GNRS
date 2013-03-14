@@ -25,6 +25,8 @@
  */
 package edu.rutgers.winlab.mfirst.net.ipv4udp;
 
+import java.util.List;
+
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
@@ -34,6 +36,7 @@ import org.apache.mina.filter.codec.demux.MessageDecoderResult;
 import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
 import edu.rutgers.winlab.mfirst.messages.MessageType;
 import edu.rutgers.winlab.mfirst.messages.ResponseCode;
+import edu.rutgers.winlab.mfirst.messages.opt.Option;
 import edu.rutgers.winlab.mfirst.net.AddressType;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 
@@ -90,9 +93,13 @@ public class LookupResponseDecoder implements MessageDecoder {
     buffer.get();
 
     // Don't need message length
-    buffer.getUnsignedShort();
+    int length = buffer.getUnsignedShort();
     final long requestId = buffer.getUnsignedInt();
 
+ // Offsets
+    final int optionsOffset = buffer.getUnsignedShort();
+    final int payloadOffset = buffer.getUnsignedShort();
+    
     // Origin Address
     final AddressType addrType = AddressType.valueOf(buffer.getUnsignedShort());
 
@@ -130,6 +137,14 @@ public class LookupResponseDecoder implements MessageDecoder {
       bindings[i] = netAddr;
     }
     msg.setBindings(bindings);
+    
+    List<Option> options = RequestOptionsTranscoder.decode(buffer, length
+        - optionsOffset);
+    if (options != null) {
+      for (Option opt : options) {
+        msg.addOption(opt);
+      }
+    }
 
     // Write decoded message to next filter.
     out.write(msg);

@@ -61,6 +61,7 @@ public class LookupEncoder implements MessageEncoder<LookupMessage> {
     int payloadOffset = 16 + message.getOriginAddress().getLength();
 
     if(!message.getOptions().isEmpty()){
+      // Remove 4 for offset values
       optionsOffset = payloadOffset + GUID.SIZE_OF_GUID;
     }
     

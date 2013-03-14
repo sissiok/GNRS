@@ -25,12 +25,15 @@
  */
 package edu.rutgers.winlab.mfirst.net.ipv4udp;
 
+import java.util.List;
+
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 import org.apache.mina.filter.codec.demux.MessageEncoder;
 
 import edu.rutgers.winlab.mfirst.messages.LookupResponseMessage;
+import edu.rutgers.winlab.mfirst.messages.opt.Option;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 
 /**
@@ -72,6 +75,11 @@ public class LookupResponseEncoder implements
         buffer.putUnsignedShort(addx.getLength());
         buffer.put(addx.getValue());
       }
+    }
+    
+    List<Option> options = message.getOptions();
+    if(options != null && !options.isEmpty()){
+      buffer.put(RequestOptionsTranscoder.encode(options));
     }
     
     buffer.flip();

@@ -25,12 +25,15 @@
  */
 package edu.rutgers.winlab.mfirst.net.ipv4udp;
 
+import java.util.List;
+
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 import org.apache.mina.filter.codec.demux.MessageEncoder;
 
 import edu.rutgers.winlab.mfirst.messages.InsertResponseMessage;
+import edu.rutgers.winlab.mfirst.messages.opt.Option;
 
 /**
  * Apache MINA message encoder for {@link InsertResponseMessage} objects.
@@ -59,6 +62,11 @@ public class InsertResponseEncoder implements MessageEncoder<InsertResponseMessa
     buffer.putUnsignedShort(message.getResponseCode().value());
     // Padding
     buffer.putUnsignedShort(0);
+    
+    List<Option> options = message.getOptions();
+    if(options != null && !options.isEmpty()){
+      buffer.put(RequestOptionsTranscoder.encode(options));
+    }
     
     buffer.flip();
     out.write(buffer);
