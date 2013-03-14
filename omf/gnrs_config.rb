@@ -283,6 +283,8 @@ def makeDelayConfig(serversMap, clientsMap, delayFileName)
 		row += 1
 	}
 
+	info "Finished parsing delay file"
+
 	# Build a delayMod config for each server, include delays
 	# from all other servers (other AS), and matching clients (same AS)
 	serversMap.each_value { | host |
