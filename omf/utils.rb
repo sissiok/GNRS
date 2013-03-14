@@ -221,7 +221,7 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 
 
 	info "Downloading topology route file"
-	cmd = "#{property.wget} #{property.dataUrl}/#{property.routeFile}"
+	system("#{property.wget} #{property.dataUrl}/#{property.routeFile}")
 
 	info "Building delay configurations"
 	# This function will set the "delayConfig" member of each server/client
@@ -252,6 +252,8 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 
 	# Delete any files we downloaded and no longer need
 	info "Deleting temporary files"
+
+	system("rm #{property.routeFile}");
 
 	serversMap.each_value { |group|
 		group.nodelist.each { |node|
