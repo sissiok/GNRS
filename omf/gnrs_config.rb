@@ -246,18 +246,21 @@ def makeDelayScript(group,isClient)
 		asString << " dst udp port #{node.port},"
 	}
 	asString << "-\\);\n"
+	asCount = Hash.new(0)
 	group.nodelist.each { |node|
-		asString << "delayMod#{node.asNumber} :: NetDelay\\(\\);\n"
+		asString << "delayMod#{node.asNumber}R#{asCount[node.asNumber]} :: NetDelay\\(\\);\n"
+		asCount[node.asNumber] = asCount[node.asNumber]+1
 	}
 	asString << "FromDevice\\(eth0\\)\n"
 	asString << " -> cla\n"
 	asString << " -> CheckIPHeader\\(14, CHECKSUM false\\)\n"
 	asString << " -> ip_cla;\n"
 	asString << "cla[1] -> ToHost;\n"
-
+	asCount = Hash.new(0)
 
 	group.nodelist.each_with_index { |node, index|
-		asString << "ip_cla[#{index}] -> delayMod#{node.asNumber} -> ToHost;\n"
+		asString << "ip_cla[#{index}] -> delayMod#{node.asNumber}R#{asCount[node.asNumber]} -> ToHost;\n"
+		asCount[node.asNumber] = asCount[node.asNumber]+1
 	}
 	asString << "ip_cla[#{group.nodelist.length}] -> ToHost;\n"
 	return asString
