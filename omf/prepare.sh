@@ -52,6 +52,7 @@ echo "Creating upload directory"
 mkdir -p $UPLOAD_DIR
 mv as_*.dat $UPLOAD_DIR
 cp $PREFIX_FILE $UPLOAD_DIR/prefixes.ipv4
+cp $ROUTE_FILE $UPLOAD_DIR/$ROUTE_FILE
 mv $BDB_FILE $UPLOAD_DIR
 mv $MAP_FILE $UPLOAD_DIR
 mv $BIND_FILE $UPLOAD_DIR

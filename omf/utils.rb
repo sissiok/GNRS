@@ -219,10 +219,13 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 
 	wait property.miniWait
 
-	info "Building the delay module configuration files"
 
+	info "Downloading topology route file"
+	cmd = "#{property.wget} #{property.dataUrl}/#{property.routeFile}"
+
+	info "Building delay configurations"
 	# This function will set the "delayConfig" member of each server/client
-	makeDelayConfig(serversMap,clientsMap)
+	makeDelayConfig(serversMap,clientsMap,property.routeFile.to_s)
 
 	info "Installing the delay module configurations"
 

@@ -263,7 +263,25 @@ def makeDelayScript(group,isClient)
 	return asString
 end # makeDelayScript
 
-def makeDelayConfig(serversMap, clientsMap)
+def makeDelayConfig(serversMap, clientsMap, delayFileName)
+
+	file = File.open(delayFileName)
+	delArr = delayFile.readlines
+	file.close
+	delArr.slice!(0)
+
+	delMat = Array.new(arr.length) { Array.new(arry.length) }
+
+	row = 0
+	delArr.each { |line|
+		col = 0
+		elems = line.split
+		elems.each { |delAsStr|
+			delMat[row][col] = delAsStr.to_i
+			col += 1
+		}
+		row += 1
+	}
 
 	# Build a delayMod config for each server, include delays
 	# from all other servers (other AS), and matching clients (same AS)
@@ -275,7 +293,7 @@ def makeDelayConfig(serversMap, clientsMap)
 				otherHost.nodelist.each { |otherServer|
 					# Skip the same AS (same server)
 					next if (server.asNumber == otherServer.asNumber)
-					delayString << "#{otherHost.ipAddress},#{otherServer.port},100,\n"
+					delayString << "#{otherHost.ipAddress},#{otherServer.port},#{delMat[server.asNumber][otherServer.asNumber]},\n"
 				}
 			}
 			clientsMap.each_value { |clientHost|

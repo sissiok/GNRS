@@ -27,6 +27,7 @@ defProperty('topology', 'system:topo:imaged', 'The primary topology from which t
 defProperty('dataUrl', 'http://my.domain.com/path/to/files', 'Base URL for topology/delay files.')
 defProperty('scriptUrl', 'https://bitbucket.org/romoore/gnrs/downloads', 'Base URL for script files.')
 defProperty('bindingFile', 'topology.bind', 'Filename of AS -> IP:Port binding information.')
+defProperty('routeFile', 'topology.date.route', 'Filename of delay matrix for topology.')
 defProperty('clickModule', 'delayModule.click', 'Filename of delay module Click script.')
 # 'XxX' is a placeholder for the AS number in the experiment script
 defProperty('delayConfigServer', 'as_XxX_delay_serv.dat', 'Filename of server delay module configuration.')
