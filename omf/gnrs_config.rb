@@ -270,7 +270,7 @@ def makeDelayConfig(serversMap, clientsMap, delayFileName)
 	file.close
 	delArr.slice!(0)
 
-	delMat = Array.new(arr.length) { Array.new(arry.length) }
+	delMat = Array.new(delArr.length) { Array.new(delArr.length) }
 
 	row = 0
 	delArr.each { |line|
