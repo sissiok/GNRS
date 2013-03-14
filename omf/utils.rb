@@ -229,21 +229,27 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 
 	info "Installing the delay module configurations"
 
+	asCount = Hash.new(0)
+
 	serversMap.each_value { |group|
 		group.nodelist.each { |node|
-			cmd = "echo '#{node.delayConfig}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >/delayMod#{node.asNumber}.dat"
+			cmd = "echo '#{node.delayConfig}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >/delayMod#{node.asNumber}R#{asCount[node.asNumber]}.dat"
 			node.group.group.exec(cmd)
-			cmd = "cp /delayMod#{node.asNumber}.dat /click/delayMod#{node.asNumber}/config"
+			cmd = "cp /delayMod#{node.asNumber}R#{asCount[node.asNumber]}.dat /click/delayMod#{node.asNumber}R#{asCount[node.asNumber]}/config"
 			node.group.group.exec(cmd)
+			asCount[node.asNumber] = asCount[node.asNumber]+1
 		}
 	}
 
+	asCount = Hash.new(0)
+
 	clientsMap.each_value { |group|
 		group.nodelist.each { |node|
-			cmd = "echo '#{node.delayConfig}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >/delayMod#{node.asNumber}.dat"
+			cmd = "echo '#{node.delayConfig}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >/delayMod#{node.asNumber}R#{asCount[node.asNumber]}.dat"
 			node.group.group.exec(cmd)
-			cmd = "cp /delayMod#{node.asNumber}.dat /click/delayMod#{node.asNumber}/config"
+			cmd = "cp /delayMod#{node.asNumber}R#{asCount[node.asNumber]}.dat /click/delayMod#{node.asNumber}R#{asCount[node.asNumber]}/config"
 			node.group.group.exec(cmd)
+			asCount[node.asNumber] = asCount[node.asNumber]+1
 		}
 	}
 
