@@ -266,7 +266,7 @@ end # makeDelayScript
 def makeDelayConfig(serversMap, clientsMap, delayFileName)
 
 	file = File.open(delayFileName)
-	delArr = delayFile.readlines
+	delArr = file.readlines
 	file.close
 	delArr.slice!(0)
 
