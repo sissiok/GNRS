@@ -252,10 +252,10 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 
 	serversMap.each_value { |group|
 		group.nodelist.each { |node|
-			#cmd = "rm #{property.clickModule}"
-			#node.group.group.exec(cmd)
-			#cmd = "rm #{property.delayConfigServer}".gsub(/XxX/,node.asNumber.to_s)
-			#node.group.group.exec(cmd)
+			cmd = "rm #{property.clickModule}"
+			node.group.group.exec(cmd)
+			cmd = "rm #{property.delayConfigServer}".gsub(/XxX/,node.asNumber.to_s)
+			node.group.group.exec(cmd)
 		}
 	}
 	clientsMap.each_value { |group|
@@ -489,7 +489,7 @@ def loadGUIDs(clientsMap)
 
 
 	# 3 parameters to gbench: client config, trace file, inter-message send time in microseconds
-	baseCmd = "/usr/local/bin/gnrs/#{property.gbench} /etc/gnrs/clientXxX.xml /etc/gnrs/#{property.clientTrace} #{property.messageDelay}"
+	baseCmd = "/usr/local/bin/gnrs/#{property.gbench} /etc/gnrs/clientXxX.xml /etc/gnrs/#{property.clientTrace} #{property.messageDelay} >/var/gnrs/clientXxX.log"
 
 	clientsMap.each_value { |group|
 		group.nodelist.each { |node|
