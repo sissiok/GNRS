@@ -15,6 +15,7 @@ def collectClientStats(clientsMap, prefixDir)
 			end
 	end
 	uniqueId = Hash.new(0)
+	asCount = Hash.new(0)
 	clientsMap.each_value { |group|
 		group.nodelist.each { |client|
 			path = prefixDir.empty? ? "client_#{client.asNumber}/" : "#{prefixDir}/client_#{client.asNumber}/";
@@ -25,8 +26,9 @@ def collectClientStats(clientsMap, prefixDir)
 				path = "#{path}_#{nextId}/"
 			end
 			system("mkdir -p #{path}");
-			system("#{property.scp} root@#{group.hostname}:\"/var/gnrs/stats#{client.asNumber}/*\" #{path}");
+			system("#{property.scp} root@#{group.hostname}:\"/var/gnrs/stats#{client.asNumber}R#{asCount[client.asNumber}/*\" #{path}");
 			system("#{property.scp} root@#{group.hostname}:/var/gnrs/client#{client.asNumber}.log #{path}");
+			asCount[client.asNumber] = asCount[client.asNumber] + 1
 
 			# exitStatus = $?.exitstatus
 			#pid = $?.pid
