@@ -349,7 +349,7 @@ def installConfigs(serversMap, clientsMap)
 		group.nodelist.each { |node|
 			# Main client config
 			configContents = makeClientConfig(node,node.server,asCount[node.asNumber])
-			cmd = "echo '#{configContents}' >/etc/gnrs/client#{node.asNumber}.xml"
+			cmd = "echo '#{configContents}' >/etc/gnrs/client#{node.asNumber}R#{asCount[node.asNumber}.xml"
 			node.group.group.exec(cmd)
 			# Download static files
 
@@ -502,11 +502,12 @@ def loadGUIDs(clientsMap)
 
 	# 3 parameters to gbench: client config, trace file, inter-message send time in microseconds
 	baseCmd = "/usr/local/bin/gnrs/#{property.gbench} /etc/gnrs/clientXxX.xml /etc/gnrs/#{property.clientTrace} #{property.messageDelay} >/var/gnrs/clientXxX.log"
-
+	asCount = Hash.new(0)
 	clientsMap.each_value { |group|
 		group.nodelist.each { |node|
-			cmd = baseCmd.gsub(/XxX/,node.asNumber.to_s)
+			cmd = baseCmd.gsub(/XxX/,"#{node.asNumber}R#{asCount[node.asNumber]}")
 			node.group.group.exec(cmd)
+			asCount[node.asNumber] = asCount[node.asNumber] + 1
 		}
 	}
 
