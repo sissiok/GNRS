@@ -501,11 +501,10 @@ def loadGUIDs(clientsMap)
 
 
 	# 3 parameters to gbench: client config, trace file, inter-message send time in microseconds
-	baseCmd = "/usr/local/bin/gnrs/#{property.gbench} /etc/gnrs/clientXxX.xml /etc/gnrs/#{property.clientTrace} #{property.messageDelay} >/var/gnrs/clientXxX.log"
 	asCount = Hash.new(0)
 	clientsMap.each_value { |group|
 		group.nodelist.each { |node|
-			cmd = baseCmd.gsub(/XxX/,"#{node.asNumber}R#{asCount[node.asNumber]}")
+			cmd = "/usr/local/bin/gnrs/#{property.gbench} /etc/gnrs/client#{node.asNumber}R#{asCount[node.asNumber]}.xml /etc/gnrs/client_#{node.asNumber}.trace #{property.messageDelay} >/var/gnrs/client#{node.asNumber}R#{asCount[node.asNumber]}.log"
 			node.group.group.exec(cmd)
 			asCount[node.asNumber] = asCount[node.asNumber] + 1
 		}
