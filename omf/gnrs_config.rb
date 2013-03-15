@@ -53,7 +53,7 @@ ENDSTR
 	return asString
 end # makeServerNetConfig
 
-def makeClientConfig(client,server)
+def makeClientConfig(client,server,asCount)
 	asString = <<-ENDSTR
 <edu.rutgers.winlab.mfirst.client.Configuration>
 \t<serverHost>#{server.group.ipAddress}</serverHost>
@@ -61,7 +61,7 @@ def makeClientConfig(client,server)
 \t<clientPort>#{client.port}</clientPort>
 \t<clientHost>#{client.group.ipAddress}</clientHost>
 \t<randomSeed>-1</randomSeed>
-\t<statsDirectory>/var/gnrs/stats#{client.asNumber}/</statsDirectory>
+\t<statsDirectory>/var/gnrs/stats#{client.asNumber}R#{asCount}/</statsDirectory>
 </edu.rutgers.winlab.mfirst.client.Configuration>
 ENDSTR
 

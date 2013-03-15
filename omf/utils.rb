@@ -344,11 +344,11 @@ def installConfigs(serversMap, clientsMap)
 	}
 
 	info "Downloading client configuration files"
-	
+	asCount = Hash.new(0)
 	clientsMap.each_value { |group|
 		group.nodelist.each { |node|
 			# Main client config
-			configContents = makeClientConfig(node,node.server)
+			configContents = makeClientConfig(node,node.server,asCount[node.asNumber])
 			cmd = "echo '#{configContents}' >/etc/gnrs/client#{node.asNumber}.xml"
 			node.group.group.exec(cmd)
 			# Download static files
@@ -365,6 +365,7 @@ def installConfigs(serversMap, clientsMap)
 			# Client trace file
 			cmd = "#{property.wget} #{property.dataUrl}/#{property.clientTrace}".gsub(/XxX/,node.asNumber.to_s)
 			node.group.group.exec(cmd)
+			asCount[node.asNumber] = asCount[node.asNumber]+1
 		}
 	}
 
