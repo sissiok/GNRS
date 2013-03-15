@@ -349,7 +349,7 @@ def installConfigs(serversMap, clientsMap)
 		group.nodelist.each { |node|
 			# Main client config
 			configContents = makeClientConfig(node,node.server,asCount[node.asNumber])
-			cmd = "echo '#{configContents}' >/etc/gnrs/client#{node.asNumber}R#{asCount[node.asNumber}.xml"
+			cmd = "echo '#{configContents}' >/etc/gnrs/client#{node.asNumber}R#{asCount[node.asNumber]}.xml"
 			node.group.group.exec(cmd)
 			# Download static files
 
