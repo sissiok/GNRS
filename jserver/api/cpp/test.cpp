@@ -30,6 +30,7 @@
 
 #include <iostream>
 #include <string>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -37,7 +38,7 @@ void
 print_usage(char* exec_name) {
 
 	cout << "usage: " << exec_name 
-        << " <server ip:port> <self ip:port>" << endl;
+        << " <server ip:port> <self ip:port> [guid: int]" << endl;
 }
 
 int
@@ -46,6 +47,10 @@ main(int argc, char* argv[]) {
 	if (argc < 3) {
 		print_usage(argv[0]);
 		return 1;
+	}
+	int guid_num = 23483098;
+	if(argc > 3){
+		guid_num = atoi(argv[3]);
 	}
     
     //string server_addr_s("127.0.0.1:5001");
@@ -58,7 +63,7 @@ main(int argc, char* argv[]) {
     //configure service endpoints
     Gnrs gnrs(server_addr, local_addr);
 
-    Guid guid = Guid::fromUnsignedInteger(23483098); 
+    Guid guid = Guid::from_unsigned_int(guid_num); 
 
     //insert operation
     list<NetAddr> addrs;

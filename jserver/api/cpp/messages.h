@@ -27,7 +27,6 @@
 #ifndef MESSAGES_H
 #define MESSAGES_H
 
-#include <list>
 #include "common.h"
 #include "guid.h"
 
@@ -48,9 +47,15 @@
 
 #define FINAL_OPTION_FLAG (uint8_t)0x80
 
+//response codes
+#define RESPONSE_SUCCESS 0
+#define RESPONSE_FAILURE 1
+
 //response status
 #define RESPONSE_INCOMPLETE 0
 #define RESPONSE_COMPLETE 1
+
+#define MAX_INSERT_REQUEST_ADDRS 64
 
 //response containers for easy unpacking
 #define MAX_RESPONSE_OPTS 64
@@ -74,6 +79,7 @@ typedef struct{
     void* data; /* request-type specific payload */
     uint16_t num_opts;
     opt_tlv_t* opts;
+    uint16_t opts_len;
 }req_t;
 
 typedef struct{
@@ -112,4 +118,281 @@ typedef struct{
     opt_tlv_t opts[MAX_RESPONSE_OPTS];
 }resp_t;
 
+class GnrsMessageHelper{
+
+    public:
+        /* returns written bytes on successful build, else returns -1 */
+        static int16_t build_request_msg(req_t req, unsigned char* buf, 
+                                                    uint16_t max_len) {
+
+            uint16_t i = 0;
+            //TODO should validate data_len and opts_len
+            if (max_len < (16 + req.src_addr.len + req.data_len 
+                                                    + req.opts_len)) {
+                return -1;
+            }
+            //version
+            *(buf + i) = req.version;
+            i++;
+            //type
+            *(buf + i) = req.type;
+            i++;
+            //len fill after counting
+            //*(uint16_t*)(buf + i) = htons(req.len);
+	    	uint16_t req_len_offset = i;
+            i += 2;
+            //request id
+            *(uint32_t*)(buf + i) = htonl(req.id);
+            i += 4;
+            //options offset
+            *(uint16_t*)(buf + i) = htons(12 + 4 + req.src_addr.len 
+                                                    + req.data_len);
+            i += 2;
+            //data offset
+            *(uint16_t*)(buf + i) = htons(12 + 4 + req.src_addr.len);
+            i += 2;
+
+            //requestor address
+            *(uint16_t*)(buf + i) = htons(req.src_addr.type);
+            i += 2;
+            *(uint16_t*)(buf + i) = htons(req.src_addr.len);
+            i += 2;
+            memcpy(buf + i, req.src_addr.value, req.src_addr.len);
+            i += req.src_addr.len;
+
+            //request payload
+            if(req.type == LOOKUP_REQUEST){
+
+                if (req.data_len < GUID_BINARY_SIZE) return -1;
+                lookup_t* lkup = (lookup_t*)req.data;
+                memcpy(buf + i, lkup->guid, GUID_BINARY_SIZE);
+                i += GUID_BINARY_SIZE;
+
+            }else if(req.type == INSERT_REQUEST ||
+                        req.type == UPDATE_REQUEST) {
+
+                uint16_t data_len = 0;
+                if (req.data_len < (GUID_BINARY_SIZE + 4)) return -1;
+                upsert_t* ups = (upsert_t*)req.data;
+                memcpy(buf + i, ups->guid, GUID_BINARY_SIZE);
+                i += GUID_BINARY_SIZE;
+                data_len += GUID_BINARY_SIZE;
+                *(uint32_t*)(buf + i) = htonl(ups->size);
+                i += 4;
+                data_len += 4;
+
+                //address entries
+                addr_tlv_t* addrs = ups->addrs;
+                for(unsigned j = 0; j < ups->size; j++) {
+                    if (req.data_len < (data_len + 4 + (addrs+j)->len)) 
+                        return -1;
+                    *(uint16_t*)(buf + i) = htons((addrs + j)->type);
+                    i += 2;
+                    *(uint16_t*)(buf + i) = htons((addrs + j)->len);
+                    i += 2;
+                    memcpy(buf + i, (addrs + j)->value, (addrs + j)->len);
+                    i += (addrs+j)->len;
+                    data_len += 4 + (addrs+j)->len;
+                }
+            }
+			cout << "DEBUG: req msg size after data: " << i << endl;
+
+            //options
+            opt_tlv_t* opts = req.opts;
+            uint16_t opts_len = 0;
+            for (int j = 0; j < req.num_opts; j++) {
+                if (req.opts_len < (opts_len + 2 + (opts+j)->len)) 
+                        return -1;
+                if (j == (req.num_opts - 1)) {
+                    /* last option, set 'final' bit 0x80 */
+                            *(uint8_t*)(buf + i) = 
+                        (opts + j)->type | FINAL_OPTION_FLAG;
+                } else {
+                            *(uint8_t*)(buf + i) = (opts + j)->type;
+                }
+                i++;
+                *(uint8_t*)(buf + i) = (opts + j)->len;
+                i++;
+                memcpy(buf + i, (opts + j)->value, (opts + j)->len);
+                i += (opts+j)->len;
+                opts_len += 2 + (opts+j)->len;
+            }
+            //fill in len 
+            *(uint16_t*)(buf + req_len_offset) = htons(i);
+            return i;
+        }
+
+
+        /* returns with rsp.status set to RESPONSE_INCOMPLETE if theres's
+         * an error while parsing, else it is set to RESPONSE_COMPLETE
+         * before returning 
+         */
+        static void parse_response_msg(unsigned char* buf, int len, 
+                                                        resp_t& rsp){
+
+            rsp.status = RESPONSE_INCOMPLETE;
+            int i = 0; // index
+            //version
+            if (len >= (i + 1)) {
+                rsp.version = *(buf + i);
+            } else {
+                return;
+            }
+            i++;
+            //message type
+            if (len >= (i+1)) {
+                rsp.type = *(buf + i);
+            } else {
+                return;
+            }
+            i++;
+            //message len
+            if (len >= (i+2)) {
+                rsp.len = ntohs(*(uint16_t *)(buf + i));
+            } else {
+                return;
+            }
+            i += 2;
+            //request id
+            if (len >= (i+4)) {
+                rsp.req_id = ntohl(*(uint32_t *)(buf + i));
+            } else {
+                return;
+            }
+            i += 4;
+        /*
+
+            //options offset
+            uint16_t opts_offset;
+            if (len >= (i+2)) {
+                opts_offset = ntohs(*(uint16_t *)(buf + i));
+            } else {
+                return;
+            }
+            i += 2;
+            //data offset
+            uint16_t data_offset;
+            if (len >= (i+2)) {
+                data_offset = ntohs(*(uint16_t *)(buf + i));
+            } else {
+                return;
+            }
+            i += 2;
+	*/
+            //origin addr
+            //T type
+            if (len >= (i+2)) {
+                rsp.src_addr.type = ntohs(*(uint16_t *)(buf + i));
+            } else {
+                return;
+            }
+            i += 2;
+            //L len
+            if (len >= (i+2)) {
+                rsp.src_addr.len = ntohs(*(uint16_t *)(buf + i));
+            } else {
+                return;
+            }
+            i += 2;
+            //V value
+            if (len >= (i + rsp.src_addr.len)) {
+                rsp.src_addr.value = buf + i;
+            } else {
+                return;
+            }
+            i += rsp.src_addr.len;
+
+            //response code
+            if (len >= (i+4)) {
+		    //16bit value and 2 byte pad - pick up only the first 2
+                rsp.code = ntohs(*(uint16_t *)(buf + i));
+            } else {
+                return;
+            }
+            i += 4;
+
+	        //response payload
+            if (rsp.type == LOOKUP_RESPONSE) {
+                if (len >= (i+4)) {
+                    rsp.lkup_data.size = ntohl(*(uint32_t *)(buf + i));
+                } else {
+                    return;
+                }
+                i += 4;
+                for(unsigned j = 0; (j < rsp.lkup_data.size) 
+                            && (j < MAX_LOOKUP_RESPONSE_ADDRS); j++){
+
+                    //addr
+                    //T type
+                    if (len >= (i+2)) {
+                        rsp.lkup_data.addrs[j].type = 
+                            ntohs(*(uint16_t *)(buf + i));
+                    } else {
+                        return;
+                    }
+                    i += 2;
+                    //L len
+                    if (len >= (i+2)) {
+                        rsp.lkup_data.addrs[j].len = 
+                            ntohs(*(uint16_t *)(buf + i));
+                    } else {
+                        return;
+                    }
+                    i += 2;
+                    //V value
+                    if (len >= (i + rsp.lkup_data.addrs[j].len)) {
+                        rsp.lkup_data.addrs[j].value = buf + i;
+                    } else {
+                        return;
+                    }
+                    i += rsp.lkup_data.addrs[j].len;
+                }
+            } else if (rsp.type == INSERT_RESPONSE) {
+                //nothing to do here
+            } else if (rsp.type == UPDATE_RESPONSE) {
+                //TODO
+            }
+
+        /*
+
+            //options TODO currently no options in responses.
+		    //also, no count, have to check for final flag on opt type
+            //num options
+            if (len >= (i+1)) {
+                rsp.num_opts = ntohl(*(uint16_t *)(buf + i));
+            } else {
+                return;
+            }
+            i += 2;
+            for(int j = 0; (j < rsp.num_opts) && (j < MAX_RESPONSE_OPTS); j++){
+
+                //option
+                //T type
+                if (len >= (i+2)) {
+                    rsp.opts[j].type = 
+                        ntohs(*(uint16_t *)(buf + i));
+                } else {
+                    return;
+                }
+                i += 2;
+                //L len
+                if (len >= (i+2)) {
+                    rsp.opts[j].len = 
+                        ntohs(*(uint16_t *)(buf + i));
+                } else {
+                    return;
+                }
+                i += 2;
+                //V value
+                if (len >= (i + rsp.opts[j].len)) {
+                    rsp.opts[j].value = buf + i;
+                } else {
+                    return;
+                }
+                i += rsp.opts[j].len;
+            }
+	*/
+            rsp.status = RESPONSE_COMPLETE;
+        }
+};
 #endif //MESSAGES_H
