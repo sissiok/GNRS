@@ -1,4 +1,4 @@
-function [ ] = eventGenerator( prefixData, topoData )
+function [ ] = eventGenerator( matFile )
 
 % Generate Event file contatining Insert, Update and Query
 % Note: No Update events currently being generated
@@ -32,14 +32,16 @@ lambdaInsert = numInsert/(totalTimeInsert* 1000);
 lambdaQuery = numQuery/(totalTimeQuery* 1000);   
 
 %Source AS is chosen based on the NODE distribution databse - change to
-%wherever these files are stored
-in = importdata(prefixData);
-in = in(:,2);
+%wherever these files are stored ( here the data is from the matFile)
+load matFile;
+%in = importdata(prefixData);
+in = asPrefix(:,1);
 in = sort(in);
 
 % ****** DATA VALIDATION ********
 % Done to remove the ASs which are not present in the topology file
-A = importdata(topoData);
+%A = importdata(topoData);
+A = asLinks;
 asListFromEdge = unique([unique(A(:,1));unique(A(:,2))]);
 uniqueIn = unique(in);
 

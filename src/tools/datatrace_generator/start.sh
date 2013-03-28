@@ -1,10 +1,9 @@
 #!/usr/bin/octave -qf
 
-#input: path to prefix.data and topology.data
+#input: .mat file containing topology data and prefix data which is generated from topology generator
 
 arg_list = argv ();
-prefixData = arg_list{1};
-topoData = arg_list{2};
+matFile = arg_list{1};
 source('eventGenerator.m')
 
-eventGenerator(prefixData, topoData)
+eventGenerator(matFile)
