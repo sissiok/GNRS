@@ -55,6 +55,8 @@ prefix_fid = fopen('prefix.data','wt');
 for i=1:length(asPrefix)
     fprintf(prefix_fid, '%d.%d.%d.%d/%d %d\n', asPrefix(i,2), asPrefix(i,3), asPrefix(i,4), asPrefix(i,5), asPrefix(i,6), asPrefix(i,1));
 end
+
+save('datatraceInput.mat','asLinks', 'asPrefix');
     
 fclose(link_fid);
 fclose(topo_fid);
