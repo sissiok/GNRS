@@ -48,7 +48,8 @@ using namespace std;
 
 #define NET_ADDR_LEN_IPV4_PORT 6
 #define NET_ADDR_LEN_GUID 20
-#define NET_ADDR_LEN_NA 4
+//TODO currently binary encoded with GUID length
+#define NET_ADDR_LEN_NA 20
 
 #define PORT_OFFSET_IPV4_PORT 4
 
@@ -88,56 +89,89 @@ class NetAddr {
         string hostname_or_ip;
         int port;
 
+        //these should go into derived class
+        string netaddr_net;
+        uint32_t netaddr_local;
+
+        //these should go into derived class
+        //GUID netaddr type
+        uint32_t guid_int;
+
         NetAddr(uint16_t addr_type, string addr_value, 
                 uint32_t expiry_ms = 0, uint32_t ttl_ms = 0): 
                 type(addr_type), value(addr_value), 
                 expiry(expiry_ms), ttl(ttl_ms) {
                 
             switch(type) {
-                case NET_ADDR_TYPE_IPV4_PORT: len = NET_ADDR_LEN_IPV4_PORT; 
-                                        parse_ip_and_port();
-                                        break;
-                case NET_ADDR_TYPE_GUID: len = NET_ADDR_LEN_GUID; 
-                                        //TODO: parse/encode GUID
-                                        break;
-                case NET_ADDR_TYPE_NA: len = NET_ADDR_LEN_NA; 
-                                        //TODO: parse/encode NA
-                                        break;
+                case NET_ADDR_TYPE_IPV4_PORT: 
+                    len = NET_ADDR_LEN_IPV4_PORT; 
+                    parse_ip_and_port();
+                    break;
+                case NET_ADDR_TYPE_GUID: 
+                    len = NET_ADDR_LEN_GUID; 
+                    /* the guid is currently encoded as a 4-byte integer */
+                    parse_guid();
+                    break;
+                case NET_ADDR_TYPE_NA: 
+                    len = NET_ADDR_LEN_NA; 
+                    //Currently, binary encoding assumes that the
+                    //addr is encoded in 20 bytes. Upto first 15 bytes network
+                    //addr, and next 4 bytes the local addr. Local address
+                    //at present is specified as 32 bit integer, while
+                    //network addr is uninterpreted bytes of upto 15 bytes
+                    // 16th byte is null for string ops
+                    type = NET_ADDR_TYPE_GUID;
+                    parse_netaddr();
+                    break;
             }
         }
      
         /* constructor for binary encoded char array for address value */
         NetAddr(uint16_t addr_type, unsigned char* buf, int len): 
                                         type(addr_type), len(len) { 
+            char tmp[32];
             switch(type) {
                 case NET_ADDR_TYPE_IPV4_PORT: 
                     if(len != NET_ADDR_LEN_IPV4_PORT){
                         cerr << "ERROR: NetAddr: length mismatch for type: " 
-                            << addr_type << "; expect " << NET_ADDR_LEN_IPV4_PORT 
+                            << addr_type << "; expect " 
+                            << NET_ADDR_LEN_IPV4_PORT 
                             << "got " << len << endl;	
                         //TODO throw exception
                         return;
                     }
+                    sprintf(tmp, "%u.%u.%u.%u", *(uint8_t*)&buf[0], 
+                                                *(uint8_t*)&buf[1], 
+                                                *(uint8_t*)&buf[2], 
+                                                *(uint8_t*)&buf[3]);
+                    hostname_or_ip.assign(tmp); 
+                    port = ntohs(*((uint16_t*)&buf[PORT_OFFSET_IPV4_PORT]));
+                    sprintf(tmp, "%s:%u", hostname_or_ip.c_str(), port); 
+                    value.assign(tmp);
                     break;
             
                 case NET_ADDR_TYPE_GUID: 
-                    //TODO: 
+                    /* the guid is currently encoded as a 4-byte integer */
+                    guid_int  = ntohl(*(uint32_t*)&buf[16]);
+                    sprintf(tmp, "%u", guid_int); 
+                    value.assign(tmp);
                     break;
+
                 case NET_ADDR_TYPE_NA: 
-                    //TODO: 
+                    //Currently, binary encoding assumes that the
+                    //addr is encoded in 20 bytes. Upto first 15 bytes network
+                    //addr, and next 4 bytes the local addr. Local address
+                    //at present is a 32 bit integer, while
+                    //network addr is uninterpreted bytes of upto 15 bytes
+                    // 16th byte is null for string ops
+
+                    netaddr_net.assign((const char*)buf);
+                    netaddr_local = ntohl(*(uint32_t*)&buf[16]);
+                    sprintf(tmp, "%s:%u", netaddr_net.c_str(), netaddr_local); 
+                    value.assign(tmp);
                     break;
             }
             memcpy(bytes, buf, len);
-            //TODO parse IP address
-            char tmp[32];
-            sprintf(tmp, "%u.%u.%u.%u", *(uint8_t*)&bytes[0], 
-                                        *(uint8_t*)&bytes[1], 
-                                        *(uint8_t*)&bytes[2], 
-                                        *(uint8_t*)&bytes[3]);
-            hostname_or_ip.assign(tmp); 
-            port = htons(*((uint16_t*)&bytes[PORT_OFFSET_IPV4_PORT]));
-            sprintf(tmp, "%s:%u", hostname_or_ip.c_str(), port); 
-            value.assign(tmp);
         }
 
         //IPV4/TCP/UDP specfic functions
@@ -177,7 +211,37 @@ class NetAddr {
             //port
             istringstream strm(value.substr(index - s + 1, value.length()));
             strm >> port;
-	        *(uint16_t*)&bytes[he->h_length] = ntohs(port);
+	        *(uint16_t*)&bytes[he->h_length] = htons(port);
+        }
+
+        /* the guid is currently encoded as a 4-byte integer */
+        void parse_guid() {
+            
+            istringstream strm(value);
+            strm >> guid_int;
+            *(uint32_t*)&bytes[16] = htonl(guid_int);
+        }
+
+        void parse_netaddr(){
+
+            //format: net:local
+            const char* s = value.c_str(); 
+            const char* index = strchr(s, ':');
+
+            //network part of NA
+            memset(bytes, 0, 16); 
+            if((index - s) < 16){
+                memcpy(bytes, s, index - s);
+                netaddr_net = value.substr(0, index - s);
+            }else{
+                memcpy(bytes, s, 15);
+                netaddr_net = value.substr(0, 15);
+            }
+
+            //local part of NA
+            istringstream strm_lcl(value.substr(index - s + 1, value.length()));
+            strm_lcl >> netaddr_local;
+	        *(uint32_t*)&bytes[16] = htonl(netaddr_local);
         }
 };
 

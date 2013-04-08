@@ -55,7 +55,11 @@ Gnrs::lookup(Guid guid) {
     req.data = (void*) &lkup;
 
     //set up options 
-    opt_tlv_t opts[1];
+	opt_tlv_t opts[1];
+	uint16_t& opts_len = req.opts_len;
+	uint16_t& num_opts = req.num_opts;
+	opts_len = 0;
+	num_opts = 0;
 
     //redirect option: allow request to be redirected to other GNRS servers
     unsigned char redirect_val[] = {0x00, 0x01};
@@ -64,11 +68,17 @@ Gnrs::lookup(Guid guid) {
     redirect_opt->type = OPTION_REQUEST_REDIRECT;
     redirect_opt->len = 2;
     redirect_opt->value = (unsigned char*)&redirect_val;
+	opts_len += 2 + redirect_opt->len;
+	num_opts++;
 
     req.opts = opts;
-    req.num_opts = 1;
 
-    req.len = build_request_msg(req, (unsigned char*)&buf);
+    if ((req.len = GnrsMessageHelper::
+        build_request_msg(req, (unsigned char*)&buf, 2048)) < 0) {
+		cout << "ERROR: gnrs_cxx: Error building lookup req message!" << endl;
+       //TODO throw an exception
+		return a_list;
+	}
 
     cout << "DEBUG: gnrs_cxx: Built lookup msg, size: " << req.len << endl;
 
@@ -93,14 +103,14 @@ Gnrs::lookup(Guid guid) {
 
     //parse lookup response and create result 
     resp_t rsp;
-    parse_response_msg((unsigned char*)&buf, len, rsp);
+    GnrsMessageHelper::parse_response_msg((unsigned char*)&buf, len, rsp);
 
     if (rsp.req_id == req.id && rsp.type == LOOKUP_RESPONSE) {
         cout << "DEBUG: gnrs_cxx: Lookup response code: " << rsp.code << endl;
 
         lookup_resp_t* lr = &rsp.lkup_data;
 
-        for (int i = 0; i < lr->size; i++) {
+        for (unsigned i = 0; i < lr->size; i++) {
             NetAddr a(lr->addrs[i].type, lr->addrs[i].value, lr->addrs[i].len);
             a_list.push_back(a);
         } 
@@ -132,7 +142,7 @@ Gnrs::add(Guid guid, list<NetAddr>& addrs) {
     upsert_t ups; 
     memcpy(ups.guid, guid.bytes, GUID_BINARY_SIZE);
     //count data len
-    int data_len = GUID_BINARY_SIZE;
+    int data_len = GUID_BINARY_SIZE + 4;
     //set the address entries
     vector<addr_tlv_t> addrs_v;
     for (list<NetAddr>::iterator it = addrs.begin(); it != addrs.end(); it++) {
@@ -146,7 +156,11 @@ Gnrs::add(Guid guid, list<NetAddr>& addrs) {
     req.data_len = data_len;
 
     //set up options 
-    opt_tlv_t opts[1];
+	opt_tlv_t opts[1];
+	uint16_t& opts_len = req.opts_len;
+	uint16_t& num_opts = req.num_opts;
+	opts_len = 0;
+	num_opts = 0;
 
     //redirect option: allow request to be redirected to other GNRS servers
     unsigned char redirect_val[] = {0x00, 0x01};
@@ -155,11 +169,17 @@ Gnrs::add(Guid guid, list<NetAddr>& addrs) {
     redirect_opt->type = OPTION_REQUEST_REDIRECT;
     redirect_opt->len = 2;
     redirect_opt->value = (unsigned char*)&redirect_val;
+	opts_len += 2 + redirect_opt->len;
+	num_opts++;
 
     req.opts = opts;
-    req.num_opts = 1;
 
-    req.len = build_request_msg(req, (unsigned char*)&buf);
+    if ((req.len = GnrsMessageHelper::
+        build_request_msg(req, (unsigned char*)&buf, 2048)) < 0) {
+		cout << "ERROR: gnrs_cxx: Error building insert req message!" << endl;
+       //TODO throw an exception
+		return;
+	}
 
     cout << "DEBUG: gnrs_cxx: Built insert msg, size: " << req.len << endl;
 
@@ -186,7 +206,7 @@ Gnrs::add(Guid guid, list<NetAddr>& addrs) {
 
     resp_t rsp; 
     
-    parse_response_msg((unsigned char*)&buf, len, rsp);
+    GnrsMessageHelper::parse_response_msg((unsigned char*)&buf, len, rsp);
 
     if (rsp.req_id == req.id && rsp.type == INSERT_RESPONSE) {
         cout << "DEBUG: gnrs_cxx: Insert result code: " << rsp.code << endl;

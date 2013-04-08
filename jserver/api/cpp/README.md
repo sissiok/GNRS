@@ -19,8 +19,8 @@ Here's an example showing basic use of the api:
 	int main() {
 
 		/* local and server network endpoint addresses */
-	    string server_addr_s("127.0.0.1:5001");
-	    string local_addr_s("192.168.1.1:3001");
+	    string server_addr_s("192.168.1.1:5001");
+	    string local_addr_s("192.168.1.2:3001");
 
 		/* Note: addresses can also be constructued as binary encoded
 		 * byte arrays.
@@ -32,7 +32,7 @@ Here's an example showing basic use of the api:
 	    Gnrs gnrs(server_addr, local_addr);
 
 		/* use helper functions to prepare GUID */
-	    Guid guid = Guid::fromUnsignedInteger(23483098); 
+	    Guid guid = Guid::from_unsigned_int(23483098); 
 
 	    /* insert operation: stores id-locator mapping in GNRS */.
 	    list<NetAddr> addrs;
@@ -60,15 +60,16 @@ Here's an example showing basic use of the api:
 		return 0;
 	}
 
-## Test Client ##
-A test client is included to test the API - test.cpp
+## Sample Clients ##
+A few test clients are included to test the API: 
+- test.cpp, lookup.cpp, add_guid_mappings.cpp
 
-This can be compiled as:
-	g++ gnrs_cxx.cpp test.cpp -o test_client	
+These can be compiled simply as:
+	g++ -Wall gnrs_cxx.cpp test.cpp -o test
 
-The client takes 2 command-line arguments: server address and local address:
+The 'test' client takes 2 command-line arguments: server address and local address:
 
-	usage: ./test_client <server ip:port> <self ip:port>
+	usage: ./test <server ip:port> <self ip:port>
 
 * server address - This is the network address at which one of the service
   instances can be reached. Presently the API supports only IPv4-UDP endpoints 
@@ -84,4 +85,3 @@ Unless otherwise noted in the application or in the source code, all
 other resources, including but not limited to source code, artwork, 
 documentation, are copyright (C) 2013 Wireless Information Laboratory (WINLAB)
 and Rutgers University.  All rights reserved.
-# GNRS C++ API #

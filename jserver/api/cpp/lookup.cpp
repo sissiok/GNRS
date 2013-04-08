@@ -38,20 +38,17 @@ void
 print_usage(char* exec_name) {
 
 	cout << "usage: " << exec_name 
-        << " <server ip:port> <self ip:port> [guid: int]" << endl;
+        << " <server ip:port> <self ip:port> guid_integer" << endl;
 }
 
 int
 main(int argc, char* argv[]) {
 
-	if (argc < 3) {
+	if (argc < 4) {
 		print_usage(argv[0]);
 		return 1;
 	}
-	int guid_num = 23483098;
-	if(argc > 3){
-		guid_num = atoi(argv[3]);
-	}
+	int guid_num = atoi(argv[3]);
     
     //string server_addr_s("127.0.0.1:5001");
     //string local_addr_s("192.168.1.1:3001");
@@ -64,11 +61,6 @@ main(int argc, char* argv[]) {
     Gnrs gnrs(server_addr, local_addr);
 
     Guid guid = Guid::from_unsigned_int(guid_num); 
-
-    //insert operation
-    list<NetAddr> addrs;
-    addrs.push_back(local_addr);
-    gnrs.add(guid, addrs);
 
     //lookup operation
     list<NetAddr> lkup_addrs = gnrs.lookup(guid);

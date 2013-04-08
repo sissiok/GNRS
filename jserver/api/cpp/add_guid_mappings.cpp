@@ -30,6 +30,7 @@
 
 #include <iostream>
 #include <string>
+#include <string.h>
 #include <stdlib.h>
 
 using namespace std;
@@ -38,20 +39,60 @@ void
 print_usage(char* exec_name) {
 
 	cout << "usage: " << exec_name 
-        << " <server ip:port> <self ip:port> [guid: int]" << endl;
+        << " <server ip:port> <self ip:port> <guid: int> "
+        << "'[guid1, guid2, ...]'" << endl
+        << " E.g.,: " << exec_name 
+        << " 127.0.0.1:5001 127.0.0.1:3009 234234 '[23, 3474, 234]'" 
+        << endl;
 }
 
 int
 main(int argc, char* argv[]) {
 
-	if (argc < 3) {
+	if (argc < 5) {
 		print_usage(argv[0]);
 		return 1;
 	}
-	int guid_num = 23483098;
-	if(argc > 3){
-		guid_num = atoi(argv[3]);
-	}
+	int guid_num;
+	guid_num = atoi(argv[3]);
+    /* 
+     * process the guid list 
+     * expecting: [guid1,guid2,guid3...guidN]
+     * extra spaces are ok 
+     */
+    int num_guid_locators = 0;
+    const char* str_index = argv[4];
+    const char* start_index;
+    /* get index beyond the start separator '[' */
+    if (!(start_index = strchr(str_index, '['))) {
+        /* syntax issue */
+        print_usage(argv[0]);
+        return 1;
+    }
+    list<NetAddr> addrs;
+    str_index = start_index + 1;
+    while (str_index < (argv[4] + strlen(argv[4]))) {
+        const char* end_index;
+        if ((end_index = strchr(str_index, ','))
+                || (end_index = strchr(str_index, ']'))) {
+            /* we have a guid followed by a separator */
+            char tmp[32]; 
+            memset(tmp, 0, 32);
+            memcpy(tmp, str_index, end_index - str_index);
+            string guid_str(tmp);
+            cout << "DEBUG: \t found locator: " << guid_str << endl;
+            NetAddr na(NET_ADDR_TYPE_GUID, guid_str);
+            addrs.push_back(na);
+            num_guid_locators++;
+            str_index = end_index + 1;
+        } else {
+            //syntax issue
+            print_usage(argv[0]);
+            return 1;
+        }
+    }
+    cout << "DEBUG: Total of " << num_guid_locators 
+        << " locator mappings will be added" << endl;
     
     //string server_addr_s("127.0.0.1:5001");
     //string local_addr_s("192.168.1.1:3001");
@@ -66,20 +107,21 @@ main(int argc, char* argv[]) {
     Guid guid = Guid::from_unsigned_int(guid_num); 
 
     //insert operation
-    list<NetAddr> addrs;
-    addrs.push_back(local_addr);
+    cout << "INFO: Executing add op..." << endl; 
     gnrs.add(guid, addrs);
 
     //lookup operation
+    cout << "INFO: Executing lookup op (to validate add)..." << endl; 
     list<NetAddr> lkup_addrs = gnrs.lookup(guid);
 
-    cout << lkup_addrs.size() << " result(s) from lookup for guid: " 
-        << guid.str.c_str() << " :" << endl;
+    cout << "INFO: " << lkup_addrs.size() 
+	<< " result(s) from lookup for guid: " 
+        << guid.str.c_str() << endl;
     int num_addrs = 0;
     for (list<NetAddr>::const_iterator it = lkup_addrs.begin(); 
                             it != lkup_addrs.end(); it++) {
         num_addrs++;
-        cout << "\t" << num_addrs << ":\t" << (*it).value << endl;
+        cout << "INFO: \t Addr #" << num_addrs << " : " << (*it).value << endl;
     }
 
     return 0;

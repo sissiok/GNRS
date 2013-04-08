@@ -42,7 +42,7 @@ class Guid {
         uint8_t bytes[GUID_BINARY_SIZE];
         string str;
 
-        static Guid fromUnsignedInteger(uint32_t guid) {
+        static Guid from_unsigned_int(uint32_t guid) {
 
             Guid g;
 		    memset(g.bytes, 0x00, 16);	
@@ -54,7 +54,7 @@ class Guid {
             return g;
         }
 
-        static Guid fromLongUnsignedInteger(uint64_t guid) {
+        static Guid from_long_unsigned_int(uint64_t guid) {
 
             Guid g;
 		    memset(g.bytes, 0x00, 12);	
