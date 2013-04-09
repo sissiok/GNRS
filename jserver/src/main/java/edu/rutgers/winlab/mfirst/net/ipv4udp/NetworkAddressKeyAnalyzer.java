@@ -52,7 +52,7 @@ public final class NetworkAddressKeyAnalyzer implements
    */
   private NetworkAddressKeyAnalyzer(final AddressType type) {
     super();
-    this.byteAnalyzer = ByteArrayKeyAnalyzer.create(type.getMaxLength());
+    this.byteAnalyzer = ByteArrayKeyAnalyzer.create(type.getMaxLength()*8);
   }
 
   /**

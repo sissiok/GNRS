@@ -27,25 +27,38 @@ package edu.rutgers.winlab.mfirst.mapping.ipv4udp;
 
 import static org.junit.Assert.*;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Iterator;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
+import org.junit.rules.TestWatchman;
+import org.junit.runners.model.FrameworkMethod;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.rutgers.winlab.mfirst.GUID;
 import edu.rutgers.winlab.mfirst.net.AddressType;
 import edu.rutgers.winlab.mfirst.net.NetworkAddress;
 import edu.rutgers.winlab.mfirst.net.ipv4udp.IPv4UDPAddress;
+import edu.rutgers.winlab.mfirst.net.ipv4udp.NetworkAddressMapper;
 
 /**
  * @author Robert Moore
  */
 public class IPv4UDPGUIDMapperTest {
+  
+  static final Logger LOG = LoggerFactory.getLogger(IPv4UDPGUIDMapperTest.class);
+  
   public GUID guid;
   public static final byte[] GUID_BYTE = new byte[] { 0x0, 0x1, 0x2, 0x3, 0x4,
       0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0x10, 0x11, 0x12,
@@ -54,6 +67,14 @@ public class IPv4UDPGUIDMapperTest {
   public NetworkAddress ipv4Addr;
   public NetworkAddress guidAddr;
 
+  @Rule public MethodRule watchman = new TestWatchman() {
+    @Override
+    public void starting(FrameworkMethod method){
+      LOG.info("{} being run...",method.getName());
+      System.out.println(method.getName() + " being run...");
+    }
+  };
+  
   @Before
   public void setup() {
     this.guid = new GUID();
@@ -131,6 +152,45 @@ public class IPv4UDPGUIDMapperTest {
       
 
       // Assert.assertTrue(nullList.isEmpty());
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+  
+  /**
+   * Test method that ensures {@code String} to {@code byte[]} conversions are handled correctly.
+   */
+  @Test
+  public void testLoadPrefixes() {
+    /* Prefixes from file
+    1.2.3.0/24 1
+    1.2.3.255/25 2
+    1.2.3.255/26 3
+    1.0.0.0/8 4
+    192.168.231.44/13 5
+    */
+    LOG.info("Testing prefixes.");
+    try {
+      IPv4UDPGUIDMapper guidMapper = new IPv4UDPGUIDMapper(
+          "src/test/resources/map-ipv4.xml");
+      NetworkAddressMapper naMapper = guidMapper.networkAddressMap;
+      NetworkAddress addr = IPv4UDPAddress.fromInetSocketAddress(new InetSocketAddress("1.2.3.4", 123));
+      Assert.assertEquals("1",naMapper.get(addr));
+      
+      addr = IPv4UDPAddress.fromInetSocketAddress(new InetSocketAddress("1.2.3.128",1244));
+      Assert.assertEquals("2",naMapper.get(addr));
+      
+      addr = IPv4UDPAddress.fromInetSocketAddress(new InetSocketAddress("1.2.3.192",3));
+      Assert.assertEquals("3",naMapper.get(addr));
+      
+      addr = IPv4UDPAddress.fromInetSocketAddress(new InetSocketAddress("0.0.0.0",1244));
+      Assert.assertEquals("4",naMapper.get(addr));
+      
+      addr = IPv4UDPAddress.fromInetSocketAddress(new InetSocketAddress("192.168.231.44",777));
+      Assert.assertEquals("5",naMapper.get(addr));
+      
+      
     } catch (IOException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

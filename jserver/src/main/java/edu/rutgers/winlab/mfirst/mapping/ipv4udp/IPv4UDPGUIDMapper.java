@@ -158,23 +158,14 @@ public class IPv4UDPGUIDMapper implements GUIDMapper {
 
       // Extract prefix length
       final int prefixLength = Integer.parseInt(prefixParts[1]);
+      final int mask = prefixLength == 0 ? 0 : (0x80000000 >> (prefixLength-1));
 
-      final int addxAsInt = (((addxBytes[0] << 24) & 0xFF000000)
-          | ((addxBytes[1] << 16) & 0xFF0000) | ((addxBytes[2] << 8) & 0xFF00) | ((addxBytes[3]) & 0xFF)
-          & (0x80000000 >> prefixLength));
-
+      final int addxAsInt = ((((addxBytes[0] << 24) & 0xFF000000)
+          | ((addxBytes[1] << 16) & 0xFF0000) | ((addxBytes[2] << 8) & 0xFF00) | ((addxBytes[3]) & 0xFF))
+          & mask);
+      
       final NetworkAddress netAddr = IPv4UDPAddress.fromInteger(addxAsInt);
-      final byte[] naBytes = netAddr.getValue();
-      int realLength = 0;
-      for (int i = 0; i < naBytes.length;++i) {
-        if (naBytes[i] != 0) {
-          realLength = i;
-        }
-      }
-      if (realLength < naBytes.length) {
-        netAddr.setValue(Arrays.copyOf(naBytes, realLength));
-      }
-
+      
       this.networkAddressMap.put(netAddr, generalComponents[1]);
 
       line = lineReader.readLine();
