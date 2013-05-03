@@ -106,9 +106,9 @@ def doMainExperiment(serversMap, clientsMap)
 
 	# remove experimental files
 	info "Removing experiment-related files from nodes."
-	success = removeExperimentFiles(serversMap)
-	success |= removeExperimentFiles(clientsMap)
 	success = 0
+#	success = removeExperimentFiles(serversMap)
+#	success |= removeExperimentFiles(clientsMap)
 	if success != 0
 		error "\tUnable to remove files from one or more nodes. You should reimage the testbed."
 		return

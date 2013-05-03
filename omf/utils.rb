@@ -265,16 +265,16 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 		group.nodelist.each { |node|
 			cmd = "rm #{property.clickModule}"
 			node.group.group.exec(cmd)
-			cmd = "rm #{property.delayConfigServer}".gsub(/XxX/,node.asNumber.to_s)
-			node.group.group.exec(cmd)
+#			cmd = "rm #{property.delayConfigServer}".gsub(/XxX/,node.asNumber.to_s)
+#			node.group.group.exec(cmd)
 		}
 	}
 	clientsMap.each_value { |group|
 		group.nodelist.each { |node|
 			cmd = "rm #{property.clickModule}"
 			node.group.group.exec(cmd)
-			cmd = "rm #{property.delayConfigClient}".gsub(/XxX/,node.asNumber.to_s)
-			node.group.group.exec(cmd)
+#			cmd = "rm #{property.delayConfigClient}".gsub(/XxX/,node.asNumber.to_s)
+#			node.group.group.exec(cmd)
 		}
 	}
 
@@ -287,6 +287,8 @@ def installConfigs(serversMap, clientsMap)
 	mkVar = "mkdir -p /var/gnrs/stats"
 	mkEtc = "mkdir -p /etc/gnrs"
 	mkBin = "mkdir -p /usr/local/bin/gnrs/"
+
+	asCount = Hash.new(0)
 	
 	serversMap.each_value { |group|
 		group.nodelist.each { |server|
@@ -298,7 +300,8 @@ def installConfigs(serversMap, clientsMap)
 
 	clientsMap.each_value { |group|
 		group.nodelist.each { |server|
-			group.group.exec("#{mkVar}#{server.asNumber}")
+			group.group.exec("#{mkVar}#{server.asNumber}R#{asCount[server.asNumber]}")
+			asCount[server.asNumber] = asCount[server.asNumber] + 1
 		}
 		group.group.exec(mkEtc)
 		group.group.exec(mkBin)
@@ -347,10 +350,6 @@ def installConfigs(serversMap, clientsMap)
 	asCount = Hash.new(0)
 	clientsMap.each_value { |group|
 		group.nodelist.each { |node|
-			# Main client config
-			configContents = makeClientConfig(node,node.server,asCount[node.asNumber])
-			cmd = "echo '#{configContents}' >/etc/gnrs/client#{node.asNumber}R#{asCount[node.asNumber]}.xml"
-			node.group.group.exec(cmd)
 			# Download static files
 
 			# Jar file
@@ -364,6 +363,11 @@ def installConfigs(serversMap, clientsMap)
 			node.group.group.exec(cmd)
 			# Client trace file
 			cmd = "#{property.wget} #{property.dataUrl}/#{property.clientTrace}".gsub(/XxX/,node.asNumber.to_s)
+			node.group.group.exec(cmd)
+			
+			# Main client config
+			configContents = makeClientConfig(node,node.server,asCount[node.asNumber])
+			cmd = "echo '#{configContents}' >/etc/gnrs/client#{node.asNumber}R#{asCount[node.asNumber]}.xml"
 			node.group.group.exec(cmd)
 			asCount[node.asNumber] = asCount[node.asNumber]+1
 		}

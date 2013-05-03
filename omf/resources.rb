@@ -26,13 +26,13 @@ defProperty('topology', 'system:topo:imaged', 'The primary topology from which t
 # Web resources
 defProperty('dataUrl', 'http://my.domain.com/path/to/files', 'Base URL for topology/delay files.')
 defProperty('scriptUrl', 'https://bitbucket.org/romoore/gnrs/downloads', 'Base URL for script files.')
-defProperty('bindingFile', 'topology.bind', 'Filename of AS -> IP:Port binding information.')
+#defProperty('bindingFile', 'topology.bind', 'Filename of AS -> IP:Port binding information.')
 defProperty('routeFile', 'topology.data.route', 'Filename of delay matrix for topology.')
 defProperty('clickModule', 'delayModule.click', 'Filename of delay module Click script.')
 # 'XxX' is a placeholder for the AS number in the experiment script
-defProperty('delayConfigServer', 'as_XxX_delay_serv.dat', 'Filename of server delay module configuration.')
-defProperty('delayConfigClient', 'as_XxX_delay_client.dat', 'Filename of client delay module configuration.')
-defProperty('serverBDB', 'berkeleydb.xml', 'Filename of BerkeleyDB configuration.')
+#defProperty('delayConfigServer', 'as_XxX_delay_serv.dat', 'Filename of server delay module configuration.')
+#defProperty('delayConfigClient', 'as_XxX_delay_client.dat', 'Filename of client delay module configuration.')
+#defProperty('serverBDB', 'berkeleydb.xml', 'Filename of BerkeleyDB configuration.')
 defProperty('mapIpv4', 'map-ipv4.xml', 'Filename of IPv4 mapper configuration.')
 defProperty('prefixIpv4', 'prefixes.ipv4', 'Filename of the IPv4 prefixes file (BGP table).')
 
