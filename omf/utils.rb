@@ -546,6 +546,8 @@ end # stopServers
 def removeExperimentFiles(nodeMap)
 	nodeMap.each_value { |group|
 		group.group.exec("rm -rf /var/gnrs /etc/gnrs /usr/local/bin/gnrs /trace-client")
+		group.group.exec("rm -rf /var/log/gbench*.log")
+		group.group.exec("rm -rf /var/log/gnrsd*.log")
 		group.nodelist.each { |node|
 			group.group.exec("#{property.updateRc} -f gnrsd_#{node.asNumber} remove")
 			group.group.exec("rm /etc/init.d/gnrsd_#{node.asNumber}")
