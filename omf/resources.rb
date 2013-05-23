@@ -56,6 +56,7 @@ defProperty('messageDelay', 2000, 'Number of microseconds between each message.'
 # wget - 3 second timeout, quiet output, overwrite if newer
 defProperty('wget', '/usr/bin/wget --timeout=3 -qN', 'Location of the wget utility.')
 defProperty('clickInstall', '/usr/local/sbin/click-install -u', 'Location of the click-install utility.')
+defProperty('clickUninstall', '/usr/local/sbin/click-uninstall', 'Location of the click-uninstall utility.')
 defProperty('java', '/usr/bin/java', 'Location of the Java launcher.')
 defProperty('updateRc', '/usr/sbin/update-rc.d', 'Location of update-rc.d utility.')
 defProperty('scp', 'scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no', 'SCP utility to copy files.')

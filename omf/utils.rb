@@ -549,6 +549,8 @@ def removeExperimentFiles(nodeMap)
 		group.nodelist.each { |node|
 			group.group.exec("#{property.updateRc} -f gnrsd_#{node.asNumber} remove")
 			group.group.exec("rm /etc/init.d/gnrsd_#{node.asNumber}")
+			group.group.exec("#{property.clickUninstall}")
+			group.group.exec("rm /delayMod*.dat")
 		}
 	}
 	return 0
