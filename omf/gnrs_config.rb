@@ -87,6 +87,7 @@ def makeServerInit(server)
 # Do NOT "set -e"
 
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
+export gnrsLogfile=/var/log/gnrsd_#{server.asNumber}.log
 GNRS_USER=root
 PATH=/usr/local/bin/gnrs:/sbin:/usr/sbin:/bin:/usr/bin
 DESC="GNRS Server #{server.asNumber}"
