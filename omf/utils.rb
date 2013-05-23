@@ -508,7 +508,7 @@ def loadGUIDs(clientsMap)
 	asCount = Hash.new(0)
 	clientsMap.each_value { |group|
 		group.nodelist.each { |node|
-			cmd = "/usr/local/bin/gnrs/#{property.gbench} /etc/gnrs/client#{node.asNumber}R#{asCount[node.asNumber]}.xml /etc/gnrs/client_#{node.asNumber}.trace #{property.messageDelay} >/var/gnrs/client#{node.asNumber}R#{asCount[node.asNumber]}.log"
+			cmd = "export gnrsLogfile=/var/log/gbench_#{node.asNumber}R#{asCount[node.asNumber]}.log /usr/local/bin/gnrs/#{property.gbench} /etc/gnrs/client#{node.asNumber}R#{asCount[node.asNumber]}.xml /etc/gnrs/client_#{node.asNumber}.trace #{property.messageDelay} >/var/gnrs/client#{node.asNumber}R#{asCount[node.asNumber]}.log"
 			node.group.group.exec(cmd)
 			asCount[node.asNumber] = asCount[node.asNumber] + 1
 		}
