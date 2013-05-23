@@ -28,7 +28,7 @@ def collectClientStats(clientsMap, prefixDir)
 			#end
 			system("mkdir -p #{path}");
 			system("#{property.scp} root@#{group.hostname}:\"/var/gnrs/stats#{client.asNumber}R#{asCount[client.asNumber]}/*\" #{path}");
-			#system("#{property.scp} root@#{group.hostname}:/var/gnrs/client#{client.asNumber}.log #{path}");
+			system("#{property.scp} root@#{group.hostname}:/var/log/gbench_#{client.asNumber}R#{asCount[client.asNumber]}.log #{path}");
 			asCount[client.asNumber] = asCount[client.asNumber] + 1
 
 			# exitStatus = $?.exitstatus
