@@ -55,6 +55,8 @@ def doMainExperiment(serversMap, clientsMap)
 		return;
 	end
 
+	wait property.largeWait
+
 	info "## Launching servers ##"
 	success = launchServers(serversMap)
 	if success == 0
