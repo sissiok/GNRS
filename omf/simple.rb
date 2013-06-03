@@ -81,6 +81,18 @@ def doMainExperiment(serversMap, clientsMap)
 
 	wait property.microWait
 	
+	# Install delay modules
+	if (property.disableDelay.to_s == "") 
+		info "## Install the delay modules ##"
+		success = installDelayModule(serversMap, clientsMap, property.dataUrl, property.clickModule)
+		if success == 0
+			info "\tSuccessfully installed and configured delay module on all nodes."
+		else
+			error "\tUnable to configure delay module on one or more nodes. Exiting."
+			return;
+		end
+	end
+
 	# Now update the permissions on the nodes
 	info "Installing init scripts"
 	installInit(serversMap)
