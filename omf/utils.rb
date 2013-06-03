@@ -421,7 +421,7 @@ def buildTarballs()
 	Dir.chdir("#{property.tmpDir}")
 	Dir.glob("*/"){ |dir|
 		dirname = dir.to_s.chomp('/')
-		`tar -czvf #{dir}.tgz #{dirname}`
+		`tar -czvf #{dirname}.tgz #{dir}`
 		unless $?.success?
 			puts "Unable to build tarball #{dirname}.tgz"
 			return -1
