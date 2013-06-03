@@ -57,6 +57,12 @@ def doMainExperiment(serversMap, clientsMap)
 
 	wait property.largeWait
 
+	# WGET everything onto the nodes
+	
+	# Now update the permissions on the nodes
+	info "Installing init scripts"
+	installInit(serversMap)
+
 	info "## Launching servers ##"
 	success = launchServers(serversMap)
 	if success == 0

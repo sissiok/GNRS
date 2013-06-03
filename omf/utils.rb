@@ -57,6 +57,14 @@ def checkParams
 		error "Must define at least 1 client."
 		return -1
 	end
+
+	`rm -rf #{property.tmpDir}`
+	`mkdir -p #{property.tmpDir}`
+	unless $?.success?
+		puts "Unable to use temporary directory #{property.tmpDir}."
+		return -1
+	end
+	
 	return 0
 end # checkParams
 
@@ -176,10 +184,12 @@ def prepareNodes(serversMap, clientsMap)
 
 	serversMap.each_value { | group | 
 		group.group.net.e0.ip = group.ipAddress
+		`mkdir -p #{property.tmpDir}/#{group.hostname}`
 	}
 
 	clientsMap.each_value { | group | 
 		group.group.net.e0.ip = group.ipAddress
+		`mkdir -p #{property.tmpDir}/#{group.hostname}`
 	}
 
 	return 0
@@ -190,19 +200,52 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 	info "Building delay module Click script"
 	# Download delay module click script
 	#cmd = "#{property.wget} #{property.scriptUrl}/#{property.clickModule}"
+	info "Downloading topology route file"
+	system("#{property.wget} #{property.dataUrl}/#{property.routeFile}")
+	info "Building delay configurations"
+	# This function will set the "delayConfig" member of each server/client
+	makeDelayConfig(serversMap,clientsMap,property.routeFile.to_s)
+
+	asCount = Hash.new(0)
 
 	serversMap.each_value { |group|
 		clickScript = makeDelayScript(group,false)
-		cmd = "echo '#{clickScript}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >/#{property.clickModule}"
-		group.group.exec(cmd)
+		`echo '#{clickScript}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >#{property.tmpDir}/#{group.hostname}/#{property.clickModule}`
+		unless $?.success?
+			puts "Unable to generate click script for #{group.hostname}."
+			return -1
+		end
+		group.nodelist.each { |node|
+			`echo '#{node.delayConfig}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >#[property.tmpDir}/#{group.hostname}/delayMod#{node.asNumber}R#{asCount[node.asNumber]}.dat`
+			unless $?.success?
+				puts "Unable to copy click script for server #{node.asNumber}."
+				return -1
+			end
+			asCount[node.asNumber] = asCount[node.asNumber]+1
+		}
 	}
 	clientsMap.each_value { |group|
 		clickScript = makeDelayScript(group,true)
-		cmd = "echo '#{clickScript}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >/#{property.clickModule}"
-		group.group.exec(cmd)
+		`echo '#{clickScript}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >#{property.tmpDir}/#{group.hostname}/#{property.clickModule}`
+		unless $?.success?
+			puts "Unable to generate click script for #{group.hostname}."
+			return -1
+		end
+		group.nodelist.each { |node|
+			`echo '#{node.delayConfig}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >#[property.tmpDir}/#{group.hostname}/delayMod#{node.asNumber}R#{asCount[node.asNumber]}.dat`
+			unless $?.success?
+				puts "Unable to copy click script for client #{node.asNumber}."
+				return -1
+			end
+			asCount[node.asNumber] = asCount[node.asNumber]+1
+		}
 	}
+	
 
-	wait property.miniWait
+	return 0
+end
+
+def installDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 
 	info "Installing delay module click script"
 
@@ -220,12 +263,7 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 	wait property.miniWait
 
 
-	info "Downloading topology route file"
-	system("#{property.wget} #{property.dataUrl}/#{property.routeFile}")
 
-	info "Building delay configurations"
-	# This function will set the "delayConfig" member of each server/client
-	makeDelayConfig(serversMap,clientsMap,property.routeFile.to_s)
 
 	info "Installing the delay module configurations"
 
@@ -233,8 +271,6 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 
 	serversMap.each_value { |group|
 		group.nodelist.each { |node|
-			cmd = "echo '#{node.delayConfig}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >/delayMod#{node.asNumber}R#{asCount[node.asNumber]}.dat"
-			node.group.group.exec(cmd)
 			cmd = "cp /delayMod#{node.asNumber}R#{asCount[node.asNumber]}.dat /click/delayMod#{node.asNumber}R#{asCount[node.asNumber]}/config"
 			node.group.group.exec(cmd)
 			asCount[node.asNumber] = asCount[node.asNumber]+1
@@ -245,8 +281,6 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 
 	clientsMap.each_value { |group|
 		group.nodelist.each { |node|
-			cmd = "echo '#{node.delayConfig}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >/delayMod#{node.asNumber}R#{asCount[node.asNumber]}.dat"
-			node.group.group.exec(cmd)
 			cmd = "cp /delayMod#{node.asNumber}R#{asCount[node.asNumber]}.dat /click/delayMod#{node.asNumber}R#{asCount[node.asNumber]}/config"
 			node.group.group.exec(cmd)
 			asCount[node.asNumber] = asCount[node.asNumber]+1
@@ -257,26 +291,26 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 	wait property.miniWait
 
 	# Delete any files we downloaded and no longer need
-	info "Deleting temporary files"
+#	info "Deleting temporary files"
 
-	system("rm #{property.routeFile}");
+#	system("rm #{property.routeFile}");
 
-	serversMap.each_value { |group|
-		group.nodelist.each { |node|
-			cmd = "rm #{property.clickModule}"
-			node.group.group.exec(cmd)
+#	serversMap.each_value { |group|
+#		group.nodelist.each { |node|
+#			cmd = "rm #{property.clickModule}"
+#			node.group.group.exec(cmd)
 #			cmd = "rm #{property.delayConfigServer}".gsub(/XxX/,node.asNumber.to_s)
 #			node.group.group.exec(cmd)
-		}
-	}
-	clientsMap.each_value { |group|
-		group.nodelist.each { |node|
-			cmd = "rm #{property.clickModule}"
-			node.group.group.exec(cmd)
+#		}
+#	}
+#	clientsMap.each_value { |group|
+#		group.nodelist.each { |node|
+#			cmd = "rm #{property.clickModule}"
+#			node.group.group.exec(cmd)
 #			cmd = "rm #{property.delayConfigClient}".gsub(/XxX/,node.asNumber.to_s)
 #			node.group.group.exec(cmd)
-		}
-	}
+#		}
+#	}
 
 	return 0
 end # prepareDelayModule
@@ -292,181 +326,112 @@ def installConfigs(serversMap, clientsMap)
 	
 	serversMap.each_value { |group|
 		group.nodelist.each { |server|
-			group.group.exec("#{mkVar}#{server.asNumber}")
+			`mkdir -p #{tmpDir}/#{group.hostname}/var/gnrs/stats#{server.asNumber}$#{asCount[server.asNumber]}`
+			asCount[server.asNumber] = asCount[server.asNumber] + 1
 		}
-		group.group.exec(mkEtc)
-		group.group.exec(mkBin)
+		`mkdir -p #{tmpDir}/#{group.hostname}/etc/gnrs`
+		`mkdir -p #{tmpDir}/#{group.hostname}/usr/local/bin/gnrs`
 	}
 
 	clientsMap.each_value { |group|
 		group.nodelist.each { |server|
-			group.group.exec("#{mkVar}#{server.asNumber}R#{asCount[server.asNumber]}")
+			`mkdir -p #{tmpDir}/#{group.hostname}/var/gnrs/stats#{server.asNumber}$#{asCount[server.asNumber]}`
 			asCount[server.asNumber] = asCount[server.asNumber] + 1
 		}
-		group.group.exec(mkEtc)
-		group.group.exec(mkBin)
+		`mkdir -p #{tmpDir}/#{group.hostname}/etc/gnrs`
+		`mkdir -p #{tmpDir}/#{group.hostname}/usr/local/bin/gnrs`
 	}
 
 	wait property.microWait
 
 	info "Downloading server configuration files."
+	`#{property.wget} #{property.dataUrl}/#{property.prefixIpv4}`
+	`#{property.wget} #{property.dataUrl}/#{property.mapIpv4}`
+	`#{property.wget} #{property.scriptUrl}/#{property.jarFile}`
+	`#{property.wget} #{property.scriptUrl}/#{property.gnrsd}`
+	# GGen script
+	`#{property.wget} -P #{property.scriptUrl}/#{property.ggen}`
+	# GBench script
+	`#{property.wget} #{property.scriptUrl}/#{property.gbench}`
+
+	# Build AS binding file
+	asBinding = makeBindingFile(serversMap)
 
 	serversMap.each_value { |group|
 		group.nodelist.each { |node|
 			# Main server config
 			configContents = makeServerConfig(node)
-			cmd = "echo '#{configContents}' >/etc/gnrs/server_#{node.asNumber}.xml"
-			node.group.group.exec(cmd)
+			`echo '#{configContents}' >#{property.tmpDir}/#{group.hostname}/etc/gnrs/server_#{node.asNumber}.xml`
 
 			# Networking config
 			configContents = makeServerNetConfig(node)
-			cmd = "echo '#{configContents}' >/etc/gnrs/net-ipv4_#{node.asNumber}.xml"
-			node.group.group.exec(cmd)
+			`echo '#{configContents}' >#{property.tmpDir}/#{group.hostname}/etc/gnrs/net-ipv4_#{node.asNumber}.xml`
 
-			# Download static files
-
-			# Binding file
-			#cmd = "#{property.wget} #{property.dataUrl}/#{property.bindingFile}"
-			#node.group.group.exec(cmd)
-			# IPv4 Prefix File (BGP Table)
-			cmd = "#{property.wget} #{property.dataUrl}/#{property.prefixIpv4}"
-			node.group.group.exec(cmd)
-			# IPv4 Mapper Configuration
-			cmd = "#{property.wget} #{property.dataUrl}/#{property.mapIpv4}"
-			node.group.group.exec(cmd)
-			# Jar file
-			cmd = "#{property.wget} #{property.scriptUrl}/#{property.jarFile}"
-			node.group.group.exec(cmd)
-			# GNRSD script
-			cmd = "#{property.wget} #{property.scriptUrl}/#{property.gnrsd}"
-			node.group.group.exec(cmd)
-			# GNRSD Init script
-			#cmd = "#{property.wget} #{property.scriptUrl}/#{property.gnrsdInit}"
-			#node.group.group.exec(cmd)
-		}
-	}
-
-	info "Downloading client configuration files"
-	asCount = Hash.new(0)
-	clientsMap.each_value { |group|
-		group.nodelist.each { |node|
-			# Download static files
-
-			# Jar file
-			cmd = "#{property.wget} #{property.scriptUrl}/#{property.jarFile}"
-			node.group.group.exec(cmd)
-			# GGen script
-			cmd = "#{property.wget} #{property.scriptUrl}/#{property.ggen}"
-			node.group.group.exec(cmd)
-			# GBench script
-			cmd = "#{property.wget} #{property.scriptUrl}/#{property.gbench}"
-			node.group.group.exec(cmd)
-			# Client trace file
-			cmd = "#{property.wget} #{property.dataUrl}/#{property.clientTrace}".gsub(/XxX/,node.asNumber.to_s)
-			node.group.group.exec(cmd)
-			
-			# Main client config
-			configContents = makeClientConfig(node,node.server,asCount[node.asNumber])
-			cmd = "echo '#{configContents}' >/etc/gnrs/client#{node.asNumber}R#{asCount[node.asNumber]}.xml"
-			node.group.group.exec(cmd)
-			asCount[node.asNumber] = asCount[node.asNumber]+1
-		}
-	}
-
-
-	wait property.miniWait
-
-	info "Installing server configuration files"
-
-	# Build AS binding file
-	asBinding = makeBindingFile(serversMap)
-
-	# Install static files
-	serversMap.each_value { |node|
-		# Binding file
-		cmd = "echo '#{asBinding}' >/etc/gnrs/topology.bind"
-		node.group.exec(cmd)
-		# BerkeleyDB Config
-		node.nodelist.each { |server|
 			bdb = makeBerkeleyDBConfig(server)
-			cmd = "echo '#{bdb}' >/etc/gnrs/berkeleydb_#{server.asNumber}.xml"
-			node.group.exec(cmd)
-		}
-		# IPv4 Mapper Configuration
-		cmd = "mv #{property.mapIpv4} /etc/gnrs/"
-		node.group.exec(cmd)
-		# IPv4 Prefix File (BGP Table)
-		cmd = "mv #{property.prefixIpv4} /etc/gnrs/"
-		node.group.exec(cmd)
-		# Jar file
-		cmd = "mv #{property.jarFile} /usr/local/bin/gnrs/"
-		node.group.exec(cmd)
-		# GNRSD Script
-		cmd = "chmod +x #{property.gnrsd}"
-		node.group.exec(cmd)
-		cmd = "mv #{property.gnrsd} /usr/local/bin/gnrs/"
-		node.group.exec(cmd)
-		# GNRSD Init script
-		cmd = "chmod +x #{property.gnrsdInit}"
-		node.group.exec(cmd)
-	}
-
-	info "Installing client configuration files"
-
-	clientsMap.each_value { |group|
-		# JAR file
-		cmd = "mv #{property.jarFile} /usr/local/bin/gnrs/"
-		group.group.exec(cmd)
-		# GBench script
-		cmd = "chmod +x #{property.gbench}"
-		group.group.exec(cmd)
-		cmd = "mv #{property.gbench} /usr/local/bin/gnrs/"
-		group.group.exec(cmd)
-		# GGen script
-		cmd = "chmod +x #{property.ggen}"
-		group.group.exec(cmd)
-		cmd = "mv #{property.ggen} /usr/local/bin/gnrs/"
-		group.group.exec(cmd)
-		group.nodelist.each { |node|
-			# Trace file
-			cmd = "mv #{property.clientTrace} /etc/gnrs/".gsub(/XxX/,node.asNumber.to_s)
-			group.group.exec(cmd)
-		}
-	}
-
-	info "Installing init scripts"
-	installInit(serversMap)
-
-	return 0
-end # installConfigs
-
-def installInit(servers)
-	info "Creating server init scripts"
-	servers.each_value { |group|
-		group.nodelist.each { |node|
-
+			`echo '#{bdb}' >#{property.tmpDir}/#{group.hostname}/etc/gnrs/berkeleydb_#{server.asNumber}.xml`
+		
 			initScript = makeServerInit(node)
 
 			# The sed command below will replace any escaped ( or ) characters on the
 			# node side.  This is because the ResourceController (RC) in OMF will
 			# crash if the string contains unbalanced ( or ) characters.
 			# Big thanks to Ben Firner for the regular expression
-			cmd = "echo '#{initScript}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >/etc/init.d/gnrsd_#{node.asNumber}"
-			node.group.group.exec(cmd)
+			`echo '#{initScript}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >#{property.tmpDir}/#{group.hostname}/etc/init.d/gnrsd_#{node.asNumber}`
+
 		}
+		# Download static files
+
+		# Binding file
+		# IPv4 Prefix File (BGP Table)
+		`cp #{property.prefixIpv4} #{property.tmpDir}/#{group.hostname}/etc/gnrs/`
+		# IPv4 Mapper Configuration
+		`cp #{property.mapIpv4} #{property.tmpDir}/#{group.hostname}/etc/gnrs/`
+		# Jar file
+		`cp #{property.jarFile} #{property.tmpDir}/#{group.hostname}/usr/local/bin/gnrs/`
+		# GNRSD script
+		`cp #{property.gnrsd} #{property.tmpDir}/#{group.hostname}/usr/local/bin/gnrs/`
+		# Binding file
+		`echo '#{asBinding}' >#{property.tmpDir}/#{group.hostname}/etc/gnrs/topology.bind`
+
 	}
 
-	wait property.microWait
-	info "Updating permissions for server init scripts"
-
-	servers.each_value { |group|
+	info "Downloading client configuration files"
+	asCount = Hash.new(0)
+	clientsMap.each_value { |group|
 		group.nodelist.each { |node|
-			cmd = "chmod +x /etc/init.d/gnrsd_#{node.asNumber}"
-			node.group.group.exec(cmd)
+			# Client trace file
+			cmd = "#{property.wget} -P #{property.tmpDir}/#{group.hostname}/etc/gnrs/ #{property.dataUrl}/#{property.clientTrace}".gsub(/XxX/,node.asNumber.to_s)
+			`#{cmd}`
+			
+			# Main client config
+			configContents = makeClientConfig(node,node.server,asCount[node.asNumber])
+			`echo '#{configContents}' >#{property.tmpDir}/#{group.hostname}/etc/gnrs/client#{node.asNumber}R#{asCount[node.asNumber]}.xml`
+			asCount[node.asNumber] = asCount[node.asNumber]+1
 		}
+		`cp #{property.jarFile} #{property.tmpDir}/#{group.hostname}/usr/local/bin/gnrs/`
+		`cp #{property.ggen} #{property.tmpDir}/#{group.hostname}/usr/local/bin/gnrs/`
+		`cp #{property.gbench} #{property.tmpDir}/#{group.hostname}/usr/local/bin/gnrs/`
+	
 	}
 
-	wait property.microWait
+	return 0
+end # installConfigs
+
+def getHostTarballs(serversMap, clientsMap)
+	
+	serversMap.each_value { |group|
+		cmd = "#{property.wget} #{property.tarUrl}/#{group.hostname}.tgz && tar -zxf #{group.hostname}.tgz"
+		group.group.exec(cmd)
+	}
+
+	clientsMap.each_value { |group|
+		cmd = "#{property.wget} #{property.tarUrl}/#{group.hostname}.tgz && tar -zxf #{group.hostname}.tgz"
+		group.group.exec(cmd)
+	}
+
+end # getHostTarballs
+
+def installInit(servers)
 	info "Installing server init scripts."
 
 	servers.each_value { |group|

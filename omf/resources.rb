@@ -26,6 +26,7 @@ defProperty('topology', 'system:topo:imaged', 'The primary topology from which t
 # Web resources
 defProperty('dataUrl', 'http://my.domain.com/path/to/files', 'Base URL for topology/delay files.')
 defProperty('scriptUrl', 'https://bitbucket.org/romoore/gnrs/downloads', 'Base URL for script files.')
+defProperty('tarUrl', 'https://my.domain.com/path/to/files', 'Base URL for tarballed files.')
 #defProperty('bindingFile', 'topology.bind', 'Filename of AS -> IP:Port binding information.')
 defProperty('routeFile', 'topology.data.route', 'Filename of delay matrix for topology.')
 defProperty('clickModule', 'delayModule.click', 'Filename of delay module Click script.')
@@ -35,6 +36,7 @@ defProperty('clickModule', 'delayModule.click', 'Filename of delay module Click 
 #defProperty('serverBDB', 'berkeleydb.xml', 'Filename of BerkeleyDB configuration.')
 defProperty('mapIpv4', 'map-ipv4.xml', 'Filename of IPv4 mapper configuration.')
 defProperty('prefixIpv4', 'prefixes.ipv4', 'Filename of the IPv4 prefixes file (BGP table).')
+defProperty('tmpDir', '/tmp/gnrs', 'Temporary directory in which to build the archives.')
 
 # Client/Server compiled JAR file
 defProperty('jarFile', 'gnrs.jar', 'Filename of the server/client JAR file.')
