@@ -97,6 +97,8 @@ def doMainExperiment(serversMap, clientsMap)
 	info "Installing init scripts"
 	installInit(serversMap)
 
+	wait property.miniWait
+
 	info "## Launching servers ##"
 	success = launchServers(serversMap)
 	if success == 0
