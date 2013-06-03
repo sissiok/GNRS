@@ -421,7 +421,7 @@ def buildTarballs()
 	Dir.chdir("#{property.tmpDir}")
 	Dir.glob("*/"){ |dir|
 		dirname = dir.to_s.chomp('/')
-		`tar -czvf #{dirname}.tgz #{dir}`
+		`cd #{dir} && tar -czvf ../#{dirname}.tgz .`
 		unless $?.success?
 			puts "Unable to build tarball #{dirname}.tgz"
 			return -1
@@ -435,14 +435,15 @@ end # buildTarballs
 def getHostTarballs(serversMap, clientsMap)
 	
 	serversMap.each_value { |group|
-		cmd = "#{property.wget} #{property.tarUrl}/#{group.hostname}.tgz && tar -zxf #{group.hostname}.tgz"
+		cmd = "cd / && #{property.wget} #{property.tarUrl}/#{group.hostname}.tgz && tar -zxf #{group.hostname}.tgz"
 		group.group.exec(cmd)
 	}
 
 	clientsMap.each_value { |group|
-		cmd = "#{property.wget} #{property.tarUrl}/#{group.hostname}.tgz && tar -zxf #{group.hostname}.tgz"
+		cmd = "cd / && #{property.wget} #{property.tarUrl}/#{group.hostname}.tgz && tar -zxf #{group.hostname}.tgz"
 		group.group.exec(cmd)
 	}
+	return 0
 
 end # getHostTarballs
 
