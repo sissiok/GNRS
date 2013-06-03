@@ -318,9 +318,7 @@ end # prepareDelayModule
 def installConfigs(serversMap, clientsMap)
 
 	info "Creating required directories"
-	mkVar = "mkdir -p /var/gnrs/stats"
-	mkEtc = "mkdir -p /etc/gnrs"
-	mkBin = "mkdir -p /usr/local/bin/gnrs/"
+
 
 	asCount = Hash.new(0)
 	
@@ -331,6 +329,7 @@ def installConfigs(serversMap, clientsMap)
 		}
 		`mkdir -p #{property.tmpDir}/#{group.hostname}/etc/gnrs`
 		`mkdir -p #{property.tmpDir}/#{group.hostname}/usr/local/bin/gnrs`
+		`mkdir -p #{property.tmpDir}/#{group.hostname}/etc/init.d`
 	}
 
 	clientsMap.each_value { |group|
@@ -356,6 +355,7 @@ def installConfigs(serversMap, clientsMap)
 
 	# Build AS binding file
 	asBinding = makeBindingFile(serversMap)
+	info "Finished making binding file for servers"
 
 	serversMap.each_value { |group|
 		group.nodelist.each { |node|
@@ -367,8 +367,8 @@ def installConfigs(serversMap, clientsMap)
 			configContents = makeServerNetConfig(node)
 			`echo '#{configContents}' >#{property.tmpDir}/#{group.hostname}/etc/gnrs/net-ipv4_#{node.asNumber}.xml`
 
-			bdb = makeBerkeleyDBConfig(server)
-			`echo '#{bdb}' >#{property.tmpDir}/#{group.hostname}/etc/gnrs/berkeleydb_#{server.asNumber}.xml`
+			bdb = makeBerkeleyDBConfig(node)
+			`echo '#{bdb}' >#{property.tmpDir}/#{group.hostname}/etc/gnrs/berkeleydb_#{node.asNumber}.xml`
 		
 			initScript = makeServerInit(node)
 
