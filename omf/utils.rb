@@ -447,11 +447,12 @@ def getHostTarballs(serversMap, clientsMap)
 	wait property.largeWait
 
 	serversMap.each_value { |group|
-	cmd = "chmod +x /usr/local/bin/gnrs/gnrsd"
-	group.nodelist.each { |node|
-		cmd = "chmod +x /etc/init.d/gnrsd_#{node.asNumber}"
-		group.group.exec(cmd)
-	} 
+		cmd = "chmod +x /usr/local/bin/gnrs/gnrsd"
+		group.nodelist.each { |node|
+			cmd = "chmod +x /etc/init.d/gnrsd_#{node.asNumber}"
+			group.group.exec(cmd)
+		} 
+	}
 
 	clientsMap.each_value { |group|
 		cmd = "chmod +x /usr/local/bin/gnrs/gbench /usr/local/bin/gnrs/ggen"
