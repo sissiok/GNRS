@@ -79,7 +79,7 @@ def doMainExperiment(serversMap, clientsMap)
 		return
 	end
 
-	wait property.microWait
+	wait property.miniWait
 	
 	# Install delay modules
 	if (property.disableDelay.to_s == "") 
