@@ -57,7 +57,29 @@ def doMainExperiment(serversMap, clientsMap)
 
 	wait property.largeWait
 
+	info "## Compressing configuration files ##"
+	success = buildTarballs()
+	if success == 0
+		info "\tSuccessfully compressed configuration files."
+	else
+		error "\tUnable to compress configuration files."
+		return;
+	end
+
+	wait property.microWait
+
 	# WGET everything onto the nodes
+	
+	info "## Downloading to the nodes ##"
+	success = getHostTarballs(serversMap,clientsMap)
+	if success == 0
+		info "\tSuccessfully downloaded configuration files."
+	else
+		error "\tUnable to download configuration files."
+		return
+	end
+
+	wait property.microWait
 	
 	# Now update the permissions on the nodes
 	info "Installing init scripts"
