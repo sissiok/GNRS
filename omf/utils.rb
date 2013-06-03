@@ -448,6 +448,7 @@ def getHostTarballs(serversMap, clientsMap)
 
 	serversMap.each_value { |group|
 		cmd = "chmod +x /usr/local/bin/gnrs/gnrsd"
+		group.group.exec(cmd)
 		group.nodelist.each { |node|
 			cmd = "chmod +x /etc/init.d/gnrsd_#{node.asNumber}"
 			group.group.exec(cmd)
