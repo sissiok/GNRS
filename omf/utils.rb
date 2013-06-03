@@ -350,7 +350,7 @@ def installConfigs(serversMap, clientsMap)
 	`#{property.wget} #{property.scriptUrl}/#{property.jarFile}`
 	`#{property.wget} #{property.scriptUrl}/#{property.gnrsd}`
 	# GGen script
-	`#{property.wget} -P #{property.scriptUrl}/#{property.ggen}`
+	`#{property.wget} #{property.scriptUrl}/#{property.ggen}`
 	# GBench script
 	`#{property.wget} #{property.scriptUrl}/#{property.gbench}`
 
