@@ -327,6 +327,8 @@ def makeDelayConfig(serversMap, clientsMap, delayFileName)
 			client.delayConfig = delayString
 		}
 	}
+
+	info "Finished building delay configurations"
 	
 end # makeDelayConfig
 
