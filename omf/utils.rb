@@ -417,6 +417,21 @@ def installConfigs(serversMap, clientsMap)
 	return 0
 end # installConfigs
 
+def buildTarballs(serversMap, clientsMap)
+	Dir.chdir("#{property.tmpDir}")
+	Dir.glob("*/"){ |dir|
+		dirname = dir.to_s.chomp('/')
+		`tar -czvf #{dir}.tgz #{dirname}`
+		unless $?.success?
+			puts "Unable to build tarball #{dirname}.tgz"
+			return -1
+		end
+	}
+
+	return 0
+
+end # buildTarballs
+
 def getHostTarballs(serversMap, clientsMap)
 	
 	serversMap.each_value { |group|
