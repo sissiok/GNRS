@@ -93,6 +93,8 @@ def doMainExperiment(serversMap, clientsMap)
 		end
 	end
 
+	wait property.largeWait
+
 	# Now update the permissions on the nodes
 	info "Installing init scripts"
 	installInit(serversMap)
