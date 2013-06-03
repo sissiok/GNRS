@@ -216,7 +216,7 @@ def prepareDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 			return -1
 		end
 		group.nodelist.each { |node|
-			`echo '#{node.delayConfig}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >#[property.tmpDir}/#{group.hostname}/delayMod#{node.asNumber}R#{asCount[node.asNumber]}.dat`
+			`echo '#{node.delayConfig}' | sed -e 's/\\\\\\([()]\\)/\\1/g' >#{property.tmpDir}/#{group.hostname}/delayMod#{node.asNumber}R#{asCount[node.asNumber]}.dat`
 			unless $?.success?
 				puts "Unable to copy click script for server #{node.asNumber}."
 				return -1
