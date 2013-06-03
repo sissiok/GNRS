@@ -326,20 +326,20 @@ def installConfigs(serversMap, clientsMap)
 	
 	serversMap.each_value { |group|
 		group.nodelist.each { |server|
-			`mkdir -p #{tmpDir}/#{group.hostname}/var/gnrs/stats#{server.asNumber}$#{asCount[server.asNumber]}`
+			`mkdir -p #{property.tmpDir}/#{group.hostname}/var/gnrs/stats#{server.asNumber}$#{asCount[server.asNumber]}`
 			asCount[server.asNumber] = asCount[server.asNumber] + 1
 		}
-		`mkdir -p #{tmpDir}/#{group.hostname}/etc/gnrs`
-		`mkdir -p #{tmpDir}/#{group.hostname}/usr/local/bin/gnrs`
+		`mkdir -p #{property.tmpDir}/#{group.hostname}/etc/gnrs`
+		`mkdir -p #{property.tmpDir}/#{group.hostname}/usr/local/bin/gnrs`
 	}
 
 	clientsMap.each_value { |group|
 		group.nodelist.each { |server|
-			`mkdir -p #{tmpDir}/#{group.hostname}/var/gnrs/stats#{server.asNumber}$#{asCount[server.asNumber]}`
+			`mkdir -p #{property.tmpDir}/#{group.hostname}/var/gnrs/stats#{server.asNumber}$#{asCount[server.asNumber]}`
 			asCount[server.asNumber] = asCount[server.asNumber] + 1
 		}
-		`mkdir -p #{tmpDir}/#{group.hostname}/etc/gnrs`
-		`mkdir -p #{tmpDir}/#{group.hostname}/usr/local/bin/gnrs`
+		`mkdir -p #{property.tmpDir}/#{group.hostname}/etc/gnrs`
+		`mkdir -p #{property.tmpDir}/#{group.hostname}/usr/local/bin/gnrs`
 	}
 
 	wait property.microWait
