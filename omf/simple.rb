@@ -55,7 +55,7 @@ def doMainExperiment(serversMap, clientsMap)
 		return;
 	end
 
-	wait property.largeWait
+	wait property.microWait
 
 	info "## Compressing configuration files ##"
 	success = buildTarballs()
