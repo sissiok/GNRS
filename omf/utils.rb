@@ -288,7 +288,7 @@ def installDelayModule(serversMap, clientsMap, baseUrl, clickScript)
 	}
 
 
-	wait property.miniWait
+#	wait property.miniWait
 
 	# Delete any files we downloaded and no longer need
 #	info "Deleting temporary files"
@@ -545,11 +545,12 @@ def removeExperimentFiles(nodeMap)
 		group.group.exec("rm -rf /var/gnrs /etc/gnrs /usr/local/bin/gnrs /trace-client")
 		group.group.exec("rm -rf /var/log/gbench*.log")
 		group.group.exec("rm -rf /var/log/gnrsd*.log")
+		group.group.exec("rm /#{group.hostname}.tgz")
+		group.group.exec("rm /delayMod*.dat")
 		group.nodelist.each { |node|
 			group.group.exec("#{property.updateRc} -f gnrsd_#{node.asNumber} remove")
 			group.group.exec("rm /etc/init.d/gnrsd_#{node.asNumber}")
 			group.group.exec("#{property.clickUninstall}")
-			group.group.exec("rm /delayMod*.dat")
 		}
 	}
 	return 0
