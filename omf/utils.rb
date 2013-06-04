@@ -546,7 +546,7 @@ def removeExperimentFiles(nodeMap)
 		group.group.exec("rm -rf /var/log/gbench*.log")
 		group.group.exec("rm -rf /var/log/gnrsd*.log")
 		group.group.exec("rm /#{group.hostname}.tgz")
-		group.group.exec("rm /delayMod*.dat")
+		group.group.exec("rm /delayMod*")
 		group.nodelist.each { |node|
 			group.group.exec("#{property.updateRc} -f gnrsd_#{node.asNumber} remove")
 			group.group.exec("rm /etc/init.d/gnrsd_#{node.asNumber}")
