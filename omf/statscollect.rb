@@ -52,7 +52,9 @@ def collectServerStats(serversMap, prefixDir)
 	serversMap.each_value { |group|
 		group.nodelist.each { |server|
 			path = prefixDir.empty? ? "server_#{server.asNumber}/" : "#{prefixDir}/server_#{server.asNumber}/";
+			info "mkdir -p #{path}"
 			system("mkdir -p #{path}");
+			info "#{property.scp} root@#{group.hostname}:\"/var/gnrs/stats#{server.asNumber}/*\" #{path}"
 			system("#{property.scp} root@#{group.hostname}:\"/var/gnrs/stats#{server.asNumber}/*\" #{path}");
 			system("#{property.scp} root@#{group.hostname}:/var/log/gnrsd_#{server.asNumber}.log #{path}");
 		}

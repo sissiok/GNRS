@@ -418,6 +418,7 @@ def installConfigs(serversMap, clientsMap)
 end # installConfigs
 
 def buildTarballs()
+	currDir = `pwd`.chomp
 	Dir.chdir("#{property.tmpDir}")
 	Dir.glob("*/"){ |dir|
 		dirname = dir.to_s.chomp('/')
@@ -427,6 +428,8 @@ def buildTarballs()
 			return -1
 		end
 	}
+
+	Dir.chdir("#{currDir}")
 
 	return 0
 
@@ -542,11 +545,7 @@ end # stopServers
 
 def removeExperimentFiles(nodeMap)
 	nodeMap.each_value { |group|
-		group.group.exec("rm -rf /var/gnrs /etc/gnrs /usr/local/bin/gnrs /trace-client")
-		group.group.exec("rm -rf /var/log/gbench*.log")
-		group.group.exec("rm -rf /var/log/gnrsd*.log")
-		group.group.exec("rm /#{group.hostname}.tgz")
-		group.group.exec("rm /delayMod*")
+		group.group.exec("rm -rf /var/gnrs /etc/gnrs /usr/local/bin/gnrs /trace-client /var/log/gbench*.log /var/log/gnrsd*.log /#{group.hostname}.tgz /delayMod*")
 		group.nodelist.each { |node|
 			group.group.exec("#{property.updateRc} -f gnrsd_#{node.asNumber} remove")
 			group.group.exec("rm /etc/init.d/gnrsd_#{node.asNumber}")
