@@ -1,0 +1,66 @@
+\documentclass[10pt,conference,compsocconf,letterpaper]{IEEEtran}
+\makeatletter
+\def\ps@headings{%
+\def\@oddhead{\mbox{}\scriptsize\rightmark \hfil \thepage}%
+\def\@evenhead{\scriptsize\thepage \hfil \leftmark\mbox{}}%
+\def\@oddfoot{}%
+\def\@evenfoot{}}
+\makeatother
+\pagestyle{headings}
+
+\usepackage{amsmath,amsfonts}
+\usepackage{times,epsfig,endnotes,color,url,paralist, multirow}
+\usepackage[lined,ruled,linesnumbered,vlined]{algorithm2e}
+\IEEEoverridecommandlockouts
+
+\begin{document}
+\pagestyle{empty}
+\title{DMap: A Shared Hosting Scheme for \\ Dynamic Identifier to
+  Locator Mappings \\ in the Global Internet$^{\star}$
+\thanks{$^{\star}$This research was supported in part by NSF Future Internet Architecture (FIA) grant CNS-1040735.}
+}
+
+\author{Tam Vu\authorrefmark{1},
+    Akash Baid\authorrefmark{1},
+    Yanyong Zhang\authorrefmark{1},
+    Thu D. Nguyen\authorrefmark{2}, \\
+    Junichiro Fukuyama\authorrefmark{3},
+    Richard P. Martin\authorrefmark{1}\authorrefmark{2},
+    Dipankar Raychaudhuri\authorrefmark{1}  \\ \\
+   \authorrefmark{1}WINLAB, Rutgers University, {\em\{tamvu, baid, yyzhang, rmartin, ray\}@winlab.rutgers.edu}
+  \\  \authorrefmark{2}Department of Computer Science, Rutgers University, {\em tdnguyen@cs.rutgers.edu}
+  \\  \authorrefmark{3}Toyota InfoTechnology Center USA, {\em jfukuyama@us.toyota-itc.com }
+}
+
+
+\maketitle
+\begin{abstract}
+    \input{abstract}
+\end{abstract}
+
+\newcommand{\arcName}{DMap}
+
+\input{introduction}
+%\input{mobilityFirst}
+%\input{motivation}
+\input{overview}
+\input{design}
+\input{evaluation}
+\input{model}
+%\input{discussion}
+\input{related}
+\input{conclusion}
+\input{ack}
+
+
+{\scriptsize
+\bibliographystyle{IEEEtran}
+\bibliography{paper}
+}
+
+%{\scriptsize
+%	\bibliographystyle{abbrv}
+%	\bibliography{paper}
+%}
+
+\end{document}

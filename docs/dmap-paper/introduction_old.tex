@@ -1,0 +1,66 @@
+\section{Introduction}
+\label{sec:intro}
+    The Internet is approaching a critical point wherein mobile platforms and applications are poised to replace the fixed-host/server model that has dominated the Internet since its inception. With over 4 billion cellular mobile devices in worldwide use today, it is anticipated that by 2015, mobile data devices will significantly outnumber fixed hosts on the Internet. This predictable, yet fundamental, shift presents a unique opportunity to design and develop a next generation Internet architecture that is efficient in supporting mobile devices and mobile applications.
+
+    To support seamless host and network mobility at a large scale, the key is to separate host names and addresses~\cite{***}, such that applications can rely on permanent host names instead of their ever-changing network addresses. This separation allows end users to have a permanent name and receive dynamic addresses as they move from one attachment point to another, or reconnect after a period of disconnection. Central to this architecture are the following two services: naming assignment service and naming resolution service, with the former assigning uniform names to each host and the latter mapping the name to a network address. In this paper, we focus on the naming resolution service, whose input is globally unique IDs of the hosts (referred to as GUIDs in this paper), and output is the corresponding network addresses. Such a naming resolution service can find many applications in addition to supporting mobility. For example, it can help facilitate efficient content retrieval in a mobile environment by mapping a content name to the corresponding content location(s).
+
+    Based upon the trends witnessed by today's Internet, we believe an efficient global naming resolution service should have the following properties. Firstly, it should be highly scalable be able to support billions of mobile devices. Secondly, it should be responsive and provide access latencies as low as tens of milliseconds. Here, accesses include naming entry updates as well as lookups. *** why tens of ms? *** Thirdly, it should be generic and independent of any specific naming structure. Fourthly, it should be backward compatible with current Internet infrastructure. Fifthly, it should be robust, and resilient against random node and network failures.
+
+    Given these requirements, no existing naming resolution approach appears to be a suitable option. 
+    %DNS
+    Designed from the old day of the Internet, the DNS approach with static, hierarchical partitioning of the namespace and excessive caching, does not satisfy (1),(2),(3) and (4) [sigcomm04\_CondoNS, 5,39,41,17,19]. ***why not scalabe ?*** The skew distribution of name under popular domain has flatten the hierarchy and unbalanced load distribution. Even with heavy caching, DNS lookup contributes more than one second for up to 30\% of web object retrieval[cite 41,17]. Shortened timeout for popular mapping entries to better support for mobility reduce DNS cache hit rates which in turn further degrades its performance, increasing lookup latency. Extensive caching makes DNS delay update propagation. DNS is prone to DoS attacks, due to the limited redundancy in nameservers and hierarchical structure.
+    %DHT-based 
+    While providing failure resilience and self-organization, DHT based approaches may lead to excessive access delays due to multi-overlay-hop communication[cite Beehive, Pasrty, CondoNS].  The price for that two properties is paid by communication overhead since peers need to maintain additional `routing table' width $(O\log{N})$ number of pointers to node with matching prefixes **CRYPTIC, need to make it easier to understand**. We argue that making use of highly available and reliable components which present already in the network, such as core routers in the Internet, is a natural approach to address system's robustness without additional communication overhead.
+    
+    In this paper, we discuss the design and initial evaluation of our global naming resolution service. Our approach has two main features. First, our approach is completely distributed; each router in the Internet participates in the global naming resolution service by storing a fraction of the GUID to address mappings. Given a specific GUID, we first perform a hash function, and the hash result gives us the IP address(es) of the destination router(s) that store the mapping for the given GUID. Then we can rely on the standard routing protocol to reach the destination router(s). Hence, no additional hashing or lookup is needed. If the resulting IP address is invalid (aka the IP hole problem), we rehash until. Second, our approach implements the naming resolution in the network layer, instead of the application layer. *** more details here! *** We can further improve the design by having multiple copies for each GUID and evenly distributing these copies, leading to reduced access latencies and better robustness.
+
+    In this paper, we build an event-driven simulator to evaluate our global naming resolution service. In our simulation, we consider *** nodes and *** GUIDs. We adopt the Internet topology ***. The simulation results show that our resolution service can achieve ***ms access delays with one replica for each GUID, and *** ms access latencies with five replicas for each GUID.
+
+    ***roadmap of the paper***
+
+
+
+   %
+%	\paragraph{Internet is moving toward mobility and the need of fast look up services due to mobility}. Fast naming lookup play an important role in routing optimization, name-based routing approach for instance[cite Name-based routing].
+%
+% Add a case for mobilty: --    User mobility  --   Mobility induce by changes in context (multicating, multihomming)  --   Vehicular --    Content mobility
+%
+%
+%
+%    \paragraph{Motivate the need for content becoming an object of network layer which leads to the need of highly scalable naming resolution service}
+%
+%
+%	\paragraph{Existing approaches are }
+%
+%        + Not responsive to naming update due to heavy caching mechanism - DNS
+%
+%        + High lookup latency due to overlay network - DHT approaches
+%
+%        + Not scalable to number of contents in the internet since it is not fully distributed - DHT based approaches.
+%
+%    \paragraph{We argue that naming resolution scheme must satisfy the following goals}
+%
+%        + Scalability - to billions of objects. (fully distributed and evenly distributed)
+%
+%        + Minimum lookup latency
+%
+%        + Highly responsive to naming update
+%
+%        + Independent from naming structure
+%
+%        + backward compatible with current Internet infrastructure
+%
+%        + Assigning load to different component according to their ability
+%
+%
+%    \paragraph{Our approach relies on direct hashing from name to the address of entity that store that name to address mapping.... }
+%
+%
+%    \paragraph{Contribution}
+%        + we provide a fully distributed, highly scalable scheme with fast lookup and low latency udpate....
+%
+%        + We are the first to provide a large scale simulation including more than 26K ASes....
+%
+%
+%    \paragraph{Organization}
+

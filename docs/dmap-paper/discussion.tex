@@ -1,0 +1,27 @@
+\section{Discussion}
+\label{sec:discussion}
+We have so far presented the design of our ongoing work on naming resolution. In this section, we discuss opening problems and directions for our future works:
+
+\paragraph{Different mapping schemes}
+        Intuitively, our scheme relies on the fact that existing routing system dictate who handles which GUID to address mapping. However, it is noteworthy that our current approach which has GUID being distributed based on existing prefix table is only one of many design options. We can hash GUID directly to AS number as another option to equally distribute mapping over ASes without taking their announced prefix size into account.
+        Another option could be hashing GUID to a predefined list of entities that registered to participate into the naming resolution service. This approach can address the incentive issues where only ASes that willing to participate into the service are assigned mapping. However, it also bring up additional overhead to our architecture, that is the cost to  maintain the membership of registered participants.
+        We believe that there are many other options need to be investigated in depth to fully benefit our approach.
+
+\paragraph{Caching scheme}
+        While do not taking caching into the design as one of the primitive, we do recognize that the use of caching can further improve our fast lookup and update latency. However, selecting caching schemes should be taken with great caution since caching and mobility support always at the 2 end of the trade off. ***Mention few caching scheme with discussion in depth***[cite]
+
+
+\paragraph{Biasing toward locality for better mapping distribution}
+        Current approach has not taken requesters' demand into account. Instead, one of our design goals was equally distributed the mappings to ASes biasing to the size of address block that they announced. However, one extension could be taking the distribution of the original of the query into account while distributing mappings. For example, a mapping of a GUID belong to US should have at least one copy to be stored in a router in US.
+
+\paragraph{Security issues due to the fact that we are relying on BGP table}
+        Since our approach relies on available information of underlying routing infrastructure, security issues of the layer bellow might affect the reliability of our design. For example, to attack our service, attackers might announce many prefixes that they not actually own which leads to the inaccurate announced prefix table. However, there have been enormous amount of effort put toward securing routing layer cite[][]. For example, that kind of attack is not viable in newer version of BGP, SecureBGP, that under practical deployment plan....
+
+
+\paragraph{Applicability of current scheme}
+        Applicability of current scheme: We believe the naming resolution service is the center of the next generation Internet architecture, can find many applications beyond providing the mapping between host names and network addresses. As one example, it can facilitate efficient content retrieval. As a significant amount of content is produced and accessed by mobile devices, it is becoming an appealing approach to assign each content a global ID, and have the naming resolution service track the locations of each content file. As another example, it may also be useful to introduce the concept of contexts as the message recipients. An example of context can be ``all the cars in New Brunswick, NJ". In this case, the naming resolution service can be used to track which network addresses belong to a specific context.
+\paragraph{Inconsistency in naming lookup result}
+        Maintaining consistency among multiple replicas is very challenging, it at all possible. For example, one of the resolvers may be offline at an update. When it becomes back online later, it will contain stale information. In our system, we plan to adopt a weak consistency model, which we refer to as \emph{online update consistency}. Specifically, at each update, we only guarantee all the online resolvers will have the consistent view by employing the ACK mechanism. Our rationale is that, this consistency model can provide stronger consistency to hosts with frequent updates, which is a desirable feature. In our continuing work, we will work out a more thorough consistency model.
+\paragraph{Incentive for participants or business model}
+        [ Need more input ]
+

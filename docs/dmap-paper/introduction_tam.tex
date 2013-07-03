@@ -1,0 +1,45 @@
+\section{Introduction}
+
+Since Saltzer's reflections on the distinction of names and addresses in networks~\cite{saltzer}, the idea of separating location and identity of network entities has attracted a plethora of incremental as well as clean-slate proposals for the design of future Internet. The reason for location/identity separation being at the core of these proposals is its direct impact on four main requirements of a new Internet architecture as suggested in the Internet Research Task Force (IRTF) design goal document~\cite{li_design}. These key requirements are routing scalability, mobility support, multi-homing support and traffic engineering enhancements, each of which has been shown to be addressable by the splitting of location and identity namespaces. 
+\subsection{A case for naming resolution for mobility}
+\emph{Related works}
+While there is broad agreement on this separation idea~\cite{li}, the implementation proposals widely vary in terms of two main design components - the structures of the locators and identifiers, and the mapping scheme used to resolve the identifiers to locators. For example LISP~\cite{farinacci}, [?] and [?] assume a hierarchical identifier space, HIP~\cite{moskowitz} and MobilityFirst~\cite{mobilityFirst} incorporate a completely flat identifier space and an even different scheme is proposed in MILSA \cite{milsa}, where identifiers are made up of variable flat and hierarchical parts depending on the context. In contrast, most of the mapping scheme proposals such as LISP-ALT~\cite{farinacci-alt}, LISP-DHT~\cite{mathy}, SLIMS [?], and others are implicitly based on the assumption of aggregatable, hierarchical identifier space - they can work with flat identifiers but the announcement overhead and/or the table sizes would become evidently unscalable. The second key difference between the different location/ identity separation ideas is in their fundamental design goals. The LISP proposal, for instance, emphasizes backward compatibility and thus reuses the 32-bit aggregatable IP addresses as endpoint identifiers. As a result, mobility and multi-homing support do not follow naturally from its design and variations such as LISP-MN have been subsequently introduced for full mobility support~\cite{farinacci-mn}. The MobilityFirst approach, in contrast, is a clean slate future Internet architecture project with a particular focus on supporting large-scale, efficient and robust mobility services. Keeping these features as basic architectural goals impacts the design of the mapping service and introduces a set of additional requirements for it to satisfy.
+We discuss limitations of existing work in detail in the next section, Section \ref{}
+
+\emph{Set of requirements of naming resolution for mobilities}
+\begin{itemize}
+    \item{Latency}
+    \item{Freshness}
+    \item{Scalability}
+    \item{Widely applicability}
+\end{itemize}
+
+\subsection{Fully distributed Single hop in-network hashing}
+The need for reliability, performance and scalability drives the design to a distributed solution with one-hop consistent hashing that leveraging the underlying routing information..., as shown in Figure
+
+these requirements we introduce a mapping distribution scheme in which, instead of each AS storing and managing its set of identifier-locator tables, each mapping entry is managed by a set of foreign ASs. We explain the reasons behind this choice, point out its benefits and address the evident incentive and privacy issues. Specifically, our approach leverages the locator reachability information (IP reachability in the present Internet context) that is readily available at the network layer, and makes use of an in-network single hop hashing technique to reach the storage point for any given identifier-locator mapping entry with low latency.
+\emph{Will give high-level description with a small example of how it works. Followed by the challenges and limitations that we have including: IP holes, BGP churns and incentive arguments.}
+
+In this paper, we argue that while there's a rich variety of location/identifier separation ideas covering a number of different design goals, the development of the accompanying mapping schemes has been myopic and predominantly based on the LISP proposal. The aim of our work is to revisit the requirements of a generic mapping scheme which can cater to all types of identifier namespaces, and address the constraints brought about from mobility, multi-homing and traffic engineering support.
+
+\subsection{Research contribution and roadmap}
+
+Based on  
+We make the following key contributions in this paper:
+
+\begin{enumerate}
+
+\item
+We propose a conceptual shift from ASs `owning' endpoint identifiers and individually storing the mappings of its owned set of identifiers to a network-wide sharing of the identifier-locator mappings irrespective of the AS boundaries. Our scheme results in a natural order of incentives in which an AS which is expected to produce a large number of identifier-locator lookups from other ASs, itself stores and answers a proportionally large number of mappings. We aim to provide reasonings that show the feasibility of the scheme in order to open further research into this line of thought.
+
+\item
+We introduce a novel single-hop hashing technique that leverages the IP reachability information available at the network later. To lookup a mapping in this scheme, one can directly hash the identifier to produce the network address of the AS that stores its mapping.
+
+\item
+We validate our scheme through a large-scale discrete event simulation based on Internet measurement traces. We show that this scheme achieves low latency values with a 95th percentile value of $\sim$100 ms, a 2x - 5x reduction compared to previously published results.
+
+\end{enumerate}
+
+
+
+

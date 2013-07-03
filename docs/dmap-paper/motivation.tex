@@ -1,0 +1,21 @@
+\subsection{Why a new mapping Scheme? }
+Why not MobileIP 
+Comparing with other mapping scheme 
+
+Given the number of identifier-locator mapping schemes recently proposed, the natural place to start is by exploring why we need a shift from traditional mechanisms. As Carpenter succinctly identified~\cite{carpenter}, the design of any mapping scheme which enables location/identifier separation in the future Internet depends on the implicit or explicit assumptions made on certain key issues - Should the scheme depend on the identifier space? What is the expected scale of identifier namespaces? Is the mapping invoked only upon the start of transmission or at successive domain boundaries while a packet is in-transit? What is the lifetime of a mapping? Should the scheme support dynamic identifier-locator mapping for mobility? and Does the mapping scheme have any impact on privacy? The design choices made by most of the existing proposals focus on a subset of these issues while giving less priority to other key requirements, especially those which directly affect mobility support. As a concrete example, the MobilityFirst proposal includes support for identifier-locator querying by network routers for in-transit packets which could result in multiple mapping queries on course the transmission of a single packet. Clearly, in this use-case, LISP-TREE with an average latency of around half a second or LISP-DHT with query times going up to a second cannot be readily used. The ABCD approach is motivated by the limitations of the two basic mechanisms for directory lookup type service, i.e., the DHT based schemes and the DNS based schemes:
+
+\subsection{Problem with DNS approach}
+TBA
+\subsection{Problem with DHT approach}
+TBA
+
+
+\section{Single Hop In-network hashing}
+Same as before
+
+{\bf Why should AS X store AS Y's mappings?}
+
+
+
+
+
