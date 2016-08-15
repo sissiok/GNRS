@@ -1,0 +1,1046 @@
+[2013-01-11 10:59:42,243] DEBUG main/GNRSServer - ------------------------
+[2013-01-11 10:59:42,244] DEBUG main/GNRSServer - GNRS Server starting up.
+[2013-01-11 10:59:42,244] DEBUG main/GNRSServer - ------------------------
+[2013-01-11 10:59:44,130] DEBUG main/GNRSServer - Finished parsing configuration file.
+[2013-01-11 10:59:44,145] INFO  main/IPv4UDPGUIDMapper - Finished loading prefix map.
+[2013-01-11 10:59:44,146] INFO  main/IPv4UDPGUIDMapper - Finished loading AS network binding values.
+[2013-01-11 10:59:44,881] DEBUG main/GNRSServer - GNRS server object successfully created.
+[2013-01-11 10:59:45,905] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 10:59:46,882] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 10:59:47,882] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 10:59:48,883] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 10:59:49,882] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 10:59:50,883] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 10:59:51,882] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 10:59:52,388] INFO  Thread-4/GNRSServer - Generating CDF files.
+[2013-01-11 11:10:35,217] DEBUG main/GNRSServer - ------------------------
+[2013-01-11 11:10:35,218] DEBUG main/GNRSServer - GNRS Server starting up.
+[2013-01-11 11:10:35,218] DEBUG main/GNRSServer - ------------------------
+[2013-01-11 11:10:35,218] ERROR main/GNRSServer - Missing 1 or more command-line arguments.
+[2013-01-11 11:10:39,760] DEBUG main/GNRSServer - ------------------------
+[2013-01-11 11:10:39,761] DEBUG main/GNRSServer - GNRS Server starting up.
+[2013-01-11 11:10:39,761] DEBUG main/GNRSServer - ------------------------
+[2013-01-11 11:10:40,238] DEBUG main/GNRSServer - Finished parsing configuration file.
+[2013-01-11 11:10:40,284] INFO  main/IPv4UDPGUIDMapper - Finished loading prefix map.
+[2013-01-11 11:10:40,285] INFO  main/IPv4UDPGUIDMapper - Finished loading AS network binding values.
+[2013-01-11 11:10:40,755] DEBUG main/GNRSServer - GNRS server object successfully created.
+[2013-01-11 11:10:41,764] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:42,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:43,758] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:44,758] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:45,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:46,758] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:47,758] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:48,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:49,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:50,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:50,763] INFO  Timer-0/BerkeleyDBStore$StatsTask - BDB Cache Misses: 18
+[2013-01-11 11:10:51,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:52,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:53,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:54,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:55,758] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:56,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:57,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:58,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:59,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:00,757] INFO  Timer-0/BerkeleyDBStore$StatsTask - BDB Cache Misses: 0
+[2013-01-11 11:11:00,758] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:01,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:02,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:03,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:04,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:05,758] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:06,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:07,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:08,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:09,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:10,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:10,757] INFO  Timer-0/BerkeleyDBStore$StatsTask - BDB Cache Misses: 0
+[2013-01-11 11:11:11,758] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:12,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:13,758] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:14,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:15,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:16,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:17,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:18,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:19,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:20,758] INFO  Timer-0/BerkeleyDBStore$StatsTask - BDB Cache Misses: 0
+[2013-01-11 11:11:20,759] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:21,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:22,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:23,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:24,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:25,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:26,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:27,758] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:28,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:29,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:29,810] DEBUG main/TraceClient - Loaded configuration file "src/main/resources/client.xml".
+[2013-01-11 11:11:29,811] DEBUG main/TraceClient - Loaded trace file "src/main/resources/example.trace".
+[2013-01-11 11:11:29,861] DEBUG main/TraceClient - Configured trace client.
+[2013-01-11 11:11:29,895] INFO  main/TraceClient - Connected to (0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)
+[2013-01-11 11:11:29,895] INFO  main/TraceClient - Starting trace from src/main/resources/example.trace.
+[2013-01-11 11:11:29,897] DEBUG main/TraceClient - FILE: 1 I 1 1,99999,1 # Comments may also be placed at the ends of lines.
+[2013-01-11 11:11:29,897] DEBUG main/TraceClient - Parsing "1 I 1 1,99999,1 # Comments may also be placed at the ends of lines."
+[2013-01-11 11:11:29,909] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent INS #1 GUID(3100000000000000000000000000000000000000) -> {0.0.0.1:5001}
+[2013-01-11 11:11:29,921] DEBUG main/TraceClient - FILE: 2 I 2 2,99999,1 # Anything after a "#" will be ignored by the client.
+[2013-01-11 11:11:29,921] DEBUG main/TraceClient - Parsing "2 I 2 2,99999,1 # Anything after a "#" will be ignored by the client."
+[2013-01-11 11:11:29,923] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent INS #2 GUID(3200000000000000000000000000000000000000) -> {0.0.0.2:5001}
+[2013-01-11 11:11:29,936] DEBUG main/TraceClient - FILE: 3 I 3 3,99999,1,19,88888,2 # This line has a second binding
+[2013-01-11 11:11:29,936] DEBUG main/TraceClient - Parsing "3 I 3 3,99999,1,19,88888,2 # This line has a second binding"
+[2013-01-11 11:11:29,938] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent INS #3 GUID(3300000000000000000000000000000000000000) -> {0.0.0.3:5001, 0.0.0.3:5001}
+[2013-01-11 11:11:29,949] DEBUG main/TraceClient - FILE: 4 I 4 4,99999,1
+[2013-01-11 11:11:29,950] DEBUG main/TraceClient - Parsing "4 I 4 4,99999,1"
+[2013-01-11 11:11:29,951] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent INS #4 GUID(3400000000000000000000000000000000000000) -> {0.0.0.4:5001}
+[2013-01-11 11:11:29,961] DEBUG main/TraceClient - FILE: 5 I 5 5,99999,1
+[2013-01-11 11:11:29,961] DEBUG main/TraceClient - Parsing "5 I 5 5,99999,1"
+[2013-01-11 11:11:29,963] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent INS #5 GUID(3500000000000000000000000000000000000000) -> {0.0.0.5:5001}
+[2013-01-11 11:11:29,974] DEBUG main/TraceClient - FILE: 6 I 6 6,99999,1
+[2013-01-11 11:11:29,974] DEBUG main/TraceClient - Parsing "6 I 6 6,99999,1"
+[2013-01-11 11:11:29,975] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent INS #6 GUID(3600000000000000000000000000000000000000) -> {0.0.0.6:5001}
+[2013-01-11 11:11:29,986] DEBUG main/TraceClient - FILE: 7 I 7 7,99999,1
+[2013-01-11 11:11:29,987] DEBUG main/TraceClient - Parsing "7 I 7 7,99999,1"
+[2013-01-11 11:11:29,990] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent INS #7 GUID(3700000000000000000000000000000000000000) -> {0.0.0.7:5001}
+[2013-01-11 11:11:30,001] DEBUG main/TraceClient - FILE: 8 I 8 8,99999,1
+[2013-01-11 11:11:30,002] DEBUG main/TraceClient - Parsing "8 I 8 8,99999,1"
+[2013-01-11 11:11:30,003] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent INS #8 GUID(3800000000000000000000000000000000000000) -> {0.0.0.8:5001}
+[2013-01-11 11:11:30,015] DEBUG main/TraceClient - FILE: 9 I 9 9,99999,1
+[2013-01-11 11:11:30,015] DEBUG main/TraceClient - Parsing "9 I 9 9,99999,1"
+[2013-01-11 11:11:30,016] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent INS #9 GUID(3900000000000000000000000000000000000000) -> {0.0.0.9:5001}
+[2013-01-11 11:11:30,028] DEBUG main/TraceClient - FILE: 10 Q 1
+[2013-01-11 11:11:30,028] DEBUG main/TraceClient - Parsing "10 Q 1"
+[2013-01-11 11:11:30,029] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #10 (GUID(3100000000000000000000000000000000000000))
+[2013-01-11 11:11:30,040] DEBUG main/TraceClient - FILE: 11 Q 2
+[2013-01-11 11:11:30,040] DEBUG main/TraceClient - Parsing "11 Q 2"
+[2013-01-11 11:11:30,042] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #11 (GUID(3200000000000000000000000000000000000000))
+[2013-01-11 11:11:30,053] DEBUG main/TraceClient - FILE: 12 Q 3
+[2013-01-11 11:11:30,053] DEBUG main/TraceClient - Parsing "12 Q 3"
+[2013-01-11 11:11:30,055] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #12 (GUID(3300000000000000000000000000000000000000))
+[2013-01-11 11:11:30,067] DEBUG main/TraceClient - FILE: 13 Q 4
+[2013-01-11 11:11:30,067] DEBUG main/TraceClient - Parsing "13 Q 4"
+[2013-01-11 11:11:30,068] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #13 (GUID(3400000000000000000000000000000000000000))
+[2013-01-11 11:11:30,080] DEBUG main/TraceClient - FILE: 14 Q 5
+[2013-01-11 11:11:30,080] DEBUG main/TraceClient - Parsing "14 Q 5"
+[2013-01-11 11:11:30,081] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #14 (GUID(3500000000000000000000000000000000000000))
+[2013-01-11 11:11:30,092] DEBUG main/TraceClient - FILE: 15 Q 6
+[2013-01-11 11:11:30,093] DEBUG main/TraceClient - Parsing "15 Q 6"
+[2013-01-11 11:11:30,095] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #15 (GUID(3600000000000000000000000000000000000000))
+[2013-01-11 11:11:30,107] DEBUG main/TraceClient - FILE: 16 Q 7
+[2013-01-11 11:11:30,107] DEBUG main/TraceClient - Parsing "16 Q 7"
+[2013-01-11 11:11:30,109] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #16 (GUID(3700000000000000000000000000000000000000))
+[2013-01-11 11:11:30,121] DEBUG main/TraceClient - FILE: 17 Q 8
+[2013-01-11 11:11:30,121] DEBUG main/TraceClient - Parsing "17 Q 8"
+[2013-01-11 11:11:30,123] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #17 (GUID(3800000000000000000000000000000000000000))
+[2013-01-11 11:11:30,134] DEBUG main/TraceClient - FILE: 18 Q 9
+[2013-01-11 11:11:30,134] DEBUG main/TraceClient - Parsing "18 Q 9"
+[2013-01-11 11:11:30,136] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #18 (GUID(3900000000000000000000000000000000000000))
+[2013-01-11 11:11:30,147] DEBUG main/TraceClient - FILE: 19 Q 100
+[2013-01-11 11:11:30,147] DEBUG main/TraceClient - Parsing "19 Q 100"
+[2013-01-11 11:11:30,148] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #19 (GUID(3130300000000000000000000000000000000000))
+[2013-01-11 11:11:30,159] DEBUG main/TraceClient - FILE: 20 Q 101
+[2013-01-11 11:11:30,160] DEBUG main/TraceClient - Parsing "20 Q 101"
+[2013-01-11 11:11:30,162] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #20 (GUID(3130310000000000000000000000000000000000))
+[2013-01-11 11:11:30,173] DEBUG main/TraceClient - FILE: 21 Q 102
+[2013-01-11 11:11:30,173] DEBUG main/TraceClient - Parsing "21 Q 102"
+[2013-01-11 11:11:30,175] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #21 (GUID(3130320000000000000000000000000000000000))
+[2013-01-11 11:11:30,186] DEBUG main/TraceClient - FILE: 22 Q 103
+[2013-01-11 11:11:30,186] DEBUG main/TraceClient - Parsing "22 Q 103"
+[2013-01-11 11:11:30,188] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #22 (GUID(3130330000000000000000000000000000000000))
+[2013-01-11 11:11:30,199] DEBUG main/TraceClient - FILE: 23 Q 104
+[2013-01-11 11:11:30,199] DEBUG main/TraceClient - Parsing "23 Q 104"
+[2013-01-11 11:11:30,200] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #23 (GUID(3130340000000000000000000000000000000000))
+[2013-01-11 11:11:30,211] DEBUG main/TraceClient - FILE: 24 Q 105
+[2013-01-11 11:11:30,211] DEBUG main/TraceClient - Parsing "24 Q 105"
+[2013-01-11 11:11:30,214] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #24 (GUID(3130350000000000000000000000000000000000))
+[2013-01-11 11:11:30,225] INFO  main/TraceClient - Finished reading trace file. Waiting for outstanding messages.
+[2013-01-11 11:11:30,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+15.015 per second (Q: 26,000.8 us, P: 457.0 us, R: 0.0 us, S: 0.0 us, T: 26,457.8 us)
+==Inserts==
+9.009 per second (Q: 189,915.2 us, P: 29,722.2 us, R: 0.0 us, S: 0.0 us, T: 219,637.4 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:30,757] INFO  Timer-0/BerkeleyDBStore$StatsTask - BDB Cache Misses: 0
+[2013-01-11 11:11:31,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:32,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:33,758] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:34,538] INFO  Thread-4/GNRSServer - Generating CDF files.
+[2013-01-11 11:11:34,539] INFO  Thread-4/StatisticsCollector - Creating stats/ins-total.csv
+[2013-01-11 11:11:34,554] INFO  Thread-4/StatisticsCollector - Creating stats/ins-queue.csv
+[2013-01-11 11:11:34,567] INFO  Thread-4/StatisticsCollector - Creating stats/lkp-proc.csv
+[2013-01-11 11:11:34,581] INFO  Thread-4/StatisticsCollector - Creating stats/ins-resp.csv
+[2013-01-11 11:11:34,594] INFO  Thread-4/StatisticsCollector - Creating stats/lkp-queue.csv
+[2013-01-11 11:11:34,605] INFO  Thread-4/StatisticsCollector - Creating stats/ins-remote.csv
+[2013-01-11 11:11:34,627] INFO  Thread-4/StatisticsCollector - Creating stats/lkp-resp.csv
+[2013-01-11 11:11:34,651] INFO  Thread-4/StatisticsCollector - Creating stats/lkp-total.csv
+[2013-01-11 11:11:34,664] INFO  Thread-4/StatisticsCollector - Creating stats/lkp-remote.csv
+[2013-01-11 11:11:34,675] INFO  Thread-4/StatisticsCollector - Creating stats/ins-proc.csv
+[2013-01-11 11:11:35,239] WARN  NioDatagramAcceptor-1/DefaultExceptionMonitor - Unexpected exception.
+java.lang.InterruptedException
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(AbstractQueuedSynchronizer.java:1279)
+	at java.util.concurrent.Semaphore.acquire(Semaphore.java:286)
+	at org.apache.mina.core.polling.AbstractPollingConnectionlessIoAcceptor$Acceptor.run(AbstractPollingConnectionlessIoAcceptor.java:591)
+	at org.apache.mina.util.NamePreservingRunnable.run(NamePreservingRunnable.java:64)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:886)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:908)
+	at java.lang.Thread.run(Thread.java:680)
+[2013-01-11 11:11:37,281] INFO  main/StatisticsCollector - Creating trace-client/clt-ins-rtt.csv
+[2013-01-11 11:11:37,295] INFO  main/StatisticsCollector - Creating trace-client/clt-lkp-rtt.csv
+[2013-01-11 11:11:37,308] INFO  main/TraceClient - 
+==Insert==
+Min: 169,089us | Med: 220,960us | Max: 271,170us
+Total: 9  |  Success: 9  |  Loss: 0
+==Lookup==
+Min: 3,477us | Med: 79,615us | Max: 157,590us
+Total: 15  |  Success: 15  |  Bound: 9  |  Loss: 0
+
+[2013-01-11 11:11:37,308] DEBUG main/TraceClient - Finished main thread.
+[2013-01-11 11:11:37,309] INFO  Thread-3/TraceClient - Finished reading trace file. Waiting for outstanding messages.
+[2013-01-11 11:11:37,309] INFO  Thread-3/StatisticsCollector - Creating trace-client/clt-ins-rtt.csv
+[2013-01-11 11:11:37,320] INFO  Thread-3/StatisticsCollector - Creating trace-client/clt-lkp-rtt.csv
+[2013-01-11 11:11:37,332] INFO  Thread-3/TraceClient - 
+==Insert==
+Min: 169,089us | Med: 220,960us | Max: 271,170us
+Total: 9  |  Success: 9  |  Loss: 0
+==Lookup==
+Min: 3,477us | Med: 79,615us | Max: 157,590us
+Total: 15  |  Success: 15  |  Bound: 9  |  Loss: 0
+
+[2013-01-11 11:13:52,974] DEBUG main/TraceClient - Loaded configuration file "src/main/resources/client.xml".
+[2013-01-11 11:13:52,975] DEBUG main/TraceClient - Loaded trace file "src/main/resources/example.trace".
+[2013-01-11 11:13:53,026] DEBUG main/TraceClient - Configured trace client.
+[2013-01-11 11:13:53,062] INFO  main/TraceClient - Connected to (0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)
+[2013-01-11 11:13:53,062] INFO  main/TraceClient - Starting trace from src/main/resources/example.trace.
+[2013-01-11 11:13:53,063] DEBUG main/TraceClient - FILE: 1 I 1 1,99999,1 # Comments may also be placed at the ends of lines.
+[2013-01-11 11:13:53,063] DEBUG main/TraceClient - Parsing "1 I 1 1,99999,1 # Comments may also be placed at the ends of lines."
+[2013-01-11 11:13:53,073] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent INS #1 GUID(3100000000000000000000000000000000000000) -> {0.0.0.1:5001}
+[2013-01-11 11:13:57,023] INFO  Thread-3/TraceClient - Finished reading trace file. Waiting for outstanding messages.
+[2013-01-11 11:13:58,035] INFO  Thread-3/TraceClient - 
+==Insert==
+Min: 0us | Med: 0us | Max: 0us
+Total: 1  |  Success: 0  |  Loss: 1
+==Lookup==
+Min: 0us | Med: 0us | Max: 0us
+Total: 0  |  Success: 0  |  Bound: 0  |  Loss: 0
+
+[2013-01-11 11:13:59,797] DEBUG main/GNRSServer - ------------------------
+[2013-01-11 11:13:59,798] DEBUG main/GNRSServer - GNRS Server starting up.
+[2013-01-11 11:13:59,798] DEBUG main/GNRSServer - ------------------------
+[2013-01-11 11:14:00,029] DEBUG main/GNRSServer - Finished parsing configuration file.
+[2013-01-11 11:14:00,044] INFO  main/IPv4UDPGUIDMapper - Finished loading prefix map.
+[2013-01-11 11:14:00,045] INFO  main/IPv4UDPGUIDMapper - Finished loading AS network binding values.
+[2013-01-11 11:14:00,479] DEBUG main/GNRSServer - GNRS server object successfully created.
+[2013-01-11 11:14:01,487] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:02,481] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:03,411] INFO  Thread-4/GNRSServer - Generating CDF files.
+[2013-01-11 11:14:08,276] DEBUG main/GNRSServer - ------------------------
+[2013-01-11 11:14:08,277] DEBUG main/GNRSServer - GNRS Server starting up.
+[2013-01-11 11:14:08,277] DEBUG main/GNRSServer - ------------------------
+[2013-01-11 11:14:08,277] ERROR main/GNRSServer - Missing 1 or more command-line arguments.
+[2013-01-11 11:14:17,107] DEBUG main/GNRSServer - ------------------------
+[2013-01-11 11:14:17,108] DEBUG main/GNRSServer - GNRS Server starting up.
+[2013-01-11 11:14:17,108] DEBUG main/GNRSServer - ------------------------
+[2013-01-11 11:14:17,409] DEBUG main/GNRSServer - Finished parsing configuration file.
+[2013-01-11 11:14:17,424] INFO  main/IPv4UDPGUIDMapper - Finished loading prefix map.
+[2013-01-11 11:14:17,425] INFO  main/IPv4UDPGUIDMapper - Finished loading AS network binding values.
+[2013-01-11 11:14:17,861] DEBUG main/GNRSServer - GNRS server object successfully created.
+[2013-01-11 11:14:18,869] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:19,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:20,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:21,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:22,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:23,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:24,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:25,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:26,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:27,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:27,871] INFO  Timer-0/BerkeleyDBStore$StatsTask - BDB Cache Misses: 18
+[2013-01-11 11:14:28,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:29,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:30,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:31,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:32,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:33,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:34,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:35,862] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:36,662] DEBUG main/TraceClient - Loaded configuration file "src/main/resources/client.xml".
+[2013-01-11 11:14:36,662] DEBUG main/TraceClient - Loaded trace file "src/main/resources/example.trace".
+[2013-01-11 11:14:36,715] DEBUG main/TraceClient - Configured trace client.
+[2013-01-11 11:14:36,751] INFO  main/TraceClient - Connected to (0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)
+[2013-01-11 11:14:36,751] INFO  main/TraceClient - Starting trace from src/main/resources/example.trace.
+[2013-01-11 11:14:36,752] DEBUG main/TraceClient - FILE: 1 I 1 1,99999,1 # Comments may also be placed at the ends of lines.
+[2013-01-11 11:14:36,752] DEBUG main/TraceClient - Parsing "1 I 1 1,99999,1 # Comments may also be placed at the ends of lines."
+[2013-01-11 11:14:36,763] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent INS #1 GUID(3100000000000000000000000000000000000000) -> {0.0.0.1:5001}
+[2013-01-11 11:14:36,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.999 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:37,764] DEBUG main/TraceClient - FILE: 2 I 2 2,99999,1 # Anything after a "#" will be ignored by the client.
+[2013-01-11 11:14:37,764] DEBUG main/TraceClient - Parsing "2 I 2 2,99999,1 # Anything after a "#" will be ignored by the client."
+[2013-01-11 11:14:37,765] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent INS #2 GUID(3200000000000000000000000000000000000000) -> {0.0.0.2:5001}
+[2013-01-11 11:14:37,864] INFO  Timer-0/BerkeleyDBStore$StatsTask - BDB Cache Misses: 4
+[2013-01-11 11:14:37,865] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.998 per second (Q: 2,630.0 us, P: 130,913.0 us, R: 0.0 us, S: 0.0 us, T: 133,543.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:38,767] DEBUG main/TraceClient - FILE: 3 I 3 3,99999,1,19,88888,2 # This line has a second binding
+[2013-01-11 11:14:38,767] DEBUG main/TraceClient - Parsing "3 I 3 3,99999,1,19,88888,2 # This line has a second binding"
+[2013-01-11 11:14:38,770] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent INS #3 GUID(3300000000000000000000000000000000000000) -> {0.0.0.3:5001, 0.0.0.3:5001}
+[2013-01-11 11:14:38,862] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+1.002 per second (Q: 233.0 us, P: 3,322.0 us, R: 0.0 us, S: 0.0 us, T: 3,555.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:39,771] DEBUG main/TraceClient - FILE: 4 I 4 4,99999,1
+[2013-01-11 11:14:39,771] DEBUG main/TraceClient - Parsing "4 I 4 4,99999,1"
+[2013-01-11 11:14:39,774] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent INS #4 GUID(3400000000000000000000000000000000000000) -> {0.0.0.4:5001}
+[2013-01-11 11:14:39,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+1.000 per second (Q: 143.0 us, P: 2,523.0 us, R: 0.0 us, S: 0.0 us, T: 2,666.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:40,775] DEBUG main/TraceClient - FILE: 5 I 5 5,99999,1
+[2013-01-11 11:14:40,775] DEBUG main/TraceClient - Parsing "5 I 5 5,99999,1"
+[2013-01-11 11:14:40,778] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent INS #5 GUID(3500000000000000000000000000000000000000) -> {0.0.0.5:5001}
+[2013-01-11 11:14:40,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.999 per second (Q: 217.0 us, P: 1,970.0 us, R: 0.0 us, S: 0.0 us, T: 2,187.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:41,779] DEBUG main/TraceClient - FILE: 6 I 6 6,99999,1
+[2013-01-11 11:14:41,780] DEBUG main/TraceClient - Parsing "6 I 6 6,99999,1"
+[2013-01-11 11:14:41,783] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent INS #6 GUID(3600000000000000000000000000000000000000) -> {0.0.0.6:5001}
+[2013-01-11 11:14:41,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+1.001 per second (Q: 146.0 us, P: 2,310.0 us, R: 0.0 us, S: 0.0 us, T: 2,456.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:42,784] DEBUG main/TraceClient - FILE: 7 I 7 7,99999,1
+[2013-01-11 11:14:42,784] DEBUG main/TraceClient - Parsing "7 I 7 7,99999,1"
+[2013-01-11 11:14:42,788] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent INS #7 GUID(3700000000000000000000000000000000000000) -> {0.0.0.7:5001}
+[2013-01-11 11:14:42,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+1.000 per second (Q: 253.0 us, P: 3,144.0 us, R: 0.0 us, S: 0.0 us, T: 3,397.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:43,790] DEBUG main/TraceClient - FILE: 8 I 8 8,99999,1
+[2013-01-11 11:14:43,790] DEBUG main/TraceClient - Parsing "8 I 8 8,99999,1"
+[2013-01-11 11:14:43,792] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent INS #8 GUID(3800000000000000000000000000000000000000) -> {0.0.0.8:5001}
+[2013-01-11 11:14:43,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+1.000 per second (Q: 223.0 us, P: 1,634.0 us, R: 0.0 us, S: 0.0 us, T: 1,857.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:44,793] DEBUG main/TraceClient - FILE: 9 I 9 9,99999,1
+[2013-01-11 11:14:44,793] DEBUG main/TraceClient - Parsing "9 I 9 9,99999,1"
+[2013-01-11 11:14:44,796] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent INS #9 GUID(3900000000000000000000000000000000000000) -> {0.0.0.9:5001}
+[2013-01-11 11:14:44,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+1.000 per second (Q: 146.0 us, P: 2,338.0 us, R: 0.0 us, S: 0.0 us, T: 2,484.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:45,798] DEBUG main/TraceClient - FILE: 10 Q 1
+[2013-01-11 11:14:45,798] DEBUG main/TraceClient - Parsing "10 Q 1"
+[2013-01-11 11:14:45,801] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #10 (GUID(3100000000000000000000000000000000000000))
+[2013-01-11 11:14:45,862] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+1.001 per second (Q: 1,720.0 us, P: 1,655.0 us, R: 0.0 us, S: 0.0 us, T: 3,375.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:46,802] DEBUG main/TraceClient - FILE: 11 Q 2
+[2013-01-11 11:14:46,802] DEBUG main/TraceClient - Parsing "11 Q 2"
+[2013-01-11 11:14:46,805] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #11 (GUID(3200000000000000000000000000000000000000))
+[2013-01-11 11:14:46,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.998 per second (Q: 156.0 us, P: 1,411.0 us, R: 0.0 us, S: 0.0 us, T: 1,567.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:47,806] DEBUG main/TraceClient - FILE: 12 Q 3
+[2013-01-11 11:14:47,806] DEBUG main/TraceClient - Parsing "12 Q 3"
+[2013-01-11 11:14:47,808] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #12 (GUID(3300000000000000000000000000000000000000))
+[2013-01-11 11:14:47,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+1.000 per second (Q: 120.0 us, P: 949.0 us, R: 0.0 us, S: 0.0 us, T: 1,069.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:47,865] INFO  Timer-0/BerkeleyDBStore$StatsTask - BDB Cache Misses: 7
+[2013-01-11 11:14:48,809] DEBUG main/TraceClient - FILE: 13 Q 4
+[2013-01-11 11:14:48,809] DEBUG main/TraceClient - Parsing "13 Q 4"
+[2013-01-11 11:14:48,811] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #13 (GUID(3400000000000000000000000000000000000000))
+[2013-01-11 11:14:48,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+1.001 per second (Q: 117.0 us, P: 1,340.0 us, R: 0.0 us, S: 0.0 us, T: 1,457.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:49,812] DEBUG main/TraceClient - FILE: 14 Q 5
+[2013-01-11 11:14:49,812] DEBUG main/TraceClient - Parsing "14 Q 5"
+[2013-01-11 11:14:49,816] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #14 (GUID(3500000000000000000000000000000000000000))
+[2013-01-11 11:14:49,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+1.000 per second (Q: 190.0 us, P: 1,434.0 us, R: 0.0 us, S: 0.0 us, T: 1,624.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:50,817] DEBUG main/TraceClient - FILE: 15 Q 6
+[2013-01-11 11:14:50,817] DEBUG main/TraceClient - Parsing "15 Q 6"
+[2013-01-11 11:14:50,820] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #15 (GUID(3600000000000000000000000000000000000000))
+[2013-01-11 11:14:50,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+1.000 per second (Q: 152.0 us, P: 1,533.0 us, R: 0.0 us, S: 0.0 us, T: 1,685.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:51,821] DEBUG main/TraceClient - FILE: 16 Q 7
+[2013-01-11 11:14:51,821] DEBUG main/TraceClient - Parsing "16 Q 7"
+[2013-01-11 11:14:51,824] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #16 (GUID(3700000000000000000000000000000000000000))
+[2013-01-11 11:14:51,862] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+1.000 per second (Q: 173.0 us, P: 1,477.0 us, R: 0.0 us, S: 0.0 us, T: 1,650.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:52,825] DEBUG main/TraceClient - FILE: 17 Q 8
+[2013-01-11 11:14:52,825] DEBUG main/TraceClient - Parsing "17 Q 8"
+[2013-01-11 11:14:52,828] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #17 (GUID(3800000000000000000000000000000000000000))
+[2013-01-11 11:14:52,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+1.000 per second (Q: 179.0 us, P: 1,723.0 us, R: 0.0 us, S: 0.0 us, T: 1,902.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:53,829] DEBUG main/TraceClient - FILE: 18 Q 9
+[2013-01-11 11:14:53,830] DEBUG main/TraceClient - Parsing "18 Q 9"
+[2013-01-11 11:14:53,833] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #18 (GUID(3900000000000000000000000000000000000000))
+[2013-01-11 11:14:53,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.999 per second (Q: 219.0 us, P: 1,420.0 us, R: 0.0 us, S: 0.0 us, T: 1,639.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:54,834] DEBUG main/TraceClient - FILE: 19 Q 100
+[2013-01-11 11:14:54,834] DEBUG main/TraceClient - Parsing "19 Q 100"
+[2013-01-11 11:14:54,836] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #19 (GUID(3130300000000000000000000000000000000000))
+[2013-01-11 11:14:54,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+1.001 per second (Q: 188.0 us, P: 735.0 us, R: 0.0 us, S: 0.0 us, T: 923.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:55,837] DEBUG main/TraceClient - FILE: 20 Q 101
+[2013-01-11 11:14:55,837] DEBUG main/TraceClient - Parsing "20 Q 101"
+[2013-01-11 11:14:55,840] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #20 (GUID(3130310000000000000000000000000000000000))
+[2013-01-11 11:14:55,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+1.000 per second (Q: 248.0 us, P: 1,091.0 us, R: 0.0 us, S: 0.0 us, T: 1,339.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:56,842] DEBUG main/TraceClient - FILE: 21 Q 102
+[2013-01-11 11:14:56,842] DEBUG main/TraceClient - Parsing "21 Q 102"
+[2013-01-11 11:14:56,843] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #21 (GUID(3130320000000000000000000000000000000000))
+[2013-01-11 11:14:56,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+1.000 per second (Q: 95.0 us, P: 941.0 us, R: 0.0 us, S: 0.0 us, T: 1,036.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:57,844] DEBUG main/TraceClient - FILE: 22 Q 103
+[2013-01-11 11:14:57,844] DEBUG main/TraceClient - Parsing "22 Q 103"
+[2013-01-11 11:14:57,847] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #22 (GUID(3130330000000000000000000000000000000000))
+[2013-01-11 11:14:57,863] INFO  Timer-0/BerkeleyDBStore$StatsTask - BDB Cache Misses: 0
+[2013-01-11 11:14:57,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.999 per second (Q: 238.0 us, P: 1,409.0 us, R: 0.0 us, S: 0.0 us, T: 1,647.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:58,849] DEBUG main/TraceClient - FILE: 23 Q 104
+[2013-01-11 11:14:58,849] DEBUG main/TraceClient - Parsing "23 Q 104"
+[2013-01-11 11:14:58,852] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #23 (GUID(3130340000000000000000000000000000000000))
+[2013-01-11 11:14:58,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+1.001 per second (Q: 183.0 us, P: 1,208.0 us, R: 0.0 us, S: 0.0 us, T: 1,391.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:59,853] DEBUG main/TraceClient - FILE: 24 Q 105
+[2013-01-11 11:14:59,853] DEBUG main/TraceClient - Parsing "24 Q 105"
+[2013-01-11 11:14:59,855] DEBUG main/TraceClient - [(0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)] Sent LKP #24 (GUID(3130350000000000000000000000000000000000))
+[2013-01-11 11:14:59,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+1.000 per second (Q: 117.0 us, P: 1,093.0 us, R: 0.0 us, S: 0.0 us, T: 1,210.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:15:00,858] INFO  main/TraceClient - Finished reading trace file. Waiting for outstanding messages.
+[2013-01-11 11:15:00,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:15:01,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:15:02,324] INFO  Thread-4/GNRSServer - Generating CDF files.
+[2013-01-11 11:15:02,324] INFO  Thread-4/StatisticsCollector - Creating stats/ins-total.csv
+[2013-01-11 11:15:02,372] INFO  Thread-4/StatisticsCollector - Creating stats/ins-queue.csv
+[2013-01-11 11:15:02,381] INFO  Thread-4/StatisticsCollector - Creating stats/lkp-proc.csv
+[2013-01-11 11:15:02,390] INFO  Thread-4/StatisticsCollector - Creating stats/ins-resp.csv
+[2013-01-11 11:15:02,400] INFO  Thread-4/StatisticsCollector - Creating stats/lkp-queue.csv
+[2013-01-11 11:15:02,413] INFO  Thread-4/StatisticsCollector - Creating stats/ins-remote.csv
+[2013-01-11 11:15:02,424] INFO  Thread-4/StatisticsCollector - Creating stats/lkp-resp.csv
+[2013-01-11 11:15:02,457] INFO  Thread-4/StatisticsCollector - Creating stats/lkp-total.csv
+[2013-01-11 11:15:02,470] INFO  Thread-4/StatisticsCollector - Creating stats/lkp-remote.csv
+[2013-01-11 11:15:02,481] INFO  Thread-4/StatisticsCollector - Creating stats/ins-proc.csv
+[2013-01-11 11:15:04,872] WARN  NioDatagramAcceptor-1/DefaultExceptionMonitor - Unexpected exception.
+java.lang.InterruptedException
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(AbstractQueuedSynchronizer.java:1279)
+	at java.util.concurrent.Semaphore.acquire(Semaphore.java:286)
+	at org.apache.mina.core.polling.AbstractPollingConnectionlessIoAcceptor$Acceptor.run(AbstractPollingConnectionlessIoAcceptor.java:591)
+	at org.apache.mina.util.NamePreservingRunnable.run(NamePreservingRunnable.java:64)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:886)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:908)
+	at java.lang.Thread.run(Thread.java:680)
+[2013-01-11 11:15:06,879] INFO  main/StatisticsCollector - Creating trace-client/clt-ins-rtt.csv
+[2013-01-11 11:15:06,895] INFO  main/StatisticsCollector - Creating trace-client/clt-lkp-rtt.csv
+[2013-01-11 11:15:06,905] INFO  main/TraceClient - 
+==Insert==
+Min: 439us | Med: 722us | Max: 140,069us
+Total: 9  |  Success: 9  |  Loss: 0
+==Lookup==
+Min: 68us | Med: 368us | Max: 1,777us
+Total: 15  |  Success: 15  |  Bound: 9  |  Loss: 0
+
+[2013-01-11 11:15:06,905] DEBUG main/TraceClient - Finished main thread.
+[2013-01-11 11:15:06,905] INFO  Thread-3/TraceClient - Finished reading trace file. Waiting for outstanding messages.
+[2013-01-11 11:15:06,906] INFO  Thread-3/StatisticsCollector - Creating trace-client/clt-ins-rtt.csv
+[2013-01-11 11:15:06,916] INFO  Thread-3/StatisticsCollector - Creating trace-client/clt-lkp-rtt.csv
+[2013-01-11 11:15:06,929] INFO  Thread-3/TraceClient - 
+==Insert==
+Min: 439us | Med: 722us | Max: 140,069us
+Total: 9  |  Success: 9  |  Loss: 0
+==Lookup==
+Min: 68us | Med: 368us | Max: 1,777us
+Total: 15  |  Success: 15  |  Bound: 9  |  Loss: 0
+

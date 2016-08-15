@@ -1,0 +1,1772 @@
+Last login: Fri Jan 11 10:46:44 on ttys000
+Xiruos-MacBook-Pro:~ sissi$ cd Downloads/
+Xiruos-MacBook-Pro:Downloads sissi$ ls
+About Downloads.lpdf			cryptopp561.zip
+JavaForOSX.dmg				googlechrome.dmg
+MathMagicPE.80.dmg			libecc-0.14.0
+Quarantine				libecc-0.14.0.tar.gz
+apache-maven-3.0.4-bin.tar.gz.download	mac_656.mobileconfig
+cryptopp561
+Xiruos-MacBook-Pro:Downloads sissi$ cd /usr/local/
+Xiruos-MacBook-Pro:local sissi$ ls
+bin	lib	libexec	share	ssl	texlive
+Xiruos-MacBook-Pro:local sissi$ tar -zxvf ~/Downloads/apache-maven-3.0.4-bin.tar.gz
+x apache-maven-3.0.4/boot/plexus-classworlds-2.4.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/boot/plexus-classworlds-2.4.jar'
+x apache-maven-3.0.4/lib/maven-embedder-3.0.4.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/maven-embedder-3.0.4.jar'
+x apache-maven-3.0.4/lib/maven-settings-3.0.4.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/maven-settings-3.0.4.jar'
+x apache-maven-3.0.4/lib/plexus-utils-2.0.6.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/plexus-utils-2.0.6.jar'
+x apache-maven-3.0.4/lib/maven-core-3.0.4.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/maven-core-3.0.4.jar'
+x apache-maven-3.0.4/lib/maven-model-3.0.4.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/maven-model-3.0.4.jar'
+x apache-maven-3.0.4/lib/maven-settings-builder-3.0.4.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/maven-settings-builder-3.0.4.jar'
+x apache-maven-3.0.4/lib/plexus-interpolation-1.14.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/plexus-interpolation-1.14.jar'
+x apache-maven-3.0.4/lib/plexus-component-annotations-1.5.5.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/plexus-component-annotations-1.5.5.jar'
+x apache-maven-3.0.4/lib/plexus-sec-dispatcher-1.3.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/plexus-sec-dispatcher-1.3.jar'
+x apache-maven-3.0.4/lib/plexus-cipher-1.7.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/plexus-cipher-1.7.jar'
+x apache-maven-3.0.4/lib/maven-repository-metadata-3.0.4.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/maven-repository-metadata-3.0.4.jar'
+x apache-maven-3.0.4/lib/maven-artifact-3.0.4.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/maven-artifact-3.0.4.jar'
+x apache-maven-3.0.4/lib/maven-plugin-api-3.0.4.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/maven-plugin-api-3.0.4.jar'
+x apache-maven-3.0.4/lib/sisu-inject-plexus-2.3.0.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/sisu-inject-plexus-2.3.0.jar'
+x apache-maven-3.0.4/lib/sisu-inject-bean-2.3.0.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/sisu-inject-bean-2.3.0.jar'
+x apache-maven-3.0.4/lib/sisu-guice-3.1.0-no_aop.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/sisu-guice-3.1.0-no_aop.jar'
+x apache-maven-3.0.4/lib/sisu-guava-0.9.9.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/sisu-guava-0.9.9.jar'
+x apache-maven-3.0.4/lib/maven-model-builder-3.0.4.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/maven-model-builder-3.0.4.jar'
+x apache-maven-3.0.4/lib/maven-aether-provider-3.0.4.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/maven-aether-provider-3.0.4.jar'
+x apache-maven-3.0.4/lib/aether-api-1.13.1.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/aether-api-1.13.1.jar'
+x apache-maven-3.0.4/lib/aether-spi-1.13.1.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/aether-spi-1.13.1.jar'
+x apache-maven-3.0.4/lib/aether-util-1.13.1.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/aether-util-1.13.1.jar'
+x apache-maven-3.0.4/lib/aether-impl-1.13.1.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/aether-impl-1.13.1.jar'
+x apache-maven-3.0.4/lib/maven-compat-3.0.4.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/maven-compat-3.0.4.jar'
+x apache-maven-3.0.4/lib/wagon-provider-api-2.2.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/wagon-provider-api-2.2.jar'
+x apache-maven-3.0.4/lib/commons-cli-1.2.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/commons-cli-1.2.jar'
+x apache-maven-3.0.4/lib/wagon-http-2.2-shaded.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/wagon-http-2.2-shaded.jar'
+x apache-maven-3.0.4/lib/wagon-file-2.2.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/wagon-file-2.2.jar'
+x apache-maven-3.0.4/lib/aether-connector-wagon-1.13.1.jar: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/aether-connector-wagon-1.13.1.jar'
+x apache-maven-3.0.4/LICENSE.txt: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/LICENSE.txt'
+x apache-maven-3.0.4/NOTICE.txt: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/NOTICE.txt'
+x apache-maven-3.0.4/README.txt: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/README.txt'
+x apache-maven-3.0.4/bin/m2.conf: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/bin/m2.conf'
+x apache-maven-3.0.4/bin/mvn.bat: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/bin/mvn.bat'
+x apache-maven-3.0.4/bin/mvnDebug.bat: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/bin/mvnDebug.bat'
+x apache-maven-3.0.4/bin/mvn: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/bin/mvn'
+x apache-maven-3.0.4/bin/mvnDebug: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/bin/mvnDebug'
+x apache-maven-3.0.4/bin/mvnyjp: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/bin/mvnyjp'
+x apache-maven-3.0.4/conf/: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/conf'
+x apache-maven-3.0.4/conf/settings.xml: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/conf/settings.xml'
+x apache-maven-3.0.4/lib/: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib'
+x apache-maven-3.0.4/lib/ext/: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/ext'
+x apache-maven-3.0.4/lib/ext/README.txt: Failed to create dir 'apache-maven-3.0.4'Can't create 'apache-maven-3.0.4/lib/ext/README.txt'
+tar: Error exit delayed from previous errors.
+Xiruos-MacBook-Pro:local sissi$ sudo !!
+sudo tar -zxvf ~/Downloads/apache-maven-3.0.4-bin.tar.gz
+Password:
+x apache-maven-3.0.4/boot/plexus-classworlds-2.4.jar
+x apache-maven-3.0.4/lib/maven-embedder-3.0.4.jar
+x apache-maven-3.0.4/lib/maven-settings-3.0.4.jar
+x apache-maven-3.0.4/lib/plexus-utils-2.0.6.jar
+x apache-maven-3.0.4/lib/maven-core-3.0.4.jar
+x apache-maven-3.0.4/lib/maven-model-3.0.4.jar
+x apache-maven-3.0.4/lib/maven-settings-builder-3.0.4.jar
+x apache-maven-3.0.4/lib/plexus-interpolation-1.14.jar
+x apache-maven-3.0.4/lib/plexus-component-annotations-1.5.5.jar
+x apache-maven-3.0.4/lib/plexus-sec-dispatcher-1.3.jar
+x apache-maven-3.0.4/lib/plexus-cipher-1.7.jar
+x apache-maven-3.0.4/lib/maven-repository-metadata-3.0.4.jar
+x apache-maven-3.0.4/lib/maven-artifact-3.0.4.jar
+x apache-maven-3.0.4/lib/maven-plugin-api-3.0.4.jar
+x apache-maven-3.0.4/lib/sisu-inject-plexus-2.3.0.jar
+x apache-maven-3.0.4/lib/sisu-inject-bean-2.3.0.jar
+x apache-maven-3.0.4/lib/sisu-guice-3.1.0-no_aop.jar
+x apache-maven-3.0.4/lib/sisu-guava-0.9.9.jar
+x apache-maven-3.0.4/lib/maven-model-builder-3.0.4.jar
+x apache-maven-3.0.4/lib/maven-aether-provider-3.0.4.jar
+x apache-maven-3.0.4/lib/aether-api-1.13.1.jar
+x apache-maven-3.0.4/lib/aether-spi-1.13.1.jar
+x apache-maven-3.0.4/lib/aether-util-1.13.1.jar
+x apache-maven-3.0.4/lib/aether-impl-1.13.1.jar
+x apache-maven-3.0.4/lib/maven-compat-3.0.4.jar
+x apache-maven-3.0.4/lib/wagon-provider-api-2.2.jar
+x apache-maven-3.0.4/lib/commons-cli-1.2.jar
+x apache-maven-3.0.4/lib/wagon-http-2.2-shaded.jar
+x apache-maven-3.0.4/lib/wagon-file-2.2.jar
+x apache-maven-3.0.4/lib/aether-connector-wagon-1.13.1.jar
+x apache-maven-3.0.4/LICENSE.txt
+x apache-maven-3.0.4/NOTICE.txt
+x apache-maven-3.0.4/README.txt
+x apache-maven-3.0.4/bin/m2.conf
+x apache-maven-3.0.4/bin/mvn.bat
+x apache-maven-3.0.4/bin/mvnDebug.bat
+x apache-maven-3.0.4/bin/mvn
+x apache-maven-3.0.4/bin/mvnDebug
+x apache-maven-3.0.4/bin/mvnyjp
+x apache-maven-3.0.4/conf/
+x apache-maven-3.0.4/conf/settings.xml
+x apache-maven-3.0.4/lib/
+x apache-maven-3.0.4/lib/ext/
+x apache-maven-3.0.4/lib/ext/README.txt
+Xiruos-MacBook-Pro:local sissi$ sudo ln -s apache-maven-3.0.4/ maven
+Xiruos-MacBook-Pro:local sissi$ vi ~/.
+./
+../
+.CFUserTextEncoding
+.DS_Store
+.InstallAnywhere/
+.Trash/
+.Xauthority
+.bash_history
+.cups/
+.dropbox/
+.flexlmrc
+.fontconfig/
+.gdb_history
+.gnuplot_history
+.m2/
+.maplesoft/
+.matlab/
+.nchsoftware/
+.network_backups/
+.org.eclipse.epp.usagedata.recording.userId
+.rnd
+.serverauth.1714
+.serverauth.5620
+.sh_history
+.ssh/
+.viminfo
+.xdvirc
+Xiruos-MacBook-Pro:local sissi$ vi ~/.
+./
+../
+.CFUserTextEncoding
+.DS_Store
+.InstallAnywhere/
+.Trash/
+.Xauthority
+.bash_history
+.cups/
+.dropbox/
+.flexlmrc
+.fontconfig/
+.gdb_history
+.gnuplot_history
+.m2/
+.maplesoft/
+.matlab/
+.nchsoftware/
+.network_backups/
+.org.eclipse.epp.usagedata.recording.userId
+.rnd
+.serverauth.1714
+.serverauth.5620
+.sh_history
+.ssh/
+.viminfo
+.xdvirc
+Xiruos-MacBook-Pro:local sissi$ vi ~/.
+./
+../
+.CFUserTextEncoding
+.DS_Store
+.InstallAnywhere/
+.Trash/
+.Xauthority
+.bash_history
+.cups/
+.dropbox/
+.flexlmrc
+.fontconfig/
+.gdb_history
+.gnuplot_history
+.m2/
+.maplesoft/
+.matlab/
+.nchsoftware/
+.network_backups/
+.org.eclipse.epp.usagedata.recording.userId
+.rnd
+.serverauth.1714
+.serverauth.5620
+.sh_history
+.ssh/
+.viminfo
+.xdvirc
+Xiruos-MacBook-Pro:local sissi$ vi ~/.bash_login
+Xiruos-MacBook-Pro:local sissi$ source ~/.bash_login 
+Xiruos-MacBook-Pro:local sissi$ mvn
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 0.147s
+[INFO] Finished at: Fri Jan 11 10:57:50 EST 2013
+[INFO] Final Memory: 2M/81M
+[INFO] ------------------------------------------------------------------------
+[ERROR] No goals have been specified for this build. You must specify a valid lifecycle phase or a goal in the format <plugin-prefix>:<goal> or <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>. Available lifecycle phases are: validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy, pre-clean, clean, post-clean, pre-site, site, post-site, site-deploy. -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/NoGoalSpecifiedException
+Xiruos-MacBook-Pro:local sissi$ cd Deskto
+-bash: cd: Deskto: No such file or directory
+Xiruos-MacBook-Pro:local sissi$ ls
+apache-maven-3.0.4	libexec			ssl
+bin			maven			texlive
+lib			share
+Xiruos-MacBook-Pro:local sissi$ cd
+Xiruos-MacBook-Pro:~ sissi$ cd Desktop/gnrs/
+Xiruos-MacBook-Pro:gnrs sissi$ cd jserver/
+Xiruos-MacBook-Pro:jserver sissi$ ls
+README.md			install-to-project-repo.py
+gbench				lib
+gbench-local			plot.sh
+ggen				pom.xml
+ggen-local			repo
+gnrsd				src
+gnrsd-local			target
+gnrsd.init
+Xiruos-MacBook-Pro:jserver sissi$ cd lib/
+Xiruos-MacBook-Pro:lib sissi$ cd ../
+Xiruos-MacBook-Pro:jserver sissi$ ./install-to-project-repo.py -i
+-----
+Processing `lib/org.ardverk.patricia-trie_0.6.jar`
+Choose a correct version for `org.ardverk.patricia-trie_0.6`:
+1) trie_0.6
+2) 0.6
+2
+Choose a correct artifactId for `org.ardverk.patricia-trie`:
+1) patricia-trie
+2) ardverk.patricia-trie
+1
+[INFO] Scanning for projects...
+Downloading: http://repo.maven.apache.org/maven2/biz/aQute/bndlib/1.50.0/bndlib-1.50.0.jar
+Downloaded: http://repo.maven.apache.org/maven2/biz/aQute/bndlib/1.50.0/bndlib-1.50.0.jar (899 KB at 1097.8 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-surefire-report-plugin/2.6/maven-surefire-report-plugin-2.6.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-surefire-report-plugin/2.6/maven-surefire-report-plugin-2.6.pom (8 KB at 29.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/surefire/surefire/2.6/surefire-2.6.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/surefire/surefire/2.6/surefire-2.6.pom (9 KB at 172.8 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-surefire-report-plugin/2.6/maven-surefire-report-plugin-2.6.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-surefire-report-plugin/2.6/maven-surefire-report-plugin-2.6.jar (39 KB at 957.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-jar-plugin/2.4/maven-jar-plugin-2.4.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-jar-plugin/2.4/maven-jar-plugin-2.4.pom (6 KB at 271.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-plugins/22/maven-plugins-22.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-plugins/22/maven-plugins-22.pom (13 KB at 310.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-parent/21/maven-parent-21.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-parent/21/maven-parent-21.pom (26 KB at 735.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/apache/10/apache-10.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/apache/10/apache-10.pom (15 KB at 535.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-assembly-plugin/2.2/maven-assembly-plugin-2.2.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-assembly-plugin/2.2/maven-assembly-plugin-2.2.pom (17 KB at 351.2 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-plugins/18/maven-plugins-18.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-plugins/18/maven-plugins-18.pom (13 KB at 552.0 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-clean-plugin/2.4.1/maven-clean-plugin-2.4.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-clean-plugin/2.4.1/maven-clean-plugin-2.4.1.pom (5 KB at 203.0 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-install-plugin/2.3.1/maven-install-plugin-2.3.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-install-plugin/2.3.1/maven-install-plugin-2.3.1.pom (5 KB at 70.1 KB/sec)
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Global Name Resolution Service for Java 1.0.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-install-plugin:2.3.1:install-file (default-cli) @ gnrs-server ---
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-digest/1.0/plexus-digest-1.0.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-digest/1.0/plexus-digest-1.0.pom (2 KB at 49.2 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-components/1.1.7/plexus-components-1.1.7.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-components/1.1.7/plexus-components-1.1.7.pom (5 KB at 202.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-digest/1.0/plexus-digest-1.0.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-digest/1.0/plexus-digest-1.0.jar (12 KB at 428.9 KB/sec)
+[INFO] Installing /Users/sissi/Desktop/gnrs/jserver/lib/org.ardverk.patricia-trie_0.6.jar to /Users/sissi/Desktop/gnrs/jserver/repo/org/ardverk/patricia-trie/0.6/patricia-trie-0.6.jar
+[INFO] Installing /var/folders/r8/1lpdw1nj42ngwwfwc2362fph0000gn/T/mvninstall3200767036593318859.pom to /Users/sissi/Desktop/gnrs/jserver/repo/org/ardverk/patricia-trie/0.6/patricia-trie-0.6.pom
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 4.701s
+[INFO] Finished at: Fri Jan 11 10:58:23 EST 2013
+[INFO] Final Memory: 6M/81M
+[INFO] ------------------------------------------------------------------------
+<dependency>
+  <groupId>org.ardverk</groupId>
+  <artifactId>patricia-trie</artifactId>
+  <version>0.6</version>
+</dependency>
+Xiruos-MacBook-Pro:jserver sissi$ mvn clean package -DskipTests=true
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Global Name Resolution Service for Java 1.0.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-surefire-plugin/2.10/maven-surefire-plugin-2.10.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-surefire-plugin/2.10/maven-surefire-plugin-2.10.pom (11 KB at 91.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/surefire/surefire/2.10/surefire-2.10.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/surefire/surefire/2.10/surefire-2.10.pom (12 KB at 485.1 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-parent/20/maven-parent-20.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-parent/20/maven-parent-20.pom (25 KB at 471.3 KB/sec)
+[WARNING] The POM for org.ardverk:patricia-trie:jar:0.6 is missing, no dependency information available
+Downloading: file:///Users/sissi/Desktop/gnrs/jserver/repo/org/apache/mina/mina-core/2.0.7/mina-core-2.0.7.jar
+Downloading: http://download.oracle.com/maven/org/apache/mina/mina-core/2.0.7/mina-core-2.0.7.jar
+Downloading: http://repo.maven.apache.org/maven2/org/apache/mina/mina-core/2.0.7/mina-core-2.0.7.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/mina/mina-core/2.0.7/mina-core-2.0.7.jar (630 KB at 2450.1 KB/sec)
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 3.106s
+[INFO] Finished at: Fri Jan 11 10:58:35 EST 2013
+[INFO] Final Memory: 6M/81M
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal on project gnrs-server: Could not resolve dependencies for project edu.rutgers.winlab.mobilityfirst:gnrs-server:jar:1.0.0-SNAPSHOT: Failure to find org.ardverk:patricia-trie:jar:0.6 in file:///Users/sissi/Desktop/gnrs/jserver/repo was cached in the local repository, resolution will not be reattempted until the update interval of repo has elapsed or updates are forced -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/DependencyResolutionException
+Xiruos-MacBook-Pro:jserver sissi$ mvn clean package -DskipTests=true -U
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Global Name Resolution Service for Java 1.0.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+Downloading: file:///Users/sissi/Desktop/gnrs/jserver/repo/org/ardverk/patricia-trie/0.6/patricia-trie-0.6.pom
+Downloaded: file:///Users/sissi/Desktop/gnrs/jserver/repo/org/ardverk/patricia-trie/0.6/patricia-trie-0.6.pom (466 B at 65.0 KB/sec)
+Downloading: file:///Users/sissi/Desktop/gnrs/jserver/repo/org/ardverk/patricia-trie/0.6/patricia-trie-0.6.jar
+Downloaded: file:///Users/sissi/Desktop/gnrs/jserver/repo/org/ardverk/patricia-trie/0.6/patricia-trie-0.6.jar (53 KB at 3280.1 KB/sec)
+[INFO] 
+[INFO] --- maven-clean-plugin:2.4.1:clean (default-clean) @ gnrs-server ---
+[INFO] Deleting /Users/sissi/Desktop/gnrs/jserver/target
+[INFO] 
+[INFO] --- cobertura-maven-plugin:2.5.2:clean (default) @ gnrs-server ---
+Downloading: http://repo.maven.apache.org/maven2/net/sourceforge/cobertura/cobertura/1.9.4.1/cobertura-1.9.4.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/net/sourceforge/cobertura/cobertura/1.9.4.1/cobertura-1.9.4.1.pom (2 KB at 7.2 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/oro/oro/2.0.8/oro-2.0.8.pom
+Downloaded: http://repo.maven.apache.org/maven2/oro/oro/2.0.8/oro-2.0.8.pom (140 B at 5.1 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/asm/asm/3.0/asm-3.0.pom
+Downloaded: http://repo.maven.apache.org/maven2/asm/asm/3.0/asm-3.0.pom (360 B at 15.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/asm/asm-parent/3.0/asm-parent-3.0.pom
+Downloaded: http://repo.maven.apache.org/maven2/asm/asm-parent/3.0/asm-parent-3.0.pom (3 KB at 83.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/asm/asm-tree/3.0/asm-tree-3.0.pom
+Downloaded: http://repo.maven.apache.org/maven2/asm/asm-tree/3.0/asm-tree-3.0.pom (499 B at 15.7 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/log4j/log4j/1.2.9/log4j-1.2.9.pom
+Downloaded: http://repo.maven.apache.org/maven2/log4j/log4j/1.2.9/log4j-1.2.9.pom (144 B at 6.7 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/ant/ant/1.7.0/ant-1.7.0.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/ant/ant/1.7.0/ant-1.7.0.pom (10 KB at 49.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/ant/ant-parent/1.7.0/ant-parent-1.7.0.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/ant/ant-parent/1.7.0/ant-parent-1.7.0.pom (5 KB at 65.8 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/ant/ant-launcher/1.7.0/ant-launcher-1.7.0.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/ant/ant-launcher/1.7.0/ant-launcher-1.7.0.pom (3 KB at 77.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/net/sourceforge/cobertura/cobertura-runtime/1.9.4.1/cobertura-runtime-1.9.4.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/net/sourceforge/cobertura/cobertura-runtime/1.9.4.1/cobertura-runtime-1.9.4.1.pom (2 KB at 42.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/urbanophile/java-getopt/1.0.9/java-getopt-1.0.9.pom
+Downloaded: http://repo.maven.apache.org/maven2/urbanophile/java-getopt/1.0.9/java-getopt-1.0.9.pom (157 B at 7.0 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-core/2.0.8/maven-core-2.0.8.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-core/2.0.8/maven-core-2.0.8.pom (7 KB at 329.8 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/junit/junit/4.10/junit-4.10.pom
+Downloaded: http://repo.maven.apache.org/maven2/junit/junit/4.10/junit-4.10.pom (3 KB at 23.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1.pom (481 B at 17.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/hamcrest/hamcrest-parent/1.1/hamcrest-parent-1.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/hamcrest/hamcrest-parent/1.1/hamcrest-parent-1.1.pom (6 KB at 179.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-plugin-parameter-documenter/2.0.8/maven-plugin-parameter-documenter-2.0.8.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-plugin-parameter-documenter/2.0.8/maven-plugin-parameter-documenter-2.0.8.pom (2 KB at 95.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting-api/2.0.8/maven-reporting-api-2.0.8.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting-api/2.0.8/maven-reporting-api-2.0.8.pom (2 KB at 92.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting/2.0.8/maven-reporting-2.0.8.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting/2.0.8/maven-reporting-2.0.8.pom (2 KB at 62.7 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-sink-api/1.0-alpha-9/doxia-sink-api-1.0-alpha-9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-sink-api/1.0-alpha-9/doxia-sink-api-1.0-alpha-9.pom (2 KB at 7.7 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia/1.0-alpha-9/doxia-1.0-alpha-9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia/1.0-alpha-9/doxia-1.0-alpha-9.pom (9 KB at 44.0 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-error-diagnostics/2.0.8/maven-error-diagnostics-2.0.8.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-error-diagnostics/2.0.8/maven-error-diagnostics-2.0.8.pom (2 KB at 11.1 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-plugin-api/2.0.1/maven-plugin-api-2.0.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-plugin-api/2.0.1/maven-plugin-api-2.0.1.pom (643 B at 34.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven/2.0.1/maven-2.0.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven/2.0.1/maven-2.0.1.pom (12 KB at 401.1 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-plugin-descriptor/2.0.8/maven-plugin-descriptor-2.0.8.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-plugin-descriptor/2.0.8/maven-plugin-descriptor-2.0.8.pom (3 KB at 112.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-monitor/2.0.8/maven-monitor-2.0.8.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-monitor/2.0.8/maven-monitor-2.0.8.pom (2 KB at 69.7 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-plugin-api/2.0.8/maven-plugin-api-2.0.8.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-plugin-api/2.0.8/maven-plugin-api-2.0.8.pom (2 KB at 47.1 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting-impl/2.0.4.2/maven-reporting-impl-2.0.4.2.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting-impl/2.0.4.2/maven-reporting-impl-2.0.4.2.pom (6 KB at 180.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-shared-components/11/maven-shared-components-11.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-shared-components/11/maven-shared-components-11.pom (9 KB at 354.2 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-parent/11/maven-parent-11.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-parent/11/maven-parent-11.pom (32 KB at 208.2 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/apache/5/apache-5.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/apache/5/apache-5.pom (5 KB at 174.0 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-project/2.0.4/maven-project-2.0.4.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-project/2.0.4/maven-project-2.0.4.pom (2 KB at 35.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven/2.0.4/maven-2.0.4.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven/2.0.4/maven-2.0.4.pom (12 KB at 371.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-settings/2.0.4/maven-settings-2.0.4.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-settings/2.0.4/maven-settings-2.0.4.pom (2 KB at 8.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-model/2.0.4/maven-model-2.0.4.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-model/2.0.4/maven-model-2.0.4.pom (3 KB at 13.1 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/1.1/plexus-utils-1.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/1.1/plexus-utils-1.1.pom (767 B at 11.7 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-container-default/1.0-alpha-9/plexus-container-default-1.0-alpha-9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-container-default/1.0-alpha-9/plexus-container-default-1.0-alpha-9.pom (2 KB at 63.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-profile/2.0.4/maven-profile-2.0.4.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-profile/2.0.4/maven-profile-2.0.4.pom (2 KB at 56.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-artifact-manager/2.0.4/maven-artifact-manager-2.0.4.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-artifact-manager/2.0.4/maven-artifact-manager-2.0.4.pom (2 KB at 53.0 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-repository-metadata/2.0.4/maven-repository-metadata-2.0.4.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-repository-metadata/2.0.4/maven-repository-metadata-2.0.4.pom (2 KB at 80.7 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-artifact/2.0.4/maven-artifact-2.0.4.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-artifact/2.0.4/maven-artifact-2.0.4.pom (765 B at 34.0 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/commons-validator/commons-validator/1.2.0/commons-validator-1.2.0.pom
+Downloaded: http://repo.maven.apache.org/maven2/commons-validator/commons-validator/1.2.0/commons-validator-1.2.0.pom (9 KB at 422.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0.pom
+Downloaded: http://repo.maven.apache.org/maven2/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0.pom (357 B at 20.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/commons-logging/commons-logging/1.0.3/commons-logging-1.0.3.pom
+Downloaded: http://repo.maven.apache.org/maven2/commons-logging/commons-logging/1.0.3/commons-logging-1.0.3.pom (866 B at 49.7 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/commons-digester/commons-digester/1.6/commons-digester-1.6.pom
+Downloaded: http://repo.maven.apache.org/maven2/commons-digester/commons-digester/1.6/commons-digester-1.6.pom (974 B at 21.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/commons-beanutils/commons-beanutils/1.6/commons-beanutils-1.6.pom
+Downloaded: http://repo.maven.apache.org/maven2/commons-beanutils/commons-beanutils/1.6/commons-beanutils-1.6.pom (3 KB at 125.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/commons-logging/commons-logging/1.0/commons-logging-1.0.pom
+Downloaded: http://repo.maven.apache.org/maven2/commons-logging/commons-logging/1.0/commons-logging-1.0.pom (163 B at 7.2 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/commons-collections/commons-collections/2.0/commons-collections-2.0.pom
+Downloaded: http://repo.maven.apache.org/maven2/commons-collections/commons-collections/2.0/commons-collections-2.0.pom (171 B at 8.8 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/commons-collections/commons-collections/2.1/commons-collections-2.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/commons-collections/commons-collections/2.1/commons-collections-2.1.pom (4 KB at 181.0 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2.pom
+Downloaded: http://repo.maven.apache.org/maven2/xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2.pom (3 KB at 115.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.pom
+Downloaded: http://repo.maven.apache.org/maven2/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.pom (6 KB at 24.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/xml-apis/xml-apis/2.0.2/xml-apis-2.0.2.pom
+Downloaded: http://repo.maven.apache.org/maven2/xml-apis/xml-apis/2.0.2/xml-apis-2.0.2.pom (346 B at 19.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-core/1.0/doxia-core-1.0.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-core/1.0/doxia-core-1.0.pom (3 KB at 123.1 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia/1.0/doxia-1.0.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia/1.0/doxia-1.0.pom (10 KB at 294.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-parent/10/maven-parent-10.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-parent/10/maven-parent-10.pom (31 KB at 996.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-sink-api/1.0/doxia-sink-api-1.0.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-sink-api/1.0/doxia-sink-api-1.0.pom (2 KB at 64.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/1.5.7/plexus-utils-1.5.7.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/1.5.7/plexus-utils-1.5.7.pom (8 KB at 201.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-container-default/1.0-alpha-30/plexus-container-default-1.0-alpha-30.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-container-default/1.0-alpha-30/plexus-container-default-1.0-alpha-30.pom (4 KB at 154.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-containers/1.0-alpha-30/plexus-containers-1.0-alpha-30.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-containers/1.0-alpha-30/plexus-containers-1.0-alpha-30.pom (2 KB at 92.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/1.4.5/plexus-utils-1.4.5.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/1.4.5/plexus-utils-1.4.5.pom (3 KB at 76.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-classworlds/1.2-alpha-9/plexus-classworlds-1.2-alpha-9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-classworlds/1.2-alpha-9/plexus-classworlds-1.2-alpha-9.pom (4 KB at 165.7 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus/1.0.10/plexus-1.0.10.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus/1.0.10/plexus-1.0.10.pom (9 KB at 237.0 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting-api/2.0.4/maven-reporting-api-2.0.4.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting-api/2.0.4/maven-reporting-api-2.0.4.pom (902 B at 51.8 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting/2.0.4/maven-reporting-2.0.4.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting/2.0.4/maven-reporting-2.0.4.pom (700 B at 38.0 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-site-renderer/1.0/doxia-site-renderer-1.0.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-site-renderer/1.0/doxia-site-renderer-1.0.pom (5 KB at 29.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-sitetools/1.0/doxia-sitetools-1.0.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-sitetools/1.0/doxia-sitetools-1.0.pom (10 KB at 492.7 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-i18n/1.0-beta-7/plexus-i18n-1.0-beta-7.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-i18n/1.0-beta-7/plexus-i18n-1.0-beta-7.pom (2 KB at 38.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-components/1.1.12/plexus-components-1.1.12.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-components/1.1.12/plexus-components-1.1.12.pom (3 KB at 139.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-velocity/1.1.7/plexus-velocity-1.1.7.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-velocity/1.1.7/plexus-velocity-1.1.7.pom (2 KB at 106.2 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-container-default/1.0-alpha-20/plexus-container-default-1.0-alpha-20.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-container-default/1.0-alpha-20/plexus-container-default-1.0-alpha-20.pom (3 KB at 13.0 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-containers/1.0-alpha-20/plexus-containers-1.0-alpha-20.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-containers/1.0-alpha-20/plexus-containers-1.0-alpha-20.pom (2 KB at 92.1 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/1.3/plexus-utils-1.3.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/1.3/plexus-utils-1.3.pom (2 KB at 37.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-classworlds/1.2-alpha-7/plexus-classworlds-1.2-alpha-7.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-classworlds/1.2-alpha-7/plexus-classworlds-1.2-alpha-7.pom (3 KB at 128.7 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus/1.0.9/plexus-1.0.9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus/1.0.9/plexus-1.0.9.pom (8 KB at 277.8 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/velocity/velocity/1.5/velocity-1.5.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/velocity/velocity/1.5/velocity-1.5.pom (8 KB at 120.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/commons-collections/commons-collections/3.1/commons-collections-3.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/commons-collections/commons-collections/3.1/commons-collections-3.1.pom (6 KB at 28.8 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/commons-lang/commons-lang/2.1/commons-lang-2.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/commons-lang/commons-lang/2.1/commons-lang-2.1.pom (10 KB at 359.1 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-decoration-model/1.0/doxia-decoration-model-1.0.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-decoration-model/1.0/doxia-decoration-model-1.0.pom (4 KB at 171.1 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/commons-collections/commons-collections/3.2/commons-collections-3.2.pom
+Downloaded: http://repo.maven.apache.org/maven2/commons-collections/commons-collections/3.2/commons-collections-3.2.pom (11 KB at 414.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-module-apt/1.0/doxia-module-apt-1.0.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-module-apt/1.0/doxia-module-apt-1.0.pom (3 KB at 122.2 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-modules/1.0/doxia-modules-1.0.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-modules/1.0/doxia-modules-1.0.pom (3 KB at 116.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-module-fml/1.0/doxia-module-fml-1.0.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-module-fml/1.0/doxia-module-fml-1.0.pom (3 KB at 65.7 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-module-xdoc/1.0/doxia-module-xdoc-1.0.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-module-xdoc/1.0/doxia-module-xdoc-1.0.pom (3 KB at 70.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-module-xhtml/1.0/doxia-module-xhtml-1.0.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-module-xhtml/1.0/doxia-module-xhtml-1.0.pom (2 KB at 91.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/commons-lang/commons-lang/2.4/commons-lang-2.4.pom
+Downloaded: http://repo.maven.apache.org/maven2/commons-lang/commons-lang/2.4/commons-lang-2.4.pom (14 KB at 593.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/commons/commons-parent/9/commons-parent-9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/commons/commons-parent/9/commons-parent-9.pom (22 KB at 931.1 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/2.0.2/plexus-utils-2.0.2.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/2.0.2/plexus-utils-2.0.2.pom (4 KB at 181.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-invoker/2.0.11/maven-invoker-2.0.11.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-invoker/2.0.11/maven-invoker-2.0.11.pom (5 KB at 236.0 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-shared-components/12/maven-shared-components-12.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-shared-components/12/maven-shared-components-12.pom (10 KB at 479.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-parent/13/maven-parent-13.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-parent/13/maven-parent-13.pom (23 KB at 119.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/apache/6/apache-6.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/apache/6/apache-6.pom (13 KB at 595.1 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/1.5.6/plexus-utils-1.5.6.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/1.5.6/plexus-utils-1.5.6.pom (6 KB at 287.7 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus/1.0.12/plexus-1.0.12.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus/1.0.12/plexus-1.0.12.pom (10 KB at 382.8 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/net/sourceforge/cobertura/cobertura/1.9.4.1/cobertura-1.9.4.1.jar
+Downloading: http://repo.maven.apache.org/maven2/oro/oro/2.0.8/oro-2.0.8.jar
+Downloading: http://repo.maven.apache.org/maven2/asm/asm/3.0/asm-3.0.jar
+Downloading: http://repo.maven.apache.org/maven2/asm/asm-tree/3.0/asm-tree-3.0.jar
+Downloading: http://repo.maven.apache.org/maven2/log4j/log4j/1.2.9/log4j-1.2.9.jar
+Downloaded: http://repo.maven.apache.org/maven2/asm/asm-tree/3.0/asm-tree-3.0.jar (22 KB at 259.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/ant/ant/1.7.0/ant-1.7.0.jar
+Downloaded: http://repo.maven.apache.org/maven2/asm/asm/3.0/asm-3.0.jar (42 KB at 331.0 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/ant/ant-launcher/1.7.0/ant-launcher-1.7.0.jar
+Downloaded: http://repo.maven.apache.org/maven2/oro/oro/2.0.8/oro-2.0.8.jar (64 KB at 388.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/urbanophile/java-getopt/1.0.9/java-getopt-1.0.9.jar
+Downloaded: http://repo.maven.apache.org/maven2/net/sourceforge/cobertura/cobertura/1.9.4.1/cobertura-1.9.4.1.jar (443 KB at 1763.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting-api/2.0.8/maven-reporting-api-2.0.8.jar
+Downloaded: http://repo.maven.apache.org/maven2/log4j/log4j/1.2.9/log4j-1.2.9.jar (345 KB at 934.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-sink-api/1.0-alpha-9/doxia-sink-api-1.0-alpha-9.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-sink-api/1.0-alpha-9/doxia-sink-api-1.0-alpha-9.jar (10 KB at 284.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting-impl/2.0.4.2/maven-reporting-impl-2.0.4.2.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting-impl/2.0.4.2/maven-reporting-impl-2.0.4.2.jar (20 KB at 613.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/commons-validator/commons-validator/1.2.0/commons-validator-1.2.0.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting-api/2.0.8/maven-reporting-api-2.0.8.jar (10 KB at 53.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0.jar
+Downloaded: http://repo.maven.apache.org/maven2/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0.jar (185 KB at 1616.2 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/commons-digester/commons-digester/1.6/commons-digester-1.6.jar
+Downloaded: http://repo.maven.apache.org/maven2/commons-validator/commons-validator/1.2.0/commons-validator-1.2.0.jar (89 KB at 747.7 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar
+Downloaded: http://repo.maven.apache.org/maven2/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar (38 KB at 951.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/ant/ant-launcher/1.7.0/ant-launcher-1.7.0.jar (12 KB at 23.1 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-core/1.0/doxia-core-1.0.jar
+Downloaded: http://repo.maven.apache.org/maven2/commons-digester/commons-digester/1.6/commons-digester-1.6.jar (165 KB at 1382.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-site-renderer/1.0/doxia-site-renderer-1.0.jar
+Downloaded: http://repo.maven.apache.org/maven2/xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2.jar (107 KB at 1241.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-i18n/1.0-beta-7/plexus-i18n-1.0-beta-7.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/ant/ant/1.7.0/ant-1.7.0.jar (1260 KB at 2008.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-velocity/1.1.7/plexus-velocity-1.1.7.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-i18n/1.0-beta-7/plexus-i18n-1.0-beta-7.jar (11 KB at 342.1 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/velocity/velocity/1.5/velocity-1.5.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-core/1.0/doxia-core-1.0.jar (54 KB at 609.8 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-decoration-model/1.0/doxia-decoration-model-1.0.jar
+Downloaded: http://repo.maven.apache.org/maven2/urbanophile/java-getopt/1.0.9/java-getopt-1.0.9.jar (53 KB at 93.0 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/commons-collections/commons-collections/3.2/commons-collections-3.2.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-velocity/1.1.7/plexus-velocity-1.1.7.jar (8 KB at 299.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-module-apt/1.0/doxia-module-apt-1.0.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-decoration-model/1.0/doxia-decoration-model-1.0.jar (48 KB at 724.8 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-module-fml/1.0/doxia-module-fml-1.0.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-module-apt/1.0/doxia-module-apt-1.0.jar (46 KB at 604.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-module-xdoc/1.0/doxia-module-xdoc-1.0.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-site-renderer/1.0/doxia-site-renderer-1.0.jar (46 KB at 311.1 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-module-xhtml/1.0/doxia-module-xhtml-1.0.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-module-fml/1.0/doxia-module-fml-1.0.jar (19 KB at 317.7 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/commons-lang/commons-lang/2.4/commons-lang-2.4.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-module-xdoc/1.0/doxia-module-xdoc-1.0.jar (28 KB at 577.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/2.0.2/plexus-utils-2.0.2.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-module-xhtml/1.0/doxia-module-xhtml-1.0.jar (22 KB at 322.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-invoker/2.0.11/maven-invoker-2.0.11.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-invoker/2.0.11/maven-invoker-2.0.11.jar (29 KB at 340.1 KB/sec)
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/velocity/velocity/1.5/velocity-1.5.jar (383 KB at 1434.2 KB/sec)
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/2.0.2/plexus-utils-2.0.2.jar (218 KB at 1169.0 KB/sec)
+Downloaded: http://repo.maven.apache.org/maven2/commons-lang/commons-lang/2.4/commons-lang-2.4.jar (256 KB at 781.9 KB/sec)
+Downloaded: http://repo.maven.apache.org/maven2/commons-collections/commons-collections/3.2/commons-collections-3.2.jar (558 KB at 1223.4 KB/sec)
+[INFO] 
+[INFO] --- maven-resources-plugin:2.5:resources (default-resources) @ gnrs-server ---
+[debug] execute contextualize
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 9 resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:2.0.2:compile (default-compile) @ gnrs-server ---
+[INFO] Compiling 77 source files to /Users/sissi/Desktop/gnrs/jserver/target/classes
+[INFO] 
+[INFO] --- maven-resources-plugin:2.5:testResources (default-testResources) @ gnrs-server ---
+[debug] execute contextualize
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 9 resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:2.0.2:testCompile (default-testCompile) @ gnrs-server ---
+[INFO] Compiling 30 source files to /Users/sissi/Desktop/gnrs/jserver/target/test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.10:test (default-test) @ gnrs-server ---
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-plugin-api/2.0.9/maven-plugin-api-2.0.9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-plugin-api/2.0.9/maven-plugin-api-2.0.9.pom (2 KB at 52.1 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven/2.0.9/maven-2.0.9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven/2.0.9/maven-2.0.9.pom (19 KB at 461.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/surefire/surefire-booter/2.10/surefire-booter-2.10.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/surefire/surefire-booter/2.10/surefire-booter-2.10.pom (3 KB at 79.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/surefire/surefire-api/2.10/surefire-api-2.10.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/surefire/surefire-api/2.10/surefire-api-2.10.pom (3 KB at 72.0 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/surefire/maven-surefire-common/2.10/maven-surefire-common-2.10.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/surefire/maven-surefire-common/2.10/maven-surefire-common-2.10.pom (4 KB at 93.2 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-artifact/2.0.9/maven-artifact-2.0.9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-artifact/2.0.9/maven-artifact-2.0.9.pom (2 KB at 56.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-project/2.0.9/maven-project-2.0.9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-project/2.0.9/maven-project-2.0.9.pom (3 KB at 94.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-settings/2.0.9/maven-settings-2.0.9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-settings/2.0.9/maven-settings-2.0.9.pom (3 KB at 100.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-model/2.0.9/maven-model-2.0.9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-model/2.0.9/maven-model-2.0.9.pom (4 KB at 153.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-profile/2.0.9/maven-profile-2.0.9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-profile/2.0.9/maven-profile-2.0.9.pom (3 KB at 71.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-artifact-manager/2.0.9/maven-artifact-manager-2.0.9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-artifact-manager/2.0.9/maven-artifact-manager-2.0.9.pom (3 KB at 138.8 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-repository-metadata/2.0.9/maven-repository-metadata-2.0.9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-repository-metadata/2.0.9/maven-repository-metadata-2.0.9.pom (2 KB at 88.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-plugin-registry/2.0.9/maven-plugin-registry-2.0.9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-plugin-registry/2.0.9/maven-plugin-registry-2.0.9.pom (2 KB at 96.2 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-core/2.0.9/maven-core-2.0.9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-core/2.0.9/maven-core-2.0.9.pom (8 KB at 362.0 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-plugin-parameter-documenter/2.0.9/maven-plugin-parameter-documenter-2.0.9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-plugin-parameter-documenter/2.0.9/maven-plugin-parameter-documenter-2.0.9.pom (2 KB at 100.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting-api/2.0.9/maven-reporting-api-2.0.9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting-api/2.0.9/maven-reporting-api-2.0.9.pom (2 KB at 80.0 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting/2.0.9/maven-reporting-2.0.9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting/2.0.9/maven-reporting-2.0.9.pom (2 KB at 60.1 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-error-diagnostics/2.0.9/maven-error-diagnostics-2.0.9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-error-diagnostics/2.0.9/maven-error-diagnostics-2.0.9.pom (2 KB at 77.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-plugin-descriptor/2.0.9/maven-plugin-descriptor-2.0.9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-plugin-descriptor/2.0.9/maven-plugin-descriptor-2.0.9.pom (3 KB at 77.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-monitor/2.0.9/maven-monitor-2.0.9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-monitor/2.0.9/maven-monitor-2.0.9.pom (2 KB at 54.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-toolchain/2.0.9/maven-toolchain-2.0.9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-toolchain/2.0.9/maven-toolchain-2.0.9.pom (4 KB at 99.8 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-common-artifact-filters/1.3/maven-common-artifact-filters-1.3.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-common-artifact-filters/1.3/maven-common-artifact-filters-1.3.pom (4 KB at 164.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/surefire/surefire-booter/2.10/surefire-booter-2.10.jar
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/surefire/surefire-api/2.10/surefire-api-2.10.jar
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/surefire/maven-surefire-common/2.10/maven-surefire-common-2.10.jar
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-common-artifact-filters/1.3/maven-common-artifact-filters-1.3.jar
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting-api/2.0.9/maven-reporting-api-2.0.9.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/surefire/surefire-booter/2.10/surefire-booter-2.10.jar (34 KB at 918.3 KB/sec)
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting-api/2.0.9/maven-reporting-api-2.0.9.jar (10 KB at 147.8 KB/sec)
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/surefire/maven-surefire-common/2.10/maven-surefire-common-2.10.jar (60 KB at 635.4 KB/sec)
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-common-artifact-filters/1.3/maven-common-artifact-filters-1.3.jar (31 KB at 326.1 KB/sec)
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/surefire/surefire-api/2.10/surefire-api-2.10.jar (158 KB at 1175.7 KB/sec)
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- maven-jar-plugin:2.4:jar (default-jar) @ gnrs-server ---
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-archiver/2.5/maven-archiver-2.5.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-archiver/2.5/maven-archiver-2.5.pom (5 KB at 49.8 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-shared-components/17/maven-shared-components-17.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-shared-components/17/maven-shared-components-17.pom (9 KB at 424.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-archiver/2.1/plexus-archiver-2.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-archiver/2.1/plexus-archiver-2.1.pom (3 KB at 62.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/sonatype/spice/spice-parent/17/spice-parent-17.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/sonatype/spice/spice-parent/17/spice-parent-17.pom (7 KB at 275.0 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/sonatype/forge/forge-parent/10/forge-parent-10.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/sonatype/forge/forge-parent/10/forge-parent-10.pom (14 KB at 630.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/3.0/plexus-utils-3.0.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/3.0/plexus-utils-3.0.pom (4 KB at 198.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-io/2.0.2/plexus-io-2.0.2.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-io/2.0.2/plexus-io-2.0.2.pom (2 KB at 26.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-components/1.1.19/plexus-components-1.1.19.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-components/1.1.19/plexus-components-1.1.19.pom (3 KB at 32.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus/3.0.1/plexus-3.0.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus/3.0.1/plexus-3.0.1.pom (19 KB at 124.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-interpolation/1.15/plexus-interpolation-1.15.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-interpolation/1.15/plexus-interpolation-1.15.pom (1018 B at 4.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-archiver/2.5/maven-archiver-2.5.jar
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-interpolation/1.15/plexus-interpolation-1.15.jar
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-archiver/2.1/plexus-archiver-2.1.jar
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-io/2.0.2/plexus-io-2.0.2.jar
+Downloading: http://repo.maven.apache.org/maven2/commons-lang/commons-lang/2.1/commons-lang-2.1.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-archiver/2.5/maven-archiver-2.5.jar (22 KB at 147.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/3.0/plexus-utils-3.0.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-interpolation/1.15/plexus-interpolation-1.15.jar (60 KB at 245.0 KB/sec)
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-io/2.0.2/plexus-io-2.0.2.jar (57 KB at 242.1 KB/sec)
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-archiver/2.1/plexus-archiver-2.1.jar (181 KB at 205.8 KB/sec)
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/3.0/plexus-utils-3.0.jar (221 KB at 231.9 KB/sec)
+Downloaded: http://repo.maven.apache.org/maven2/commons-lang/commons-lang/2.1/commons-lang-2.1.jar (203 KB at 172.9 KB/sec)
+[INFO] Building jar: /Users/sissi/Desktop/gnrs/jserver/target/gnrs-server-1.0.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --- maven-assembly-plugin:2.2:single (build-jar-with-dependencies) @ gnrs-server ---
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-plugin-api/2.2.1/maven-plugin-api-2.2.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-plugin-api/2.2.1/maven-plugin-api-2.2.1.pom (2 KB at 17.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven/2.2.1/maven-2.2.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven/2.2.1/maven-2.2.1.pom (22 KB at 232.8 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-core/2.2.1/maven-core-2.2.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-core/2.2.1/maven-core-2.2.1.pom (12 KB at 124.8 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-settings/2.2.1/maven-settings-2.2.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-settings/2.2.1/maven-settings-2.2.1.pom (3 KB at 28.8 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-model/2.2.1/maven-model-2.2.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-model/2.2.1/maven-model-2.2.1.pom (4 KB at 8.1 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-interpolation/1.11/plexus-interpolation-1.11.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-interpolation/1.11/plexus-interpolation-1.11.pom (889 B at 15.2 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-plugin-parameter-documenter/2.2.1/maven-plugin-parameter-documenter-2.2.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-plugin-parameter-documenter/2.2.1/maven-plugin-parameter-documenter-2.2.1.pom (2 KB at 26.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/slf4j/slf4j-jdk14/1.5.6/slf4j-jdk14-1.5.6.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/slf4j/slf4j-jdk14/1.5.6/slf4j-jdk14-1.5.6.pom (2 KB at 36.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/slf4j/slf4j-parent/1.5.6/slf4j-parent-1.5.6.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/slf4j/slf4j-parent/1.5.6/slf4j-parent-1.5.6.pom (8 KB at 83.2 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/slf4j/slf4j-api/1.5.6/slf4j-api-1.5.6.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/slf4j/slf4j-api/1.5.6/slf4j-api-1.5.6.pom (3 KB at 71.1 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/slf4j/jcl-over-slf4j/1.5.6/jcl-over-slf4j-1.5.6.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/slf4j/jcl-over-slf4j/1.5.6/jcl-over-slf4j-1.5.6.pom (3 KB at 124.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting-api/2.2.1/maven-reporting-api-2.2.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting-api/2.2.1/maven-reporting-api-2.2.1.pom (2 KB at 100.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting/2.2.1/maven-reporting-2.2.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting/2.2.1/maven-reporting-2.2.1.pom (2 KB at 78.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-sink-api/1.1/doxia-sink-api-1.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-sink-api/1.1/doxia-sink-api-1.1.pom (2 KB at 110.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia/1.1/doxia-1.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia/1.1/doxia-1.1.pom (15 KB at 644.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-logging-api/1.1/doxia-logging-api-1.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-logging-api/1.1/doxia-logging-api-1.1.pom (2 KB at 85.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-profile/2.2.1/maven-profile-2.2.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-profile/2.2.1/maven-profile-2.2.1.pom (3 KB at 101.0 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-artifact/2.2.1/maven-artifact-2.2.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-artifact/2.2.1/maven-artifact-2.2.1.pom (2 KB at 81.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-repository-metadata/2.2.1/maven-repository-metadata-2.2.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-repository-metadata/2.2.1/maven-repository-metadata-2.2.1.pom (2 KB at 87.0 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-error-diagnostics/2.2.1/maven-error-diagnostics-2.2.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-error-diagnostics/2.2.1/maven-error-diagnostics-2.2.1.pom (2 KB at 92.7 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-project/2.2.1/maven-project-2.2.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-project/2.2.1/maven-project-2.2.1.pom (3 KB at 142.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-artifact-manager/2.2.1/maven-artifact-manager-2.2.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-artifact-manager/2.2.1/maven-artifact-manager-2.2.1.pom (4 KB at 34.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/backport-util-concurrent/backport-util-concurrent/3.1/backport-util-concurrent-3.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/backport-util-concurrent/backport-util-concurrent/3.1/backport-util-concurrent-3.1.pom (880 B at 4.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-plugin-registry/2.2.1/maven-plugin-registry-2.2.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-plugin-registry/2.2.1/maven-plugin-registry-2.2.1.pom (2 KB at 9.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/commons-cli/commons-cli/1.2/commons-cli-1.2.pom
+Downloaded: http://repo.maven.apache.org/maven2/commons-cli/commons-cli/1.2/commons-cli-1.2.pom (8 KB at 278.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/commons/commons-parent/11/commons-parent-11.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/commons/commons-parent/11/commons-parent-11.pom (25 KB at 891.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-plugin-descriptor/2.2.1/maven-plugin-descriptor-2.2.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-plugin-descriptor/2.2.1/maven-plugin-descriptor-2.2.1.pom (3 KB at 45.8 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-monitor/2.2.1/maven-monitor-2.2.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-monitor/2.2.1/maven-monitor-2.2.1.pom (2 KB at 36.1 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/sonatype/plexus/plexus-sec-dispatcher/1.3/plexus-sec-dispatcher-1.3.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/sonatype/plexus/plexus-sec-dispatcher/1.3/plexus-sec-dispatcher-1.3.pom (3 KB at 152.2 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/sonatype/spice/spice-parent/12/spice-parent-12.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/sonatype/spice/spice-parent/12/spice-parent-12.pom (7 KB at 368.8 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/sonatype/forge/forge-parent/4/forge-parent-4.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/sonatype/forge/forge-parent/4/forge-parent-4.pom (9 KB at 273.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/1.5.5/plexus-utils-1.5.5.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/1.5.5/plexus-utils-1.5.5.pom (6 KB at 279.2 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/sonatype/plexus/plexus-cipher/1.4/plexus-cipher-1.4.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/sonatype/plexus/plexus-cipher/1.4/plexus-cipher-1.4.pom (3 KB at 106.1 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/1.4.9/plexus-utils-1.4.9.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/1.4.9/plexus-utils-1.4.9.pom (3 KB at 86.2 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-archiver/1.1/plexus-archiver-1.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-archiver/1.1/plexus-archiver-1.1.pom (2 KB at 73.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-components/1.1.18/plexus-components-1.1.18.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-components/1.1.18/plexus-components-1.1.18.pom (6 KB at 28.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus/2.0.7/plexus-2.0.7.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus/2.0.7/plexus-2.0.7.pom (17 KB at 844.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-io/1.0.1/plexus-io-1.0.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-io/1.0.1/plexus-io-1.0.1.pom (2 KB at 57.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/shared/file-management/1.1/file-management-1.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/shared/file-management/1.1/file-management-1.1.pom (3 KB at 70.2 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-shared-components/4/maven-shared-components-4.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-shared-components/4/maven-shared-components-4.pom (3 KB at 107.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-parent/4/maven-parent-4.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-parent/4/maven-parent-4.pom (10 KB at 424.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-shared-io/1.0/maven-shared-io-1.0.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-shared-io/1.0/maven-shared-io-1.0.pom (3 KB at 140.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-artifact/2.0.2/maven-artifact-2.0.2.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-artifact/2.0.2/maven-artifact-2.0.2.pom (765 B at 43.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven/2.0.2/maven-2.0.2.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven/2.0.2/maven-2.0.2.pom (13 KB at 389.8 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-artifact-manager/2.0.2/maven-artifact-manager-2.0.2.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-artifact-manager/2.0.2/maven-artifact-manager-2.0.2.pom (2 KB at 75.7 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-repository-metadata/2.0.2/maven-repository-metadata-2.0.2.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-repository-metadata/2.0.2/maven-repository-metadata-2.0.2.pom (2 KB at 13.0 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/wagon/wagon-provider-api/1.0-alpha-6/wagon-provider-api-1.0-alpha-6.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/wagon/wagon-provider-api/1.0-alpha-6/wagon-provider-api-1.0-alpha-6.pom (588 B at 31.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/wagon/wagon/1.0-alpha-6/wagon-1.0-alpha-6.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/wagon/wagon/1.0-alpha-6/wagon-1.0-alpha-6.pom (7 KB at 329.2 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/1.2/plexus-utils-1.2.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/1.2/plexus-utils-1.2.pom (767 B at 28.8 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus/1.0.5/plexus-1.0.5.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus/1.0.5/plexus-1.0.5.pom (6 KB at 290.1 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-shared-io/1.1/maven-shared-io-1.1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-shared-io/1.1/maven-shared-io-1.1.pom (4 KB at 220.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-shared-components/8/maven-shared-components-8.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-shared-components/8/maven-shared-components-8.pom (3 KB at 100.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/maven-parent/7/maven-parent-7.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/maven-parent/7/maven-parent-7.pom (21 KB at 740.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-filtering/1.0-beta-4/maven-filtering-1.0-beta-4.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-filtering/1.0-beta-4/maven-filtering-1.0-beta-4.pom (5 KB at 206.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-repository-builder/1.0-alpha-2/maven-repository-builder-1.0-alpha-2.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-repository-builder/1.0-alpha-2/maven-repository-builder-1.0-alpha-2.pom (4 KB at 175.2 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-shared-components/7/maven-shared-components-7.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-shared-components/7/maven-shared-components-7.pom (3 KB at 141.0 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-common-artifact-filters/1.0-alpha-1/maven-common-artifact-filters-1.0-alpha-1.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-common-artifact-filters/1.0-alpha-1/maven-common-artifact-filters-1.0-alpha-1.pom (2 KB at 109.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-shared-components/6/maven-shared-components-6.pom
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-shared-components/6/maven-shared-components-6.pom (4 KB at 112.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/slf4j/slf4j-jdk14/1.5.6/slf4j-jdk14-1.5.6.jar
+Downloading: http://repo.maven.apache.org/maven2/org/slf4j/slf4j-api/1.5.6/slf4j-api-1.5.6.jar
+Downloading: http://repo.maven.apache.org/maven2/org/slf4j/jcl-over-slf4j/1.5.6/jcl-over-slf4j-1.5.6.jar
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting-api/2.2.1/maven-reporting-api-2.2.1.jar
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-sink-api/1.1/doxia-sink-api-1.1.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/slf4j/jcl-over-slf4j/1.5.6/jcl-over-slf4j-1.5.6.jar (17 KB at 125.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-logging-api/1.1/doxia-logging-api-1.1.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/slf4j/slf4j-api/1.5.6/slf4j-api-1.5.6.jar (22 KB at 158.1 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/commons-cli/commons-cli/1.2/commons-cli-1.2.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/reporting/maven-reporting-api/2.2.1/maven-reporting-api-2.2.1.jar (10 KB at 44.0 KB/sec)
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-logging-api/1.1/doxia-logging-api-1.1.jar (12 KB at 125.8 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/backport-util-concurrent/backport-util-concurrent/3.1/backport-util-concurrent-3.1.jar
+Downloading: http://repo.maven.apache.org/maven2/org/sonatype/plexus/plexus-sec-dispatcher/1.3/plexus-sec-dispatcher-1.3.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/doxia/doxia-sink-api/1.1/doxia-sink-api-1.1.jar (13 KB at 57.7 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/sonatype/plexus/plexus-cipher/1.4/plexus-cipher-1.4.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/slf4j/slf4j-jdk14/1.5.6/slf4j-jdk14-1.5.6.jar (9 KB at 37.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-archiver/1.1/plexus-archiver-1.1.jar
+Downloaded: http://repo.maven.apache.org/maven2/commons-cli/commons-cli/1.2/commons-cli-1.2.jar (41 KB at 371.8 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/shared/file-management/1.1/file-management-1.1.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/sonatype/plexus/plexus-cipher/1.4/plexus-cipher-1.4.jar (14 KB at 292.8 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-shared-io/1.1/maven-shared-io-1.1.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/sonatype/plexus/plexus-sec-dispatcher/1.3/plexus-sec-dispatcher-1.3.jar (28 KB at 410.1 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-filtering/1.0-beta-4/maven-filtering-1.0-beta-4.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/shared/file-management/1.1/file-management-1.1.jar (31 KB at 287.2 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-io/1.0.1/plexus-io-1.0.1.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-filtering/1.0-beta-4/maven-filtering-1.0-beta-4.jar (34 KB at 443.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-repository-builder/1.0-alpha-2/maven-repository-builder-1.0-alpha-2.jar
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-shared-io/1.1/maven-shared-io-1.1.jar (39 KB at 347.3 KB/sec)
+Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-repository-builder/1.0-alpha-2/maven-repository-builder-1.0-alpha-2.jar (23 KB at 293.7 KB/sec)
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-archiver/1.1/plexus-archiver-1.1.jar (178 KB at 792.9 KB/sec)
+Downloaded: http://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-io/1.0.1/plexus-io-1.0.1.jar (50 KB at 473.1 KB/sec)
+Downloaded: http://repo.maven.apache.org/maven2/backport-util-concurrent/backport-util-concurrent/3.1/backport-util-concurrent-3.1.jar (324 KB at 1045.0 KB/sec)
+[INFO] META-INF/ already added, skipping
+[INFO] META-INF/MANIFEST.MF already added, skipping
+[INFO] org/ already added, skipping
+[INFO] META-INF/maven/ already added, skipping
+[INFO] META-INF/ already added, skipping
+[INFO] META-INF/MANIFEST.MF already added, skipping
+[INFO] org/ already added, skipping
+[INFO] org/slf4j/ already added, skipping
+[INFO] META-INF/maven/ already added, skipping
+[INFO] META-INF/maven/org.slf4j/ already added, skipping
+[INFO] META-INF/MANIFEST.MF already added, skipping
+[INFO] META-INF/ already added, skipping
+[INFO] META-INF/LICENSE already added, skipping
+[INFO] META-INF/NOTICE already added, skipping
+[INFO] META-INF/maven/ already added, skipping
+[INFO] org/ already added, skipping
+[INFO] org/apache/ already added, skipping
+[INFO] META-INF/ already added, skipping
+[INFO] META-INF/MANIFEST.MF already added, skipping
+[INFO] META-INF/maven/ already added, skipping
+[INFO] META-INF/ already added, skipping
+[INFO] META-INF/MANIFEST.MF already added, skipping
+[INFO] org/ already added, skipping
+[INFO] META-INF/ already added, skipping
+[INFO] META-INF/MANIFEST.MF already added, skipping
+[INFO] org/ already added, skipping
+[INFO] org/xmlpull/ already added, skipping
+[INFO] org/xmlpull/v1/ already added, skipping
+[INFO] org/xmlpull/v1/XmlPullParser.class already added, skipping
+[INFO] org/xmlpull/v1/XmlPullParserException.class already added, skipping
+[INFO] META-INF/ already added, skipping
+[INFO] META-INF/MANIFEST.MF already added, skipping
+[INFO] org/ already added, skipping
+[INFO] META-INF/ already added, skipping
+[INFO] META-INF/MANIFEST.MF already added, skipping
+[INFO] com/ already added, skipping
+[INFO] META-INF/ already added, skipping
+[INFO] META-INF/MANIFEST.MF already added, skipping
+[INFO] META-INF/maven/ already added, skipping
+[INFO] Building jar: /Users/sissi/Desktop/gnrs/jserver/target/gnrs-server-1.0.0-SNAPSHOT-jar-with-dependencies.jar
+[INFO] META-INF/ already added, skipping
+[INFO] META-INF/MANIFEST.MF already added, skipping
+[INFO] org/ already added, skipping
+[INFO] META-INF/maven/ already added, skipping
+[INFO] META-INF/ already added, skipping
+[INFO] META-INF/MANIFEST.MF already added, skipping
+[INFO] org/ already added, skipping
+[INFO] org/slf4j/ already added, skipping
+[INFO] META-INF/maven/ already added, skipping
+[INFO] META-INF/maven/org.slf4j/ already added, skipping
+[INFO] META-INF/MANIFEST.MF already added, skipping
+[INFO] META-INF/ already added, skipping
+[INFO] META-INF/LICENSE already added, skipping
+[INFO] META-INF/NOTICE already added, skipping
+[INFO] META-INF/maven/ already added, skipping
+[INFO] org/ already added, skipping
+[INFO] org/apache/ already added, skipping
+[INFO] META-INF/ already added, skipping
+[INFO] META-INF/MANIFEST.MF already added, skipping
+[INFO] META-INF/maven/ already added, skipping
+[INFO] META-INF/ already added, skipping
+[INFO] META-INF/MANIFEST.MF already added, skipping
+[INFO] org/ already added, skipping
+[INFO] META-INF/ already added, skipping
+[INFO] META-INF/MANIFEST.MF already added, skipping
+[INFO] org/ already added, skipping
+[INFO] org/xmlpull/ already added, skipping
+[INFO] org/xmlpull/v1/ already added, skipping
+[INFO] org/xmlpull/v1/XmlPullParser.class already added, skipping
+[INFO] org/xmlpull/v1/XmlPullParserException.class already added, skipping
+[INFO] META-INF/ already added, skipping
+[INFO] META-INF/MANIFEST.MF already added, skipping
+[INFO] org/ already added, skipping
+[INFO] META-INF/ already added, skipping
+[INFO] META-INF/MANIFEST.MF already added, skipping
+[INFO] com/ already added, skipping
+[INFO] META-INF/ already added, skipping
+[INFO] META-INF/MANIFEST.MF already added, skipping
+[INFO] META-INF/maven/ already added, skipping
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 22.040s
+[INFO] Finished at: Fri Jan 11 10:59:32 EST 2013
+[INFO] Final Memory: 16M/81M
+[INFO] ------------------------------------------------------------------------
+Xiruos-MacBook-Pro:jserver sissi$ ls -la target/
+total 8680
+drwxr-xr-x   8 sissi  staff      272 Jan 11 10:59 .
+drwxr-xr-x  21 sissi  staff      714 Jan 11 10:59 ..
+drwxr-xr-x   2 sissi  staff       68 Jan 11 10:59 archive-tmp
+drwxr-xr-x  12 sissi  staff      408 Jan 11 10:59 classes
+-rw-r--r--   1 sissi  staff  4310052 Jan 11 10:59 gnrs-server-1.0.0-SNAPSHOT-jar-with-dependencies.jar
+-rw-r--r--   1 sissi  staff   128427 Jan 11 10:59 gnrs-server-1.0.0-SNAPSHOT.jar
+drwxr-xr-x   3 sissi  staff      102 Jan 11 10:59 maven-archiver
+drwxr-xr-x  12 sissi  staff      408 Jan 11 10:59 test-classes
+Xiruos-MacBook-Pro:jserver sissi$ java -jar target/gnrs-server-1.0.0-SNAPSHOT-jar-with-dependencies.jar src/main/resources/server.xml 
+[2013-01-11 10:59:44,145] INFO  main/IPv4UDPGUIDMapper - Finished loading prefix map.
+[2013-01-11 10:59:44,146] INFO  main/IPv4UDPGUIDMapper - Finished loading AS network binding values.
+[2013-01-11 10:59:45,905] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 10:59:46,882] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 10:59:47,882] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 10:59:48,883] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 10:59:49,882] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 10:59:50,883] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 10:59:51,882] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+^C[2013-01-11 10:59:52,388] INFO  Thread-4/GNRSServer - Generating CDF files.
+Xiruos-MacBook-Pro:jserver sissi$ mvn compile
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Global Name Resolution Service for Java 1.0.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:2.5:resources (default-resources) @ gnrs-server ---
+[debug] execute contextualize
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 9 resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:2.0.2:compile (default-compile) @ gnrs-server ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 2.398s
+[INFO] Finished at: Fri Jan 11 11:04:55 EST 2013
+[INFO] Final Memory: 5M/81M
+[INFO] ------------------------------------------------------------------------
+Xiruos-MacBook-Pro:jserver sissi$ ls
+README.md			gnrsd.init
+bdb				install-to-project-repo.py
+gbench				lib
+gbench-local			plot.sh
+ggen				pom.xml
+ggen-local			repo
+gnrsd				src
+gnrsd-debug.log			stats
+gnrsd-local			target
+Xiruos-MacBook-Pro:jserver sissi$ vi pom.xml 
+Xiruos-MacBook-Pro:jserver sissi$ 
+Last login: Fri Jan 11 10:55:19 on ttys000
+Xiruos-MacBook-Pro:jserver sissi$ ls
+README.md			gnrsd.init
+bdb				install-to-project-repo.py
+gbench				lib
+gbench-local			plot.sh
+ggen				pom.xml
+ggen-local			repo
+gnrsd				src
+gnrsd-debug.log			stats
+gnrsd-local			target
+Xiruos-MacBook-Pro:jserver sissi$ ./gnrsd-local 
+[2013-01-11 11:10:35,218] ERROR main/GNRSServer - Missing 1 or more command-line arguments.
+Parameters: <Config file>
+Xiruos-MacBook-Pro:jserver sissi$ ./gnrsd-local src/main/resources/server.xml 
+[2013-01-11 11:10:40,284] INFO  main/IPv4UDPGUIDMapper - Finished loading prefix map.
+[2013-01-11 11:10:40,285] INFO  main/IPv4UDPGUIDMapper - Finished loading AS network binding values.
+[2013-01-11 11:10:41,764] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:42,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:43,758] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:44,758] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:45,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:46,758] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:47,758] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:48,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:49,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:50,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:50,763] INFO  Timer-0/BerkeleyDBStore$StatsTask - BDB Cache Misses: 18
+[2013-01-11 11:10:51,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:52,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:53,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:54,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:55,758] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:56,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:57,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:58,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:10:59,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:00,757] INFO  Timer-0/BerkeleyDBStore$StatsTask - BDB Cache Misses: 0
+[2013-01-11 11:11:00,758] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:01,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:02,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:03,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:04,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:05,758] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:06,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:07,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:08,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:09,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:10,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:10,757] INFO  Timer-0/BerkeleyDBStore$StatsTask - BDB Cache Misses: 0
+[2013-01-11 11:11:11,758] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:12,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:13,758] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:14,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:15,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:16,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:17,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:18,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:19,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:20,758] INFO  Timer-0/BerkeleyDBStore$StatsTask - BDB Cache Misses: 0
+[2013-01-11 11:11:20,759] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:21,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:22,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:23,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:24,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:25,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:26,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:27,758] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:28,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:29,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:30,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+15.015 per second (Q: 26,000.8 us, P: 457.0 us, R: 0.0 us, S: 0.0 us, T: 26,457.8 us)
+==Inserts==
+9.009 per second (Q: 189,915.2 us, P: 29,722.2 us, R: 0.0 us, S: 0.0 us, T: 219,637.4 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:30,757] INFO  Timer-0/BerkeleyDBStore$StatsTask - BDB Cache Misses: 0
+[2013-01-11 11:11:31,757] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:32,756] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:11:33,758] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+^C[2013-01-11 11:11:34,538] INFO  Thread-4/GNRSServer - Generating CDF files.
+[2013-01-11 11:11:34,539] INFO  Thread-4/StatisticsCollector - Creating stats/ins-total.csv
+[2013-01-11 11:11:34,554] INFO  Thread-4/StatisticsCollector - Creating stats/ins-queue.csv
+[2013-01-11 11:11:34,567] INFO  Thread-4/StatisticsCollector - Creating stats/lkp-proc.csv
+[2013-01-11 11:11:34,581] INFO  Thread-4/StatisticsCollector - Creating stats/ins-resp.csv
+[2013-01-11 11:11:34,594] INFO  Thread-4/StatisticsCollector - Creating stats/lkp-queue.csv
+[2013-01-11 11:11:34,605] INFO  Thread-4/StatisticsCollector - Creating stats/ins-remote.csv
+[2013-01-11 11:11:34,627] INFO  Thread-4/StatisticsCollector - Creating stats/lkp-resp.csv
+[2013-01-11 11:11:34,651] INFO  Thread-4/StatisticsCollector - Creating stats/lkp-total.csv
+[2013-01-11 11:11:34,664] INFO  Thread-4/StatisticsCollector - Creating stats/lkp-remote.csv
+[2013-01-11 11:11:34,675] INFO  Thread-4/StatisticsCollector - Creating stats/ins-proc.csv
+Xiruos-MacBook-Pro:jserver sissi$ ./gnrsd-local src/main/resources/server.xml 
+[2013-01-11 11:14:00,044] INFO  main/IPv4UDPGUIDMapper - Finished loading prefix map.
+[2013-01-11 11:14:00,045] INFO  main/IPv4UDPGUIDMapper - Finished loading AS network binding values.
+[2013-01-11 11:14:01,487] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:02,481] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+^C[2013-01-11 11:14:03,411] INFO  Thread-4/GNRSServer - Generating CDF files.
+Xiruos-MacBook-Pro:jserver sissi$ ./gnrsd-local 
+[2013-01-11 11:14:08,277] ERROR main/GNRSServer - Missing 1 or more command-line arguments.
+Parameters: <Config file>
+Xiruos-MacBook-Pro:jserver sissi$ ./gnrsd-local src/main/resources/server.xml 
+[2013-01-11 11:14:17,424] INFO  main/IPv4UDPGUIDMapper - Finished loading prefix map.
+[2013-01-11 11:14:17,425] INFO  main/IPv4UDPGUIDMapper - Finished loading AS network binding values.
+[2013-01-11 11:14:18,869] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:19,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:20,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:21,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:22,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:23,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:24,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:25,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:26,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:27,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:27,871] INFO  Timer-0/BerkeleyDBStore$StatsTask - BDB Cache Misses: 18
+[2013-01-11 11:14:28,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:29,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:30,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:31,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:32,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:33,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:34,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:35,862] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:36,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.999 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:37,864] INFO  Timer-0/BerkeleyDBStore$StatsTask - BDB Cache Misses: 4
+[2013-01-11 11:14:37,865] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.998 per second (Q: 2,630.0 us, P: 130,913.0 us, R: 0.0 us, S: 0.0 us, T: 133,543.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:38,862] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+1.002 per second (Q: 233.0 us, P: 3,322.0 us, R: 0.0 us, S: 0.0 us, T: 3,555.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:39,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+1.000 per second (Q: 143.0 us, P: 2,523.0 us, R: 0.0 us, S: 0.0 us, T: 2,666.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:40,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.999 per second (Q: 217.0 us, P: 1,970.0 us, R: 0.0 us, S: 0.0 us, T: 2,187.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:41,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+1.001 per second (Q: 146.0 us, P: 2,310.0 us, R: 0.0 us, S: 0.0 us, T: 2,456.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:42,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+1.000 per second (Q: 253.0 us, P: 3,144.0 us, R: 0.0 us, S: 0.0 us, T: 3,397.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:43,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+1.000 per second (Q: 223.0 us, P: 1,634.0 us, R: 0.0 us, S: 0.0 us, T: 1,857.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:44,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+1.000 per second (Q: 146.0 us, P: 2,338.0 us, R: 0.0 us, S: 0.0 us, T: 2,484.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:45,862] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+1.001 per second (Q: 1,720.0 us, P: 1,655.0 us, R: 0.0 us, S: 0.0 us, T: 3,375.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:46,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.998 per second (Q: 156.0 us, P: 1,411.0 us, R: 0.0 us, S: 0.0 us, T: 1,567.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:47,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+1.000 per second (Q: 120.0 us, P: 949.0 us, R: 0.0 us, S: 0.0 us, T: 1,069.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:47,865] INFO  Timer-0/BerkeleyDBStore$StatsTask - BDB Cache Misses: 7
+[2013-01-11 11:14:48,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+1.001 per second (Q: 117.0 us, P: 1,340.0 us, R: 0.0 us, S: 0.0 us, T: 1,457.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:49,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+1.000 per second (Q: 190.0 us, P: 1,434.0 us, R: 0.0 us, S: 0.0 us, T: 1,624.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:50,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+1.000 per second (Q: 152.0 us, P: 1,533.0 us, R: 0.0 us, S: 0.0 us, T: 1,685.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:51,862] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+1.000 per second (Q: 173.0 us, P: 1,477.0 us, R: 0.0 us, S: 0.0 us, T: 1,650.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:52,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+1.000 per second (Q: 179.0 us, P: 1,723.0 us, R: 0.0 us, S: 0.0 us, T: 1,902.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:53,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.999 per second (Q: 219.0 us, P: 1,420.0 us, R: 0.0 us, S: 0.0 us, T: 1,639.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:54,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+1.001 per second (Q: 188.0 us, P: 735.0 us, R: 0.0 us, S: 0.0 us, T: 923.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:55,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+1.000 per second (Q: 248.0 us, P: 1,091.0 us, R: 0.0 us, S: 0.0 us, T: 1,339.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:56,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+1.000 per second (Q: 95.0 us, P: 941.0 us, R: 0.0 us, S: 0.0 us, T: 1,036.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:57,863] INFO  Timer-0/BerkeleyDBStore$StatsTask - BDB Cache Misses: 0
+[2013-01-11 11:14:57,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.999 per second (Q: 238.0 us, P: 1,409.0 us, R: 0.0 us, S: 0.0 us, T: 1,647.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:58,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+1.001 per second (Q: 183.0 us, P: 1,208.0 us, R: 0.0 us, S: 0.0 us, T: 1,391.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:14:59,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+1.000 per second (Q: 117.0 us, P: 1,093.0 us, R: 0.0 us, S: 0.0 us, T: 1,210.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:15:00,863] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+[2013-01-11 11:15:01,864] INFO  Timer-0/GNRSServer$StatsTask - 
+==Lookups==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+==Inserts==
+0.000 per second (Q: 0.0 us, P: 0.0 us, R: 0.0 us, S: 0.0 us, T: 0.0 us)
+Outstanding responses: 0
+
+^C[2013-01-11 11:15:02,324] INFO  Thread-4/GNRSServer - Generating CDF files.
+[2013-01-11 11:15:02,324] INFO  Thread-4/StatisticsCollector - Creating stats/ins-total.csv
+[2013-01-11 11:15:02,372] INFO  Thread-4/StatisticsCollector - Creating stats/ins-queue.csv
+[2013-01-11 11:15:02,381] INFO  Thread-4/StatisticsCollector - Creating stats/lkp-proc.csv
+[2013-01-11 11:15:02,390] INFO  Thread-4/StatisticsCollector - Creating stats/ins-resp.csv
+[2013-01-11 11:15:02,400] INFO  Thread-4/StatisticsCollector - Creating stats/lkp-queue.csv
+[2013-01-11 11:15:02,413] INFO  Thread-4/StatisticsCollector - Creating stats/ins-remote.csv
+[2013-01-11 11:15:02,424] INFO  Thread-4/StatisticsCollector - Creating stats/lkp-resp.csv
+[2013-01-11 11:15:02,457] INFO  Thread-4/StatisticsCollector - Creating stats/lkp-total.csv
+[2013-01-11 11:15:02,470] INFO  Thread-4/StatisticsCollector - Creating stats/lkp-remote.csv
+[2013-01-11 11:15:02,481] INFO  Thread-4/StatisticsCollector - Creating stats/ins-proc.csv
+Xiruos-MacBook-Pro:jserver sissi$ 

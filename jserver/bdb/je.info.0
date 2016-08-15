@@ -1,0 +1,4 @@
+130111 10:59:44:698 INFO [bdb]Chose lowest utilized file for cleaning. totalUtilization: 46 bestFileUtilization: 101 lnSizeCorrectionFactor: NaN isProbe: false
+130111 11:10:40:631 INFO [bdb]No file selected for cleaning. totalUtilization: 54 bestFileUtilization: 101 lnSizeCorrectionFactor: NaN isProbe: false
+130111 11:14:00:361 INFO [bdb]No file selected for cleaning. totalUtilization: 54 bestFileUtilization: 101 lnSizeCorrectionFactor: NaN isProbe: false
+130111 11:14:17:740 INFO [bdb]No file selected for cleaning. totalUtilization: 54 bestFileUtilization: 101 lnSizeCorrectionFactor: NaN isProbe: false

@@ -1,0 +1,109 @@
+Last login: Fri Jan 11 11:10:30 on ttys000
+Xiruos-MacBook-Pro:jserver sissi$ ./gbench
+Exception in thread "main" java.lang.NoClassDefFoundError: edu/rutgers/winlab/mfirst/client/TraceClient
+Caused by: java.lang.ClassNotFoundException: edu.rutgers.winlab.mfirst.client.TraceClient
+	at java.net.URLClassLoader$1.run(URLClassLoader.java:202)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:190)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:306)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:301)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:247)
+Xiruos-MacBook-Pro:jserver sissi$ ./gbench-local 
+Usage: <Config File> <Trace File> <Delay Value>
+Xiruos-MacBook-Pro:jserver sissi$ ./gbench-local src/main/resources/client.xml src/main/resources/example.trace 10000
+[2013-01-11 11:11:29,895] INFO  main/TraceClient - Connected to (0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)
+[2013-01-11 11:11:29,895] INFO  main/TraceClient - Starting trace from src/main/resources/example.trace.
+[2013-01-11 11:11:30,225] INFO  main/TraceClient - Finished reading trace file. Waiting for outstanding messages.
+[2013-01-11 11:11:35,239] WARN  NioDatagramAcceptor-1/DefaultExceptionMonitor - Unexpected exception.
+java.lang.InterruptedException
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(AbstractQueuedSynchronizer.java:1279)
+	at java.util.concurrent.Semaphore.acquire(Semaphore.java:286)
+	at org.apache.mina.core.polling.AbstractPollingConnectionlessIoAcceptor$Acceptor.run(AbstractPollingConnectionlessIoAcceptor.java:591)
+	at org.apache.mina.util.NamePreservingRunnable.run(NamePreservingRunnable.java:64)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:886)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:908)
+	at java.lang.Thread.run(Thread.java:680)
+[2013-01-11 11:11:37,281] INFO  main/StatisticsCollector - Creating trace-client/clt-ins-rtt.csv
+[2013-01-11 11:11:37,295] INFO  main/StatisticsCollector - Creating trace-client/clt-lkp-rtt.csv
+[2013-01-11 11:11:37,308] INFO  main/TraceClient - 
+==Insert==
+Min: 169,089us | Med: 220,960us | Max: 271,170us
+Total: 9  |  Success: 9  |  Loss: 0
+==Lookup==
+Min: 3,477us | Med: 79,615us | Max: 157,590us
+Total: 15  |  Success: 15  |  Bound: 9  |  Loss: 0
+
+[2013-01-11 11:11:37,309] INFO  Thread-3/TraceClient - Finished reading trace file. Waiting for outstanding messages.
+[2013-01-11 11:11:37,309] INFO  Thread-3/StatisticsCollector - Creating trace-client/clt-ins-rtt.csv
+[2013-01-11 11:11:37,320] INFO  Thread-3/StatisticsCollector - Creating trace-client/clt-lkp-rtt.csv
+[2013-01-11 11:11:37,332] INFO  Thread-3/TraceClient - 
+==Insert==
+Min: 169,089us | Med: 220,960us | Max: 271,170us
+Total: 9  |  Success: 9  |  Loss: 0
+==Lookup==
+Min: 3,477us | Med: 79,615us | Max: 157,590us
+Total: 15  |  Success: 15  |  Bound: 9  |  Loss: 0
+
+Xiruos-MacBook-Pro:jserver sissi$ ./gbench-local 
+Usage: <Config File> <Trace File> <Delay Value>
+Xiruos-MacBook-Pro:jserver sissi$ ./gbench-local src/main/resources/
+as-binding.ipv4  example.trace    net-ipv4.xml     
+berkeleydb.xml   log4j.xml        prefixes.ipv4    
+client.xml       map-ipv4.xml     server.xml       
+Xiruos-MacBook-Pro:jserver sissi$ ./gbench-local src/main/resources/client.xml src/main/resources/example.trace 10000000
+[2013-01-11 11:13:53,062] INFO  main/TraceClient - Connected to (0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)
+[2013-01-11 11:13:53,062] INFO  main/TraceClient - Starting trace from src/main/resources/example.trace.
+^C[2013-01-11 11:13:57,023] INFO  Thread-3/TraceClient - Finished reading trace file. Waiting for outstanding messages.
+[2013-01-11 11:13:58,035] INFO  Thread-3/TraceClient - 
+==Insert==
+Min: 0us | Med: 0us | Max: 0us
+Total: 1  |  Success: 0  |  Loss: 1
+==Lookup==
+Min: 0us | Med: 0us | Max: 0us
+Total: 0  |  Success: 0  |  Bound: 0  |  Loss: 0
+
+Xiruos-MacBook-Pro:jserver sissi$ ./gbench-local src/main/resources/client.xml src/main/resources/example.trace 1000000
+[2013-01-11 11:14:36,751] INFO  main/TraceClient - Connected to (0x00000001: nio datagram, server, localhost/127.0.0.1:5001 => /127.0.0.1:4001)
+[2013-01-11 11:14:36,751] INFO  main/TraceClient - Starting trace from src/main/resources/example.trace.
+[2013-01-11 11:15:00,858] INFO  main/TraceClient - Finished reading trace file. Waiting for outstanding messages.
+[2013-01-11 11:15:04,872] WARN  NioDatagramAcceptor-1/DefaultExceptionMonitor - Unexpected exception.
+java.lang.InterruptedException
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(AbstractQueuedSynchronizer.java:1279)
+	at java.util.concurrent.Semaphore.acquire(Semaphore.java:286)
+	at org.apache.mina.core.polling.AbstractPollingConnectionlessIoAcceptor$Acceptor.run(AbstractPollingConnectionlessIoAcceptor.java:591)
+	at org.apache.mina.util.NamePreservingRunnable.run(NamePreservingRunnable.java:64)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:886)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:908)
+	at java.lang.Thread.run(Thread.java:680)
+[2013-01-11 11:15:06,879] INFO  main/StatisticsCollector - Creating trace-client/clt-ins-rtt.csv
+[2013-01-11 11:15:06,895] INFO  main/StatisticsCollector - Creating trace-client/clt-lkp-rtt.csv
+[2013-01-11 11:15:06,905] INFO  main/TraceClient - 
+==Insert==
+Min: 439us | Med: 722us | Max: 140,069us
+Total: 9  |  Success: 9  |  Loss: 0
+==Lookup==
+Min: 68us | Med: 368us | Max: 1,777us
+Total: 15  |  Success: 15  |  Bound: 9  |  Loss: 0
+
+[2013-01-11 11:15:06,905] INFO  Thread-3/TraceClient - Finished reading trace file. Waiting for outstanding messages.
+[2013-01-11 11:15:06,906] INFO  Thread-3/StatisticsCollector - Creating trace-client/clt-ins-rtt.csv
+[2013-01-11 11:15:06,916] INFO  Thread-3/StatisticsCollector - Creating trace-client/clt-lkp-rtt.csv
+[2013-01-11 11:15:06,929] INFO  Thread-3/TraceClient - 
+==Insert==
+Min: 439us | Med: 722us | Max: 140,069us
+Total: 9  |  Success: 9  |  Loss: 0
+==Lookup==
+Min: 68us | Med: 368us | Max: 1,777us
+Total: 15  |  Success: 15  |  Bound: 9  |  Loss: 0
+
+Xiruos-MacBook-Pro:jserver sissi$ less src/main/resources/example.trace 
+Xiruos-MacBook-Pro:jserver sissi$ less src/main/resources/client.xml 
+Xiruos-MacBook-Pro:jserver sissi$ less src/main/resources/server.xml 
+Xiruos-MacBook-Pro:jserver sissi$ less src/main/resources/map-ipv4.xml 
+Xiruos-MacBook-Pro:jserver sissi$ less src/main/resources/
+as-binding.ipv4  example.trace    net-ipv4.xml     
+berkeleydb.xml   log4j.xml        prefixes.ipv4    
+client.xml       map-ipv4.xml     server.xml       
+Xiruos-MacBook-Pro:jserver sissi$ less src/main/resources/as-binding.ipv4 
+Xiruos-MacBook-Pro:jserver sissi$ less src/main/resources/server.xml 
+Xiruos-MacBook-Pro:jserver sissi$ 
